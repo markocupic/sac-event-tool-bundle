@@ -1,9 +1,4 @@
 services:
-    # CorsListener Enable Cors requests
-    Markocupic\SacEventToolBundle\EventListener\Cors\CorsListener:
-        tags:
-            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
-
     Markocupic\SacEventToolBundle\EventListener\Contao\PreviewUrlCreateListener:
         arguments:
             - '@request_stack'

@@ -23,45 +23,43 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class EventRegistrationEvent extends Event
 {
-	public const NAME = 'markocupic.sac_event_tool_bundle.event_registration';
+    public function __construct(
+        private readonly Request $request,
+        private readonly CalendarEventsMemberModel $eventMemberModel,
+        private readonly CalendarEventsModel $eventModel,
+        private readonly MemberModel $memberModel,
+        private readonly ModuleModel $moduleModel,
+        private readonly array $arrData,
+    ) {
+    }
 
-	public function __construct(
-		private readonly Request $request,
-		private readonly CalendarEventsMemberModel $eventMemberModel,
-		private readonly CalendarEventsModel $eventModel,
-		private readonly MemberModel $memberModel,
-		private readonly ModuleModel $moduleModel,
-		private readonly array $arrData,
-	) {
-	}
+    public function getRequest(): Request
+    {
+        return $this->request;
+    }
 
-	public function getRequest(): Request
-	{
-		return $this->request;
-	}
+    public function getRegistration(): CalendarEventsMemberModel
+    {
+        return $this->eventMemberModel;
+    }
 
-	public function getRegistration(): CalendarEventsMemberModel
-	{
-		return $this->eventMemberModel;
-	}
+    public function getEvent(): CalendarEventsModel
+    {
+        return $this->eventModel;
+    }
 
-	public function getEvent(): CalendarEventsModel
-	{
-		return $this->eventModel;
-	}
+    public function getContaoMemberModel(): MemberModel
+    {
+        return $this->memberModel;
+    }
 
-	public function getContaoMemberModel(): MemberModel
-	{
-		return $this->memberModel;
-	}
+    public function getRegistrationModule(): ModuleModel
+    {
+        return $this->moduleModel;
+    }
 
-	public function getRegistrationModule(): ModuleModel
-	{
-		return $this->moduleModel;
-	}
-
-	public function getData(): array
-	{
-		return $this->arrData;
-	}
+    public function getData(): array
+    {
+        return $this->arrData;
+    }
 }

@@ -38,7 +38,7 @@ if (BackendUser::getInstance()->admin) {
 PaletteManipulator::create()
 	->addLegend('event_type_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_reader_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
-	->addField(['allowedEventTypes,adviceOnEventReleaseLevelChange,adviceOnEventPublish'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['allowedEventTypes,notifyOnEventReleaseLevelChange,notifyOnEventPublish'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['userPortraitJumpTo'], 'event_reader_legend', PaletteManipulator::POSITION_APPEND)
 	->applyToPalette('default', 'tl_calendar');
 
@@ -60,8 +60,8 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['allowedEventTypes'] = [
 	'sql'       => 'blob NULL',
 ];
 
-$GLOBALS['TL_DCA']['tl_calendar']['fields']['adviceOnEventReleaseLevelChange'] = [
-	'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventReleaseLevelChange'],
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['notifyOnEventReleaseLevelChange'] = [
+	'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['notifyOnEventReleaseLevelChange'],
 	'exclude'   => true,
 	'filter'    => false,
 	'inputType' => 'text',
@@ -69,8 +69,8 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['adviceOnEventReleaseLevelChange'] =
 	'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
-$GLOBALS['TL_DCA']['tl_calendar']['fields']['adviceOnEventPublish'] = [
-	'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventPublish'],
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['notifyOnEventPublish'] = [
+	'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['notifyOnEventPublish'],
 	'exclude'   => true,
 	'filter'    => false,
 	'inputType' => 'text',

@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 						const street = json['street'];
 						const postal = json['postal'];
 						const city = json['city'];
+						console.log(json)
 
 						let markup = [];
 						markup.push(` <p class="autocompleteInfo">In der Datenbank wurde zur Mitgliednummer <strong>${sacMemberId}</strong> folgendes Mitglied gefunden:</p>`);
@@ -73,8 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
 						markup.push(` <button id="btnRefuseAutocomplete" class="tl_submit autocompleteBtn">Nein</button>`);
 						markup = markup.join('');
 
+						// Inject autocompleter markup
 						acceptAutocomplete.insertAdjacentHTML('afterbegin', markup);
-
 
 						// Autofill form inputs
 						acceptAutocomplete.addEventListener('click', () => {
@@ -86,18 +87,20 @@ document.addEventListener('DOMContentLoaded', () => {
 									// Special handling for arrays (select inputs)
 									if (fieldname === 'sectionId') {
 										const arrSections = json[fieldname];
+
 										const options = document.querySelectorAll('select#ctrl_' + fieldname + ' option');
+
 										// First reset select field
 										for (const option of options) {
 											option.selected = false;
 										}
 
 										// Then add new entries
-										if (arrSections.length) {
-											for (const sectionId of arrSections) {
+										if (arrSections) {
+											for (const [key, sectionId] of Object.entries(arrSections)) {
+
 												const option = document.querySelector('select#ctrl_' + fieldname + ' option[value="' + sectionId + '"]')
 												if (option) {
-													console.log(option.textContent);
 													option.selected = true;
 												}
 											}

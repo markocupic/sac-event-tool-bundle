@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\EventSubscriber;
+namespace Markocupic\SacEventToolBundle\EventListener;
 
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\Adapter;
@@ -24,10 +24,11 @@ use Contao\UserModel;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Terminal42\NotificationCenterBundle\NotificationCenter;
 
-final class NotifyOnEventRegistration implements EventSubscriberInterface
+#[AsEventListener]
+final class NotifyMemberOnEventRegistration
 {
     public const PRIORITY = 10000;
 
@@ -51,14 +52,7 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
         $this->userModelAdapter = $this->framework->getAdapter(UserModel::class);
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EventRegistrationEvent::NAME => ['notifyUserOnEventRegistration', self::PRIORITY],
-        ];
-    }
-
-    public function notifyUserOnEventRegistration(EventRegistrationEvent $event): void
+    public function __invoke(EventRegistrationEvent $event): void
     {
         $this->initialize($event);
 
@@ -70,20 +64,21 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
         $strRegistrationGoesToName = '';
         $strRegistrationGoesToEmail = '';
 
-        // Switch sender/recipient if the main instructor has delegated event registrations administration work to somebody else
+        // Switch sender/recipient if the main instructor has delegated
+	    // event registrations administration work to another person.
         $bypassRegistration = false;
 
         if ($this->eventModel->registrationGoesTo) {
             $objUser = $this->userModelAdapter->findByPk($this->eventModel->registrationGoesTo);
 
             if (null !== $objUser) {
-                if ('' !== $objUser->email) {
+                if (!empty($objUser->email)) {
                     $strRegistrationGoesToName = $objUser->name;
                     $strRegistrationGoesToEmail = $objUser->email;
                 }
             }
 
-            if ('' !== $strRegistrationGoesToEmail && '' !== $strRegistrationGoesToName) {
+            if (!empty($strRegistrationGoesToEmail) && !empty($strRegistrationGoesToName)) {
                 $bypassRegistration = true;
             }
         }
@@ -138,7 +133,7 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
         $this->moduleModel = $event->getRegistrationModule();
 
         if (!$this->framework->isInitialized()) {
-            $this->framework->initialize(true);
+            $this->framework->initialize();
         }
     }
 }

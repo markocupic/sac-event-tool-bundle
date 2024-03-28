@@ -83,20 +83,24 @@ class ExecutePreActionsListener
                 $json['password'] = '';
                 $json['sectionId'] = $this->stringUtilAdapter->deserialize($objMemberModel->sectionId, true);
 
-	            $html = '<div>';
+                $html = '<div>';
                 $html .= '<h1>Mitglied gefunden</h1>';
                 $html .= '<div>Sollen die Daten von %s %s übernommen werden?</div>';
                 $html .= '<button class="tl_button">Ja</button> <button class="tl_button">nein</button>';
-				$html .= '</div>';
+                $html .= '</div>';
 
                 $json['html'] = sprintf($html, $objMemberModel->firstname, $objMemberModel->lastname);
 
-				$json = array_map(function($val){
-					if(empty($val) || !is_string($val)){
-						return $val;
-					}
-					return $this->stringUtilAdapter->revertInputEncoding($val);
-				}, $json);
+                $json = array_map(
+                    function ($val) {
+                        if (empty($val) || !\is_string($val)) {
+                            return $val;
+                        }
+
+                        return $this->stringUtilAdapter->revertInputEncoding($val);
+                    },
+                    $json
+                );
             }
 
             // Send json data to the browser

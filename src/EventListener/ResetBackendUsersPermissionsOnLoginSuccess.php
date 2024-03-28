@@ -42,7 +42,7 @@ final readonly class ResetBackendUsersPermissionsOnLoginSuccess
 
     public function maintainBackendUserPermissions(LoginSuccessEvent $event): void
     {
-        if (false === $this->sacevtUserBackendResetPermissionsOnLogin) {
+		if (false === $this->sacevtUserBackendResetPermissionsOnLogin) {
             return;
         }
 

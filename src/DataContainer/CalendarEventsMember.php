@@ -18,7 +18,6 @@ use Code4Nix\UriSigner\UriSigner;
 use Codefog\HasteBundle\UrlParser;
 use Contao\Backend;
 use Contao\BackendTemplate;
-use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
@@ -35,7 +34,6 @@ use Contao\MemberModel;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
-use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
@@ -43,10 +41,8 @@ use Doctrine\DBAL\Types\Types;
 use League\Csv\CannotInsertRecord;
 use League\Csv\InvalidArgument;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
-use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmailController;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventRegistrationStateController;
@@ -68,17 +64,14 @@ class CalendarEventsMember
     public const TABLE = 'tl_calendar_events_member';
 
     // Adapters
-    private Adapter $backend;
     private Adapter $calendarEvents;
     private Adapter $calendarEventsHelper;
     private Adapter $calendarEventsMember;
     private Adapter $controller;
     private Adapter $events;
-    private Adapter $image;
     private Adapter $member;
     private Adapter $message;
     private Adapter $stringUtil;
-    private Adapter $user;
     private Adapter $validator;
 
     public function __construct(
@@ -100,8 +93,6 @@ class CalendarEventsMember
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
         // Adapters
-        $this->image = $this->framework->getAdapter(Image::class);
-        $this->backend = $this->framework->getAdapter(Backend::class);
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
@@ -110,7 +101,6 @@ class CalendarEventsMember
         $this->member = $this->framework->getAdapter(MemberModel::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
-        $this->user = $this->framework->getAdapter(UserModel::class);
         $this->validator = $this->framework->getAdapter(Validator::class);
     }
 
@@ -152,95 +142,7 @@ class CalendarEventsMember
     }
 
     /**
-     * @throws \Exception
-     */
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
-    public function checkPermission(DataContainer $dc): void
-    {
-        $user = $this->security->getUser();
-
-        $request = $this->requestStack->getCurrentRequest();
-
-        if ($this->security->isGranted('ROLE_ADMIN')) {
-            return;
-        }
-
-        // Do not allow non-admins to delete event registrations with the booking type 'onlineForm'!
-        if ('delete' === $request->query->get('act') || 'deleteAll' === $request->query->get('act')) {
-            $registration = $this->calendarEventsMember->findByPk($dc->id);
-
-            if (null !== $registration && BookingType::ONLINE_FORM === $registration->bookingType) {
-                throw new AccessDeniedException('Not enough permissions to '.$request->query->get('act').' the event registration with ID '.$dc->id.'.');
-            }
-        }
-
-        // @todo: if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $dc->id)) {
-        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $dc->currentPid)) {
-            // Grant write access to the event registration table if the user is member of an allowed group.
-            return;
-        }
-
-        // Do not show certain buttons if the user is not member of an allowed group.
-        if (!$request->query->get('act') && $request->query->get('id')) {
-            $objEvent = $this->calendarEvents->findByPk($request->query->get('id'));
-
-            if (null !== $objEvent) {
-                $arrAuthors = $this->stringUtil->deserialize($objEvent->author, true);
-                $arrRegistrationGoesTo = $this->stringUtil->deserialize($objEvent->registrationGoesTo, true);
-
-                if (!\in_array($user->id, $arrAuthors, false) && !\in_array($user->id, $arrRegistrationGoesTo, true)) {
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['closed'] = true;
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCreatable'] = true;
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notEditable'] = true;
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notDeletable'] = true;
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCopyable'] = true;
-
-                    unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['all'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['downloadEventMemberList'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['operations']['edit'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['operations']['delete'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['operations']['toggleParticipationState']);
-                }
-            }
-        }
-
-        // Grant write-access to the event-author, to event tour guides and registration admins (tl_calendar_events.registrationGoesTo) on the respective event.
-        if ('toggle' === $request->query->get('act') || 'edit' === $request->query->get('act') || 'select' === $request->query->get('act')) {
-            if ('select' === $request->query->get('act')) {
-                $objEvent = $this->calendarEvents->findByPk($dc->id);
-            } else {
-                $registration = $this->calendarEventsMember->findByPk($dc->id);
-
-                /** @var CalendarEventsMemberModel $objEvent */
-                if (null !== $registration) {
-                    /** @var CalendarEventsModel $objEvent */
-                    $objEvent = $registration->getRelated('eventId');
-                }
-            }
-
-            if (null !== $objEvent) {
-                $arrAuthors = $this->stringUtil->deserialize($objEvent->author, true);
-                $arrRegistrationGoesTo = $this->stringUtil->deserialize($objEvent->registrationGoesTo, true);
-                $arrInstructor = CalendarEventsHelper::getInstructorsAsArray($objEvent);
-
-                if (!\in_array($user->id, $arrAuthors, false) && !\in_array($user->id, $arrRegistrationGoesTo, true) && !\in_array($user->id, $arrInstructor, true)) {
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['closed'] = true;
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCreatable'] = true;
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notEditable'] = true;
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notDeletable'] = true;
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCopyable'] = true;
-                    $this->message->addError($this->translator->trans('ERR.accessDenied', [], 'contao_default'));
-
-                    $href = $this->router->generate('contao_backend', [
-                        'do' => 'calendar',
-                        'table' => 'tl_calendar_events_member',
-                        'id' => $objEvent->id,
-                    ]);
-
-                    $this->controller->redirect($href);
-                }
-            }
-        }
-    }
-
-    /**
-     * Download registration list as a DOCX or CSV file. *.
+     * Download registration list as a DOCX or CSV file.
      *
      * @param DataContainer $dc
      *
@@ -253,17 +155,30 @@ class CalendarEventsMember
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ($request->query->has('id') && null !== ($objEvent = $this->calendarEvents->findByPk($request->query->get('id')))) {
-            // Download the registration list as a docx file
-            if ('downloadEventRegistrationListDocx' === $request->query->get('action')) {
-                throw new ResponseException($this->registrationListGeneratorDocx->generate($objEvent, 'docx'));
-            }
+        $action = $request->query->get('action', '');
+        $supported = ['downloadEventRegistrationListDocx', 'downloadEventRegistrationListCsv'];
 
-            // Download the registration list as a csv file
-            if ('downloadEventRegistrationListCsv' === $request->query->get('action')) {
-                throw new ResponseException($this->registrationListGeneratorCsv->generate($objEvent));
-            }
+        if (!\in_array($action, $supported, true)) {
+            return;
         }
+
+        $eventId = $request->query->get('id', 0);
+        $objEvent = $this->calendarEvents->findByPk($eventId);
+
+        if (null === $objEvent) {
+            throw new \InvalidArgumentException(sprintf('Could not find event with ID "%s".', $eventId));
+        }
+
+        if (!$this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $objEvent->id)) {
+            throw new AccessDeniedException('');
+        }
+
+        match ($action) {
+            // Download the registration list as a docx file
+            'downloadEventRegistrationListDocx' => throw new ResponseException($this->registrationListGeneratorDocx->generate($objEvent, 'docx')),
+            // Download the registration list as a csv file
+            'downloadEventRegistrationListCsv' => throw new ResponseException($this->registrationListGeneratorCsv->generate($objEvent)),
+        };
     }
 
     /**
@@ -483,55 +398,6 @@ class CalendarEventsMember
     }
 
     /**
-     * Generate href for $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']
-     * Generate href for $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice'].
-     */
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
-    public function setGlobalOperations(DataContainer $dc): void
-    {
-        $request = $this->requestStack->getCurrentRequest();
-
-        /** @var BackendUser $user */
-        $user = $this->security->getUser();
-
-        // Remove edit_all (mehrere bearbeiten) button
-        if (!$user->admin) {
-            unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['all']);
-        }
-
-        $blnAllowTourReportButton = false;
-        $blnAllowInstructorInvoiceButton = false;
-
-        $eventId = $request->query->get('id');
-        $objEvent = $this->calendarEvents->findByPk($eventId);
-
-        if (null !== $objEvent) {
-            // Check if backend user is allowed
-            if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $user->id) {
-                if (EventType::TOUR === $objEvent->eventType || EventType::LAST_MINUTE_TOUR === $objEvent->eventType) {
-                    $href = $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'];
-                    $href = sprintf($href, $eventId);
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'] = $href;
-                    $blnAllowTourReportButton = true;
-
-                    $href = $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']['href'];
-                    $href = sprintf($href, $eventId);
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']['href'] = $href;
-                    $blnAllowInstructorInvoiceButton = true;
-                }
-            }
-        }
-
-        if (!$blnAllowTourReportButton) {
-            unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']);
-        }
-
-        if (!$blnAllowInstructorInvoiceButton) {
-            unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']);
-        }
-    }
-
-    /**
      * Display the section name instead of the section id
      * 4250,4252 becomes SAC PILATUS, SAC PILATUS NAPF.
      */
@@ -644,36 +510,5 @@ class CalendarEventsMember
         unset($arrButtons['saveNback'], $arrButtons['saveNduplicate'], $arrButtons['saveNcreate']);
 
         return $arrButtons;
-    }
-
-    /**
-     * Return the delete user button.
-     *
-     * @param array       $row
-     * @param string|null $href
-     * @param string      $label
-     * @param string      $title
-     * @param string|null $icon
-     * @param string      $attributes
-     *
-     * @return string
-     */
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'list.operations.delete.button', priority: 100)]
-    public function deleteRegistration(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
-    {
-        $allowDeletion = false;
-
-        if ($this->security->isGranted('ROLE_ADMIN')) {
-            $allowDeletion = true;
-        } elseif (isset($row['bookingType']) && BookingType::ONLINE_FORM !== $row['bookingType']) {
-            $allowDeletion = true;
-        }
-
-		if(!$allowDeletion){
-			$icon = str_replace('.svg', '--disabled.svg', $icon);
-			return $this->image->getHtml($icon).' ';
-		}
-
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 }

@@ -131,11 +131,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
             $eventId = $this->inputAdapter->get('auto_item');
 
             // Get the event model from url query.
-	        try{
-		        $this->eventModel = $this->calendarEventsModelAdapter->findByIdOrAlias($eventId);
-	        }catch (\Exception $e){
-		        throw new InternalServerErrorException('Could not find a valid event id/alias in the url.');
-	        }
+            try {
+                $this->eventModel = $this->calendarEventsModelAdapter->findByIdOrAlias($eventId);
+            } catch (\Exception $e) {
+                throw new InternalServerErrorException('Could not find a valid event id/alias in the url.');
+            }
 
             // Get the main instructor object.
             $this->mainInstructorModel = $this->userModelAdapter->findByPk($this->eventModel->mainInstructor);
@@ -413,7 +413,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 );
 
                 // Dispatch event registration event (e.g. notify user upon event registration).
-                $this->eventDispatcher->dispatch($event, EventRegistrationEvent::NAME);
+                $this->eventDispatcher->dispatch($event);
 
                 // Reload page.
                 $this->controllerAdapter->reload();

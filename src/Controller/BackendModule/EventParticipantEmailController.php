@@ -33,6 +33,7 @@ use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
+use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Filesystem;
@@ -110,9 +111,19 @@ class EventParticipantEmailController extends AbstractBackendController
 
         $this->initialize($eventId, $sid);
 
+        $blnAllow = true;
+
         $uriSigner = $this->system->getContainer()->get('code4nix_uri_signer.uri_signer');
 
         if (!$uriSigner->check($this->requestStack->getCurrentRequest()->getRequestUri())) {
+            $blnAllow = false;
+        }
+
+        if (!$this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $eventId)) {
+			$blnAllow = false;
+        }
+
+        if (!$blnAllow) {
             $this->message->addError($this->translator->trans('MSC.evt_epe_accessDenied', [], 'contao_default'));
             $this->controller->redirect($this->getBackUri());
         }

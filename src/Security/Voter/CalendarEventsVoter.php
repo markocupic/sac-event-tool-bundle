@@ -32,6 +32,7 @@ class CalendarEventsVoter extends Voter
     public const CAN_CUT_EVENT = 'sacevt_can_cut_event';
     public const CAN_UPGRADE_EVENT_RELEASE_LEVEL = 'sacevt_can_upgrade_event_release_level';
     public const CAN_DOWNGRADE_EVENT_RELEASE_LEVEL = 'sacevt_can_downgrade_event_release_level';
+    public const CAN_ADMINISTER_EVENT_REGISTRATIONS = 'sacevt_can_administer_event_registrations';
 
     private const EVENT_PERMISSIONS_ALL = [
         self::CAN_DELETE_EVENT,
@@ -39,6 +40,7 @@ class CalendarEventsVoter extends Voter
         self::CAN_CUT_EVENT,
         self::CAN_UPGRADE_EVENT_RELEASE_LEVEL,
         self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL,
+        self::CAN_ADMINISTER_EVENT_REGISTRATIONS,
     ];
 
     // Adapters
@@ -68,9 +70,9 @@ class CalendarEventsVoter extends Voter
      * - do not allow upgrading if the event release level is on the last level
      * but allow upgrading or downgrading...
      * - to admins
-     * - to permitted event-authors (-> tl_event_release_level_policy.allowWriteAccessToAuthor
-     * - to permitted event-instructors (-> tl_event_release_level_policy.allowWriteAccessToInstructors
-     * - to "super-users" (-> tl_event_release_level_policy.groupReleaseLevelPerm).
+     * - to permitted event-authors --> tl_event_release_level_policy.allowWriteAccessToAuthor
+     * - to permitted event-instructors --> tl_event_release_level_policy.allowWriteAccessToInstructors
+     * - to "super-users" --> tl_event_release_level_policy.groupReleaseLevelPerm.
      *
      * @throws \Exception
      */
@@ -81,11 +83,11 @@ class CalendarEventsVoter extends Voter
         }
 
         if ('up' === $direction) {
-            if ($eventReleaseLevelPolicyModel === $eventReleaseLevelPolicyModel::findLastLevelByEventId($eventsModel->id)) {
+            if ($eventReleaseLevelPolicyModel === $eventReleaseLevelPolicyModel::findHighestLevelByEventId($eventsModel->id)) {
                 return false;
             }
         } else {
-            if ($eventReleaseLevelPolicyModel === $eventReleaseLevelPolicyModel::findFirstLevelByEventId($eventsModel->id)) {
+            if ($eventReleaseLevelPolicyModel === $eventReleaseLevelPolicyModel::findLowestLevelByEventId($eventsModel->id)) {
                 return false;
             }
         }
@@ -171,6 +173,7 @@ class CalendarEventsVoter extends Voter
             self::CAN_WRITE_EVENT => $this->canWriteEvent(),
             self::CAN_CUT_EVENT => $this->canCutEvent(),
             self::CAN_UPGRADE_EVENT_RELEASE_LEVEL, self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL => $this->canSwitchReleaseLevel($attribute),
+            self::CAN_ADMINISTER_EVENT_REGISTRATIONS => $this->canAdministerEventRegistrations(),
             default => throw new \LogicException(sprintf('You vote on a unsupported attribute "%s"!', $attribute)),
         };
     }
@@ -179,9 +182,9 @@ class CalendarEventsVoter extends Voter
      * Grant delete-access...
      * - to all users, if there is no release package assigned to the calendar (tl_calendar).
      * - to admins
-     * - to permitted event-authors (-> tl_event_release_level_policy.allowDeleteAccessToAuthor
-     * - to permitted event-instructors (-> tl_event_release_level_policy.allowDeleteAccessToInstructors
-     * - to "super-users" (-> tl_event_release_level_policy.groupEventPerm).
+     * - to permitted event-authors --> tl_event_release_level_policy.allowDeleteAccessToAuthor
+     * - to permitted event-instructors --> tl_event_release_level_policy.allowDeleteAccessToInstructors
+     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm.
      *
      * @throws \Exception
      */
@@ -249,9 +252,9 @@ class CalendarEventsVoter extends Voter
      * Grant cut-access...
      * - to all users, if there is no release package assigned to the calendar (tl_calendar).
      * - to admins
-     * - to permitted event-authors (-> tl_event_release_level_policy.allowCutAccessToAuthor
-     * - to permitted event-instructors (-> tl_event_release_level_policy.allowCutAccessToInstructors
-     * - to "super-users" (-> tl_event_release_level_policy.groupEventPerm).
+     * - to permitted event-authors --> tl_event_release_level_policy.allowCutAccessToAuthor
+     * - to permitted event-instructors --> tl_event_release_level_policy.allowCutAccessToInstructors
+     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm.
      *
      * @throws \Exception
      */
@@ -319,9 +322,9 @@ class CalendarEventsVoter extends Voter
      * Grant write-access...
      * - to all users, if there is no release package assigned to the calendar (tl_calendar).
      * - to admins
-     * - to permitted event-authors (-> tl_event_release_level_policy.allowWriteAccessToAuthor
-     * - to permitted event-instructors (-> tl_event_release_level_policy.allowWriteAccessToInstructors
-     * - to "super-users" (-> tl_event_release_level_policy.groupEventPerm).
+     * - to permitted event-authors --> tl_event_release_level_policy.allowWriteAccessToAuthor
+     * - to permitted event-instructors --> tl_event_release_level_policy.allowWriteAccessToInstructors
+     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm.
      *
      * @throws \Exception
      */
@@ -340,7 +343,7 @@ class CalendarEventsVoter extends Voter
             return true;
         }
 
-        // Allow deletion to admins.
+        // Allow write-access to admins.
         if ($this->security->isGranted('ROLE_ADMIN')) {
             return true;
         }
@@ -386,12 +389,34 @@ class CalendarEventsVoter extends Voter
     }
 
     /**
+     * Grant administer-access...
+     * - to all users with write-access on the event (tl_calendar).
+     * - and if the user is receiving the registrations by email --> tl_calendar_events.registrationGoesTo.
+     *
+     * @throws \Exception
+     */
+    private function canAdministerEventRegistrations(): bool
+    {
+        if ($this->canWriteEvent()) {
+            return true;
+        }
+
+        if (!empty($this->event->registrationGoesTo)) {
+            if ($this->user->id === $this->event->registrationGoesTo) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Grant switch-release-level-access (upgrade/downgrade)...
      * - to all users, if there is no release package assigned to the calendar (tl_calendar).
      * - to admins
-     * - to permitted event-authors (-> tl_event_release_level_policy.allowWriteAccessToAuthor
-     * - to permitted event-instructors (-> tl_event_release_level_policy.allowWriteAccessToInstructors
-     * - to "super-users" (-> tl_event_release_level_policy.groupReleaseLevelPerm).
+     * - to permitted event-authors --> tl_event_release_level_policy.allowWriteAccessToAuthor
+     * - to permitted event-instructors --> tl_event_release_level_policy.allowWriteAccessToInstructors
+     * - to "super-users" --> tl_event_release_level_policy.groupReleaseLevelPerm.
      *
      * @throws \Exception
      */

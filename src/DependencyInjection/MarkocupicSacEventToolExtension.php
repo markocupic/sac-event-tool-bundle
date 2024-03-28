@@ -44,7 +44,6 @@ class MarkocupicSacEventToolExtension extends Extension
         );
 
         $loader->load('security.yaml');
-        $loader->load('event_listener.yaml');
         $loader->load('services.yaml');
 
         // Friendly configuration
