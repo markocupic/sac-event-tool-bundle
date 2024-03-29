@@ -142,7 +142,7 @@ class CalendarEvents
                     if ($user->id !== $objEventsModel->registrationGoesTo && !$this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEventsModel->id)) {
                         // User has no write access to the data record, that's why we display field values without a form input
                         foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldName) {
-                            $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [self::class, 'showFieldValue'];
+                            $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [\Markocupic\SacEventToolBundle\DataContainer\CalendarEvents::class, 'showFieldValue'];
                         }
 
                         // User is not allowed to submit any data!
@@ -181,7 +181,7 @@ class CalendarEvents
                                 }
 
                                 if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
-                                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [self::class, 'showFieldValue'];
+                                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [\Markocupic\SacEventToolBundle\DataContainer\CalendarEvents::class, 'showFieldValue'];
                                 }
                             }
                         }
@@ -305,7 +305,7 @@ class CalendarEvents
                     foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] ?? []) as $fieldName) {
                         if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
                             if ('editAll' === $request->query->get('act')) {
-                                $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [self::class, 'showFieldValue'];
+                                $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [\Markocupic\SacEventToolBundle\DataContainer\CalendarEvents::class, 'showFieldValue'];
                             } else {
                                 unset($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]);
                             }
