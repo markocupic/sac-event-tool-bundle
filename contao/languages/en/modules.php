@@ -26,7 +26,7 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEditP
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardPastEventsController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardProfileController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardUpcomingEventsController;
-use Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExport2021Controller;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListController;
 
 // Backend Modules
@@ -63,5 +63,5 @@ $GLOBALS['TL_LANG']['FMD'][MemberDashboardEditProfileController::TYPE] = ['SAC M
 $GLOBALS['TL_LANG']['FMD'][MemberDashboardPastEventsController::TYPE] = ['SAC Mitgliederkonto Dashboard - Meine absolvierten Events'];
 $GLOBALS['TL_LANG']['FMD'][MemberDashboardProfileController::TYPE] = ['SAC Mitgliederkonto Dashboard - Profil'];
 $GLOBALS['TL_LANG']['FMD'][MemberDashboardUpcomingEventsController::TYPE] = ['SAC Mitgliederkonto Dashboard - Meine nächsten Events'];
-$GLOBALS['TL_LANG']['FMD'][PilatusExport2021Controller::TYPE] = ['SAC Event-Export 2021 für Monatszeitschrift'];
+$GLOBALS['TL_LANG']['FMD'][PilatusExportController::TYPE] = ['SAC Event-Export 2021 für Monatszeitschrift'];
 $GLOBALS['TL_LANG']['FMD'][TourDifficultyListController::TYPE] = ['Schwierigkeitsgrade Tabelle mit Erklärungen als Modalfenster'];

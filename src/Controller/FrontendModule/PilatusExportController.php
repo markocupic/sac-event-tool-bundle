@@ -22,6 +22,7 @@ use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\InsertTag\InsertTagParser;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Date;
 use Contao\Environment;
 use Contao\Events;
@@ -29,7 +30,6 @@ use Contao\FrontendTemplate;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Contao\Template;
 use Contao\Validator;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
@@ -40,10 +40,10 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(PilatusExport2021Controller::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_pilatus_export_2021')]
-class PilatusExport2021Controller extends AbstractPrintExportController
+#[AsFrontendModule(PilatusExportController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_pilatus_export')]
+class PilatusExportController extends AbstractPrintExportController
 {
-    public const TYPE = 'pilatus_export_2021';
+    public const TYPE = 'pilatus_export';
     private const DEFAULT_EVENT_RELEASE_LEVEL = 3;
 
     private ModuleModel|null $model;
@@ -80,7 +80,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
@@ -89,26 +89,26 @@ class PilatusExport2021Controller extends AbstractPrintExportController
 
         // Generate the filter form
         $this->generateForm($request);
-        $template->form = $this->objForm;
+        $template->set('form', $this->objForm);
 
         // Course table
-        $objPartial = new FrontendTemplate('mod_pilatus_export_2021_events_table_partial');
+        $objPartial = new FrontendTemplate('mod_pilatus_export_events_table_partial');
         $objPartial->eventTable = $this->htmlCourseTable;
         $objPartial->isCourse = true;
-        $template->htmlCourseTable = $objPartial->parse();
+        $template->set('htmlCourseTable', $objPartial->parse());
 
         // Tour & general event table
-        $objPartial = new FrontendTemplate('mod_pilatus_export_2021_events_table_partial');
+        $objPartial = new FrontendTemplate('mod_pilatus_export_events_table_partial');
         $objPartial->eventTable = $this->htmlTourTable;
         $objPartial->isCourse = false;
-        $template->htmlTourTable = $objPartial->parse();
+        $template->set('htmlTourTable', $objPartial->parse());
 
         // The event array() courses, tours, generalEvents
-        $template->events = $this->events;
+        $template->set('events', $this->events);
 
         // Pass editable fields to the template object
-        $template->courseFeEditableFields = $this->courseFeEditableFields;
-        $template->tourFeEditableFields = $this->tourFeEditableFields;
+        $template->set('courseFeEditableFields', $this->courseFeEditableFields);
+        $template->set('tourFeEditableFields', $this->tourFeEditableFields);
 
         return $template->getResponse();
     }

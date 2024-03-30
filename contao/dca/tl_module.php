@@ -28,7 +28,7 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEditP
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardPastEventsController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardProfileController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardUpcomingEventsController;
-use Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExport2021Controller;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListController;
 
 /*
@@ -51,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardEditProfileController
 $GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardPastEventsController::TYPE] = '{title_legend},name,headline,type;{member_dashboard_event_type_filter_legend},eventType;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardProfileController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardUpcomingEventsController::TYPE] = '{title_legend},name,headline,type;{member_dashboard_upcoming_events_legend},unregisterFromEventNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][PilatusExport2021Controller::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][PilatusExportController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][TourDifficultyListController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 
 // Add fields to tl_module
