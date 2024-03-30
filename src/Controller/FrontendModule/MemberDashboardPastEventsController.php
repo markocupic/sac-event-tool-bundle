@@ -18,6 +18,7 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Date;
 use Contao\Frontend;
 use Contao\FrontendUser;
@@ -49,7 +50,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
     public const TYPE = 'member_dashboard_past_events';
 
     private FrontendUser|null $objUser;
-    private Template|null $template;
+    private FragmentTemplate|null $template;
 
     public function __construct(
         private readonly ContaoFramework $framework,
@@ -87,7 +88,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         // Do not allow for not authorized users
         if (null === $this->objUser) {
@@ -138,7 +139,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
             $arrEvents[] = $event;
         }
 
-        $this->template->arrPastEvents = $arrEvents;
+        $this->template->set('arrPastEvents',$arrEvents);
 
         return $this->template->getResponse();
     }
@@ -242,16 +243,16 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         $systemAdapter = $this->framework->getAdapter(System::class);
 
         if ($messageAdapter->hasInfo()) {
-            $this->template->hasInfoMessage = true;
+            $this->template->set('hasInfoMessage', true);
             $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.info');
-            $this->template->infoMessage = $session[0];
+            $this->template->set('infoMessage', $session[0]);
         }
 
         if ($messageAdapter->hasError()) {
-            $this->template->hasErrorMessage = true;
+            $this->template->set('hasErrorMessage', true);
             $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.error');
-            $this->template->errorMessage = $session[0];
-            $this->template->errorMessages = $session;
+            $this->template->set('errorMessage', $session[0]);
+            $this->template->set('errorMessages', $session);
         }
 
         $messageAdapter->reset();

@@ -16,16 +16,16 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
+use Contao\CoreBundle\File\Metadata;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\InsertTag\InsertTagParser;
+use Contao\CoreBundle\Image\ImageFactoryInterface;
+use Contao\CoreBundle\Image\Studio\Studio;
 use Contao\CoreBundle\Routing\ScopeMatcher;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\FrontendUser;
-use Contao\Image\PictureConfiguration;
 use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Contao\StringUtil;
-use Contao\Template;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,20 +39,21 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
 
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly ImageFactoryInterface $imageFactory,
+        private readonly Avatar $avatar,
         private readonly ScopeMatcher $scopeMatcher,
         private readonly Security $security,
-        private readonly InsertTagParser $insertTagParser,
-        private readonly Avatar $avatar,
+        private readonly Studio $studio,
     ) {
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        // Get logged in member object
+        // Get logged in frontend user
         if (($user = $this->security->getUser()) instanceof FrontendUser) {
             $this->user = $user;
         } else {
-            if ($this->isFrontend($request)) {
+            if ($this->scopeMatcher->isFrontendRequest($request)) {
                 return new Response('', Response::HTTP_NO_CONTENT);
             }
         }
@@ -60,53 +61,23 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
 
-        $resPath = $this->avatar->getAvatarResourcePath($memberModelAdapter->findByPk($this->user->id));
+        $path = $this->avatar->getAvatarResourcePath($memberModelAdapter->findByPk($this->user->id), true);
 
-        if (!empty($resPath)) {
-            $size = $stringUtilAdapter->deserialize($model->imgSize);
+        $image = $this->imageFactory->create($path);
 
-            if (is_numeric($size)) {
-                $size = [0, 0, (int) $size];
-            } elseif (!$size instanceof PictureConfiguration) {
-                if (!\is_array($size)) {
-                    $size = [];
-                }
+            $figureBuilder = $this->studio
+                ->createFigureBuilder()
+                ->setMetadata(new Metadata(['alt' => $this->user->firstname.' '.$this->user->lastname]))
+                ->setSize($model->imgSize)
+                ->from($image)
+            ;
 
-                $size += [0, 0, 'crop'];
-            }
-
-            // If picture
-            if (isset($size[2]) && is_numeric($size[2])) {
-                $template->image = $this->insertTagParser->replace(sprintf(
-                    '{{picture::%s?size=%s&alt=%s&class=%s}}',
-                    $resPath,
-                    $size[2],
-                    $this->user->firstname.' '.$this->user->lastname,
-                    $model->imageClass
-                ));
-            } else { // If image
-                $template->image = $this->insertTagParser->replace(sprintf(
-                    '{{image::%s?width=%s&height=%s&mode=%s&alt=%s&class=%s}}',
-                    $resPath,
-                    $size[0],
-                    $size[1],
-                    $size[2],
-                    $this->user->firstname.' '.$this->user->lastname,
-                    $model->imageClass
-                ));
-            }
-        }
+            $template->set('figure', $figureBuilder->buildIfResourceExists());
 
         return $template->getResponse();
-    }
-
-    private function isFrontend(Request $request): bool
-    {
-        return $this->scopeMatcher->isFrontendRequest($request);
     }
 }

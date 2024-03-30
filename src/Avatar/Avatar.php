@@ -19,39 +19,40 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FilesModel;
 use Contao\MemberModel;
 use Contao\UserModel;
+use Symfony\Component\Filesystem\Path;
 
 class Avatar
 {
-	private Adapter $filesModelAdapter;
+    private Adapter $filesModelAdapter;
 
-	public function __construct(
-		private readonly ContaoFramework $framework,
-		private readonly string $projectDir,
-		private readonly string $sacevtAvatarFemale,
-		private readonly string $sacevtAvatarMale,
-	) {
-		$this->filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
-	}
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly string $projectDir,
+        private readonly string $sacevtAvatarFemale,
+        private readonly string $sacevtAvatarMale,
+    ) {
+        $this->filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+    }
 
-	/**
-	 * @todo Provide an avatar if gender === 'other'
-	 */
-	public function getAvatarResourcePath(MemberModel|UserModel $userModel): string
-	{
-		if (!empty($userModel->avatar)) {
-			$objFiles = $this->filesModelAdapter->findByUuid($userModel->avatar);
+    /**
+     * @todo Provide an avatar if gender === 'other'
+     */
+    public function getAvatarResourcePath(MemberModel|UserModel|null $userModel, $blnAbsolute = false): string
+    {
+        if (!empty($userModel->avatar)) {
+            $objFiles = $this->filesModelAdapter->findByUuid($userModel->avatar);
 
-			if (null !== $objFiles) {
-				if (is_file($this->projectDir.'/'.$objFiles->path)) {
-					return $objFiles->path;
-				}
-			}
-		}
+            if (null !== $objFiles) {
+                if (is_file($this->projectDir.'/'.$objFiles->path)) {
+                    return $blnAbsolute ? Path::makeAbsolute($objFiles->path, $this->projectDir) : $objFiles->path;
+                }
+            }
+        }
 
-		if ('female' === $userModel->gender) {
-			return $this->sacevtAvatarFemale;
-		}
+        if (!empty($userModel) && 'female' === $userModel->gender) {
+            return $blnAbsolute ? Path::makeAbsolute($this->sacevtAvatarFemale, $this->projectDir) : $this->sacevtAvatarFemale;
+        }
 
-		return $this->sacevtAvatarMale;
-	}
+        return $blnAbsolute ? Path::makeAbsolute($this->sacevtAvatarMale, $this->projectDir) : $this->sacevtAvatarMale;
+    }
 }

@@ -19,6 +19,7 @@ use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Environment;
 use Contao\Events;
 use Contao\FrontendUser;
@@ -27,7 +28,6 @@ use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\System;
-use Contao\Template;
 use Contao\UserModel;
 use Contao\Validator;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
@@ -46,7 +46,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
     public const TYPE = 'member_dashboard_upcoming_events';
 
     private FrontendUser|null $user = null;
-    private Template|null $template = null;
+    private FragmentTemplate|null $template = null;
 
     public function __construct(
         private readonly ContaoFramework $framework,
@@ -84,7 +84,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         // Do not allow for not authorized users
         if (null === $this->user) {
@@ -111,7 +111,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
         // Upcoming events
-        $this->template->arrUpcomingEvents = $calendarEventsMemberModelAdapter->findUpcomingEventsByMemberId($this->user->id);
+        $this->template->set('arrUpcomingEvents', $calendarEventsMemberModelAdapter->findUpcomingEventsByMemberId($this->user->id));
 
         return $this->template->getResponse();
     }
@@ -130,9 +130,8 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
 
-        $blnHasError = true;
-
         $objEventRegistration = $calendarEventsMemberModelAdapter->findByPk($registrationId);
+        $errorMsg = null;
 
         if (null === $objEventRegistration) {
             $errorMsg = sprintf(
@@ -168,30 +167,29 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
             }
 
             if (EventSubscriptionState::USER_HAS_UNSUBSCRIBED === $objEventRegistration->stateOfSubscription) {
-                $errorMsg = 'Abmeldung fehlgeschlagen! Du hast dich vom Event "'.$objEvent->title.'" bereits abgemeldet.';
-            } elseif (EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED === $objEventRegistration->stateOfSubscription || EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST === $objEventRegistration->stateOfSubscription) {
+                $errorMsg = "Abmeldung fehlgeschlagen! Du hast dich vom Event \"$objEvent->title\" bereits abgemeldet.";
+            } elseif (EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED === $objEventRegistration->stateOfSubscription) {
                 // allow unregistering if member is not confirmed on the event
-                // or member is on the waiting list for this event
-                $blnHasError = false;
+            } elseif (EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST === $objEventRegistration->stateOfSubscription) {
+                // allow unregistering if member is on the waiting list for this event
             } elseif (!$objEvent->allowDeregistration) {
-                $errorMsg = 'Du kannst dich vom Event "'.$objEvent->title.'" nicht abmelden. Die Anmeldung ist definitiv. Nimm Kontakt mit dem Event-Organisator auf.';
+                $errorMsg = "Du kannst dich vom Event \"$objEvent->title\" nicht abmelden. Die Anmeldung ist definitiv. Bitte nimm Kontakt mit dem Event-Organisator auf.";
             } elseif ($objEvent->startDate < time()) {
-                $errorMsg = 'Du konntest nicht vom Event "'.$objEvent->title.'" abgemeldet werden, da der Event bereits vorbei ist.';
+                $errorMsg = "Du konntest nicht vom Event \"$objEvent->title\" abgemeldet werden, da der Event bereits vorbei ist.";
             } elseif ($objEvent->allowDeregistration && ($objEvent->startDate < (time() + $objEvent->deregistrationLimit * 25 * 3600))) {
-                $errorMsg = 'Du konntest nicht vom Event "'.$objEvent->title.'" abgemeldet werden, da die Abmeldefrist von '.$objEvent->deregistrationLimit.' Tag(en) abgelaufen ist. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
+                $errorMsg = "Du konntest nicht vom Event \"$objEvent->title\" abgemeldet werden, da die Abmeldefrist von $objEvent->deregistrationLimit Tag(en) abgelaufen ist. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.";
             } elseif (empty($this->user->email) || !$validatorAdapter->isEmail($this->user->email)) {
                 $errorMsg = 'Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
             } elseif ((int) $objEventRegistration->sacMemberId !== (int) $this->user->sacMemberId) {
-                $errorMsg = 'Du hast nicht die nötigen Benutzerrechte um dich vom Event "'.$objEvent->title.'" abzumelden.';
+                $errorMsg = "Du hast nicht die nötigen Benutzerrechte um dich vom Event \"$objEvent->title\" abzumelden.";
             } elseif (null !== $objInstructor) {
                 // unregister from event
-                $blnHasError = false;
             } else {
-                $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event "'.$objEvent->title.'" abgemeldet werden. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
+                $errorMsg = "Es ist ein Fehler aufgetreten. Du konntest nicht vom Event \"$objEvent->title\" abgemeldet werden. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.";
             }
 
             // Unregister from event
-            if (!$blnHasError) {
+            if (!$errorMsg) {
                 $objEventRegistration->stateOfSubscription = EventSubscriptionState::USER_HAS_UNSUBSCRIBED;
 
                 // Save data record in tl_calendar_events_member
@@ -242,7 +240,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
             }
         }
 
-        if ($blnHasError) {
+        if ($errorMsg) {
             $messageAdapter->addError($errorMsg);
         }
     }
@@ -254,20 +252,20 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
     {
         $messageAdapter = $this->framework->getAdapter(Message::class);
 
-        $this->template->hasInfoMessage = false;
-        $this->template->hasErrorMessage = false;
+        $this->template->set('hasInfoMessage', false);
+        $this->template->set('hasErrorMessage', false);
 
         if ($messageAdapter->hasInfo()) {
-            $this->template->hasInfoMessage = true;
-            $session = $request->getSession()->getFlashBag()->get('contao.FE.info');
-            $this->template->infoMessage = $session[0];
+	        $session = $request->getSession()->getFlashBag()->get('contao.FE.info');
+	        $this->template->set('hasInfoMessage', true);
+            $this->template->set('infoMessage', $session[0]);
         }
 
         if ($messageAdapter->hasError()) {
-            $this->template->hasErrorMessage = true;
-            $session = $request->getSession()->getFlashBag()->get('contao.FE.error');
-            $this->template->errorMessage = $session[0];
-            $this->template->errorMessages = $session;
+	        $session = $request->getSession()->getFlashBag()->get('contao.FE.error');
+	        $this->template->set('hasErrorMessage', true);
+            $this->template->set('errorMessage', $session[0]);
+            $this->template->set('errorMessages', $session);
         }
 
         $messageAdapter->reset();

@@ -19,6 +19,7 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Dbafs;
 use Contao\Environment;
 use Contao\File;
@@ -30,7 +31,6 @@ use Contao\MemberModel;
 use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Contao\Template;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Image\RotateImage;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -44,7 +44,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     public const TYPE = 'member_dashboard_avatar_upload';
 
     private FrontendUser|null $user;
-    private Template|null $template;
+    private FragmentTemplate|null $template;
 
     public function __construct(
         private readonly ContaoFramework $framework,
@@ -87,7 +87,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         // Do not allow for not authorized users
         if (null === $this->user) {
@@ -113,7 +113,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             $filesModel = $filesModelAdapter->findByPath($this->avatar->getAvatarResourcePath($user));
 
             if (null !== $filesModel) {
-                $template->avatar = $filesModel->row();
+                $template->set('avatar', $filesModel->row());
                 $arrUser['hasAvatar'] = true;
             }
         }
@@ -121,8 +121,8 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         // Generate avatar uploader
         $this->template->avatarForm = $this->generateAvatarForm();
 
-        $template->user = $arrUser;
-        $template->userModel = $user;
+        $template->set('user', $arrUser);
+        $template->set('userModel', $user);
 
         // Add messages to template
         $this->addMessagesToTemplate($request);
@@ -280,23 +280,23 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     {
         $messageAdapter = $this->framework->getAdapter(Message::class);
 
-        $this->template->hasInfoMessage = false;
-        $this->template->hasErrorMessage = false;
+        $this->template->set('hasInfoMessage', false);
+        $this->template->set('hasErrorMessage', false);
 
         $session = $request->getSession();
 
         if ($messageAdapter->hasInfo()) {
-            $this->template->hasInfoMessage = true;
             $bag = $session->getFlashBag()->get('contao.FE.info');
-            $this->template->infoMessage = $bag[0];
-            $this->template->infoMessages = $bag;
+            $this->template->set('hasInfoMessage', true);
+            $this->template->set('infoMessage', $bag[0]);
+            $this->template->set('infoMessages', $bag);
         }
 
         if ($messageAdapter->hasError()) {
-            $this->template->hasErrorMessage = true;
             $bag = $session->getFlashBag()->get('contao.FE.error');
-            $this->template->errorMessage = $bag[0];
-            $this->template->errorMessages = $bag;
+            $this->template->set('hasErrorMessage', true);
+            $this->template->set('errorMessage', $bag[0]);
+            $this->template->set('errorMessages', $bag);
         }
 
         $messageAdapter->reset();

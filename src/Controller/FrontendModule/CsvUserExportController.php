@@ -20,6 +20,7 @@ use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Date;
 use Contao\Environment;
 use Contao\File;
@@ -67,18 +68,19 @@ class CsvUserExportController extends AbstractFrontendModuleController
      * @throws \Doctrine\DBAL\Exception
      * @throws InvalidArgument
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $template->form = $this->getForm()->generate();
+        $template->set('form',$this->getForm()->generate());
 
         return $template->getResponse();
     }
 
-    /**
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
-     * @throws InvalidArgument
-     */
+	/**
+	 * @return Form
+	 * @throws Exception
+	 * @throws InvalidArgument
+	 * @throws \Doctrine\DBAL\Exception
+	 */
     private function getForm(): Form
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -158,7 +160,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
                     $strTable = 'tl_member';
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'sacMemberId', 'login', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
-                    $result = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember = ? ORDER BY lastname, firstname', [1],[Types::INTEGER]);
+                    $result = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember = ? ORDER BY lastname, firstname', [1], [Types::INTEGER]);
 
                     throw new ResponseException($this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, MemberGroupModel::class, $blnKeepGroupsInOneLine));
                 }
@@ -168,13 +170,19 @@ class CsvUserExportController extends AbstractFrontendModuleController
         return $objForm;
     }
 
-    /**
-     * @param $type
-     *
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
-     * @throws InvalidArgument
-     */
+	/**
+	 * @param string $type
+	 * @param string $strTable
+	 * @param array $arrFields
+	 * @param string $strGroupFieldName
+	 * @param Result $result
+	 * @param string $GroupModelClassName
+	 * @param bool $blnKeepGroupsInOneLine
+	 * @return BinaryFileResponse
+	 * @throws Exception
+	 * @throws InvalidArgument
+	 * @throws \Doctrine\DBAL\Exception
+	 */
     private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $result, string $GroupModelClassName, bool $blnKeepGroupsInOneLine = false): BinaryFileResponse
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -287,6 +295,11 @@ class CsvUserExportController extends AbstractFrontendModuleController
         return $this->sendToBrowser($arrData, $filename);
     }
 
+	/**
+	 * @param array $arrFields
+	 * @param string $strTable
+	 * @return array
+	 */
     private function getHeadline(array $arrFields, string $strTable): array
     {
         /** @var Controller $controllerAdapter */
@@ -305,6 +318,11 @@ class CsvUserExportController extends AbstractFrontendModuleController
         return $arrHeadline;
     }
 
+	/**
+	 * @param string $fieldName
+	 * @param array $arrUser
+	 * @return string
+	 */
     private function getField(string $fieldName, array $arrUser): string
     {
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
@@ -338,10 +356,14 @@ class CsvUserExportController extends AbstractFrontendModuleController
         return (string) $arrUser[$fieldName];
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidArgument
-     */
+	/**
+	 * @param array $arrData
+	 * @param string $filename
+	 * @return BinaryFileResponse
+	 * @throws Exception
+	 * @throws InvalidArgument
+	 * @throws \League\Csv\CannotInsertRecord
+	 */
     private function sendToBrowser(array $arrData, string $filename): BinaryFileResponse
     {
         /** @var Writer $writerAdapter */

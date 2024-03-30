@@ -26,6 +26,7 @@ use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Routing\ScopeMatcher;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Events;
 use Contao\FrontendUser;
 use Contao\Input;
@@ -72,7 +73,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private Adapter $calendarEventsJourneyModelAdapter;
     private Adapter $calendarEventsMemberModelAdapter;
     private Adapter $calendarEventsModelAdapter;
-    private Adapter $configAdapter;
     private Adapter $controllerAdapter;
     private Adapter $eventReleaseLevelPolicyModelAdapter;
     private Adapter $eventsAdapter;
@@ -102,7 +102,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $this->calendarEventsJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
         $this->calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->configAdapter = $this->framework->getAdapter(Config::class);
         $this->controllerAdapter = $this->framework->getAdapter(Controller::class);
         $this->eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
         $this->eventsAdapter = $this->framework->getAdapter(Events::class);
@@ -155,7 +154,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         // Do numerous checks to be sure that the event is bookable.
         // If validation fails write an info/error message to the session flash bag.
@@ -186,21 +185,21 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 break;
             case self::CHECKOUT_STEP_REGISTER:
                 // All ok! Booking request has passed all checks. So let's generate the registration form now.
-                $template->form = $this->generateForm($request);
+                $template->set('form', $this->generateForm($request));
 
                 // Check if event is already fully booked.
                 if ($this->calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel)) {
-                    $template->eventFullyBooked = true;
+                    $template->set('eventFullyBooked', true);
                 }
 
                 break;
             case self::CHECKOUT_STEP_CONFIRM:
-                $template->regInfo = $this->renderEventRegistrationConfirmTemplate();
+                $template->set('regInfo', $this->renderEventRegistrationConfirmTemplate());
                 break;
             case self::CHECKOUT_STEP_REGISTRATION_INTERRUPTED:
                 if ($this->messageAdapter->hasError()) {
                     $errorMessage = $this->getFirstErrorMessage($request);
-                    $template->errorMessage = $errorMessage;
+                    $template->set('errorMessage', $errorMessage);
 
                     // Contao system log
                     if ($this->contaoGeneralLogger) {
@@ -211,7 +210,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
                 if ($this->messageAdapter->hasInfo()) {
                     $infoMessage = $this->getFirstInfoMessage($request);
-                    $template->infoMessage = $infoMessage;
+                    $template->set('infoMessage', $infoMessage);
                 }
 
                 break;
@@ -222,8 +221,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         // Add more data to the template.
         $template = $this->addTemplateVars($template);
-        $template->currentStep = $currentStep;
-        $template->stepIndicator = $this->renderStepIndicatorTemplate($request->query->get('action'));
+        $template->set('currentStep', $currentStep);
+        $template->set('stepIndicator', $this->renderStepIndicatorTemplate($request->query->get('action')));
 
         return $template->getResponse();
     }
@@ -423,12 +422,12 @@ class EventRegistrationController extends AbstractFrontendModuleController
         return $objForm;
     }
 
-    private function addTemplateVars(Template $template): Template
+    private function addTemplateVars(FragmentTemplate $template): Template
     {
-        $template->controller = $this;
-        $template->eventModel = $this->eventModel;
-        $template->memberModel = $this->memberModel;
-        $template->moduleModel = $this->moduleModel;
+        $template->set('controller',$this);
+        $template->set('eventModel',$this->eventModel);
+        $template->set('memberModel',$this->memberModel);
+        $template->set('moduleModel',$this->moduleModel);
 
         return $template;
     }

@@ -15,11 +15,11 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\CalendarEventsModel;
-use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
@@ -41,6 +41,14 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
     ) {
     }
 
+	/**
+	 * @param Request $request
+	 * @param ModuleModel $model
+	 * @param string $section
+	 * @param array|null $classes
+	 * @param PageModel|null $page
+	 * @return Response
+	 */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         $inputAdapter = $this->framework->getAdapter(Input::class);
@@ -65,12 +73,18 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+	/**
+	 * @param FragmentTemplate $template
+	 * @param ModuleModel $model
+	 * @param Request $request
+	 * @return Response
+	 */
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $params = '/'.$this->objEvent->alias;
 
-        $template->jumpTo = $this->objJumpTo->getFrontendUrl($params);
-        $template->btnLbl = $model->eventRegCheckoutLinkLabel;
+        $template->set('jumpTo',$this->objJumpTo->getFrontendUrl($params));
+        $template->set('btnLbl',$model->eventRegCheckoutLinkLabel);
 
         return $template->getResponse();
     }

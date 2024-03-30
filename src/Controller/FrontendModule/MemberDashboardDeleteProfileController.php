@@ -19,12 +19,12 @@ use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Environment;
 use Contao\FrontendUser;
 use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Contao\Template;
 use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -66,20 +66,20 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         // Do not allow for not authorized users
         if (null === $this->user) {
             throw new UnauthorizedHttpException('Not authorized. Please log in as frontend user.');
         }
 
-        $template->passedConfirmation = false;
-        $template->user = $this->user;
+        $template->set('passedConfirmation',false);
+        $template->set('user',$this->user);
 
         if ('clear-profile' === $request->query->get('action')) {
             // Generate the delete profile form
-            $template->deleteProfileForm = $this->generateDeleteProfileForm($request);
-            $template->passedConfirmation = true;
+            $template->set('deleteProfileForm',$this->generateDeleteProfileForm($request));
+            $template->set('passedConfirmation',true);
         }
 
         // Add messages to template
@@ -153,26 +153,26 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
     /**
      * Add messages from session to template.
      */
-    protected function addMessagesToTemplate(Request $request, Template $template): void
+    protected function addMessagesToTemplate(Request $request, FragmentTemplate $template): void
     {
         $messageAdapter = $this->framework->getAdapter(Message::class);
 
         $session = $request->getSession();
-        $template->hasInfoMessages = false;
-        $template->hasErrorMessages = false;
+        $template->set('hasInfoMessages',false);
+        $template->set('hasErrorMessages', false);
 
         if ($messageAdapter->hasInfo()) {
-            $template->hasInfoMessage = true;
+            $template->set('hasInfoMessage', true);
             $bag = $session->getFlashBag()->get('contao.FE.info');
-            $template->infoMessage = $bag[0];
-            $template->infoMessages = $bag;
+            $template->set('infoMessage', $bag[0]);
+            $template->set('infoMessages', $bag);
         }
 
         if ($messageAdapter->hasError()) {
-            $template->hasErrorMessage = true;
+            $template->set('hasErrorMessage',true);
             $bag = $session->getFlashBag()->get('contao.FE.error');
-            $template->errorMessage = $bag[0];
-            $template->errorMessages = $bag;
+            $template->set('errorMessage',$bag[0]);
+            $template->set('errorMessages',$bag);
         }
 
         $messageAdapter->reset();

@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\ModuleModel;
 use Contao\Template;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
@@ -34,7 +35,7 @@ class TourDifficultyListController extends AbstractFrontendModuleController
     ) {
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $arrDifficulty = [];
         $pid = 0;
@@ -58,7 +59,7 @@ class TourDifficultyListController extends AbstractFrontendModuleController
             }
         }
 
-        $template->difficulties = $arrDifficulty;
+        $template->set('difficulties',$arrDifficulty);
 
         return $template->getResponse();
     }

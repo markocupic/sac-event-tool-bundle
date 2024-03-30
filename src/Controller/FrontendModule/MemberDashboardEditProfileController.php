@@ -19,13 +19,13 @@ use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Environment;
 use Contao\FrontendUser;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Contao\Template;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -40,7 +40,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
     public const TYPE = 'member_dashboard_edit_profile';
 
     private FrontendUser|null $objUser;
-    private Template|null $template;
+    private FragmentTemplate|null $template;
 
     public function __construct(
         private readonly ContaoFramework $framework,
@@ -64,7 +64,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         // Do not allow for not authorized users
         if (!$this->objUser instanceof FrontendUser) {
@@ -73,10 +73,10 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
 
         $this->template = $template;
 
-        $this->template->objUser = $this->objUser;
+        $this->template->set('objUser', $this->objUser);
 
         // Generate the users profile form
-        $this->template->userProfileForm = $this->generateUserProfileForm($request);
+        $this->template->set('userProfileForm', $this->generateUserProfileForm());
 
         // Add messages to template
         $this->addMessagesToTemplate($request);
@@ -94,23 +94,23 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         $flashBag = $session->getFlashBag();
 
         if ($messageAdapter->hasInfo()) {
-            $this->template->hasInfoMessage = true;
+            $this->template->set('hasInfoMessage', true);
             $infoMsg = $flashBag->get('contao.FE.info');
-            $this->template->infoMessage = $infoMsg[0];
-            $this->template->infoMessages = $infoMsg;
+            $this->template->set('infoMessage', $infoMsg[0]);
+            $this->template->set('infoMessages', $infoMsg);
         }
 
         if ($messageAdapter->hasError()) {
-            $this->template->hasErrorMessage = true;
+            $this->template->set('hasErrorMessage', true);
             $errorMsg = $flashBag->get('contao.FE.error');
-            $this->template->errorMessage = $errorMsg[0];
-            $this->template->errorMessages = $errorMsg;
+            $this->template->set('errorMessage', $errorMsg[0]);
+            $this->template->set('errorMessages', $errorMsg);
         }
 
         $messageAdapter->reset();
     }
 
-    private function generateUserProfileForm(Request $request): string
+    private function generateUserProfileForm(): string
     {
         // Set adapters
         $environmentAdapter = $this->framework->getAdapter(Environment::class);

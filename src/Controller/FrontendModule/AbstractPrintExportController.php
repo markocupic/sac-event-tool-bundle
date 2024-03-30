@@ -21,7 +21,7 @@ use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 
 /**
  * This is the base class for:
- * JahresprogrammExportController and PilatusExport2021Controller.
+ * JahresprogrammExportController and PilatusExportController.
  */
 abstract class AbstractPrintExportController extends AbstractFrontendModuleController
 {

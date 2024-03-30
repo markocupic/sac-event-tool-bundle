@@ -18,6 +18,7 @@ use Contao\ContentModel;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\FrontendTemplate;
 use Contao\PageModel;
 use Contao\StringUtil;
@@ -52,20 +53,15 @@ class UserPortraitListController extends AbstractContentElementController
     /**
      * @throws Exception
      */
-    protected function getResponse(Template $template, ContentModel $model, Request $request): Response
+    protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {
-        /** @var UserModel $userModelAdapter */
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-
-        /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
-        /** @var UserRoleModel $userRoleModelAdapter */
         $userRoleModelAdapter = $this->framework->getAdapter(UserRoleModel::class);
 
         // Get template
-        if ('' !== $model->userList_template) {
-            $template->strTemplate = $model->userList_template;
+        if (!empty($model->userList_template)) {
+            $template->set('strTemplate', $model->userList_template);
         }
 
         $arrIDS = [];
@@ -76,9 +72,9 @@ class UserPortraitListController extends AbstractContentElementController
 
             if (\count($arrSelectedRoles) > 0) {
                 $stmt = $this->connection->executeQuery(
-					'SELECT * FROM tl_user  WHERE disable = ? AND hideInFrontendListings = ? ORDER BY lastname, firstname',
-					[0, 0],
-					[Types::INTEGER, Types::INTEGER],
+                    'SELECT * FROM tl_user  WHERE disable = ? AND hideInFrontendListings = ? ORDER BY lastname, firstname',
+                    [0, 0],
+                    [Types::INTEGER, Types::INTEGER],
                 );
 
                 if ('OR' === $queryType) {
@@ -178,11 +174,11 @@ class UserPortraitListController extends AbstractContentElementController
                 }
                 $strItems .= $objTemplate->parse();
             }
-            $template->items = $strItems;
+            $template->set('items', $strItems);
         }
 
-        $template->hasMultiple = $itemCount > 1;
-        $template->itemCount = $itemCount;
+        $template->set('hasMultiple', $itemCount > 1);
+        $template->set('itemCount', $itemCount);
 
         return $template->getResponse();
     }

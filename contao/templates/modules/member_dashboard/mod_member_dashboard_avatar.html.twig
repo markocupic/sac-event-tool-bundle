@@ -1,8 +1,8 @@
 {% extends '@Contao/block_unsearchable' %}
+{% import "@ContaoCore/Image/Studio/_macros.html.twig" as studio %}
 
 {% block content %}
-    {% if image|default %}
-        {{ image|raw }}
+    {% if figure|default %}
+        {{- studio.figure(figure) -}}
     {% endif %}
-
 {% endblock %}

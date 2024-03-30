@@ -21,11 +21,11 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Date;
 use Contao\Environment;
 use Contao\MemberModel;
 use Contao\ModuleModel;
-use Contao\Template;
 use Doctrine\DBAL\Connection;
 use League\Csv\ByteSequence;
 use League\Csv\Exception;
@@ -52,23 +52,33 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     ) {
     }
 
-    /**
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
-     */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+	/**
+	 * @param FragmentTemplate $template
+	 * @param ModuleModel $model
+	 * @param Request $request
+	 * @return Response
+	 * @throws Exception
+	 * @throws InvalidArgument
+	 * @throws \Doctrine\DBAL\Exception
+	 * @throws \League\Csv\CannotInsertRecord
+	 */
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $form = $this->getForm($request);
-        $template->form = $form->generate();
-        $template->dateFormat = $this->framework->getAdapter(Config::class)->get('dateFormat');
+        $template->set('form', $form->generate());
+        $template->set('dateFormat', $this->framework->getAdapter(Config::class)->get('dateFormat'));
 
         return $template->getResponse();
     }
 
-    /**
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
-     */
+	/**
+	 * @param Request $request
+	 * @return Form
+	 * @throws Exception
+	 * @throws InvalidArgument
+	 * @throws \Doctrine\DBAL\Exception
+	 * @throws \League\Csv\CannotInsertRecord
+	 */
     private function getForm(Request $request): Form
     {
         $objForm = new Form(
@@ -149,6 +159,11 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         return $objForm;
     }
 
+	/**
+	 * @param array $arrFields
+	 * @param array $arrEventMember
+	 * @return void
+	 */
     private function addLine(array $arrFields, array $arrEventMember): void
     {
         $arrLine = [];
@@ -160,10 +175,11 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $this->arrLines[] = $arrLine;
     }
 
-    /**
-     * @param $arrFields
-     */
-    private function getHeadline($arrFields): void
+	/**
+	 * @param array $arrFields
+	 * @return void
+	 */
+    private function getHeadline(array $arrFields): void
     {
         // Write headline
         $controller = $this->framework->getAdapter(Controller::class);
@@ -184,6 +200,11 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $this->arrLines[] = $arrHeadline;
     }
 
+	/**
+	 * @param string $field
+	 * @param array $arrEventMember
+	 * @return string
+	 */
     private function getField(string $field, array $arrEventMember): string
     {
         $date = $this->framework->getAdapter(Date::class);
@@ -260,12 +281,14 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         return (string) $value;
     }
 
-    /**
-     * @param $filename
-     *
-     * @throws InvalidArgument
-     */
-    private function printCsv($filename): void
+	/**
+	 * @param string $filename
+	 * @return void
+	 * @throws Exception
+	 * @throws InvalidArgument
+	 * @throws \League\Csv\CannotInsertRecord
+	 */
+    private function printCsv(string $filename): void
     {
         $arrData = $this->arrLines;
 
