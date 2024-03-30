@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Migration\Version503;
 
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Migration\AbstractMigration;
 use Contao\CoreBundle\Migration\MigrationResult;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 
 /**
@@ -25,74 +25,90 @@ use Doctrine\DBAL\Types\Types;
  */
 class NotificationMigration extends AbstractMigration
 {
-	public function __construct(
-		private readonly Connection $connection,
-	) {
-	}
+    public function __construct(
+        private readonly Connection $connection,
+    ) {
+    }
 
-	/**
-	 * @return bool
-	 * @throws \Doctrine\DBAL\Exception
-	 */
-	public function shouldRun(): bool
-	{
-		$schemaManager = $this->connection->createSchemaManager();
+    /**
+     * @throws Exception
+     */
+    public function shouldRun(): bool
+    {
+        $schemaManager = $this->connection->createSchemaManager();
 
-		if (!$schemaManager->tablesExist(['tl_nc_language'])) {
-			return false;
-		}
+        if (!$schemaManager->tablesExist(['tl_nc_language', 'tl_nc_notification'])) {
+            return false;
+        }
 
-		$columns = $schemaManager->listTableColumns('tl_nc_language');
+        $columns = $schemaManager->listTableColumns('tl_nc_language');
 
-		if (!isset($columns['email_text']) || !isset($columns['id'])) {
-			return false;
-		}
+        if (!isset($columns['email_text']) || !isset($columns['id']) || !isset($columns['type'])) {
+            return false;
+        }
 
-		$runMigration = false;
+        $runMigration = false;
 
-		$hasResultA = $this->connection->fetchOne(
-			'SELECT id FROM tl_nc_language WHERE email_text LIKE :needle',
-			['needle' => '%do=sac_calendar_events_tool%'],
-			['needle' => Types::STRING],
-		);
+        $hasResultA = $this->connection->fetchOne(
+            "SELECT id FROM tl_nc_language WHERE email_text LIKE '%do=sac_calendar_events_tool%'",
+        );
 
-		if ($hasResultA) {
-			$runMigration = true;
-		}
+        $hasResultB = $this->connection->fetchOne(
+            "SELECT id FROM tl_nc_notification WHERE type = 'receipt_event_registration'",
+        );
 
-		return $runMigration;
-	}
+        $hasResultC = $this->connection->fetchOne(
+            "SELECT id FROM tl_nc_notification WHERE type = 'accept_event_participation'",
+        );
 
-	/**
-	 * @return MigrationResult
-	 */
-	public function run(): MigrationResult
-	{
+        if ($hasResultA || $hasResultB || $hasResultC) {
+            $runMigration = true;
+        }
 
-		$this->refactorModuleName();
+        return $runMigration;
+    }
 
-		return $this->createResult(true);
-	}
+    public function run(): MigrationResult
+    {
+        $this->refactorModuleName();
+        $this->renameNotificationType();
 
-	/**
-	 * @return void
-	 * @throws \Doctrine\DBAL\Exception
-	 */
-	protected function refactorModuleName(): void
-	{
+        return $this->createResult(true);
+    }
 
-		$ids = $this->connection->fetchAllKeyValue(
-			"SELECT id,email_text FROM tl_nc_language WHERE email_text LIKE :needle",
-			['needle' => "%do=sac_calendar_events_tool%"],
-			['needle' => Types::STRING],
-		);
+    /**
+     * @throws Exception
+     */
+    protected function refactorModuleName(): void
+    {
+        $ids = $this->connection->fetchAllKeyValue(
+            "SELECT id,email_text FROM tl_nc_language WHERE email_text LIKE '%do=sac_calendar_events_tool%'",
+        );
 
-		foreach ($ids as $id => $text) {
-			$set = [
-				'email_text' => str_replace('do=sac_calendar_events_tool', 'do=calendar', $text),
-			];
+        foreach ($ids as $id => $text) {
+            $set = [
+                'email_text' => str_replace('do=sac_calendar_events_tool', 'do=calendar', $text),
+            ];
 
-			$this->connection->update('tl_nc_language', $set, ['id' => $id]);
-		}
-	}
+            $this->connection->update('tl_nc_language', $set, ['id' => $id]);
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function renameNotificationType(): void
+    {
+        $setA = [
+            'type' => 'event_registration',
+        ];
+
+        $this->connection->update('tl_nc_notification', $setA, ['type' => 'receipt_event_registration']);
+
+        $setB = [
+            'type' => 'onchange_state_of_subscription',
+        ];
+
+        $this->connection->update('tl_nc_notification', $setB, ['type' => 'accept_event_participation']);
+    }
 }
