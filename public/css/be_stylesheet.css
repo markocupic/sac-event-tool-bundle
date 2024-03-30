@@ -339,19 +339,19 @@ div.tl_header_tour_rapport table td {
 	/** https://isotropic.co/tool/hex-color-to-css-filter/ */
 
 	& td .filter-brightened {
-		filter: opacity(0.30);
+		color: #6F7685;
 	}
 
 	/** https://isotropic.co/tool/hex-color-to-css-filter/ */
 
 	& td .filter-green {
-		filter: invert(59%) sepia(20%) saturate(1169%) hue-rotate(94deg) brightness(96%) contrast(93%);
+		color:#589B0F;
 	}
 
 	/** https://isotropic.co/tool/hex-color-to-css-filter/ */
 
 	& td .filter-red {
-		filter: invert(31%) sepia(93%) saturate(7446%) hue-rotate(356deg) brightness(103%) contrast(121%);
+		color: #D80128;
 	}
 
 	& .subscription-badge {
