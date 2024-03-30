@@ -90,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 				'custom_glob_op_options' => ['add_to_menu_group' => 'tour_report', 'sorting' => 100],
 			],
 			'printInstructorInvoice'            => [
-				'href'                   => 'table=tl_calendar_events_instructor_invoice&amp;id=%d',
+				'href'                   => 'table=tl_calendar_events_instructor_invoice&id=%d',
 				'class'                  => 'printInstructorInvoice',
 				'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/print-regular.svg',
 				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
