@@ -386,11 +386,11 @@ class CalendarEvents
             $objEvent->tstamp = time();
             $objEvent->save();
 
-			// Dispatch ChangeEventReleaseLevelEvent event
+            // Dispatch ChangeEventReleaseLevelEvent event
             $event = new ChangeEventReleaseLevelEvent($request, $objEvent, 'upgradeEventReleaseLevel' === $action ? 'up' : 'down');
             $this->eventDispatcher->dispatch($event);
 
-			// Publish or unpublish event
+            // Publish or unpublish event
             $this->eventReleaseLevelUtil->publishOrUnpublishEventDependingOnEventReleaseLevel((int) $objEvent->id, (int) $objEvent->eventReleaseLevel);
 
             // Create new version

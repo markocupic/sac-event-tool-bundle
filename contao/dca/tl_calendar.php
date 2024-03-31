@@ -25,15 +25,6 @@ $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['mode'] = DataContainer::MO
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['headerFields'] = ['title'];
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['disableGrouping'] = true;
 
-if (BackendUser::getInstance()->admin) {
-	/**
-	 * $GLOBALS['TL_DCA']['tl_calendar']['list']['operations']['cut'] = [
-	 * 'label' => &$GLOBALS['TL_LANG']['tl_calendar']['cut'],
-	 * 'href'  => 'act=paste&amp;mode=cut',
-	 * 'icon'  => 'cut.svg',
-	 * ];**/
-}
-
 // Palettes
 PaletteManipulator::create()
 	->addLegend('event_type_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
