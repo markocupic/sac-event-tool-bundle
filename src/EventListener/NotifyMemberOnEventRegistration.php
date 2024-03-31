@@ -65,7 +65,7 @@ final class NotifyMemberOnEventRegistration
         $strRegistrationGoesToEmail = '';
 
         // Switch sender/recipient if the main instructor has delegated
-	    // event registrations administration work to another person.
+        // event registrations administration work to another person.
         $bypassRegistration = false;
 
         if ($this->eventModel->registrationGoesTo) {

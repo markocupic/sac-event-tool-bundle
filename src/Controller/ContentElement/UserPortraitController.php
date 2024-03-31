@@ -62,8 +62,8 @@ class UserPortraitController extends AbstractContentElementController
 
         $arrUser = $user->row();
         $arrUser['mainQualification'] = $calendarEventsHelperAdapter->getMainQualification($user);
-        $template->set('user',$arrUser);
-        $template->set('userModel',$user);
+        $template->set('user', $arrUser);
+        $template->set('userModel', $user);
 
         return $template->getResponse();
     }

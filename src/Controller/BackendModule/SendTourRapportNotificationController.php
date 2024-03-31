@@ -100,10 +100,10 @@ class SendTourRapportNotificationController extends AbstractBackendController
     public function __invoke(int $rapport_id, string $sid, string $rt, Request $request, string $action = ''): Response
     {
         // Initialize Contao framework
-		$this->framework->initialize();
+        $this->framework->initialize();
 
-	    // Load Contao language file
-		$this->controller->loadLanguageFile('modules');
+        // Load Contao language file
+        $this->controller->loadLanguageFile('modules');
 
         $this->sid = $sid;
         $uriSigner = $this->system->getContainer()->get('code4nix_uri_signer.uri_signer');

@@ -23,11 +23,12 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['onloadCallbackExportCalendar'] = ['Ex
 
 // Operations
 $GLOBALS['TL_LANG']['tl_calendar_events']['registrations'] = ['Event-Anmeldungen', 'Bearbeiten Sie die Anmeldungen des Events mit ID %s.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelNext'] = ['Freigabestufe um +1 erhöhen', 'Freigabestufe von Datensatz mit ID %s um +1 erhöhen. Der Datensatz ist dann vielleicht nicht mehr bearbeitbar.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelPrev'] = ['Freigabestufe um -1 verringern', 'Freigabestufe  von Datensatz mit ID %s um -1 verringern.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['upgradeEventReleaseLevel'] = ['Freigabestufe um +1 erhöhen', 'Freigabestufe von Datensatz mit ID %s um +1 erhöhen. Der Datensatz ist dann vielleicht nicht mehr bearbeitbar.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['downgradeEventReleaseLevel'] = ['Freigabestufe um -1 verringern', 'Freigabestufe  von Datensatz mit ID %s um -1 verringern.'];
 
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar_events']['title_legend'] = 'Basis-Einstellungen';
+$GLOBALS['TL_LANG']['tl_calendar_events']['event_release_level_legend'] = 'Freigabestufe-Einstellungen';
 $GLOBALS['TL_LANG']['tl_calendar_events']['tech_difficulty_legend'] = 'Technisch-/konditionelle Schwierigkeiten';
 $GLOBALS['TL_LANG']['tl_calendar_events']['broschuere_legend'] = 'Einstellungen SAC Kursprogramm PDF Broschüre';
 $GLOBALS['TL_LANG']['tl_calendar_events']['deregistration_legend'] = 'Einstellungen für Event-Abmeldungen';

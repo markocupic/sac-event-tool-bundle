@@ -316,151 +316,137 @@ class CalendarEvents
         }
     }
 
-    /**
-     * Push event to next release level.
-     *
-     * @throws \Exception
-     */
-    #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.releaseLevelNext.button', priority: 100)]
-    public function releaseLevelNext(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 60)]
+    public function modifyEventReleaseLevel(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        $strDirection = 'up';
-
-        $blnAllow = false;
-        $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
-        $nextReleaseLevel = null;
-
-        if (null !== $objReleaseLevelModel) {
-            $nextReleaseLevel = $objReleaseLevelModel->level + 1;
+        if ('edit' !== $request->query->get('act')) {
+            return;
         }
 
-        // Save to database
-        if ('releaseLevelNext' === $request->query->get('action') && (int) $request->query->get('eventId') === (int) $row['id']) {
-            if (true === $this->security->isGranted(CalendarEventsVoter::CAN_UPGRADE_EVENT_RELEASE_LEVEL, $row['id']) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel)) {
-                $objEvent = $this->calendarEventsModel->findByPk($request->query->get('eventId'));
+        if (7 !== $request->query->count()) {
+            // Bypass the versions popup!
+            return;
+        }
 
-                if (null !== $objEvent) {
-                    $objReleaseLevelModelCurrent = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
-                    $titleCurrent = $objReleaseLevelModelCurrent ? $objReleaseLevelModelCurrent->title : 'not defined';
+        $action = $request->query->get('action');
 
-                    $objReleaseLevelModelNew = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
-                    $titleNew = $objReleaseLevelModelNew ? $objReleaseLevelModelNew->title : 'not defined';
+        if ('upgradeEventReleaseLevel' !== $action && 'downgradeEventReleaseLevel' !== $action) {
+            return;
+        }
 
-                    if (null !== $objReleaseLevelModelNew) {
-                        $objEvent->eventReleaseLevel = $objReleaseLevelModelNew->id;
-                        $objEvent->save();
+        $id = $request->query->get('id', 0);
+        $objEvent = $this->calendarEventsModel->findByPk($id);
 
-                        // Create new version
-                        $objVersions = new Versions('tl_calendar_events', $objEvent->id);
-                        $objVersions->initialize();
-                        $objVersions->create();
+        if (null === $objEvent) {
+            throw new \RuntimeException(sprintf('Event with ID %d not found.', $id));
+        }
 
-                        // System log
-                        $this->contaoGeneralLogger?->info(
-                            sprintf(
-                                'Event release level for event with ID %d ["%s"] pushed %s from "%s" to "%s".',
-                                $objEvent->id,
-                                $objEvent->title,
-                                $strDirection,
-                                $titleCurrent,
-                                $titleNew,
-                            ),
-                        );
-
-                        $this->eventReleaseLevelUtil->handleEventReleaseLevelAndPublishUnpublish((int) $objEvent->id, (int) $objEvent->eventReleaseLevel);
-
-                        // Dispatch ChangeEventReleaseLevelEvent event
-                        $event = new ChangeEventReleaseLevelEvent($request, $objEvent, $strDirection);
-                        $this->eventDispatcher->dispatch($event);
-                    }
-                }
+        if ('upgradeEventReleaseLevel' === $action) {
+            if (!$this->security->isGranted(CalendarEventsVoter::CAN_UPGRADE_EVENT_RELEASE_LEVEL, $objEvent->id)) {
+                $this->controller->redirect($this->system->getReferer());
             }
+        } else {
+            if (!$this->security->isGranted(CalendarEventsVoter::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $objEvent->id)) {
+                $this->controller->redirect($this->system->getReferer());
+            }
+        }
 
+        $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+
+        if (null === $objReleaseLevelModel) {
+            throw new \RuntimeException(sprintf('Could not find a valid event release level for event with ID %d.', $id));
+        }
+
+        $targetReleaseLevel = 'upgradeEventReleaseLevel' === $action ? $objReleaseLevelModel->level + 1 : $objReleaseLevelModel->level - 1;
+
+        if (false === EventReleaseLevelPolicyModel::levelExists($objEvent->id, $targetReleaseLevel)) {
             $this->controller->redirect($this->system->getReferer());
         }
 
-        if (true === $this->security->isGranted(CalendarEventsVoter::CAN_UPGRADE_EVENT_RELEASE_LEVEL, $row['id']) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel)) {
-            $blnAllow = true;
+        $objReleaseLevelModelCurrent = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+        $titleCurrent = $objReleaseLevelModelCurrent ? $objReleaseLevelModelCurrent->title : 'not defined';
+
+        if ('upgradeEventReleaseLevel' === $action) {
+            $objReleaseLevelModelTarget = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
+        } else {
+            $objReleaseLevelModelTarget = EventReleaseLevelPolicyModel::findPrevLevel($objEvent->eventReleaseLevel);
         }
 
-        if (!$blnAllow) {
-            $icon = str_replace('default', 'disabled', $icon);
+        $titleTarget = $objReleaseLevelModelTarget ? $objReleaseLevelModelTarget->title : 'not defined';
 
-            return $this->image->getHtml($icon, $label).' ';
+        if (null === $objReleaseLevelModelTarget) {
+            $this->controller->redirect($this->system->getReferer());
         }
 
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
+        $objEvent->eventReleaseLevel = $objReleaseLevelModelTarget->id;
+
+        if ($objEvent->isModified()) {
+            $objEvent->tstamp = time();
+            $objEvent->save();
+
+			// Dispatch ChangeEventReleaseLevelEvent event
+            $event = new ChangeEventReleaseLevelEvent($request, $objEvent, 'upgradeEventReleaseLevel' === $action ? 'up' : 'down');
+            $this->eventDispatcher->dispatch($event);
+
+			// Publish or unpublish event
+            $this->eventReleaseLevelUtil->publishOrUnpublishEventDependingOnEventReleaseLevel((int) $objEvent->id, (int) $objEvent->eventReleaseLevel);
+
+            // Create new version
+            $objVersions = new Versions('tl_calendar_events', $objEvent->id);
+            $objVersions->initialize();
+            $objVersions->create();
+
+            // System log
+            $this->contaoGeneralLogger?->info(
+                sprintf(
+                    'Event release level for event with ID %d ["%s"] has been %s from "%s" to "%s".',
+                    $objEvent->id,
+                    $objEvent->title,
+                    'upgradeEventReleaseLevel' === $action ? 'upgraded' : 'downgraded',
+                    $titleCurrent,
+                    $titleTarget,
+                ),
+            );
+        }
+
+        $this->controller->redirect($this->system->getReferer());
     }
 
     /**
-     * Downgrade event to the previous release level.
-     *
      * @throws \Exception
      */
-    #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.releaseLevelPrev.button', priority: 90)]
-    public function releaseLevelPrev(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.upgradeEventReleaseLevel.button', priority: 100)]
+    #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.downgradeEventReleaseLevel.button', priority: 100)]
+    public function downOrUpgradeEventReleaseLevelIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $mode = str_contains((string) $href, 'upgradeEventReleaseLevel') ? 'upgradeEventReleaseLevel' : 'downgradeEventReleaseLevel';
 
-        $strDirection = 'down';
-
-        $blnAllow = false;
-        $prevReleaseLevel = null;
+        $blnAllow = true;
         $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
+        $targetReleaseLevel = null;
 
-        if (null !== $objReleaseLevelModel) {
-            $prevReleaseLevel = $objReleaseLevelModel->level - 1;
-        }
-
-        // Save to database
-        if ('releaseLevelPrev' === $request->query->get('action') && (int) $request->query->get('eventId') === (int) $row['id']) {
-            if (true === $this->security->isGranted(CalendarEventsVoter::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $row['id']) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
-                $objEvent = $this->calendarEventsModel->findByPk($request->query->get('eventId'));
-
-                if (null !== $objEvent) {
-                    $objReleaseLevelModelCurrent = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
-                    $titleCurrent = $objReleaseLevelModelCurrent ? $objReleaseLevelModelCurrent->title : 'not defined';
-
-                    $objReleaseLevelModelNew = EventReleaseLevelPolicyModel::findPrevLevel($objEvent->eventReleaseLevel);
-                    $titleNew = $objReleaseLevelModelNew ? $objReleaseLevelModelNew->title : 'not defined';
-
-                    if (null !== $objReleaseLevelModelNew) {
-                        $objEvent->eventReleaseLevel = $objReleaseLevelModelNew->id;
-                        $objEvent->save();
-
-                        // Create new version
-                        $objVersions = new Versions('tl_calendar_events', $objEvent->id);
-                        $objVersions->initialize();
-                        $objVersions->create();
-
-                        // System log
-                        $this->contaoGeneralLogger?->info(
-                            sprintf(
-                                'Event release level for event with ID %d ["%s"] pushed %s from "%s" to "%s".',
-                                $objEvent->id,
-                                $objEvent->title,
-                                $strDirection,
-                                $titleCurrent,
-                                $titleNew,
-                            ),
-                        );
-
-                        $this->eventReleaseLevelUtil->handleEventReleaseLevelAndPublishUnpublish((int) $objEvent->id, (int) $objEvent->eventReleaseLevel);
-
-                        // Dispatch ChangeEventReleaseLevelEvent event
-                        $event = new ChangeEventReleaseLevelEvent($request, $objEvent, $strDirection);
-                        $this->eventDispatcher->dispatch($event);
-                    }
-                }
+        if ('upgradeEventReleaseLevel' === $mode) {
+            if (null !== $objReleaseLevelModel) {
+                $targetReleaseLevel = $objReleaseLevelModel->level + 1;
             }
 
-            $this->controller->redirect($this->system->getReferer());
+            if (!$this->security->isGranted(CalendarEventsVoter::CAN_UPGRADE_EVENT_RELEASE_LEVEL, $row['id'])) {
+                $blnAllow = false;
+            }
+        } else {
+            if (null !== $objReleaseLevelModel) {
+                $targetReleaseLevel = $objReleaseLevelModel->level - 1;
+            }
+
+            if (!$this->security->isGranted(CalendarEventsVoter::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $row['id'])) {
+                $blnAllow = false;
+            }
         }
 
-        if (true === $this->security->isGranted(CalendarEventsVoter::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $row['id']) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
-            $blnAllow = true;
+        if (!EventReleaseLevelPolicyModel::levelExists($row['id'], $targetReleaseLevel)) {
+            $blnAllow = false;
         }
 
         if (!$blnAllow) {
@@ -469,7 +455,7 @@ class CalendarEvents
             return $this->image->getHtml($icon, $label).' ';
         }
 
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.delete.button', priority: 80)]

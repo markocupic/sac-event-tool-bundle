@@ -19,30 +19,30 @@ use Contao\Model;
 
 class EventReleaseLevelPolicyPackageModel extends Model
 {
-	/**
-	 * Table name.
-	 *
-	 * @var string
-	 */
-	protected static $strTable = 'tl_event_release_level_policy_package';
+    /**
+     * Table name.
+     *
+     * @var string
+     */
+    protected static $strTable = 'tl_event_release_level_policy_package';
 
-	/**
-	 * @param $eventId
-	 */
-	public static function findReleaseLevelPolicyPackageModelByEventId($eventId): static|null
-	{
-		$objEvent = CalendarEventsModel::findByPk($eventId);
+    /**
+     * @param $eventId
+     */
+    public static function findReleaseLevelPolicyPackageModelByEventId($eventId): static|null
+    {
+        $objEvent = CalendarEventsModel::findByPk($eventId);
 
-		if (null === $objEvent) {
-			return null;
-		}
+        if (null === $objEvent) {
+            return null;
+        }
 
-		$objEventType = EventTypeModel::findOneBy('alias', $objEvent->eventType);
+        $objEventType = EventTypeModel::findOneBy('alias', $objEvent->eventType);
 
-		if (null === $objEventType || !$objEventType->levelAccessPermissionPackage > 0) {
-			return null;
-		}
+        if (null === $objEventType || !$objEventType->levelAccessPermissionPackage > 0) {
+            return null;
+        }
 
-		return static::findByPk($objEventType->levelAccessPermissionPackage);
-	}
+        return static::findByPk($objEventType->levelAccessPermissionPackage);
+    }
 }

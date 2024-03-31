@@ -154,9 +154,9 @@ class CalendarEventsMember
         $user = $this->security->getUser();
 
         // Generally do not allow selectAll to non-admins.
-	    if(!$this->security->isGranted('ROLE_ADMIN')){
-		    unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['all']);
-	    }
+        if (!$this->security->isGranted('ROLE_ADMIN')) {
+            unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['all']);
+        }
 
         if (!$this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $dc->id)) {
             unset(

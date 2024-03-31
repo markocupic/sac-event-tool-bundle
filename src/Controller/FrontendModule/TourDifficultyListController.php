@@ -19,7 +19,6 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\ModuleModel;
-use Contao\Template;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,7 +58,7 @@ class TourDifficultyListController extends AbstractFrontendModuleController
             }
         }
 
-        $template->set('difficulties',$arrDifficulty);
+        $template->set('difficulties', $arrDifficulty);
 
         return $template->getResponse();
     }

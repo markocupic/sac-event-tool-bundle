@@ -16,7 +16,6 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Code4Nix\UriSigner\UriSigner;
 use Codefog\HasteBundle\UrlParser;
-use Contao\Backend;
 use Contao\BackendTemplate;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
@@ -29,7 +28,6 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\DataContainer;
 use Contao\Events;
-use Contao\Image;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\StringUtil;

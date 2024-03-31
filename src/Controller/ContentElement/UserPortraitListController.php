@@ -22,7 +22,6 @@ use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\FrontendTemplate;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Contao\Template;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;

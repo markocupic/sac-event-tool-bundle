@@ -23,7 +23,6 @@ use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -41,14 +40,6 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
     ) {
     }
 
-	/**
-	 * @param Request $request
-	 * @param ModuleModel $model
-	 * @param string $section
-	 * @param array|null $classes
-	 * @param PageModel|null $page
-	 * @return Response
-	 */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         $inputAdapter = $this->framework->getAdapter(Input::class);
@@ -73,18 +64,12 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-	/**
-	 * @param FragmentTemplate $template
-	 * @param ModuleModel $model
-	 * @param Request $request
-	 * @return Response
-	 */
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $params = '/'.$this->objEvent->alias;
 
-        $template->set('jumpTo',$this->objJumpTo->getFrontendUrl($params));
-        $template->set('btnLbl',$model->eventRegCheckoutLinkLabel);
+        $template->set('jumpTo', $this->objJumpTo->getFrontendUrl($params));
+        $template->set('btnLbl', $model->eventRegCheckoutLinkLabel);
 
         return $template->getResponse();
     }

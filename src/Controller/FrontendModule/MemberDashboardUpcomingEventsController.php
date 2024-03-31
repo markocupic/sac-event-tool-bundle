@@ -256,14 +256,14 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         $this->template->set('hasErrorMessage', false);
 
         if ($messageAdapter->hasInfo()) {
-	        $session = $request->getSession()->getFlashBag()->get('contao.FE.info');
-	        $this->template->set('hasInfoMessage', true);
+            $session = $request->getSession()->getFlashBag()->get('contao.FE.info');
+            $this->template->set('hasInfoMessage', true);
             $this->template->set('infoMessage', $session[0]);
         }
 
         if ($messageAdapter->hasError()) {
-	        $session = $request->getSession()->getFlashBag()->get('contao.FE.error');
-	        $this->template->set('hasErrorMessage', true);
+            $session = $request->getSession()->getFlashBag()->get('contao.FE.error');
+            $this->template->set('hasErrorMessage', true);
             $this->template->set('errorMessage', $session[0]);
             $this->template->set('errorMessages', $session);
         }

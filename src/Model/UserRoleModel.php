@@ -18,10 +18,10 @@ use Contao\Model;
 
 class UserRoleModel extends Model
 {
-	/**
-	 * Table name.
-	 *
-	 * @var string
-	 */
-	protected static $strTable = 'tl_user_role';
+    /**
+     * Table name.
+     *
+     * @var string
+     */
+    protected static $strTable = 'tl_user_role';
 }

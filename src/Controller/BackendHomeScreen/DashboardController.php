@@ -40,288 +40,288 @@ use Twig\Error\SyntaxError;
 
 class DashboardController
 {
-	private Adapter $calendarEventsHelperAdapter;
-	private Adapter $calendarEventsModelAdapter;
-	private Adapter $configAdapter;
-	private Adapter $stringUtilAdapter;
+    private Adapter $calendarEventsHelperAdapter;
+    private Adapter $calendarEventsModelAdapter;
+    private Adapter $configAdapter;
+    private Adapter $stringUtilAdapter;
 
-	public function __construct(
-		private readonly ContaoFramework $framework,
-		private readonly Connection $connection,
-		private readonly RequestStack $requestStack,
-		private readonly Twig $twig,
-		private readonly Security $security,
-		private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
-		private readonly UrlParser $urlParser,
-		private readonly UriSigner $uriSigner,
-		private readonly RouterInterface $router,
-	) {
-		// Adapters
-		$this->calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-		$this->calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-		$this->configAdapter = $this->framework->getAdapter(Config::class);
-		$this->stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-	}
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
+        private readonly RequestStack $requestStack,
+        private readonly Twig $twig,
+        private readonly Security $security,
+        private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
+        private readonly UrlParser $urlParser,
+        private readonly UriSigner $uriSigner,
+        private readonly RouterInterface $router,
+    ) {
+        // Adapters
+        $this->calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+        $this->configAdapter = $this->framework->getAdapter(Config::class);
+        $this->stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+    }
 
-	/**
-	 * @throws Exception
-	 * @throws LoaderError
-	 * @throws RuntimeError
-	 * @throws SyntaxError
-	 */
-	public function generate(): Response
-	{
-		$html = '';
+    /**
+     * @throws Exception
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    public function generate(): Response
+    {
+        $html = '';
 
-		/** @var BackendUser $user */
-		$user = $this->security->getUser();
+        /** @var BackendUser $user */
+        $user = $this->security->getUser();
 
-		if ($user instanceof BackendUser) {
-			$upcomingEvents = $this->getUpcomingEvents($user);
-			$pastEvents = $this->getPastEvents($user);
+        if ($user instanceof BackendUser) {
+            $upcomingEvents = $this->getUpcomingEvents($user);
+            $pastEvents = $this->getPastEvents($user);
 
-			$events = array_merge(
-				[['separator' => 'upcoming-events']],
-				$this->prepareForTwig($upcomingEvents, 'upcoming-event'),
-				[['separator' => 'past-events']],
-				$this->prepareForTwig($pastEvents, 'past-event')
-			);
+            $events = array_merge(
+                [['separator' => 'upcoming-events']],
+                $this->prepareForTwig($upcomingEvents, 'upcoming-event'),
+                [['separator' => 'past-events']],
+                $this->prepareForTwig($pastEvents, 'past-event')
+            );
 
-			$html = $this->twig->render(
-				'@MarkocupicSacEventTool/BackendHomeScreen/dashboard.html.twig',
-				[
-					'events'              => $events,
-					'has_upcoming_events' => !empty($upcomingEvents),
-					'has_past_events'     => !empty($pastEvents),
-				]
-			);
-		}
+            $html = $this->twig->render(
+                '@MarkocupicSacEventTool/BackendHomeScreen/dashboard.html.twig',
+                [
+                    'events' => $events,
+                    'has_upcoming_events' => !empty($upcomingEvents),
+                    'has_past_events' => !empty($pastEvents),
+                ]
+            );
+        }
 
-		return new Response($html);
-	}
+        return new Response($html);
+    }
 
-	/**
-	 * @throws Exception
-	 */
-	private function getUpcomingEvents(BackendUser $user): array
-	{
-		$timeCut = time() - 15 * 24 * 3600; // 14 + 1 days
+    /**
+     * @throws Exception
+     */
+    private function getUpcomingEvents(BackendUser $user): array
+    {
+        $timeCut = time() - 15 * 24 * 3600; // 14 + 1 days
 
-		$arrAllowedCalIds = $this->getAllowedCalendarIds();
-		$arrAllowedCalIds = empty($arrAllowedCalIds) ? [0] : $arrAllowedCalIds;
+        $arrAllowedCalIds = $this->getAllowedCalendarIds();
+        $arrAllowedCalIds = empty($arrAllowedCalIds) ? [0] : $arrAllowedCalIds;
 
-		$result = $this->connection->executeQuery(
-			'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN('.implode(',', $arrAllowedCalIds).') AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate > ? ORDER BY t1.startDate',
-			[
-				$user->id,
-				$user->id,
-				$timeCut,
-			]
-		);
+        $result = $this->connection->executeQuery(
+            'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN('.implode(',', $arrAllowedCalIds).') AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate > ? ORDER BY t1.startDate',
+            [
+                $user->id,
+                $user->id,
+                $timeCut,
+            ]
+        );
 
-		return $result->fetchAllAssociative();
-	}
+        return $result->fetchAllAssociative();
+    }
 
-	/**
-	 * @throws Exception
-	 */
-	private function getPastEvents(BackendUser $user): array
-	{
-		$timeCut = time() - 15 * 24 * 3600; // 14 + 1 days
+    /**
+     * @throws Exception
+     */
+    private function getPastEvents(BackendUser $user): array
+    {
+        $timeCut = time() - 15 * 24 * 3600; // 14 + 1 days
 
-		$arrAllowedCalIds = $this->getAllowedCalendarIds();
-		$arrAllowedCalIds = empty($arrAllowedCalIds) ? [0] : $arrAllowedCalIds;
+        $arrAllowedCalIds = $this->getAllowedCalendarIds();
+        $arrAllowedCalIds = empty($arrAllowedCalIds) ? [0] : $arrAllowedCalIds;
 
-		$result = $this->connection->executeQuery(
-			'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN ('.implode(',', $arrAllowedCalIds).') AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate <= ? AND t1.startDate > ? ORDER BY t1.startDate DESC LIMIT 0,10',
-			[
-				$user->id,
-				$user->id,
-				$timeCut,
-				time() - 1.5 * 365 * 24 * 3600,
-			]
-		);
+        $result = $this->connection->executeQuery(
+            'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN ('.implode(',', $arrAllowedCalIds).') AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate <= ? AND t1.startDate > ? ORDER BY t1.startDate DESC LIMIT 0,10',
+            [
+                $user->id,
+                $user->id,
+                $timeCut,
+                time() - 1.5 * 365 * 24 * 3600,
+            ]
+        );
 
-		return $result->fetchAllAssociative();
-	}
+        return $result->fetchAllAssociative();
+    }
 
-	/**
-	 * @throws Exception
-	 * @throws \Exception
-	 */
-	private function prepareForTwig(array $arrEvents, string $rowClass): array
-	{
-		$events = [];
-		$rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
-		$refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
+    /**
+     * @throws Exception
+     * @throws \Exception
+     */
+    private function prepareForTwig(array $arrEvents, string $rowClass): array
+    {
+        $events = [];
+        $rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
+        $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
 
-		foreach ($arrEvents as $row) {
-			$eventModel = $this->calendarEventsModelAdapter->findByPk($row['id']);
-			$title = $this->stringUtilAdapter->decodeEntities($eventModel->title);
-			$title = $this->stringUtilAdapter->restoreBasicEntities($title);
+        foreach ($arrEvents as $row) {
+            $eventModel = $this->calendarEventsModelAdapter->findByPk($row['id']);
+            $title = $this->stringUtilAdapter->decodeEntities($eventModel->title);
+            $title = $this->stringUtilAdapter->restoreBasicEntities($title);
 
-			$hrefEvent = $this->router->generate('contao_backend', [
-				'do'    => 'calendar',
-				'table' => 'tl_calendar_events',
-				'id'    => $eventModel->id,
-				'act'   => 'edit',
-				'rt'    => $rt,
-				'ref'   => $refId,
-			]);
+            $hrefEvent = $this->router->generate('contao_backend', [
+                'do' => 'calendar',
+                'table' => 'tl_calendar_events',
+                'id' => $eventModel->id,
+                'act' => 'edit',
+                'rt' => $rt,
+                'ref' => $refId,
+            ]);
 
-			$hrefRegistrations = $this->router->generate('contao_backend', [
-				'do'    => 'calendar',
-				'table' => 'tl_calendar_events_member',
-				'id'    => $eventModel->id,
-				'rt'    => $rt,
-				'ref'   => $refId,
-			]);
+            $hrefRegistrations = $this->router->generate('contao_backend', [
+                'do' => 'calendar',
+                'table' => 'tl_calendar_events_member',
+                'id' => $eventModel->id,
+                'rt' => $rt,
+                'ref' => $refId,
+            ]);
 
-			$hrefEventListing = $this->router->generate('contao_backend', [
-				'do'    => 'calendar',
-				'table' => 'tl_calendar_events',
-				'id'    => $eventModel->pid,
-				'rt'    => $rt,
-				'ref'   => $refId,
-			]);
+            $hrefEventListing = $this->router->generate('contao_backend', [
+                'do' => 'calendar',
+                'table' => 'tl_calendar_events',
+                'id' => $eventModel->pid,
+                'rt' => $rt,
+                'ref' => $refId,
+            ]);
 
-			$event = [];
-			$event['row_class'] = $rowClass;
-			$event['badge'] = $this->calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($eventModel);
-			$event['title'] = $title;
-			$event['date'] = date($this->configAdapter->get('dateFormat'), (int)$eventModel->startDate);
-			$event['state_icon'] = $this->calendarEventsHelperAdapter->getEventStateIcon($eventModel);
-			$event['release_level'] = $this->calendarEventsHelperAdapter->getEventReleaseLevelAsString($eventModel);
-			$event['href_eventListing'] = $hrefEventListing;
-			$event['href_email'] = $this->generateEmailHref($eventModel);
-			$event['href_event'] = $hrefEvent;
-			$event['href_preview'] = $this->calendarEventsHelperAdapter->generateEventPreviewUrl($eventModel);
-			$event['href_print_report'] = $this->generatePrintReportHref($eventModel);
-			$event['href_registrations'] = $hrefRegistrations;
-			$event['href_report'] = $this->generateReportHref($eventModel);
-			$event['has_filled_in_tour_report'] = $eventModel->filledInEventReportForm;
+            $event = [];
+            $event['row_class'] = $rowClass;
+            $event['badge'] = $this->calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($eventModel);
+            $event['title'] = $title;
+            $event['date'] = date($this->configAdapter->get('dateFormat'), (int) $eventModel->startDate);
+            $event['state_icon'] = $this->calendarEventsHelperAdapter->getEventStateIcon($eventModel);
+            $event['release_level'] = $this->calendarEventsHelperAdapter->getEventReleaseLevelAsString($eventModel);
+            $event['href_eventListing'] = $hrefEventListing;
+            $event['href_email'] = $this->generateEmailHref($eventModel);
+            $event['href_event'] = $hrefEvent;
+            $event['href_preview'] = $this->calendarEventsHelperAdapter->generateEventPreviewUrl($eventModel);
+            $event['href_print_report'] = $this->generatePrintReportHref($eventModel);
+            $event['href_registrations'] = $hrefRegistrations;
+            $event['href_report'] = $this->generateReportHref($eventModel);
+            $event['has_filled_in_tour_report'] = $eventModel->filledInEventReportForm;
 
-			$events[] = $event;
-		}
+            $events[] = $event;
+        }
 
-		return $events;
-	}
+        return $events;
+    }
 
-	/**
-	 * @throws Exception
-	 */
-	private function generateEmailHref(CalendarEventsModel $eventModel): string|null
-	{
-		$regId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$eventModel->id]);
+    /**
+     * @throws Exception
+     */
+    private function generateEmailHref(CalendarEventsModel $eventModel): string|null
+    {
+        $regId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$eventModel->id]);
 
-		if ($regId) {
-			$url = System::getContainer()->get('router')->generate(EventParticipantEmailController::class);
+        if ($regId) {
+            $url = System::getContainer()->get('router')->generate(EventParticipantEmailController::class);
 
-			$url = $this->urlParser->addQueryString('eventId='.$eventModel->id, $url);
-			$url = $this->urlParser->addQueryString('rt='.$this->contaoCsrfTokenManager->getDefaultTokenValue(), $url);
-			$url = $this->urlParser->addQueryString('sid='.uniqid(), $url);
+            $url = $this->urlParser->addQueryString('eventId='.$eventModel->id, $url);
+            $url = $this->urlParser->addQueryString('rt='.$this->contaoCsrfTokenManager->getDefaultTokenValue(), $url);
+            $url = $this->urlParser->addQueryString('sid='.uniqid(), $url);
 
-			return $this->uriSigner->sign($url);
-		}
+            return $this->uriSigner->sign($url);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	private function generateReportHref(CalendarEventsModel $eventModel): string|null
-	{
-		$rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
-		$refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
+    private function generateReportHref(CalendarEventsModel $eventModel): string|null
+    {
+        $rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
+        $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
 
-		if (EventType::TOUR === $eventModel->eventType || EventType::LAST_MINUTE_TOUR === $eventModel->eventType) {
-			return $this->router->generate('contao_backend', [
-				'do'    => 'calendar',
-				'table' => 'tl_calendar_events',
-				'act'   => 'edit',
-				'call'  => 'writeTourReport',
-				'id'    => $eventModel->id,
-				'rt'    => $rt,
-				'ref'   => $refId,
-			]);
-		}
+        if (EventType::TOUR === $eventModel->eventType || EventType::LAST_MINUTE_TOUR === $eventModel->eventType) {
+            return $this->router->generate('contao_backend', [
+                'do' => 'calendar',
+                'table' => 'tl_calendar_events',
+                'act' => 'edit',
+                'call' => 'writeTourReport',
+                'id' => $eventModel->id,
+                'rt' => $rt,
+                'ref' => $refId,
+            ]);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	private function generatePrintReportHref(CalendarEventsModel $eventModel): string|null
-	{
-		$rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
-		$refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
+    private function generatePrintReportHref(CalendarEventsModel $eventModel): string|null
+    {
+        $rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
+        $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
 
-		if (EventType::TOUR === $eventModel->eventType || EventType::LAST_MINUTE_TOUR === $eventModel->eventType) {
-			return $this->router->generate('contao_backend', [
-				'do'    => 'calendar',
-				'table' => 'tl_calendar_events_instructor_invoice',
-				'id'    => $eventModel->id,
-				'rt'    => $rt,
-				'ref'   => $refId,
-			]);
-		}
+        if (EventType::TOUR === $eventModel->eventType || EventType::LAST_MINUTE_TOUR === $eventModel->eventType) {
+            return $this->router->generate('contao_backend', [
+                'do' => 'calendar',
+                'table' => 'tl_calendar_events_instructor_invoice',
+                'id' => $eventModel->id,
+                'rt' => $rt,
+                'ref' => $refId,
+            ]);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * @return array<int>
-	 * @throws Exception
-	 *
-	 */
-	private function getAllowedCalendarContainerIds(): array
-	{
-		/** @var BackendUser $user */
-		$user = $this->security->getUser();
+    /**
+     * @throws Exception
+     *
+     * @return array<int>
+     */
+    private function getAllowedCalendarContainerIds(): array
+    {
+        /** @var BackendUser $user */
+        $user = $this->security->getUser();
 
-		if ($this->security->isGranted('ROLE_ADMIN')) {
-			$arrIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar_container');
-		} else {
-			$arrIds = $user->calendar_containers;
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            $arrIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar_container');
+        } else {
+            $arrIds = $user->calendar_containers;
 
-			if (!\is_array($arrIds) || empty($arrIds)) {
-				$arrIds = [];
-			}
-		}
+            if (!\is_array($arrIds) || empty($arrIds)) {
+                $arrIds = [];
+            }
+        }
 
-		return array_map('\intval', $arrIds);
-	}
+        return array_map('\intval', $arrIds);
+    }
 
-	/**
-	 * @return array<int>
-	 * @throws Exception
-	 *
-	 */
-	private function getAllowedCalendarIds(): array
-	{
-		$arrCalContainerIds = $this->getAllowedCalendarContainerIds();
+    /**
+     * @throws Exception
+     *
+     * @return array<int>
+     */
+    private function getAllowedCalendarIds(): array
+    {
+        $arrCalContainerIds = $this->getAllowedCalendarContainerIds();
 
-		/** @var BackendUser $user */
-		$user = $this->security->getUser();
+        /** @var BackendUser $user */
+        $user = $this->security->getUser();
 
-		if ($this->security->isGranted('ROLE_ADMIN')) {
-			$arrCalendarIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar');
-		} else {
-			$arrCalendarIds = $user->calendars;
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            $arrCalendarIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar');
+        } else {
+            $arrCalendarIds = $user->calendars;
 
-			if (!\is_array($arrCalendarIds) || empty($arrCalendarIds)) {
-				$arrCalendarIds = [];
-			}
-		}
+            if (!\is_array($arrCalendarIds) || empty($arrCalendarIds)) {
+                $arrCalendarIds = [];
+            }
+        }
 
-		$arrAllowed = [];
+        $arrAllowed = [];
 
-		foreach ($arrCalendarIds as $calId) {
-			$pid = $this->connection->fetchOne('SELECT pid FROM tl_calendar WHERE id = ?', [$calId]);
+        foreach ($arrCalendarIds as $calId) {
+            $pid = $this->connection->fetchOne('SELECT pid FROM tl_calendar WHERE id = ?', [$calId]);
 
-			if (false !== $pid) {
-				if (\in_array($pid, $arrCalContainerIds, true)) {
-					$arrAllowed[] = $calId;
-				}
-			}
-		}
+            if (false !== $pid) {
+                if (\in_array($pid, $arrCalContainerIds, true)) {
+                    $arrAllowed[] = $calId;
+                }
+            }
+        }
 
-		return array_map('\intval', $arrAllowed);
-	}
+        return array_map('\intval', $arrAllowed);
+    }
 }

@@ -80,11 +80,11 @@ class ModuleSacEventToolEventPreviewReader extends Events
 
         $eventId = Input::get('auto_item');
 
-		try{
-			$objEvent = CalendarEventsModel::findByIdOrAlias($eventId);
-		}catch (\Exception $e){
-			throw new InternalServerErrorException('Could not find a valid event id/alias in the url.');
-		}
+        try {
+            $objEvent = CalendarEventsModel::findByIdOrAlias($eventId);
+        } catch (\Exception $e) {
+            throw new InternalServerErrorException('Could not find a valid event id/alias in the url.');
+        }
 
         if (null === $objEvent) {
             throw new InternalServerErrorException('Event "'.$eventId.'" not found.');
@@ -113,9 +113,9 @@ class ModuleSacEventToolEventPreviewReader extends Events
 
         $this->Template->event = '';
 
-	    $eventId = Input::get('auto_item');
+        $eventId = Input::get('auto_item');
 
-	    if ($this->overviewPage) {
+        if ($this->overviewPage) {
             $this->Template->referer = PageModel::findById($this->overviewPage)->getFrontendUrl();
             $this->Template->back = $this->customLabel ?: $GLOBALS['TL_LANG']['MSC']['eventOverview'];
         } else {

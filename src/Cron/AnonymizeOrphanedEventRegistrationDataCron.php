@@ -21,21 +21,21 @@ use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
 #[AsCronJob('daily')]
 class AnonymizeOrphanedEventRegistrationDataCron
 {
-	public function __construct(
-		private readonly ContaoFramework $framework,
-		private readonly ClearFrontendUserData $clearFrontendUserData,
-	) {
-	}
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly ClearFrontendUserData $clearFrontendUserData,
+    ) {
+    }
 
-	/**
-	 * Anonymize orphaned event registration data records
-	 * (tl_calendar_events_member).
-	 */
-	public function __invoke(): void
-	{
-		// Initialize contao framework
-		$this->framework->initialize();
+    /**
+     * Anonymize orphaned event registration data records
+     * (tl_calendar_events_member).
+     */
+    public function __invoke(): void
+    {
+        // Initialize contao framework
+        $this->framework->initialize();
 
-		$this->clearFrontendUserData->anonymizeOrphanedEventRegistrations();
-	}
+        $this->clearFrontendUserData->anonymizeOrphanedEventRegistrations();
+    }
 }

@@ -17,7 +17,6 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 use Codefog\HasteBundle\Form\Form;
 use Codefog\HasteBundle\UrlParser;
 use Contao\CalendarEventsModel;
-use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
@@ -424,10 +423,10 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     private function addTemplateVars(FragmentTemplate $template): Template
     {
-        $template->set('controller',$this);
-        $template->set('eventModel',$this->eventModel);
-        $template->set('memberModel',$this->memberModel);
-        $template->set('moduleModel',$this->moduleModel);
+        $template->set('controller', $this);
+        $template->set('eventModel', $this->eventModel);
+        $template->set('memberModel', $this->memberModel);
+        $template->set('moduleModel', $this->moduleModel);
 
         return $template;
     }

@@ -29,7 +29,6 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
-use Contao\Template;
 use Contao\Validator;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
@@ -139,7 +138,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
             $arrEvents[] = $event;
         }
 
-        $this->template->set('arrPastEvents',$arrEvents);
+        $this->template->set('arrPastEvents', $arrEvents);
 
         return $this->template->getResponse();
     }

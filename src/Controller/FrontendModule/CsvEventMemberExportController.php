@@ -28,6 +28,7 @@ use Contao\MemberModel;
 use Contao\ModuleModel;
 use Doctrine\DBAL\Connection;
 use League\Csv\ByteSequence;
+use League\Csv\CannotInsertRecord;
 use League\Csv\Exception;
 use League\Csv\InvalidArgument;
 use League\Csv\Writer;
@@ -52,16 +53,12 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     ) {
     }
 
-	/**
-	 * @param FragmentTemplate $template
-	 * @param ModuleModel $model
-	 * @param Request $request
-	 * @return Response
-	 * @throws Exception
-	 * @throws InvalidArgument
-	 * @throws \Doctrine\DBAL\Exception
-	 * @throws \League\Csv\CannotInsertRecord
-	 */
+    /**
+     * @throws Exception
+     * @throws InvalidArgument
+     * @throws \Doctrine\DBAL\Exception
+     * @throws CannotInsertRecord
+     */
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $form = $this->getForm($request);
@@ -71,14 +68,12 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         return $template->getResponse();
     }
 
-	/**
-	 * @param Request $request
-	 * @return Form
-	 * @throws Exception
-	 * @throws InvalidArgument
-	 * @throws \Doctrine\DBAL\Exception
-	 * @throws \League\Csv\CannotInsertRecord
-	 */
+    /**
+     * @throws Exception
+     * @throws InvalidArgument
+     * @throws \Doctrine\DBAL\Exception
+     * @throws CannotInsertRecord
+     */
     private function getForm(Request $request): Form
     {
         $objForm = new Form(
@@ -159,11 +154,6 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         return $objForm;
     }
 
-	/**
-	 * @param array $arrFields
-	 * @param array $arrEventMember
-	 * @return void
-	 */
     private function addLine(array $arrFields, array $arrEventMember): void
     {
         $arrLine = [];
@@ -175,10 +165,6 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $this->arrLines[] = $arrLine;
     }
 
-	/**
-	 * @param array $arrFields
-	 * @return void
-	 */
     private function getHeadline(array $arrFields): void
     {
         // Write headline
@@ -200,11 +186,6 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $this->arrLines[] = $arrHeadline;
     }
 
-	/**
-	 * @param string $field
-	 * @param array $arrEventMember
-	 * @return string
-	 */
     private function getField(string $field, array $arrEventMember): string
     {
         $date = $this->framework->getAdapter(Date::class);
@@ -281,13 +262,11 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         return (string) $value;
     }
 
-	/**
-	 * @param string $filename
-	 * @return void
-	 * @throws Exception
-	 * @throws InvalidArgument
-	 * @throws \League\Csv\CannotInsertRecord
-	 */
+    /**
+     * @throws Exception
+     * @throws InvalidArgument
+     * @throws CannotInsertRecord
+     */
     private function printCsv(string $filename): void
     {
         $arrData = $this->arrLines;

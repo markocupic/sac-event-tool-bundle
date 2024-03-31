@@ -23,88 +23,88 @@ use Contao\Message;
 
 class RotateImage
 {
-	private Adapter $messageAdapter;
+    private Adapter $messageAdapter;
 
-	public function __construct(
-		private readonly ContaoFramework $framework,
-		private readonly string $projectDir,
-	) {
-		$this->messageAdapter = $framework->getAdapter(Message::class);
-	}
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly string $projectDir,
+    ) {
+        $this->messageAdapter = $framework->getAdapter(Message::class);
+    }
 
-	/**
-	 * @throws \ImagickException
-	 */
-	public function rotate(FilesModel $filesModel = null, int $angle = 90, string $target = ''): bool
-	{
-		if (null === $filesModel) {
-			return false;
-		}
+    /**
+     * @throws \ImagickException
+     */
+    public function rotate(FilesModel $filesModel = null, int $angle = 90, string $target = ''): bool
+    {
+        if (null === $filesModel) {
+            return false;
+        }
 
-		$this->framework->initialize();
+        $this->framework->initialize();
 
-		if (!file_exists($filesModel->getAbsolutePath())) {
-			$this->messageAdapter->addError(sprintf('File "%s" not found.', $filesModel->getAbsolutePath()));
+        if (!file_exists($filesModel->getAbsolutePath())) {
+            $this->messageAdapter->addError(sprintf('File "%s" not found.', $filesModel->getAbsolutePath()));
 
-			return false;
-		}
+            return false;
+        }
 
-		$objFile = new File($filesModel->path);
+        $objFile = new File($filesModel->path);
 
-		if (!$objFile->isGdImage) {
-			$this->messageAdapter->addError(sprintf('File "%s" could not be rotated, because it is not an image.', $filesModel->getAbsolutePath()));
+        if (!$objFile->isGdImage) {
+            $this->messageAdapter->addError(sprintf('File "%s" could not be rotated, because it is not an image.', $filesModel->getAbsolutePath()));
 
-			return false;
-		}
+            return false;
+        }
 
-		if ('' === $target) {
-			$target = $filesModel->getAbsolutePath();
-		} else {
-			new Folder(\dirname($target));
-			$target = $this->projectDir.'/'.$target;
-		}
+        if ('' === $target) {
+            $target = $filesModel->getAbsolutePath();
+        } else {
+            new Folder(\dirname($target));
+            $target = $this->projectDir.'/'.$target;
+        }
 
-		if (class_exists('Imagick') && class_exists('ImagickPixel')) {
-			$imagick = new \Imagick();
+        if (class_exists('Imagick') && class_exists('ImagickPixel')) {
+            $imagick = new \Imagick();
 
-			if ($imagick->readImage($filesModel->getAbsolutePath())) {
-				if ($imagick->rotateImage(new \ImagickPixel('none'), $angle)) {
-					if ($imagick->writeImage($target)) {
-						$imagick->clear();
-						$imagick->destroy();
+            if ($imagick->readImage($filesModel->getAbsolutePath())) {
+                if ($imagick->rotateImage(new \ImagickPixel('none'), $angle)) {
+                    if ($imagick->writeImage($target)) {
+                        $imagick->clear();
+                        $imagick->destroy();
 
-						return true;
-					}
-				}
-			}
-		}
+                        return true;
+                    }
+                }
+            }
+        }
 
-		if (\function_exists('imagerotate')) {
-			$objGdImage = imagecreatefromjpeg($filesModel->getAbsolutePath());
+        if (\function_exists('imagerotate')) {
+            $objGdImage = imagecreatefromjpeg($filesModel->getAbsolutePath());
 
-			if (false !== $objGdImage) {
-				$objRotGdImage = imagerotate($objGdImage, $angle, 0);
+            if (false !== $objGdImage) {
+                $objRotGdImage = imagerotate($objGdImage, $angle, 0);
 
-				if (imagejpeg($objRotGdImage, $target)) {
-					// Free the memory
-					imagedestroy($objGdImage);
-					imagedestroy($objRotGdImage);
+                if (imagejpeg($objRotGdImage, $target)) {
+                    // Free the memory
+                    imagedestroy($objGdImage);
+                    imagedestroy($objRotGdImage);
 
-					if (is_file($target)) {
-						return true;
-					}
-				}
+                    if (is_file($target)) {
+                        return true;
+                    }
+                }
 
-				imagedestroy($objGdImage);
-			}
+                imagedestroy($objGdImage);
+            }
 
-			$this->messageAdapter->addError('An unexpected error occurred while attempting to rotate the image.');
+            $this->messageAdapter->addError('An unexpected error occurred while attempting to rotate the image.');
 
-			return false;
-		}
+            return false;
+        }
 
-		$this->messageAdapter->addError('Could not find any PHP library to rotate the image.');
+        $this->messageAdapter->addError('Could not find any PHP library to rotate the image.');
 
-		return false;
-	}
+        return false;
+    }
 }

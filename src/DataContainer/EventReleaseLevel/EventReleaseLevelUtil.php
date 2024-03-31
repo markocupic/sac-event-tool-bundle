@@ -39,66 +39,118 @@ class EventReleaseLevelUtil
         $this->message = $this->framework->getAdapter(Message::class);
     }
 
+    public function hasValidEventReleaseLevel(int $eventId, int $eventReleaseLevelId): bool
+    {
+        $objEvent = $this->calendarEventsModel->findByPk($eventId);
+
+        if (null === $objEvent) {
+            throw new \RuntimeException('Event not found.');
+        }
+
+        $highestValidEventReleaseModel = EventReleaseLevelPolicyModel::findHighestLevelByEventId($objEvent->id);
+
+        if (0 === $eventReleaseLevelId && null === $highestValidEventReleaseModel) {
+            return true;
+        }
+
+        if (0 === $eventReleaseLevelId && null !== $highestValidEventReleaseModel) {
+            return false;
+        }
+
+        $eventReleaseModel = EventReleaseLevelPolicyModel::findByPk($eventReleaseLevelId);
+
+        return $highestValidEventReleaseModel->pid === $eventReleaseModel->pid;
+    }
+
     /**
      * @throws \Exception
      */
-    public function handleEventReleaseLevelAndPublishUnpublish(int $eventId, int $targetEventReleaseLevelId): int
+    public function publishOrUnpublishEventDependingOnEventReleaseLevel(int $eventId, int $targetEventReleaseLevelId): int
     {
-        $hasError = false;
-
         $objEvent = $this->calendarEventsModel->findByPk($eventId);
 
         if (null === $objEvent) {
             throw new \Exception('Event not found.');
         }
 
-        $highestEventReleaseModel = EventReleaseLevelPolicyModel::findHighestLevelByEventId($objEvent->id);
+        $eventReleaseModel = EventReleaseLevelPolicyModel::findByPk($targetEventReleaseLevelId);
 
-        if (null !== $highestEventReleaseModel) {
-            // Display a message in the backend if the event has been published or unpublished.
-            // @todo For some reason this the comparison operator will not work without type casting the id.
-            if ((int) $highestEventReleaseModel->id === $targetEventReleaseLevelId) {
-                if (!$objEvent->published) {
-                    $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
-                }
+        if (!$this->hasValidEventReleaseLevel($eventId, $targetEventReleaseLevelId)) {
+            $lowestEventReleaseModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($objEvent->id);
 
-                $objEvent->published = true;
-                $objEvent->save();
-                $request = $this->requestStack->getCurrentRequest();
-
-                // Dispatch PublishEventEvent
-
-                $event = new PublishEventEvent($request, $objEvent);
-                $this->eventDispatcher->dispatch($event);
+            if (null === $lowestEventReleaseModel) {
+                // If no ev.rel.level policy package is assigned to the calendar,
+                // we set the ev.rel.level ID to 0
+                $objEvent->eventReleaseLevel = 0;
             } else {
-                $eventReleaseModel = EventReleaseLevelPolicyModel::findByPk($targetEventReleaseLevelId);
-                $lowestEventReleaseModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($objEvent->id);
+                // Set the lowest ev.rel.level ID
+                $objEvent->eventReleaseLevel = $lowestEventReleaseModel->id;
+            }
 
-                if (null !== $eventReleaseModel) {
-                    if ((int) $eventReleaseModel->pid !== (int) $lowestEventReleaseModel->pid) {
-                        $hasError = true;
+            // Unpublish event because evt.rel.level is invalid or 0.
+            $objEvent->published = 0;
 
-                        if ($objEvent->eventReleaseLevel > 0) {
-                            $targetEventReleaseLevelId = $objEvent->eventReleaseLevel;
-                            $this->message->addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" konnte nicht auf "%s" geändert werden, weil diese Freigabestufe zum Event-Typ ungültig ist. ', $objEvent->title, $objEvent->id, $eventReleaseModel->title));
-                        } else {
-                            $targetEventReleaseLevelId = $lowestEventReleaseModel->id;
-                            $this->message->addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" musste auf "%s" korrigiert werden, weil eine zum Event-Typ ungültige Freigabestufe gewählt wurde. ', $objEvent->title, $objEvent->id, $lowestEventReleaseModel->title));
-                        }
-                    }
-                }
-
-                if ($objEvent->published) {
-                    $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
-                }
-
-                $objEvent->published = false;
+            if ($objEvent->isModified()) {
+                $objEvent->tstamp = time();
                 $objEvent->save();
             }
 
-            if (!$hasError) {
-                // Display a message in the backend.
-                $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['setEventReleaseLevelTo'], $objEvent->id, EventReleaseLevelPolicyModel::findByPk($targetEventReleaseLevelId)->level));
+            $this->message->addError(
+                sprintf(
+                    'Die Freigabestufe für Event "%s (ID: %s)" konnte nicht auf "%s" geändert werden, weil diese Freigabestufe zum Event-Typ ungültig ist.',
+                    $objEvent->title,
+                    $objEvent->id,
+                    null !== $eventReleaseModel ? $eventReleaseModel->title : 'undefined',
+                )
+            );
+
+            return $objEvent->eventReleaseLevel;
+        }
+
+        // No evt.rel.level ID is valid
+        // if is no evt.rel.level.package is assigned
+        // to the calendar the event belongs to
+        if (0 === $targetEventReleaseLevelId) {
+            $objEvent->published = 0;
+
+            if ($objEvent->isModified()) {
+                $objEvent->tstamp = time();
+                $objEvent->save();
+            }
+
+            return $targetEventReleaseLevelId;
+        }
+
+        $highestEventReleaseModel = EventReleaseLevelPolicyModel::findHighestLevelByEventId($objEvent->id);
+
+        if (null === $highestEventReleaseModel) {
+            throw new \RuntimeException(sprintf('Could not determine the highest event release level for the event with ID %d.', $objEvent->id));
+        }
+
+        // @todo For some reason this the comparison operator will not work without type casting the id.
+        if ((int) $highestEventReleaseModel->id === $targetEventReleaseLevelId) {
+	        if(!$objEvent->published){
+		        $objEvent->published = 1;
+		        $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
+
+		        // Dispatch PublishEventEvent
+		        $event = new PublishEventEvent($this->requestStack->getCurrentRequest(), $objEvent);
+		        $this->eventDispatcher->dispatch($event);
+	        }
+
+            if ($objEvent->isModified()) {
+                $objEvent->tstamp = time();
+                $objEvent->save();
+            }
+        } else {
+			if( $objEvent->published){
+				$objEvent->published = 0;
+				$this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
+			}
+
+            if ($objEvent->isModified()) {
+                $objEvent->tstamp = time();
+                $objEvent->save();
             }
         }
 

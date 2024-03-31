@@ -33,7 +33,7 @@ class CorsListener
      */
     public function __invoke(ResponseEvent $event): void
     {
-		$responseHeaders = $event->getResponse()->headers;
+        $responseHeaders = $event->getResponse()->headers;
         $responseHeaders->set('Access-Control-Allow-Headers', 'origin, content-type, accept,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type');
         $responseHeaders->set('Access-Control-Allow-Origin', '*');
         $responseHeaders->set('Access-Control-Allow-Credentials', 'true');

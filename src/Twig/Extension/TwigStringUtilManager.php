@@ -21,22 +21,22 @@ use Twig\TwigFilter;
 
 class TwigStringUtilManager extends AbstractExtension
 {
-	public function __construct(
-		private readonly ContaoFramework $framework,
-	) {
-	}
+    public function __construct(
+        private readonly ContaoFramework $framework,
+    ) {
+    }
 
-	public function getFilters(): array
-	{
-		return [
-			new TwigFilter('revert_input_encoding', [$this, 'revertInputEncoding']),
-		];
-	}
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('revert_input_encoding', [$this, 'revertInputEncoding']),
+        ];
+    }
 
-	public function revertInputEncoding(string $str): string
-	{
-		$stringUtil = $this->framework->getAdapter(StringUtil::class);
+    public function revertInputEncoding(string $str): string
+    {
+        $stringUtil = $this->framework->getAdapter(StringUtil::class);
 
-		return $stringUtil->revertInputEncoding($str);
-	}
+        return $stringUtil->revertInputEncoding($str);
+    }
 }

@@ -33,70 +33,71 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EventICal
 {
-	private Adapter $calendarEventsHelper;
-	private Adapter $events;
-	private Adapter $stringUtil;
+    private Adapter $calendarEventsHelper;
+    private Adapter $events;
+    private Adapter $stringUtil;
 
-	public function __construct(
-		private readonly ContaoFramework $framework,
-		private readonly InsertTagParser $insertTagParser,
-	) {
-		$this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
-		$this->events = $this->framework->getAdapter(Events::class);
-		$this->stringUtil = $this->framework->getAdapter(StringUtil::class);
-	}
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly InsertTagParser $insertTagParser,
+    ) {
+        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->events = $this->framework->getAdapter(Events::class);
+        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
+    }
 
-	public function download(CalendarEventsModel $objEvent): Response
-	{
-		// Summary
-		$summary = $this->insertTagParser->replaceInline($objEvent->title);
-		$summary = strip_tags($this->stringUtil->revertInputEncoding($summary));
+    public function download(CalendarEventsModel $objEvent): Response
+    {
+        // Summary
+        $summary = $this->insertTagParser->replaceInline($objEvent->title);
+        $summary = strip_tags($this->stringUtil->revertInputEncoding($summary));
 
-		// Location
-		$location = $this->insertTagParser->replaceInline($objEvent->location);
-		$location = strip_tags($this->stringUtil->revertInputEncoding($location));
+        // Location
+        $location = $this->insertTagParser->replaceInline($objEvent->location);
+        $location = strip_tags($this->stringUtil->revertInputEncoding($location));
 
-		// Get the url
-		$url = $this->events->generateEventUrl($objEvent, true);
+        // Get the url
+        $url = $this->events->generateEventUrl($objEvent, true);
 
-		$arrEvents = [];
-		$arrEventTimestamps = $this->calendarEventsHelper->getEventTimestamps($objEvent);
+        $arrEvents = [];
+        $arrEventTimestamps = $this->calendarEventsHelper->getEventTimestamps($objEvent);
 
-		foreach ($arrEventTimestamps as $timestamp) {
-			$occurrence = new SingleDay(
-				new Date(
-					new \DateTime(
-						date('d.m.Y', (int)$timestamp)
-					)
-				)
-			);
+        foreach ($arrEventTimestamps as $timestamp) {
+            $occurrence = new SingleDay(
+                new Date(
+                    new \DateTime(
+                        date('d.m.Y', (int) $timestamp)
+                    )
+                )
+            );
 
-			$vEvent = new Event();
-			$vEvent
-				->setSummary($summary)
-				->setLocation(new Location($location))
-				->setUrl(new Uri($url))
-				->setOccurrence($occurrence);
+            $vEvent = new Event();
+            $vEvent
+                ->setSummary($summary)
+                ->setLocation(new Location($location))
+                ->setUrl(new Uri($url))
+                ->setOccurrence($occurrence)
+            ;
 
-			$arrEvents[] = $vEvent;
-		}
+            $arrEvents[] = $vEvent;
+        }
 
-		$vCalendar = new Calendar([...$arrEvents]);
-		$componentFactory = new CalendarFactory();
-		$calendarComponent = $componentFactory->createCalendar($vCalendar);
+        $vCalendar = new Calendar([...$arrEvents]);
+        $componentFactory = new CalendarFactory();
+        $calendarComponent = $componentFactory->createCalendar($vCalendar);
 
-		$response = new Response((string)$calendarComponent);
+        $response = new Response((string) $calendarComponent);
 
-		$disposition = HeaderUtils::makeDisposition(
-			HeaderUtils::DISPOSITION_ATTACHMENT,
-			sprintf('%s.ics', $objEvent->alias),
-		);
+        $disposition = HeaderUtils::makeDisposition(
+            HeaderUtils::DISPOSITION_ATTACHMENT,
+            sprintf('%s.ics', $objEvent->alias),
+        );
 
-		$response->headers->addCacheControlDirective('must-revalidate');
-		$response->headers->set('Connection', 'close');
-		$response->headers->set('Content-Disposition', $disposition);
-		$response->headers->set('Content-Type', 'text/calendar; charset=utf-8');
+        $response->headers->addCacheControlDirective('must-revalidate');
+        $response->headers->set('Connection', 'close');
+        $response->headers->set('Content-Disposition', $disposition);
+        $response->headers->set('Content-Type', 'text/calendar; charset=utf-8');
 
-		return $response;
-	}
+        return $response;
+    }
 }

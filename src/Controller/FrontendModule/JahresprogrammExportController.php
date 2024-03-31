@@ -65,13 +65,9 @@ class JahresprogrammExportController extends AbstractPrintExportController
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-	/**
-	 * @param FragmentTemplate $template
-	 * @param ModuleModel $model
-	 * @param Request $request
-	 * @return Response
-	 * @throws \Exception
-	 */
+    /**
+     * @throws \Exception
+     */
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $this->template = $template;
@@ -86,10 +82,9 @@ class JahresprogrammExportController extends AbstractPrintExportController
         return $this->template->getResponse();
     }
 
-	/**
-	 * @return Form
-	 * @throws \Exception
-	 */
+    /**
+     * @throws \Exception
+     */
     private function generateForm(): Form
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -369,10 +364,6 @@ class JahresprogrammExportController extends AbstractPrintExportController
         }
     }
 
-	/**
-	 * @param array $arrUserRoles
-	 * @return array
-	 */
     private function getUsersByUserRole(array $arrUserRoles): array
     {
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
@@ -435,11 +426,6 @@ class JahresprogrammExportController extends AbstractPrintExportController
         return $specialUsers;
     }
 
-	/**
-	 * @param CalendarEventsModel $objEvent
-	 * @param string $dateFormat
-	 * @return string
-	 */
     private function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = ''): string
     {
         $dateAdapter = $this->framework->getAdapter(Date::class);

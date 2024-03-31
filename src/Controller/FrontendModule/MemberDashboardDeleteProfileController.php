@@ -73,13 +73,13 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
             throw new UnauthorizedHttpException('Not authorized. Please log in as frontend user.');
         }
 
-        $template->set('passedConfirmation',false);
-        $template->set('user',$this->user);
+        $template->set('passedConfirmation', false);
+        $template->set('user', $this->user);
 
         if ('clear-profile' === $request->query->get('action')) {
             // Generate the delete profile form
-            $template->set('deleteProfileForm',$this->generateDeleteProfileForm($request));
-            $template->set('passedConfirmation',true);
+            $template->set('deleteProfileForm', $this->generateDeleteProfileForm($request));
+            $template->set('passedConfirmation', true);
         }
 
         // Add messages to template
@@ -158,7 +158,7 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
         $messageAdapter = $this->framework->getAdapter(Message::class);
 
         $session = $request->getSession();
-        $template->set('hasInfoMessages',false);
+        $template->set('hasInfoMessages', false);
         $template->set('hasErrorMessages', false);
 
         if ($messageAdapter->hasInfo()) {
@@ -169,10 +169,10 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
         }
 
         if ($messageAdapter->hasError()) {
-            $template->set('hasErrorMessage',true);
+            $template->set('hasErrorMessage', true);
             $bag = $session->getFlashBag()->get('contao.FE.error');
-            $template->set('errorMessage',$bag[0]);
-            $template->set('errorMessages',$bag);
+            $template->set('errorMessage', $bag[0]);
+            $template->set('errorMessages', $bag);
         }
 
         $messageAdapter->reset();

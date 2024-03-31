@@ -69,14 +69,14 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
 
         $image = $this->imageFactory->create($path);
 
-            $figureBuilder = $this->studio
-                ->createFigureBuilder()
-                ->setMetadata(new Metadata(['alt' => $this->user->firstname.' '.$this->user->lastname]))
-                ->setSize($model->imgSize)
-                ->from($image)
+        $figureBuilder = $this->studio
+            ->createFigureBuilder()
+            ->setMetadata(new Metadata(['alt' => $this->user->firstname.' '.$this->user->lastname]))
+            ->setSize($model->imgSize)
+            ->from($image)
             ;
 
-            $template->set('figure', $figureBuilder->buildIfResourceExists());
+        $template->set('figure', $figureBuilder->buildIfResourceExists());
 
         return $template->getResponse();
     }

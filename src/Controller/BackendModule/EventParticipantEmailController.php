@@ -120,7 +120,7 @@ class EventParticipantEmailController extends AbstractBackendController
         }
 
         if (!$this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $eventId)) {
-			$blnAllow = false;
+            $blnAllow = false;
         }
 
         if (!$blnAllow) {

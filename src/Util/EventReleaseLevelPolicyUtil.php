@@ -23,75 +23,75 @@ use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 
 class EventReleaseLevelPolicyUtil
 {
-	private Adapter $eventReleaseLevelPolicyModel;
+    private Adapter $eventReleaseLevelPolicyModel;
 
-	public function __construct(
-		private readonly ContaoFramework $framework,
-		private readonly CalendarEventsVoter $calendarEventsVoter,
-	) {
-		$this->eventReleaseLevelPolicyModel = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
-	}
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly CalendarEventsVoter $calendarEventsVoter,
+    ) {
+        $this->eventReleaseLevelPolicyModel = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
+    }
 
-	/**
-	 * !!! Not used method at the moment.
-	 *
-	 * Returns an array of IDS of all accessible event release level policies.
-	 *
-	 * @throws \Exception
-	 */
-	public function getAccessibleReleaseLevels(CalendarEventsModel $eventModel, BackendUser $user): array
-	{
-		$allowedIDS = [];
+    /**
+     * !!! Not used method at the moment.
+     *
+     * Returns an array of IDS of all accessible event release level policies.
+     *
+     * @throws \Exception
+     */
+    public function getAccessibleReleaseLevels(CalendarEventsModel $eventModel, BackendUser $user): array
+    {
+        $allowedIDS = [];
 
-		$currentEventReleaseLevelPolicyModel = $this->eventReleaseLevelPolicyModel->findByPk($eventModel->eventReleaseLevel);
+        $currentEventReleaseLevelPolicyModel = $this->eventReleaseLevelPolicyModel->findByPk($eventModel->eventReleaseLevel);
 
-		if (null === $currentEventReleaseLevelPolicyModel) {
-			return $allowedIDS;
-		}
+        if (null === $currentEventReleaseLevelPolicyModel) {
+            return $allowedIDS;
+        }
 
-		// Test downwards
-		$prevLevel = $this->eventReleaseLevelPolicyModel->findByPk($currentEventReleaseLevelPolicyModel->id);
+        // Test downwards
+        $prevLevel = $this->eventReleaseLevelPolicyModel->findByPk($currentEventReleaseLevelPolicyModel->id);
 
-		$stop = false;
+        $stop = false;
 
-		do {
-			if (null === $prevLevel) {
-				$stop = true;
-				continue;
-			}
+        do {
+            if (null === $prevLevel) {
+                $stop = true;
+                continue;
+            }
 
-			if ($this->calendarEventsVoter->canChangeReleaseLevel($eventModel, $user, $prevLevel, 'down')) {
-				$prevLevel = $this->eventReleaseLevelPolicyModel->findPrevLevel($prevLevel->id);
-				$allowedIDS[] = $prevLevel->id;
-			} else {
-				$stop = true;
-			}
-		} while (true !== $stop);
+            if ($this->calendarEventsVoter->canChangeReleaseLevel($eventModel, $user, $prevLevel, 'down')) {
+                $prevLevel = $this->eventReleaseLevelPolicyModel->findPrevLevel($prevLevel->id);
+                $allowedIDS[] = $prevLevel->id;
+            } else {
+                $stop = true;
+            }
+        } while (true !== $stop);
 
-		$allowedIDS = array_reverse($allowedIDS);
+        $allowedIDS = array_reverse($allowedIDS);
 
-		// Add the current release level
-		$allowedIDS[] = $currentEventReleaseLevelPolicyModel->id;
+        // Add the current release level
+        $allowedIDS[] = $currentEventReleaseLevelPolicyModel->id;
 
-		// Test upwards
-		$nextLevel = $this->eventReleaseLevelPolicyModel->findByPk($currentEventReleaseLevelPolicyModel->id);
+        // Test upwards
+        $nextLevel = $this->eventReleaseLevelPolicyModel->findByPk($currentEventReleaseLevelPolicyModel->id);
 
-		$stop = false;
+        $stop = false;
 
-		do {
-			if (null === $nextLevel) {
-				$stop = true;
-				continue;
-			}
+        do {
+            if (null === $nextLevel) {
+                $stop = true;
+                continue;
+            }
 
-			if ($this->calendarEventsVoter->canChangeReleaseLevel($eventModel, $user, $nextLevel, 'up')) {
-				$nextLevel = $this->eventReleaseLevelPolicyModel->findNextLevel($nextLevel->id);
-				$allowedIDS[] = $nextLevel->id;
-			} else {
-				$stop = true;
-			}
-		} while (true !== $stop);
+            if ($this->calendarEventsVoter->canChangeReleaseLevel($eventModel, $user, $nextLevel, 'up')) {
+                $nextLevel = $this->eventReleaseLevelPolicyModel->findNextLevel($nextLevel->id);
+                $allowedIDS[] = $nextLevel->id;
+            } else {
+                $stop = true;
+            }
+        } while (true !== $stop);
 
-		return $allowedIDS;
-	}
+        return $allowedIDS;
+    }
 }

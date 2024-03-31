@@ -21,10 +21,10 @@ use Contao\Model;
  */
 class EventTypeModel extends Model
 {
-	/**
-	 * Table name.
-	 *
-	 * @var string
-	 */
-	protected static $strTable = 'tl_event_type';
+    /**
+     * Table name.
+     *
+     * @var string
+     */
+    protected static $strTable = 'tl_event_type';
 }

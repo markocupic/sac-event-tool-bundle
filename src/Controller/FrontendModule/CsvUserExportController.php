@@ -27,11 +27,11 @@ use Contao\File;
 use Contao\MemberGroupModel;
 use Contao\ModuleModel;
 use Contao\StringUtil;
-use Contao\Template;
 use Contao\UserGroupModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\Types;
+use League\Csv\CannotInsertRecord;
 use League\Csv\Exception;
 use League\Csv\InvalidArgument;
 use League\Csv\Reader;
@@ -70,17 +70,16 @@ class CsvUserExportController extends AbstractFrontendModuleController
      */
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $template->set('form',$this->getForm()->generate());
+        $template->set('form', $this->getForm()->generate());
 
         return $template->getResponse();
     }
 
-	/**
-	 * @return Form
-	 * @throws Exception
-	 * @throws InvalidArgument
-	 * @throws \Doctrine\DBAL\Exception
-	 */
+    /**
+     * @throws Exception
+     * @throws InvalidArgument
+     * @throws \Doctrine\DBAL\Exception
+     */
     private function getForm(): Form
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -170,19 +169,11 @@ class CsvUserExportController extends AbstractFrontendModuleController
         return $objForm;
     }
 
-	/**
-	 * @param string $type
-	 * @param string $strTable
-	 * @param array $arrFields
-	 * @param string $strGroupFieldName
-	 * @param Result $result
-	 * @param string $GroupModelClassName
-	 * @param bool $blnKeepGroupsInOneLine
-	 * @return BinaryFileResponse
-	 * @throws Exception
-	 * @throws InvalidArgument
-	 * @throws \Doctrine\DBAL\Exception
-	 */
+    /**
+     * @throws Exception
+     * @throws InvalidArgument
+     * @throws \Doctrine\DBAL\Exception
+     */
     private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $result, string $GroupModelClassName, bool $blnKeepGroupsInOneLine = false): BinaryFileResponse
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -295,11 +286,6 @@ class CsvUserExportController extends AbstractFrontendModuleController
         return $this->sendToBrowser($arrData, $filename);
     }
 
-	/**
-	 * @param array $arrFields
-	 * @param string $strTable
-	 * @return array
-	 */
     private function getHeadline(array $arrFields, string $strTable): array
     {
         /** @var Controller $controllerAdapter */
@@ -318,11 +304,6 @@ class CsvUserExportController extends AbstractFrontendModuleController
         return $arrHeadline;
     }
 
-	/**
-	 * @param string $fieldName
-	 * @param array $arrUser
-	 * @return string
-	 */
     private function getField(string $fieldName, array $arrUser): string
     {
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
@@ -356,14 +337,11 @@ class CsvUserExportController extends AbstractFrontendModuleController
         return (string) $arrUser[$fieldName];
     }
 
-	/**
-	 * @param array $arrData
-	 * @param string $filename
-	 * @return BinaryFileResponse
-	 * @throws Exception
-	 * @throws InvalidArgument
-	 * @throws \League\Csv\CannotInsertRecord
-	 */
+    /**
+     * @throws Exception
+     * @throws InvalidArgument
+     * @throws CannotInsertRecord
+     */
     private function sendToBrowser(array $arrData, string $filename): BinaryFileResponse
     {
         /** @var Writer $writerAdapter */

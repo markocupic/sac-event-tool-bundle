@@ -258,11 +258,11 @@ class SyncSacMemberDatabase
 
                             $setRemote = array_map(
                                 static function ($value) {
-                                    if (empty($value) || is_numeric($value) || is_array($value)) {
+                                    if (empty($value) || is_numeric($value) || \is_array($value)) {
                                         return $value;
                                     }
 
-	                                return utf8_encode(trim($value));
+                                    return utf8_encode(trim($value));
                                 },
                                 $setRemote
                             );

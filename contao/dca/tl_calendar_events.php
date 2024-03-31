@@ -75,6 +75,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'custom
 // Put here all defined fields in the dca
 PaletteManipulator::create()
 	->addField(['eventType'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['eventReleaseLevel'], 'event_release_level_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['singleSRCBroschuere'], 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['title', 'teaser', 'alias', 'courseId', 'eventState', 'rescheduledEventDate', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType'], 'title_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['tourTechDifficulty'], 'tech_difficulty_legend', PaletteManipulator::POSITION_APPEND)
@@ -216,13 +217,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] 
 	'icon' => Bundle::ASSET_DIR.'/icons/fontawesome/default/people-group-solid.svg',
 ];
 
-$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelPrev'] = [
-	'href' => 'action=releaseLevelPrev', // use a button callback to generate the url
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['downgradeEventReleaseLevel'] = [
+	'href' => 'act=edit&action=downgradeEventReleaseLevel', // use a button callback to generate the url
 	'icon' => Bundle::ASSET_DIR.'/icons/fontawesome/default/square-arrow-down-solid.svg',
 ];
 
-$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelNext'] = [
-	'href' => 'action=releaseLevelNext', // use a button callback to generate the url
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['upgradeEventReleaseLevel'] = [
+	'href' => 'act=edit&action=upgradeEventReleaseLevel', // use a button callback to generate the url
 	'icon' => Bundle::ASSET_DIR.'/icons/fontawesome/default/square-arrow-up-solid.svg',
 ];
 
@@ -906,6 +907,7 @@ foreach ($allowEditingOnFirstReleaseLevelOnly as $field) {
 }
 
 // DoNotCopy - Settings
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['published']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['author']['eval']['doNotCopy'] = false;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startDate']['eval']['doNotCopy'] = false;

@@ -15,14 +15,12 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Security\User;
 
 use Contao\BackendUser;
-use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Security\User\ContaoUserProvider;
 use Contao\FrontendUser;
 use Contao\User;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
-use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
@@ -60,10 +58,10 @@ class CustomContaoUserProvider extends ContaoUserProvider
             );
 
             if (false !== $username) {
-				/** @var User $adapter */
-	            $adapter = $this->framework->getAdapter($this->userClass);
+                /** @var User $adapter */
+                $adapter = $this->framework->getAdapter($this->userClass);
 
-	            $user = $adapter->loadUserByIdentifier($username);
+                $user = $adapter->loadUserByIdentifier($username);
 
                 if (is_a($user, $this->userClass)) {
                     return $user;
@@ -71,7 +69,7 @@ class CustomContaoUserProvider extends ContaoUserProvider
             }
         }
 
-		// Call the parent user provider from the Contao Core
-		return parent::loadUserByIdentifier($identifier);
+        // Call the parent user provider from the Contao Core
+        return parent::loadUserByIdentifier($identifier);
     }
 }

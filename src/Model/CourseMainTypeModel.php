@@ -18,10 +18,10 @@ use Contao\Model;
 
 class CourseMainTypeModel extends Model
 {
-	/**
-	 * Table name.
-	 *
-	 * @var string
-	 */
-	protected static $strTable = 'tl_course_main_type';
+    /**
+     * Table name.
+     *
+     * @var string
+     */
+    protected static $strTable = 'tl_course_main_type';
 }
