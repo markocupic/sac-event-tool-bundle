@@ -43,7 +43,7 @@ class BackendPermissionMigration extends AbstractMigration
         $columnsA = $schemaManager->listTableColumns('tl_user');
         $columnsB = $schemaManager->listTableColumns('tl_user_group');
 
-        if (!isset($columnsA['modules']) || !isset($columnsB['modules'])) {
+        if (!isset($columnsA['id']) || !isset($columnsA['modules']) || !isset($columnsB['id']) || !isset($columnsB['modules'])) {
             return false;
         }
 

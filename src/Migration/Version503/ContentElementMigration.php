@@ -39,7 +39,7 @@ class ContentElementMigration extends AbstractMigration
 
         $columns = $schemaManager->listTableColumns('tl_content');
 
-        if (!isset($columns['customtpl']) || !isset($columns['gallerytpl'])) {
+        if (!isset($columns['id']) || !isset($columns['type']) || !isset($columns['customtpl']) || !isset($columns['gallerytpl'])) {
             return false;
         }
 
@@ -81,7 +81,7 @@ class ContentElementMigration extends AbstractMigration
     protected function swapTemplate(string $table_name, string $content_element_type, string $field_name, string $template_old, string $template_new): int|string
     {
         return $this->connection->executeStatement(
-            "UPDATE $table_name SET $field_name = '$template_new' WHERE $content_element_type = :content_element_type AND $field_name = :template_old",
+            "UPDATE $table_name SET $field_name = '$template_new' WHERE type = :content_element_type AND $field_name = :template_old",
             [
                 'content_element_type' => $content_element_type,
                 'template_old' => $template_old,

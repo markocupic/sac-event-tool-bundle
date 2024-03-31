@@ -38,7 +38,7 @@ class FrontendModuleMigration extends AbstractMigration
 
         $columns = $schemaManager->listTableColumns('tl_module');
 
-        if (!isset($columns['type'])) {
+        if (!isset($columns['id']) || !isset($columns['type'])) {
             return false;
         }
 

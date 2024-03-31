@@ -18,7 +18,6 @@ use Contao\CoreBundle\Migration\AbstractMigration;
 use Contao\CoreBundle\Migration\MigrationResult;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\Types\Types;
 
 /**
  * @internal
@@ -41,9 +40,10 @@ class NotificationMigration extends AbstractMigration
             return false;
         }
 
-        $columns = $schemaManager->listTableColumns('tl_nc_language');
+        $columnsA = $schemaManager->listTableColumns('tl_nc_language');
+        $columnsB = $schemaManager->listTableColumns('tl_nc_notification');
 
-        if (!isset($columns['email_text']) || !isset($columns['id']) || !isset($columns['type'])) {
+        if (!isset($columnsA['id']) || !isset($columnsA['email_text']) || !isset($columnsB['id']) || !isset($columnsB['type'])) {
             return false;
         }
 
