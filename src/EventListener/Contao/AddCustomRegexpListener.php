@@ -19,17 +19,47 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\MemberModel;
 use Contao\Widget;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AsHook('addCustomRegexp', priority: 100)]
-class AddCustomRegexpListener
+readonly class AddCustomRegexpListener
 {
     public function __construct(
-        private readonly ContaoFramework $framework,
+        private ContaoFramework $framework,
+        private RequestStack $requestStack,
     ) {
     }
 
     public function __invoke(string $strRegexp, $varValue, Widget $objWidget): bool
     {
+        // Check for a valid duration info: tl_calendar_events.durationInfo
+        if ('durationInfo' === $strRegexp) {
+            $request = $this->requestStack->getCurrentRequest();
+
+            // $request->request->get('eventDates') will throw an exception,
+            // because $_POST['eventDates'] is a non-scalar value.
+            $post = $request->request->all();
+
+            if (empty($varValue) || empty($post['eventDates'][0])) {
+                return true;
+            }
+
+            $countDates = \count($post['eventDates']);
+            $arrDurationInfo = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$varValue] ?? null;
+
+            if (null === $arrDurationInfo) {
+                return true;
+            }
+
+            if ($arrDurationInfo['dateRows'] !== $countDates) {
+                $objWidget->addError($GLOBALS['TL_LANG']['ERR']['invalidEventDurationInfo']);
+
+                return false;
+            }
+
+            return true;
+        }
+
         // Set adapters
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
         $databaseAdapter = $this->framework->getAdapter(Database::class);
@@ -50,7 +80,7 @@ class AddCustomRegexpListener
         // Check for a valid/existent sacMemberId
         if ('sacMemberIdIsUniqueAndValid' === $strRegexp) {
             if (!is_numeric($varValue)) {
-                $objWidget->addError('Sac member id must be number >= 0');
+                $objWidget->addError('Sac member id must be a number >= 0');
             } elseif ('' !== trim($varValue) && $varValue > 0) {
                 $objMemberModel = $memberModelAdapter->findOneBySacMemberId(trim($varValue));
 
@@ -58,7 +88,7 @@ class AddCustomRegexpListener
                     $objWidget->addError('Field '.$objWidget->label.' should be a valid sac member id.');
                 }
 
-                $objUser = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_user WHERE sacMemberId=?')->execute($varValue);
+                $objUser = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_user WHERE sacMemberId = ?')->execute($varValue);
 
                 if ($objUser->numRows > 1) {
                     $objWidget->addError('SAC member id '.$varValue.' is already in use.');

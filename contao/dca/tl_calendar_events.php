@@ -425,7 +425,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['durationInfo'] = [
 	'filter'    => true,
 	'exclude'   => true,
 	'inputType' => 'select',
-	'eval'      => ['includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['includeBlankOption' => true, 'rgxp' => 'durationInfo', 'mandatory' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(32) NOT NULL default ''",
 ];
 

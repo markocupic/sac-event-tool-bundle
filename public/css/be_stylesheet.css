@@ -10,6 +10,23 @@
 	}
 }
 
+/** Make fields with incorrect entries more recognizable **/
+.tl_form.tl_edit_form {
+	& .error.tl_select,
+	& .error.tl_text,
+	& .error.tl_textarea,
+	& .error.tl_chosen > ul.chzn-choices {
+		border-width: 2px;
+		animation: border_color_change_on_widget_error 1s step-start infinite !important;
+	}
+}
+
+@keyframes border_color_change_on_widget_error {
+	50% {
+		border-color: var(--red);
+	}
+}
+
 /** multicolumn wizard fix: Fix cutted of sentences issue on small screens in the bottom-/tooltip section */
 [class*="mcwColumnCount_"] .tl_help.tl_tip {
 	height: auto !important;
@@ -345,7 +362,7 @@ div.tl_header_tour_rapport table td {
 	/** https://isotropic.co/tool/hex-color-to-css-filter/ */
 
 	& td .filter-green {
-		color:#589B0F;
+		color: #589B0F;
 	}
 
 	/** https://isotropic.co/tool/hex-color-to-css-filter/ */

@@ -42,6 +42,9 @@ $GLOBALS['TL_LANG']['ERR']['clearMemberProfile'] = 'Das Mitglied mit ID %d kann 
 // tl_event_release_level_policy
 $GLOBALS['TL_LANG']['MSC']['level'] = 'Stufe';
 
+// tl_calendar_events
+$GLOBALS['TL_LANG']['ERR']['invalidEventDurationInfo'] = 'Die Event-Dauer stimmt nicht mit der Anzahl Event-Daten überein. Setzen Sie für jeden Tag des Events eine Datumszeile oder korrigieren Sie die Event-Dauer.';
+
 // tl_calendar_events_member
 $GLOBALS['TL_LANG']['ERR']['accessDenied'] = 'Zutritt verweigert.';
 $GLOBALS['TL_LANG']['MSC']['messageSuccessfullySent'] = 'Die Nachricht wurde erfolgreich versandt.';

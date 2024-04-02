@@ -611,44 +611,6 @@ class CalendarEvents
     }
 
     /**
-     * @throws Exception
-     */
-    #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: 60)]
-    public function adjustDurationInfo(DataContainer $dc): void
-    {
-        // Return if there is no active record (override all)
-        if (!$dc->activeRecord) {
-            return;
-        }
-
-        $objEvent = $this->calendarEventsModel->findByPk($dc->activeRecord->id);
-
-        if (null !== $objEvent) {
-            $arrTimestamps = $this->calendarEventsHelper->getEventTimestamps($objEvent);
-
-            if ('' !== $objEvent->durationInfo && !empty($arrTimestamps)) {
-                $countTimestamps = \count($arrTimestamps);
-
-                if (isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$objEvent->durationInfo])) {
-                    $arrDuration = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$objEvent->durationInfo];
-
-                    if (!empty($arrDuration) && \is_array($arrDuration)) {
-                        $duration = $arrDuration['dateRows'];
-
-                        if ($duration !== $countTimestamps) {
-                            $set = ['durationInfo' => ''];
-                            $dc->activeRecord->durationInfo = '';
-                            $this->connection->update('tl_calendar_events', $set, ['id' => $objEvent->id]);
-
-                            $this->message->addError(sprintf('Die Event-Dauer in "%s" [ID:%s] stimmt nicht mit der Anzahl Event-Daten überein. Setzen Sie für jeden Event-Tag eine Datumszeile!', $objEvent->title, $objEvent->id));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * @param DataContainer $dc
      *
      * @throws Exception
