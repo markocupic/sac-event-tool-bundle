@@ -31,6 +31,9 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 #[AsEventListener]
 final readonly class ChangeEventReleaseLevelListener
@@ -50,13 +53,11 @@ final readonly class ChangeEventReleaseLevelListener
         $this->eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
     }
 
-	/**
-	 * @param ChangeEventReleaseLevelEvent $event
-	 * @return void
-	 * @throws \Twig\Error\LoaderError
-	 * @throws \Twig\Error\RuntimeError
-	 * @throws \Twig\Error\SyntaxError
-	 */
+    /**
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
     public function __invoke(ChangeEventReleaseLevelEvent $event): void
     {
         $strDirection = $event->getDirection();
@@ -100,15 +101,11 @@ final readonly class ChangeEventReleaseLevelListener
         }
     }
 
-	/**
-	 * @param CalendarEventsModel $objEvent
-	 * @param UserModel $objUser
-	 * @param string $strDirection
-	 * @return string
-	 * @throws \Twig\Error\LoaderError
-	 * @throws \Twig\Error\RuntimeError
-	 * @throws \Twig\Error\SyntaxError
-	 */
+    /**
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
     private function parseEmailText(CalendarEventsModel $objEvent, UserModel $objUser, string $strDirection): string
     {
         $eventReleaseLevel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);

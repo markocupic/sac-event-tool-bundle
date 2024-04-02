@@ -64,7 +64,7 @@ class CalendarMigration extends AbstractMigration
         // hasOneA
         $this->copyContentFromFieldAtoFieldB('tl_calendar', 'adviceOnEventPublish', 'notifyOnEventPublish');
 
-		// hasOneB
+        // hasOneB
         $this->copyContentFromFieldAtoFieldB('tl_calendar', 'adviceOnEventReleaseLevelChange', 'notifyOnEventReleaseLevelChange');
 
         return $this->createResult(true);

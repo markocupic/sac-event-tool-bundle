@@ -129,24 +129,24 @@ class EventReleaseLevelUtil
 
         // @todo For some reason this the comparison operator will not work without type casting the id.
         if ((int) $highestEventReleaseModel->id === $targetEventReleaseLevelId) {
-	        if(!$objEvent->published){
-		        $objEvent->published = 1;
-		        $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
+            if (!$objEvent->published) {
+                $objEvent->published = 1;
+                $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
 
-		        // Dispatch PublishEventEvent
-		        $event = new PublishEventEvent($this->requestStack->getCurrentRequest(), $objEvent);
-		        $this->eventDispatcher->dispatch($event);
-	        }
+                // Dispatch PublishEventEvent
+                $event = new PublishEventEvent($this->requestStack->getCurrentRequest(), $objEvent);
+                $this->eventDispatcher->dispatch($event);
+            }
 
             if ($objEvent->isModified()) {
                 $objEvent->tstamp = time();
                 $objEvent->save();
             }
         } else {
-			if( $objEvent->published){
-				$objEvent->published = 0;
-				$this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
-			}
+            if ($objEvent->published) {
+                $objEvent->published = 0;
+                $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
+            }
 
             if ($objEvent->isModified()) {
                 $objEvent->tstamp = time();

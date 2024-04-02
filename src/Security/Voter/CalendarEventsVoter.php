@@ -114,7 +114,7 @@ class CalendarEventsVoter extends Voter
             }
         }
 
-        // Check if the user is member in an allowed group
+        // Check if the user is member of an allowed group
         $arrAllowedGroups = $this->stringUtil->deserialize($eventReleaseLevelPolicyModel->groupReleaseLevelPerm, true);
         $arrUserGroups = $this->stringUtil->deserialize($user->groups, true);
 
@@ -230,7 +230,7 @@ class CalendarEventsVoter extends Voter
             }
         }
 
-        // Check if the user is member in an allowed group
+        // Check if the user is member of an allowed group
         $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupEventPerm, true);
         $arrUserGroups = $this->stringUtil->deserialize($this->user->groups, true);
 
@@ -300,7 +300,7 @@ class CalendarEventsVoter extends Voter
             }
         }
 
-        // Check if the user is member in an allowed group
+        // Check if the user is member of an allowed group
         $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupEventPerm, true);
         $arrUserGroups = $this->stringUtil->deserialize($this->user->groups, true);
 
@@ -370,7 +370,7 @@ class CalendarEventsVoter extends Voter
             }
         }
 
-        // Check if the user is member in an allowed group
+        // Check if the user is member of an allowed group
         $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupEventPerm, true);
         $arrUserGroups = $this->stringUtil->deserialize($this->user->groups, true);
 
@@ -389,21 +389,80 @@ class CalendarEventsVoter extends Voter
     }
 
     /**
-     * Grant administer-access...
-     * - to all users with write-access on the event (tl_calendar).
-     * - and if the user is receiving the registrations by email --> tl_calendar_events.registrationGoesTo.
+     * Allow to administer event registrations (means the user is allowed to add new event registrations too)...
+     * - if the event is not assigned to an event release level
+     * - to all admins (regardless of the current time)
+     * - to allowed instructors if the registrations start date has expired
+     * - to allowed authors if the registrations start date has expired
+     * - if user is charged to do the registration admin work (tl_calendar_events.registrationGoesTo)
+     * - to allowed super-users.
      *
      * @throws \Exception
      */
     private function canAdministerEventRegistrations(): bool
     {
-        if ($this->canWriteEvent()) {
+        if (!empty($this->event->eventReleaseLevel)) {
+            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findByPk($this->event->eventReleaseLevel);
+
+            if (null === $releaseLevelPolicy) {
+                $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
+
+                throw new \Exception(sprintf($msg, $this->event->id));
+            }
+        } else {
+            // Grant access if the event is not assigned to a release level.
             return true;
+        }
+
+        // Grant action to admins.
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return true;
+        }
+
+        if ($this->event->setRegistrationPeriod && $this->event->registrationStartDate > time()) {
+            return false;
+        }
+
+        if ($releaseLevelPolicy->allowAdministerEventRegistrationsToAuthors) {
+            if ((int) $this->user->id === (int) $this->event->author) {
+                // Grant action if...
+                // if authors are allowed
+                // and
+                // the user has the role "author" on the current event
+                return true;
+            }
+        }
+
+        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event);
+
+        if ($releaseLevelPolicy->allowAdministerEventRegistrationsToInstructors) {
+            if (\in_array($this->user->id, $arrEventInstructors, true)) {
+                // Grant action if...
+                // instructors are allowed
+                // and
+                // the user has the role "instructor" on the current event
+                return true;
+            }
         }
 
         if (!empty($this->event->registrationGoesTo)) {
             if ($this->user->id === $this->event->registrationGoesTo) {
                 return true;
+            }
+        }
+
+        // Check if the user is member of an allowed group
+        $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupEventPerm, true);
+        $arrUserGroups = $this->stringUtil->deserialize($this->user->groups, true);
+
+        foreach ($arrAllowedGroups as $v) {
+            if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
+                $arrPerm = isset($v['permissions']) && \is_array($v['permissions']) ? $v['permissions'] : [];
+
+                if (\in_array('canAdministerEventRegistrations', $arrPerm, true)) {
+                    // Grant write-access to "super-users"
+                    return true;
+                }
             }
         }
 

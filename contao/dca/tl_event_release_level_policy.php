@@ -47,90 +47,108 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 	'palettes' => [
 		'default' => '
 		{title_legend},level,title,description;
-		{event_grants_legend},allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowDeleteAccessToAuthor,allowDeleteAccessToInstructors,allowCutAccessToAuthor,allowCutAccessToInstructors,groupEventPerm;
+		{event_grants_legend},allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowDeleteAccessToAuthor,allowDeleteAccessToInstructors,allowCutAccessToAuthor,allowCutAccessToInstructors,allowAdministerEventRegistrationsToInstructors,allowAdministerEventRegistrationsToAuthors,groupEventPerm;
 		{event_release_level_grants_legend},allowSwitchingToPrevLevel,allowSwitchingToNextLevel,groupReleaseLevelPerm;
 		{event_registrations_grants_legend},allowRegistration',
 	],
 	'fields'   => [
-		'id'                             => [
+		'id'                                         => [
 			'sql' => 'int(10) unsigned NOT NULL auto_increment',
 		],
-		'pid'                            => [
+		'pid'                                        => [
 			'foreignKey' => 'tl_event_release_level_policy_package.title',
 			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 		],
-		'tstamp'                         => [
+		'tstamp'                                     => [
 			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
-		'level'                          => [
+		'level'                                      => [
 			'exclude'   => true,
 			'inputType' => 'select',
 			'options'   => range(1, 10),
 			'eval'      => ['mandatory' => true, 'tl_class' => 'clr'],
 			'sql'       => "smallint(2) unsigned NOT NULL default 0",
 		],
-		'title'                          => [
+		'title'                                      => [
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
-		'description'                    => [
+		'description'                                => [
 			'exclude'   => true,
 			'inputType' => 'textarea',
 			'eval'      => ['mandatory' => true, 'tl_class' => 'clr'],
 			'sql'       => 'text NULL',
 		],
-		'allowSwitchingToPrevLevel'      => [
+		'allowSwitchingToPrevLevel'                  => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowSwitchingToNextLevel'      => [
+		'allowSwitchingToNextLevel'                  => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowWriteAccessToAuthor'       => [
+		'allowWriteAccessToAuthor'                   => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowWriteAccessToInstructors'  => [
+		'allowWriteAccessToInstructors'              => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowDeleteAccessToAuthor'      => [
+		'allowDeleteAccessToAuthor'                  => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowDeleteAccessToInstructors' => [
+		'allowDeleteAccessToInstructors'             => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowCutAccessToAuthor'         => [
+		'allowCutAccessToAuthor'                     => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowCutAccessToInstructors'    => [
+		'allowAdministerEventRegistrationsToInstructors' => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'groupEventPerm'                 => [
+		'allowAdministerEventRegistrationsToAuthors'     => [
+			'exclude'   => true,
+			'filter'    => true,
+			'inputType' => 'checkbox',
+			'sql'       => ['type' => 'boolean', 'default' => false],
+		],
+		'allowCutAccessToInstructors'                => [
+			'exclude'   => true,
+			'filter'    => true,
+			'inputType' => 'checkbox',
+			'sql'       => ['type' => 'boolean', 'default' => false],
+		],
+		'allowCutAccessToInstructors'                => [
+			'exclude'   => true,
+			'filter'    => true,
+			'inputType' => 'checkbox',
+			'sql'       => ['type' => 'boolean', 'default' => false],
+		],
+		'groupEventPerm'                             => [
 			'exclude'   => true,
 			'inputType' => 'multiColumnWizard',
 			'eval'      => [
@@ -149,7 +167,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 						'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissions'],
 						'exclude'   => true,
 						'inputType' => 'select',
-						'options'   => ['canWriteEvent', 'canDeleteEvent', 'canCutEvent'],
+						'options'   => ['canWriteEvent', 'canDeleteEvent', 'canCutEvent', 'canAdministerEventRegistrations'],
 						'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
 						'eval'      => ['style' => 'width: 80%', 'multiple' => true, 'chosen' => true, 'mandatory' => false],
 					],
@@ -157,13 +175,13 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 			],
 			'sql'       => 'blob NULL',
 		],
-		'allowRegistration'              => [
+		'allowRegistration'                          => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'groupReleaseLevelPerm'          => [
+		'groupReleaseLevelPerm'                      => [
 			'exclude'   => true,
 			'inputType' => 'multiColumnWizard',
 			'eval'      => [

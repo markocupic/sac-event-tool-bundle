@@ -99,21 +99,21 @@ class CalendarEventsMember
                     $blnAllow = true;
                     break;
                 case 'create':
-                    if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $dc->id)) {
+                    if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $dc->id)) {
                         $blnAllow = true;
                         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCreatable'] = false;
                         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['closed'] = false;
                     }
                     break;
                 case 'edit':
-                case 'toggle':
-                    if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $dc->getCurrentRecord()['eventId'])) {
+                case 'toggle': // tl_calendar_events_member.hasParticipated
+                    if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $dc->getCurrentRecord()['eventId'])) {
                         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notEditable'] = false;
                         $blnAllow = true;
                     }
                     break;
                 case 'delete':
-                    if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $dc->getCurrentRecord()['eventId'])) {
+                    if ($this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $dc->getCurrentRecord()['eventId'])) {
                         $regId = $request->query->get('id');
 
                         $bookingType = $this->connection->fetchOne(
@@ -217,7 +217,7 @@ class CalendarEventsMember
             $blnAllow = true;
         }
 
-        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $row['eventId'])) {
+        if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $row['eventId'])) {
             $blnAllow = true;
         }
 
