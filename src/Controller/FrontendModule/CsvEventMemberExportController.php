@@ -118,7 +118,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         if ($objForm->validate()) {
             if ('form-event-member-export' === $request->request->get('FORM_SUBMIT')) {
                 $eventType = $request->request->get('event-type');
-                $arrFields = ['id', 'eventId', 'eventName', 'startDate', 'endDate', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'dateAdded'];
+                $arrFields = ['id', 'eventId', 'eventName', 'startDate', 'endDate', 'organizers', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'dateAdded'];
                 $startDate = strtotime($request->request->get('startDate'));
                 $endDate = strtotime($request->request->get('endDate'));
 
@@ -172,15 +172,26 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $arrHeadline = [];
 
         foreach ($arrFields as $field) {
-            if ('mainInstructor' === $field || 'mountainguide' === $field || 'startDate' === $field || 'endDate' === $field || 'eventState' === $field || 'executionState' === $field) {
-                $controller->loadLanguageFile('tl_calendar_events');
-                $arrHeadline[] = $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?? $field;
-            } elseif ('phone' === $field) {
-                $controller->loadLanguageFile('tl_member');
-                $arrHeadline[] = $GLOBALS['TL_LANG']['tl_member'][$field][0] ?? $field;
-            } else {
-                $controller->loadLanguageFile('tl_calendar_events_member');
-                $arrHeadline[] = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0] ?? $field;
+            switch ($field) {
+                case 'mainInstructor':
+                case 'mountainguide':
+                case 'startDate':
+                case 'endDate':
+                case 'eventState':
+                case 'executionState':
+                case 'organizers':
+                    $controller->loadLanguageFile('tl_calendar_events');
+                    $arrHeadline[] = $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?? $field;
+                    break;
+                case 'phone':
+                    $controller->loadLanguageFile('tl_member');
+                    $arrHeadline[] = $GLOBALS['TL_LANG']['tl_member'][$field][0] ?? $field;
+                    break;
+
+                default:
+                    $controller->loadLanguageFile('tl_calendar_events_member');
+                    $arrHeadline[] = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0] ?? $field;
+                    break;
             }
         }
         $this->arrLines[] = $arrHeadline;
@@ -197,67 +208,68 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
         $value = '';
 
-        if ('password' === $field) {
-            $value = '#######';
-        }
-
-        if ('dateAdded' === $field) {
-            $value = $date->parse('Y-m-d', $arrEventMember['dateAdded']);
-        }
-
-        if ('dateOfBirth' === $field) {
-            if (is_numeric($arrEventMember[$field])) {
-                $value = $date->parse($config->get('dateFormat'), $arrEventMember[$field]);
-            }
-        } elseif ('stateOfSubscription' === $field) {
-            $value = $GLOBALS['TL_LANG']['MSC'][$arrEventMember[$field]] ?? $arrEventMember[$field];
-        } elseif ('startDate' === $field) {
-            $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
-
-            if (null !== $objEvent) {
-                $value = $date->parse('Y-m-d', $objEvent->startDate);
-            }
-        } elseif ('endDate' === $field) {
-            $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
-
-            if (null !== $objEvent) {
-                $value = $date->parse('Y-m-d', $objEvent->endDate);
-            }
-        } elseif ('executionState' === $field) {
-            $controller->loadLanguageFile('tl_calendar_events');
-            $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
-
-            if (null !== $objEvent) {
-                $value = $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] ?? $objEvent->$field;
-            }
-        } elseif ('eventState' === $field) {
-            $controller->loadLanguageFile('tl_calendar_events');
-            $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
-
-            if (null !== $objEvent) {
-                $value = $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] ?? $objEvent->$field;
-            }
-        } elseif ('mainInstructor' === $field) {
-            $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
-
-            if (null !== $objEvent) {
-                $value = $calendarEventsHelper->getMainInstructorName($objEvent);
-            }
-        } elseif ('mountainguide' === $field) {
-            $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
-
-            if (null !== $objEvent) {
-                $value = $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][$objEvent->$field];
-            }
-        } elseif ('phone' === $field) {
-            $objMember = $memberModel->findOneBySacMemberId($arrEventMember['sacMemberId']);
-
-            if (null !== $objMember) {
-                $value = $objMember->$field;
-            }
-        } else {
-            $value = $arrEventMember[$field];
-        }
+		switch($field){
+			case 'password':
+				$value = '#######';
+				break;
+			case 'dateAdded':
+				$value = $date->parse('Y-m-d', $arrEventMember['dateAdded']);
+				break;
+			case 'dateOfBirth':
+				if (is_numeric($arrEventMember[$field])) {
+					$value = $date->parse($config->get('dateFormat'), $arrEventMember[$field]);
+				}
+				break;
+			case 'organizers':
+				$objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+				if (null !== $objEvent) {
+					$arrOrganizer = $calendarEventsHelper->getEventOrganizersAsArray($objEvent, 'title');
+					$value = implode(', ', $arrOrganizer);
+				}				break;
+			case 'stateOfSubscription':
+				$value = $GLOBALS['TL_LANG']['MSC'][$arrEventMember[$field]] ?? $arrEventMember[$field];
+				break;
+			case 'startDate':
+				$objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+				if (null !== $objEvent) {
+					$value = $date->parse('Y-m-d', $objEvent->startDate);
+				}				break;
+			case 'endDate':
+				$objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+				if (null !== $objEvent) {
+					$value = $date->parse('Y-m-d', $objEvent->endDate);
+				}
+				break;
+			case 'executionState':
+			case 'eventState':
+				$controller->loadLanguageFile('tl_calendar_events');
+				$objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+				if (null !== $objEvent) {
+					$value = $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] ?? $objEvent->$field;
+				}
+				break;
+			case 'mainInstructor':
+				$objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+				if (null !== $objEvent) {
+					$value = $calendarEventsHelper->getMainInstructorName($objEvent);
+				}
+				break;
+			case 'mountainguide':
+				$objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+				if (null !== $objEvent) {
+					$value = $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][$objEvent->$field];
+				}
+				break;
+			case 'phone':
+				$objMember = $memberModel->findOneBySacMemberId($arrEventMember['sacMemberId']);
+				if (null !== $objMember) {
+					$value = $objMember->$field;
+				}
+				break;
+			default:
+				$value = $arrEventMember[$field];
+				break;
+		}
 
         return (string) $value;
     }
