@@ -35,6 +35,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -63,8 +64,9 @@ class PilatusExportController extends AbstractPrintExportController
     private array $tourFeEditableFields = ['teaser', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous'];
 
     public function __construct(
-        private readonly ContaoFramework $framework,
+        private readonly CourseLevels $courseLevels,
         private readonly Connection $connection,
+        private readonly ContaoFramework $framework,
         private readonly InsertTagParser $insertTagParser,
     ) {
         parent::__construct($this->framework);
@@ -471,8 +473,8 @@ class PilatusExportController extends AbstractPrintExportController
             $arrHeadline[] = $this->getEventPeriod($eventModel, 'D');
             $arrHeadline[] = $eventModel->title;
 
-            if (isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$eventModel->courseLevel])) {
-                $arrHeadline[] = 'Kursstufe '.$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$eventModel->courseLevel];
+            if ($eventModel->courseLevel && $this->courseLevels->has($eventModel->courseLevel)) {
+                $arrHeadline[] = 'Kursstufe '.$this->courseLevels->get($eventModel->courseLevel);
             }
 
             if ('' !== $eventModel->courseId) {

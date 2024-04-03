@@ -11,6 +11,7 @@ services:
             $sacevtAvatarMale: '%sacevt.avatar.male%'
             $sacevtEventAdminEmail: '%sacevt.event_admin_email%'
             $sacevtEventAdminName: '%sacevt.event_admin_name%'
+            $sacevtEventCourseLevels: '%sacevt.event.course.levels%'
             $sacevtEventCourseBookletFilenamePattern: '%sacevt.event.course.booklet_filename_pattern%'
             $sacevtEventCourseConfirmationFileNamePattern: '%sacevt.event.course_confirmation_file_name_pattern%'
             $sacevtEventMemberListFileNamePattern: '%sacevt.event.member_list_file_name_pattern%'
@@ -82,3 +83,5 @@ services:
     Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventRegistrationStateController:
         public: true
 
+    Markocupic\SacEventToolBundle\Config\CourseLevels:
+        public: true

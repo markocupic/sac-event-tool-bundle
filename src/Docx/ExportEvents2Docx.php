@@ -24,6 +24,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
@@ -45,8 +46,9 @@ class ExportEvents2Docx
     private array|null $arrDatarecord;
 
     public function __construct(
-        private readonly ContaoFramework $framework,
+		private readonly CourseLevels $courseLevels,
         private readonly BinaryFileDownload $binaryFileDownload,
+        private readonly ContaoFramework $framework,
         private readonly string $projectDir,
     ) {
         $this->framework->initialize(true);
@@ -204,8 +206,8 @@ class ExportEvents2Docx
 
         if ('tl_calendar_events' === $table) {
             if ('courseLevel' === $field) {
-                if ('' !== $value) {
-                    $value = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$value];
+                if (is_numeric($value)) {
+                    $value = $this->courseLevels->get($value);
                 }
             }
 

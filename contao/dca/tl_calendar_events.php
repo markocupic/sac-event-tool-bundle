@@ -20,6 +20,7 @@ use Contao\Date;
 use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\Bundle;
+use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventState;
@@ -372,7 +373,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel'] = [
 	'search'    => true,
 	'filter'    => true,
 	'inputType' => 'select',
-	'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'],
+	'options'   => System::getContainer()->get(CourseLevels::class)->getAll(),
 	'eval'      => ['mandatory' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => 'int(10) unsigned NULL',
 ];

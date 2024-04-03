@@ -29,6 +29,7 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
 use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
@@ -55,6 +56,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly CourseLevels $courseLevels,
         private readonly RequestStack $requestStack,
     ) {
         parent::__construct($framework);
@@ -299,7 +301,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $arrData['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->current(), 'title'));
                     $arrData['organizerTitle'] = $organizerTitle;
                     $arrData['organizerTitlePrint'] = $organizerTitlePrint;
-                    $arrData['courseLevel'] = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel] ?? '';
+                    $arrData['courseLevel'] = $objEvent->courseLevel ? $this->courseLevels->get($objEvent->courseLevel) : '';
                     $arrData['courseTypeLevel0'] = null !== $courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0) ? $courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0)->name : '';
                     $arrData['courseTypeLevel1'] = null !== $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1) ? $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1)->name : '';
                     $arrData['date'] = $this->getEventPeriod($objEvent->current(), $dateFormat);

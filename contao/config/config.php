@@ -40,48 +40,48 @@ unset($GLOBALS['BE_MOD']['content']['calendar']);
 
 // Back end modules
 $GLOBALS['BE_MOD']['sac_be_modules'] = [
-    'sac_section_tool' => [
-        'tables' => ['tl_sac_section'],
-    ],
-    'calendar' => [
-        'tables' => ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'],
-        'table' => [BackendCsvImportController::class, 'importTableWizardAction'],
-        'list' => [BackendCsvImportController::class, 'importListWizardAction'],
-        NotifyEventRegistrationStateController::PARAM_KEY => [NotifyEventRegistrationStateController::class, 'generate'],
-    ],
-    'sac_course_main_types_tool' => [
-        'tables' => ['tl_course_main_type'],
-    ],
-    'sac_course_sub_types_tool' => [
-        'tables' => ['tl_course_sub_type'],
-    ],
-    'sac_event_type_tool' => [
-        'tables' => ['tl_event_type'],
-    ],
-    'sac_tour_difficulty_tool' => [
-        'tables' => ['tl_tour_difficulty_category', 'tl_tour_difficulty'],
-        'table' => [TableWizard::class, 'importTable'],
-        'list' => [ListWizard::class, 'importList'],
-    ],
-    'sac_tour_type_tool' => [
-        'tables' => ['tl_tour_type'],
-    ],
-    'sac_event_release_tool' => [
-        'tables' => ['tl_event_release_level_policy_package', 'tl_event_release_level_policy'],
-        'table' => [TableWizard::class, 'importTable'],
-        'list' => [ListWizard::class, 'importList'],
-    ],
-    'sac_event_organizer_tool' => [
-        'tables' => ['tl_event_organizer'],
-        'table' => [TableWizard::class, 'importTable'],
-        'list' => [ListWizard::class, 'importList'],
-    ],
-    'sac_event_journey_tool' => [
-        'tables' => ['tl_calendar_events_journey'],
-    ],
-    'sac_user_role_tool' => [
-        'tables' => ['tl_user_role'],
-    ],
+	'sac_section_tool'           => [
+		'tables' => ['tl_sac_section'],
+	],
+	'calendar'                   => [
+		'tables'                                          => ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'],
+		'table'                                           => [BackendCsvImportController::class, 'importTableWizardAction'],
+		'list'                                            => [BackendCsvImportController::class, 'importListWizardAction'],
+		NotifyEventRegistrationStateController::PARAM_KEY => [NotifyEventRegistrationStateController::class, 'generate'],
+	],
+	'sac_course_main_types_tool' => [
+		'tables' => ['tl_course_main_type'],
+	],
+	'sac_course_sub_types_tool'  => [
+		'tables' => ['tl_course_sub_type'],
+	],
+	'sac_event_type_tool'        => [
+		'tables' => ['tl_event_type'],
+	],
+	'sac_tour_difficulty_tool'   => [
+		'tables' => ['tl_tour_difficulty_category', 'tl_tour_difficulty'],
+		'table'  => [TableWizard::class, 'importTable'],
+		'list'   => [ListWizard::class, 'importList'],
+	],
+	'sac_tour_type_tool'         => [
+		'tables' => ['tl_tour_type'],
+	],
+	'sac_event_release_tool'     => [
+		'tables' => ['tl_event_release_level_policy_package', 'tl_event_release_level_policy'],
+		'table'  => [TableWizard::class, 'importTable'],
+		'list'   => [ListWizard::class, 'importList'],
+	],
+	'sac_event_organizer_tool'   => [
+		'tables' => ['tl_event_organizer'],
+		'table'  => [TableWizard::class, 'importTable'],
+		'list'   => [ListWizard::class, 'importList'],
+	],
+	'sac_event_journey_tool'     => [
+		'tables' => ['tl_calendar_events_journey'],
+	],
+	'sac_user_role_tool'         => [
+		'tables' => ['tl_user_role'],
+	],
 ];
 
 /*
@@ -111,7 +111,7 @@ $GLOBALS['TL_MODELS'][UserRoleModel::getTable()] = UserRoleModel::class;
  * and tl_user.inherit = 'extend'
  */
 $GLOBALS['TL_PURGE']['custom']['reset_backend_user_rights'] = [
-    'callback' => [MaintainBackendUser::class, 'resetBackendUserPermissions'],
+	'callback' => [MaintainBackendUser::class, 'resetBackendUserPermissions'],
 ];
 
 /*
@@ -125,71 +125,50 @@ $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
  * Contao 5 ready fe modules are registered in controller-frontend-module.yml
  */
 $GLOBALS['FE_MOD']['sac_event_tool_frontend_modules'] = [
-    'eventToolCalendarEventPreviewReader' => ModuleSacEventToolEventPreviewReader::class,
+	'eventToolCalendarEventPreviewReader' => ModuleSacEventToolEventPreviewReader::class,
 ];
 
 /*
  * Avalanche levels
  */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL'] = [
-    'avalanche_level_0',
-    'avalanche_level_1',
-    'avalanche_level_2',
-    'avalanche_level_3',
-    'avalanche_level_4',
-    'avalanche_level_5',
+	'avalanche_level_0',
+	'avalanche_level_1',
+	'avalanche_level_2',
+	'avalanche_level_3',
+	'avalanche_level_4',
+	'avalanche_level_5',
 ];
 
 /*
  * Backend user rescission/retirement cause
  */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['userRescissionCause'] = [
-    'deceased', // verstorben
-    'recission', // Rücktritt
-    'leaving', // Austritt
-];
-
-/*
- * Course levels
- */
-$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'] = [
-	1  => '1',
-	2  => '2',
-	3  => '3',
-	4  => '4',
-	5  => '5',
-	6  => '1 - 2',
-	7  => '1 - 3',
-	8  => '1 - 4',
-	9  => '1 - 5',
-	10 => '2 - 3',
-	11 => '2 - 4',
-	12 => '2 - 5',
-	13 => '3 - 4',
-	14 => '3 - 5',
-	15 => '4 - 5',
+	'deceased', // verstorben
+	'recission', // Rücktritt
+	'leaving', // Austritt
 ];
 
 /*
  * Car seats info: We use that in the event registration form
  */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'] = [
-    'kein Auto',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
+	'kein Auto',
+	'2',
+	'3',
+	'4',
+	'5',
+	'6',
+	'7',
+	'8',
+	'9',
 ];
 
 /*
  * Ticket info: We use that in the event registration form.
  */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'] = [
-    'Nichts',
-    'GA',
-    'Halbtax-Abo',
+	'Nichts',
+	'GA',
+	'Halbtax-Abo',
 ];

@@ -25,6 +25,7 @@ use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
@@ -43,12 +44,13 @@ class WorkshopBookletGenerator
     private bool $printSingleEvent = false;
 
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly Connection $connection,
+		private readonly CourseLevels $courseLevels,
         private readonly BinaryFileDownload $binaryFileDownload,
+        private readonly Connection $connection,
+        private readonly ContaoFramework $framework,
         private readonly string $projectDir,
-        private readonly string $sacevtTempDir,
         private readonly string $sacevtEventCourseBookletFilenamePattern,
+        private readonly string $sacevtTempDir,
     ) {
         $this->framework->initialize(true);
 
@@ -292,7 +294,7 @@ class WorkshopBookletGenerator
         $objPartial->courseTypeLevel1 = CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name;
 
         // Course level
-        $objPartial->courseLevel = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel];
+        $objPartial->courseLevel = $this->courseLevels->get($objEvent->courseLevel);
 
         // Organizers
         $arrItems = array_map(

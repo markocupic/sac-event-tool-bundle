@@ -39,6 +39,7 @@ use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Config\Bundle;
+use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
@@ -251,7 +252,7 @@ class CalendarEventsHelper
                 break;
 
             case 'courseLevelName':
-                $value = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel] ?? '';
+                $value = System::getContainer()->get(CourseLevels::class)->get($objEvent->courseLevel);
                 break;
 
             case 'courseTypeLevel0Name':

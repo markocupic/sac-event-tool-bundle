@@ -45,6 +45,7 @@ use League\Csv\CharsetConverter;
 use League\Csv\InvalidArgument;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventType;
@@ -62,7 +63,6 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 class CalendarEvents
 {
     // Adapters
-    private Adapter $image;
     private Adapter $arrayUtil;
     private Adapter $calendarEventsHelper;
     private Adapter $calendarEventsJourneyModel;
@@ -73,22 +73,23 @@ class CalendarEvents
     private Adapter $date;
     private Adapter $filesModel;
     private Adapter $idna;
+    private Adapter $image;
     private Adapter $message;
     private Adapter $stringUtil;
     private Adapter $system;
     private Adapter $userModel;
 
     public function __construct(
-        private readonly EventDurationInfo $eventDurationInfo,
+	    private readonly CourseLevels $courseLevels,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
+        private readonly EventDurationInfo $eventDurationInfo,
         private readonly EventReleaseLevelUtil $eventReleaseLevelUtil,
         private readonly PasswordHasherFactoryInterface $passwordHasherFactory,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
     ) {
         // Adapters
-        $this->image = $this->framework->getAdapter(Image::class);
         $this->arrayUtil = $this->framework->getAdapter(ArrayUtil::class);
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->calendarEventsJourneyModel = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
@@ -99,6 +100,7 @@ class CalendarEvents
         $this->date = $this->framework->getAdapter(Date::class);
         $this->filesModel = $this->framework->getAdapter(FilesModel::class);
         $this->idna = $this->framework->getAdapter(Idna::class);
+        $this->image = $this->framework->getAdapter(Image::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->system = $this->framework->getAdapter(System::class);
@@ -325,7 +327,7 @@ class CalendarEvents
                             $objJourney = $this->calendarEventsJourneyModel->findByPk($objEvent->{$field});
                             $arrRow[] = null !== $objJourney ? $objJourney->title : $objEvent->{$field};
                         } elseif ('courseLevel' === $field) {
-                            $arrRow[] = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->{$field}] ?? $objEvent->{$field};
+                            $arrRow[] = $this->courseLevels->get($objEvent->{$field});
                         } elseif ('courseTypeLevel0' === $field) {
                             $arrRow[] = empty($objEvent->{$field}) ? '' : (string) $this->connection->fetchOne('SELECT name FROM tl_course_main_type WHERE id = ?', [$objEvent->{$field}]);
                         } elseif ('courseTypeLevel1' === $field) {
