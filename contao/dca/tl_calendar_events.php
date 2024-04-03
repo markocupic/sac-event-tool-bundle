@@ -19,6 +19,7 @@ use Contao\DataContainer;
 use Contao\Date;
 use Contao\Input;
 use Contao\System;
+use Markocupic\SacEventToolBundle\Config\AvalancheLevel;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
@@ -860,7 +861,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
-	'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL'],
+	'options'   => System::getContainer()->get(AvalancheLevel::class)->getAll(),
 	'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
 	'eval'      => ['multiple' => false, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(255) NOT NULL default ''",

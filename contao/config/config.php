@@ -129,18 +129,6 @@ $GLOBALS['FE_MOD']['sac_event_tool_frontend_modules'] = [
 ];
 
 /*
- * Avalanche levels
- */
-$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL'] = [
-	'avalanche_level_0',
-	'avalanche_level_1',
-	'avalanche_level_2',
-	'avalanche_level_3',
-	'avalanche_level_4',
-	'avalanche_level_5',
-];
-
-/*
  * Backend user rescission/retirement cause
  */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['userRescissionCause'] = [

@@ -28,6 +28,7 @@ services:
             $sacevtUserBackendResetPermissionsOnLogin: '%sacevt.user.backend.reset_permissions_on_login%'
             $sacevtUserFrontendAvatarDir: '%sacevt.user.frontend.avatar_dir%'
             $sacevtEventConfigDurationInfo: '%sacevt.event.config.duration_info%'
+            $sacevtEventConfigAvalancheLevel: '%sacevt.event.config.avalanche_level%'
 
     _instanceof:
         Symfony\Bundle\FrameworkBundle\Controller\AbstractController:
@@ -84,4 +85,7 @@ services:
         public: true
 
     Markocupic\SacEventToolBundle\Config\CourseLevels:
+        public: true
+
+    Markocupic\SacEventToolBundle\Config\AvalancheLevel:
         public: true
