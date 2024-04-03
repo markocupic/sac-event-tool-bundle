@@ -45,6 +45,7 @@ use League\Csv\CharsetConverter;
 use League\Csv\InvalidArgument;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\EventReleaseLevelUtil;
@@ -78,12 +79,13 @@ class CalendarEvents
     private Adapter $userModel;
 
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly RequestStack $requestStack,
+        private readonly EventDurationInfo $eventDurationInfo,
         private readonly Connection $connection,
-        private readonly Security $security,
+        private readonly ContaoFramework $framework,
         private readonly EventReleaseLevelUtil $eventReleaseLevelUtil,
         private readonly PasswordHasherFactoryInterface $passwordHasherFactory,
+        private readonly RequestStack $requestStack,
+        private readonly Security $security,
     ) {
         // Adapters
         $this->image = $this->framework->getAdapter(Image::class);
@@ -925,21 +927,7 @@ class CalendarEvents
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.durationInfo.options', priority: 100)]
     public function getEventDuration(): array
     {
-        $arrDuration = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'];
-
-        if (!empty($arrDuration) && \is_array($arrDuration)) {
-            $opt = $arrDuration;
-        } else {
-            $opt = [];
-        }
-
-        $arrOpt = [];
-
-        foreach (array_keys($opt) as $k) {
-            $arrOpt[] = $k;
-        }
-
-        return $arrOpt;
+        return array_keys($this->eventDurationInfo->getAll());
     }
 
     /**

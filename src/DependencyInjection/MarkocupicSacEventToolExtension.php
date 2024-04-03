@@ -34,7 +34,7 @@ class MarkocupicSacEventToolExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $configuration = new Configuration();
+        $configuration = new Configuration((string) $container->getParameter('kernel.project_dir'));
 
         $config = $this->processConfiguration($configuration, $configs);
 
@@ -61,6 +61,7 @@ class MarkocupicSacEventToolExtension extends Extension
         $container->setParameter($rootKey.'.user.backend.reset_permissions_on_login', $config['user']['backend']['reset_permissions_on_login']);
         $container->setParameter($rootKey.'.user.frontend.home_dir', $config['user']['frontend']['home_dir']);
         $container->setParameter($rootKey.'.user.frontend.avatar_dir', $config['user']['frontend']['avatar_dir']);
+        $container->setParameter($rootKey.'.event.config.duration_info', $config['event']['config']['duration_info']);
         $container->setParameter($rootKey.'.event.course.booklet_cover_image', $config['event']['course']['booklet_cover_image']);
         $container->setParameter($rootKey.'.event.course.booklet_filename_pattern', $config['event']['course']['booklet_filename_pattern']);
         $container->setParameter($rootKey.'.event.course.fallback_image', $config['event']['course']['fallback_image']);

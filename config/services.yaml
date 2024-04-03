@@ -26,6 +26,7 @@ services:
             $sacevtUserBackendHomeDir: '%sacevt.user.backend.home_dir%'
             $sacevtUserBackendResetPermissionsOnLogin: '%sacevt.user.backend.reset_permissions_on_login%'
             $sacevtUserFrontendAvatarDir: '%sacevt.user.frontend.avatar_dir%'
+            $sacevtEventConfigDurationInfo: '%sacevt.event.config.duration_info%'
 
     _instanceof:
         Symfony\Bundle\FrameworkBundle\Controller\AbstractController:
@@ -34,7 +35,7 @@ services:
 
     Markocupic\SacEventToolBundle\:
         resource: ../src/
-        exclude: ../src/{ContaoManager,Session,Config,Event,DependencyInjection,Resources,Model}
+        exclude: ../src/{ContaoManager,Session,Event,DependencyInjection,Resources,Model}
 
     # Override the Contao Backend User Provider
     # to enable login with the SAC member id

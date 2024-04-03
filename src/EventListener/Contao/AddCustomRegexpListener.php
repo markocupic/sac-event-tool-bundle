@@ -19,6 +19,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\MemberModel;
 use Contao\Widget;
+use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AsHook('addCustomRegexp', priority: 100)]
@@ -27,6 +28,7 @@ readonly class AddCustomRegexpListener
     public function __construct(
         private ContaoFramework $framework,
         private RequestStack $requestStack,
+	    private EventDurationInfo $eventDurationInfo,
     ) {
     }
 
@@ -44,14 +46,14 @@ readonly class AddCustomRegexpListener
                 return true;
             }
 
-            $countDates = \count($post['eventDates']);
-            $arrDurationInfo = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$varValue] ?? null;
-
-            if (null === $arrDurationInfo) {
+            if (!$this->eventDurationInfo->has($varValue)) {
                 return true;
             }
 
-            if ($arrDurationInfo['dateRows'] !== $countDates) {
+	        $arrDurationInfo = $this->eventDurationInfo->get($varValue);
+	        $countDates = \count($post['eventDates']);
+
+	        if ($arrDurationInfo['dateRows'] !== $countDates) {
                 $objWidget->addError($GLOBALS['TL_LANG']['ERR']['invalidEventDurationInfo']);
 
                 return false;

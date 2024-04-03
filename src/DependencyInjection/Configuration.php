@@ -16,10 +16,15 @@ namespace Markocupic\SacEventToolBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class Configuration implements ConfigurationInterface
 {
     public const ROOT_KEY = 'sacevt';
+
+    public function __construct(private readonly string $projectDir)
+    {
+    }
 
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -77,6 +82,18 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('event')
                     ->addDefaultsIfNotSet()
                     ->children()
+                        ->arrayNode('config')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->arrayNode('duration_info')
+                                    ->useAttributeAsKey('name')
+                                    ->prototype('scalar')->end()
+                                    ->normalizeKeys(false)
+                                    ->useAttributeAsKey('name')
+                                    ->defaultValue(Yaml::parse(file_get_contents($this->projectDir.'/vendor/markocupic/sac-event-tool-bundle/config/_event_duration.yaml')))
+                                ->end()
+                            ->end()
+                        ->end()
                         ->arrayNode('course')
                             ->addDefaultsIfNotSet()
                             ->children()
