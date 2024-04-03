@@ -472,28 +472,6 @@ class CalendarEvents
     }
 
     /**
-     * Do not allow to non-admins deleting records,
-     * if there are registrations on the current event.
-     *
-     * @throws Exception
-     */
-    #[AsCallback(table: 'tl_calendar_events', target: 'config.ondelete', priority: 100)]
-    public function onDelete(DataContainer $dc): void
-    {
-        // Return if there is no ID
-        if (!$dc->activeRecord) {
-            return;
-        }
-
-        $registrationId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$dc->activeRecord->id]);
-
-        if ($registrationId) {
-            $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['deleteEventMembersBeforeDeleteEvent'], $dc->activeRecord->id));
-            $this->controller->redirect($this->system->getReferer());
-        }
-    }
-
-    /**
      * Add a priority of -100
      * This way this callback will be executed after! the legacy callback tl_calendar_events.adjustTime()
      * but before self::adjustRegistrationPeriod (priority: -110).
@@ -1113,7 +1091,7 @@ class CalendarEvents
      * @throws \Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventReleaseLevel.options', priority: 50)]
-    public function getReleaseLevels(DataContainer $dc): array
+    public function getEventReleaseLevels(DataContainer $dc): array
     {
         // Use $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel']['foreignKey']
         // for the filter panel instead of the options callback
@@ -1312,7 +1290,7 @@ class CalendarEvents
     }
 
     /**
-     * Don't allow the max value to be the same as the min value.
+     * Don't allow tourTechDifficultyMax to be equal to tourTechDifficultyMin.
      *
      * @param $value
      * @param DataContainer $dc

@@ -15,10 +15,10 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer\AccessDecision;
 
 use Contao\Backend;
-use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
@@ -39,34 +39,36 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CalendarEvents
 {
     // Adapters
-    private Adapter $image;
     private Adapter $backend;
     private Adapter $calendarEventsHelper;
     private Adapter $calendarEventsModel;
     private Adapter $controller;
+    private Adapter $image;
     private Adapter $message;
     private Adapter $stringUtil;
     private Adapter $system;
 
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly RequestStack $requestStack,
+		private readonly TranslatorInterface $translator,
         private readonly Connection $connection,
-        private readonly Security $security,
-        private readonly EventReleaseLevelUtil $eventReleaseLevelUtil,
+        private readonly ContaoFramework $framework,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly EventReleaseLevelUtil $eventReleaseLevelUtil,
+        private readonly RequestStack $requestStack,
+        private readonly Security $security,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
         // Adapters
         $this->backend = $this->framework->getAdapter(Backend::class);
-        $this->image = $this->framework->getAdapter(Image::class);
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
+        $this->image = $this->framework->getAdapter(Image::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->system = $this->framework->getAdapter(System::class);
@@ -119,8 +121,9 @@ class CalendarEvents
 
                             // User is not allowed to submit any data!
                             if ('tl_calendar_events' === $request->request->get('FORM_SUBMIT')) {
-                                $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToEditEvent'], $dc->id));
-                                $this->controller->redirect($this->system->getReferer());
+	                            $this->message->addError($this->translator->trans('ERR.missingPermissionsToEditEvent', [$dc->id], 'contao_default'));
+
+	                            $this->controller->redirect($this->system->getReferer());
                             }
                         } else {
                             // User has write access to all fields on the first e.r.level.
@@ -165,8 +168,9 @@ class CalendarEvents
             case 'delete':
                 // Prevent unauthorized deletion
                 if (!$this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $dc->id)) {
-                    $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToDeleteEvent'], $dc->id));
-                    $this->controller->redirect($this->system->getReferer());
+	                $this->message->addError($this->translator->trans('ERR.missingPermissionsToDeleteEvent', [$dc->id], 'contao_default'));
+
+	                $this->controller->redirect($this->system->getReferer());
                 }
 
                 break;
@@ -174,7 +178,7 @@ class CalendarEvents
                 // Prevent unauthorized publishing
                 if ('published' === $request->query->get('field')) {
                     if (!$this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $dc->id)) {
-                        $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToPublishOrUnpublishEvent'], $dc->id));
+	                    $this->message->addError($this->translator->trans('ERR.missingPermissionsToPublishOrUnpublishEvent', [$dc->id], 'contao_default'));
                         $this->controller->redirect($this->system->getReferer());
                     }
                 }
@@ -187,13 +191,51 @@ class CalendarEvents
                     $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_CUT_EVENT, $dc->id);
 
                     if (!$blnAllow) {
-                        $this->message->addInfo(sprintf('Du hast keine Berechtigung den Event mit ID %d zu verschieben', $dc->id));
-                        $this->controller->redirect($this->system->getReferer());
+	                    $this->message->addError($this->translator->trans('ERR.missingPermissionsToCutEvent', [$dc->id], 'contao_default'));
+
+	                    $this->controller->redirect($this->system->getReferer());
                     }
                 }
 
                 break;
 
+            case 'deleteAll':
+                (
+                    function (): void {
+                        // Check if
+                        //
+                        // user has the permission to run deleteAll
+                        $session = $this->requestStack->getSession()->get('CURRENT');
+                        $arrIDS = $session['IDS'];
+
+                        if (empty($arrIDS) || !\is_array($arrIDS)) {
+                            return;
+                        }
+
+                        foreach ($arrIDS as $id) {
+                            $objEventsModel = $this->calendarEventsModel->findByPk($id);
+
+                            if (null === $objEventsModel) {
+                                throw new \RuntimeException(sprintf('Could not find event with ID %d', $id));
+                            }
+
+                            if (!$this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $id)) {
+	                            $this->message->addError($this->translator->trans('ERR.missingPermissionsToEditEvent', [$id], 'contao_default'));
+
+	                            $this->controller->redirect($this->system->getReferer());
+                            }
+
+                            $registrationId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$id]);
+
+                            if ($registrationId) {
+	                            $this->message->addError($this->translator->trans('ERR.deleteEventMembersBeforeDeleteEvent', [$id], 'contao_default'));
+
+	                            $this->controller->redirect($this->system->getReferer());
+                            }
+                        }
+                    }
+                )();
+                break;
             case 'cutAll':
                 (
                     function (): void {
@@ -233,7 +275,7 @@ class CalendarEvents
             case 'editAll':
                 (
                     function () use ($dc, $request): void {
-                        // Allow select mode only, if an eventReleaseLevel filter is set
+                        // Allow the "select" and editAll action only, if an "eventReleaseLevel" filter is set.
                         $objSessionBag = $request->getSession()->getBag('contao_backend');
 
                         $session = $objSessionBag->all();
@@ -241,7 +283,7 @@ class CalendarEvents
                         $filter = DataContainer::MODE_PARENT === $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['mode'] ? 'tl_calendar_events_'.$dc->currentPid : 'tl_calendar_events';
 
                         if (!isset($session['filter'][$filter]['eventReleaseLevel'])) {
-                            $this->message->addInfo('"Mehrere bearbeiten" nur möglich, wenn ein Freigabestufen-Filter gesetzt wurde."');
+                            $this->message->addError($this->translator->trans('ERR.setEvtRelLevelForSelectAll',[], 'contao_default'));
                             $this->controller->redirect($this->system->getReferer());
                         }
                     }
@@ -268,7 +310,7 @@ class CalendarEvents
                     function () use ($act): void {
                         // Do not allow editing write-protected fields in editAll mode
                         // Use input_field_callback to only display the field values without the form input field
-                        if ('editAll' !== $act && 'overrideAll' !== $act) {
+                        if ('editAll' !== $act) {
                             return;
                         }
 
@@ -279,25 +321,8 @@ class CalendarEvents
                             return;
                         }
 
-                        $objEventsModel = $this->calendarEventsModel->findByPk($arrIDS[0]);
-
-                        if (null === $objEventsModel) {
-                            return;
-                        }
-
-                        if (empty($objEventsModel->eventReleaseLevel)) {
-                            return;
-                        }
-
-                        $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($objEventsModel->id);
-
-                        if (null === $objEventReleaseLevelPolicyModel) {
-                            return;
-                        }
-
-                        if ($objEventReleaseLevelPolicyModel->id === $objEventsModel->eventReleaseLevel) {
-                            return;
-                        }
+                        // !!! Whether an eventReleaseLevel filter is set
+                        // has already been checked above.
 
                         $request = $this->requestStack->getCurrentRequest();
 
@@ -305,13 +330,65 @@ class CalendarEvents
                             if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
                                 if ('editAll' === $request->query->get('act')) {
                                     $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [\Markocupic\SacEventToolBundle\DataContainer\CalendarEvents::class, 'showFieldValue'];
-                                } else {
-                                    unset($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]);
                                 }
                             }
                         }
                     }
                 )();
+
+                break;
+
+            case 'overrideAll':
+                    (
+                        function (): void {
+                            // Do not allow editing write-protected fields in editAll mode
+                            // Use input_field_callback to only display the field values without the form input field
+
+                            $session = $this->requestStack->getSession()->get('CURRENT');
+
+                            $arrIDS = $session['IDS'];
+
+                            if (empty($arrIDS) || !\is_array($arrIDS)) {
+                                return;
+                            }
+
+                            $arrFields = $session['tl_calendar_events'];
+
+                            if (empty($arrFields) || !\is_array($arrFields)) {
+                                return;
+                            }
+
+                            $objEventsModel = $this->calendarEventsModel->findByPk($arrIDS[0]);
+
+                            if (null === $objEventsModel) {
+                                return;
+                            }
+
+                            if (empty($objEventsModel->eventReleaseLevel)) {
+                                return;
+                            }
+
+                            // Check if an "eventReleaseLevel" filter is set.
+                            $strIds = implode(',', array_map('\intval', $arrIDS));
+                            $arrEventReleaseLevel = $this->connection->fetchFirstColumn("SELECT eventReleaseLevel FROM tl_calendar_events WHERE id IN($strIds) GROUP BY eventReleaseLevel");
+
+                            if (1 !== \count($arrEventReleaseLevel)) {
+                                throw new AccessDeniedException('Access to the action "overrideAll" denied, because no "eventReleaseLevel" filter has been set.');
+                            }
+
+                            $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findByPk($arrEventReleaseLevel[0]);
+
+                            if (null === $objEventReleaseLevelPolicyModel) {
+                                return;
+                            }
+
+                            foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] ?? []) as $fieldName) {
+                                if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
+                                    unset($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]);
+                                }
+                            }
+                        }
+                    )();
 
                 break;
         }

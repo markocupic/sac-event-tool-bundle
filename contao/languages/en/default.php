@@ -28,8 +28,8 @@ $GLOBALS['TL_LANG']['CTE'][UserPortraitListController::TYPE] = ['SAC-User-Portra
 $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
 if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isFrontendRequest($request)) {
-    $GLOBALS['TL_LANG']['MSC']['username'] = 'SAC Mitgliedernummer';
-    $GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
+	$GLOBALS['TL_LANG']['MSC']['username'] = 'SAC Mitgliedernummer';
+	$GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
 }
 
 // DCA
@@ -41,9 +41,6 @@ $GLOBALS['TL_LANG']['ERR']['clearMemberProfile'] = 'Das Mitglied mit ID %d kann 
 
 // tl_event_release_level_policy
 $GLOBALS['TL_LANG']['MSC']['level'] = 'Stufe';
-
-// tl_calendar_events
-$GLOBALS['TL_LANG']['ERR']['invalidEventDurationInfo'] = 'Die Event-Dauer stimmt nicht mit der Anzahl Event-Daten überein. Setzen Sie für jeden Tag des Events eine Datumszeile oder korrigieren Sie die Event-Dauer.';
 
 // tl_calendar_events_member
 $GLOBALS['TL_LANG']['ERR']['accessDenied'] = 'Zutritt verweigert.';
@@ -100,18 +97,23 @@ $GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] = 'Möchten Sie wirklich die Even
 $GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] = 'Möchten Sie wirklich die Eventzeitpunkte aller Events in diesem Kalender um 1 Jahr nach vorne schieben?';
 $GLOBALS['TL_LANG']['MSC']['plusOneReleaseLevelConfirm'] = 'Möchten Sie wirklich alle hier gelisteten Events um eine Freigabestufe erhöhen?';
 $GLOBALS['TL_LANG']['MSC']['minusOneReleaseLevelConfirm'] = 'Möchten Sie wirklich alle hier gelisteten Events um eine Freigabestufe vermindern?';
-$GLOBALS['TL_LANG']['MSC']['deleteEventMembersBeforeDeleteEvent'] = 'Für den Event mit ID %s sind Anmeldungen vorhanden. Bitte löschen Sie diese, bevor Sie den Event selber löschen.';
 $GLOBALS['TL_LANG']['MSC']['setEventReleaseLevelTo'] = 'Die Freigabestufe für Event mit ID %s wurde auf Level %s gesetzt.';
 $GLOBALS['TL_LANG']['MSC']['publishedEvent'] = 'Der Event mit ID %s wurde veröffentlicht.';
 $GLOBALS['TL_LANG']['MSC']['unpublishedEvent'] = 'Der Event mit ID %s ist nicht mehr veröffentlicht.';
 $GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck'] = 'Das Datum für den Anfang des Anmeldezeitraums musste angepasst werden. Bitte kontrollieren Sie dieses nochmals.';
 $GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck'] = 'Das Datum für das Ende des Anmeldezeitraums musste angepasst werden. Bitte kontrollieren Sie dieses nochmals.';
-$GLOBALS['TL_LANG']['MSC']['missingPermissionsToEditEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Datensatz mit ID %s zu bearbeiten.';
-$GLOBALS['TL_LANG']['MSC']['missingPermissionsToDeleteEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Datensatz mit ID %s zu löschen.';
-$GLOBALS['TL_LANG']['MSC']['missingPermissionsToPublishOrUnpublishEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Datensatz mit ID %s zu veröffentlichen.';
 $GLOBALS['TL_LANG']['MSC']['writeTourReport'] = 'Möchten Sie den Tourrapport erstellen/bearbeiten?';
 $GLOBALS['TL_LANG']['MSC']['goToPartcipantList'] = 'Möchten Sie zur Teilnehmerliste wechseln?';
 $GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'Möchten Sie das Vergütungsformular bearbeiten/erstellen?';
+
+// tl_calendar_events error messages
+$GLOBALS['TL_LANG']['ERR']['invalidEventDurationInfo'] = 'Die Event-Dauer stimmt nicht mit der Anzahl Event-Daten überein. Setzen Sie für jeden Tag des Events eine Datumszeile oder korrigieren Sie die Event-Dauer.';
+$GLOBALS['TL_LANG']['ERR']['deleteEventMembersBeforeDeleteEvent'] = 'Für den Event mit ID %s sind Anmeldungen vorhanden. Bitte löschen Sie diese, bevor Sie den Event selber löschen.';
+$GLOBALS['TL_LANG']['ERR']['setEvtRelLevelForSelectAll'] = 'Mehrere bearbeiten" nur möglich, wenn ein Freigabestufen-Filter gesetzt wurde.';
+$GLOBALS['TL_LANG']['ERR']['missingPermissionsToEditEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Event mit ID %s zu bearbeiten.';
+$GLOBALS['TL_LANG']['ERR']['missingPermissionsToDeleteEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Event mit ID %s zu löschen.';
+$GLOBALS['TL_LANG']['ERR']['missingPermissionsToPublishOrUnpublishEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Event mit ID %s zu veröffentlichen.';
+$GLOBALS['TL_LANG']['ERR']['missingPermissionsToCutEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Event mit ID %d zu verschieben.';
 
 // Backend home screen dashboard
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_sacEvents'] = 'SAC Events';
