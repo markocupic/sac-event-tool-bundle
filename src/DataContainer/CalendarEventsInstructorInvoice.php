@@ -100,10 +100,6 @@ readonly class CalendarEventsInstructorInvoice
             if (isset($objEvent)) {
                 $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id);
 
-                if ($objEvent->registrationGoesTo === $user->id) {
-                    $blnAllow = true;
-                }
-
                 if (!$blnAllow) {
                     Message::addError('Sie besitzen nicht die nötigen Rechte, um diese Seite zu sehen.');
                     Controller::redirect(System::getReferer());

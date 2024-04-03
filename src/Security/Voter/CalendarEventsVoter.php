@@ -324,6 +324,7 @@ class CalendarEventsVoter extends Voter
      * - to admins
      * - to permitted event-authors --> tl_event_release_level_policy.allowWriteAccessToAuthor
      * - to permitted event-instructors --> tl_event_release_level_policy.allowWriteAccessToInstructors
+     * - if user is charged to do the registration admin work (tl_calendar_events.registrationGoesTo)
      * - to "super-users" --> tl_event_release_level_policy.groupEventPerm.
      *
      * @throws \Exception
@@ -369,6 +370,12 @@ class CalendarEventsVoter extends Voter
                 return true;
             }
         }
+
+	    if (!empty($this->event->registrationGoesTo)) {
+		    if ($this->user->id === $this->event->registrationGoesTo) {
+			    return true;
+		    }
+	    }
 
         // Check if the user is member of an allowed group
         $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupEventPerm, true);

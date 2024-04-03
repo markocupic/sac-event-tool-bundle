@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\DataContainer\AccessDescision;
+namespace Markocupic\SacEventToolBundle\DataContainer\AccessDecision;
 
 use Contao\Backend;
 use Contao\BackendUser;
@@ -96,223 +96,224 @@ class CalendarEvents
             $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['children'],
         );
 
-        // Prevent unauthorized deletion
-        if ('delete' === $request->query->get('act')) {
-            $eventId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events WHERE id = ?', [$dc->id]);
+        $act = $request->query->get('act');
 
-            if ($eventId) {
-                if (!$this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $eventId)) {
-                    $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToDeleteEvent'], $eventId));
-                    $this->controller->redirect($this->system->getReferer());
-                }
-            }
-        }
+        switch ($act) {
+            case 'edit':
+                (
+                    function () use ($dc): void {
+                        // Prevent unauthorized editing
+                        $request = $this->requestStack->getCurrentRequest();
 
-        // Prevent unauthorized publishing
-        if ($request->query->has('tid')) {
-            $tid = $request->query->get('tid');
-            $eventId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events WHERE id = ?', [$tid]);
+                        $objEventsModel = $this->calendarEventsModel->findByPk($dc->id);
 
-            if ($eventId && !$this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $eventId)) {
-                $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToPublishOrUnpublishEvent'], $eventId));
-                $this->controller->redirect($this->system->getReferer());
-            }
-        }
-
-        // Prevent unauthorized editing
-        if ('edit' === $request->query->get('act')) {
-            // An anonymous function increases the readability of the code
-            (
-                function (): void {
-                    $request = $this->requestStack->getCurrentRequest();
-
-                    $objEventsModel = $this->calendarEventsModel->findByPk($request->query->get('id'));
-
-                    if (null === $objEventsModel) {
-                        return;
-                    }
-
-                    if (null === EventReleaseLevelPolicyModel::findByPk($objEventsModel->eventReleaseLevel)) {
-                        return;
-                    }
-
-                    /** @var BackendUser $user */
-                    $user = $this->security->getUser();
-
-                    if ($user->id !== $objEventsModel->registrationGoesTo && !$this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEventsModel->id)) {
-                        // User has no write access to the data record, that's why we display field values without a form input
-                        foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldName) {
-                            $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [\Markocupic\SacEventToolBundle\DataContainer\CalendarEvents::class, 'showFieldValue'];
-                        }
-
-                        // User is not allowed to submit any data!
-                        if ('tl_calendar_events' === $request->request->get('FORM_SUBMIT')) {
-                            $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToEditEvent'], $objEventsModel->id));
-                            $this->controller->redirect($this->system->getReferer());
-                        }
-                    } else {
-                        // User has write access to all fields on the first e.r.level.
-                        // If the e.r.level is > 1 ...
-                        // fields with the flag $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] === true,
-                        // are readonly
-                        $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($objEventsModel->id);
-
-                        // The event belongs not to an e.r.l.package
-                        if (null === $objEventReleaseLevelPolicyPackageModel) {
+                        if (null === EventReleaseLevelPolicyModel::findByPk($objEventsModel->eventReleaseLevel)) {
                             return;
                         }
 
-                        // The event has no e.r.level
+                        if (!$this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $dc->id)) {
+                            // User has no write access to the data record, that's why we display field values without a form input
+                            foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldName) {
+                                $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [\Markocupic\SacEventToolBundle\DataContainer\CalendarEvents::class, 'showFieldValue'];
+                            }
+
+                            // User is not allowed to submit any data!
+                            if ('tl_calendar_events' === $request->request->get('FORM_SUBMIT')) {
+                                $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToEditEvent'], $dc->id));
+                                $this->controller->redirect($this->system->getReferer());
+                            }
+                        } else {
+                            // User has write access to all fields on the first e.r.level.
+                            // If the e.r.level is > 1 ...
+                            // fields with the flag $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] === true,
+                            // are readonly
+                            $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($dc->id);
+
+                            // The event belongs not to an e.r.l.package
+                            if (null === $objEventReleaseLevelPolicyPackageModel) {
+                                return;
+                            }
+
+                            // The event has no e.r.level
+                            if (empty($objEventsModel->eventReleaseLevel)) {
+                                return;
+                            }
+
+                            // Get the first e.r.level of the e.r.l.package the event belongs to
+                            $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($dc->id);
+
+                            if (null === $objEventReleaseLevelPolicyModel) {
+                                return;
+                            }
+
+                            if ($objEventReleaseLevelPolicyModel->id !== $objEventsModel->eventReleaseLevel) {
+                                foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldName) {
+                                    if (empty($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['inputType'])) {
+                                        continue;
+                                    }
+
+                                    if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
+                                        $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [\Markocupic\SacEventToolBundle\DataContainer\CalendarEvents::class, 'showFieldValue'];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                )();
+                break;
+
+            case 'delete':
+                // Prevent unauthorized deletion
+                if (!$this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $dc->id)) {
+                    $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToDeleteEvent'], $dc->id));
+                    $this->controller->redirect($this->system->getReferer());
+                }
+
+                break;
+            case 'toggle':
+                // Prevent unauthorized publishing
+                if ('published' === $request->query->get('field')) {
+                    if (!$this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $dc->id)) {
+                        $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToPublishOrUnpublishEvent'], $dc->id));
+                        $this->controller->redirect($this->system->getReferer());
+                    }
+                }
+
+                break;
+
+            case 'paste':
+                // Check if user has the permission to cut events
+                if ('cut' === $request->query->get('mode')) {
+                    $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_CUT_EVENT, $dc->id);
+
+                    if (!$blnAllow) {
+                        $this->message->addInfo(sprintf('Du hast keine Berechtigung den Event mit ID %d zu verschieben', $dc->id));
+                        $this->controller->redirect($this->system->getReferer());
+                    }
+                }
+
+                break;
+
+            case 'cutAll':
+                (
+                    function (): void {
+                        // Check if user has the permission to cut events in the select all mode
+                        $session = $this->requestStack->getSession()->get('CURRENT');
+                        $arrIDS = $session['IDS'];
+
+                        if (empty($arrIDS) || !\is_array($arrIDS)) {
+                            return;
+                        }
+
+                        $blnAllow = true;
+
+                        foreach ($arrIDS as $id) {
+                            $objEventsModel = $this->calendarEventsModel->findByPk($id);
+
+                            if (null === $objEventsModel) {
+                                $blnAllow = false;
+                                break;
+                            }
+
+                            if (!$this->security->isGranted(CalendarEventsVoter::CAN_CUT_EVENT, $id)) {
+                                $blnAllow = false;
+                                break;
+                            }
+                        }
+
+                        if (!$blnAllow) {
+                            $this->message->addError(sprintf('Keine Berechtigung die Events mit IDS %s zu verschieben.', implode(', ', $arrIDS)));
+                            $this->controller->redirect($this->system->getReferer());
+                        }
+                    }
+                )();
+                break;
+
+            case 'select':
+            case 'editAll':
+                (
+                    function () use ($dc, $request): void {
+                        // Allow select mode only, if an eventReleaseLevel filter is set
+                        $objSessionBag = $request->getSession()->getBag('contao_backend');
+
+                        $session = $objSessionBag->all();
+
+                        $filter = DataContainer::MODE_PARENT === $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['mode'] ? 'tl_calendar_events_'.$dc->currentPid : 'tl_calendar_events';
+
+                        if (!isset($session['filter'][$filter]['eventReleaseLevel'])) {
+                            $this->message->addInfo('"Mehrere bearbeiten" nur möglich, wenn ein Freigabestufen-Filter gesetzt wurde."');
+                            $this->controller->redirect($this->system->getReferer());
+                        }
+                    }
+                )();
+
+                (
+                    function () use ($dc): void {
+                        // Only list record if the currently logged-in backend user has write-permissions.
+                        $arrIDS = [0];
+
+                        $ids = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar_events WHERE pid = ?', [$dc->currentPid]);
+
+                        foreach ($ids as $id) {
+                            if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $id)) {
+                                $arrIDS[] = $id;
+                            }
+                        }
+
+                        $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['root'] = $arrIDS;
+                    }
+                )();
+
+                (
+                    function () use ($act): void {
+                        // Do not allow editing write-protected fields in editAll mode
+                        // Use input_field_callback to only display the field values without the form input field
+                        if ('editAll' !== $act && 'overrideAll' !== $act) {
+                            return;
+                        }
+
+                        $session = $this->requestStack->getSession()->get('CURRENT');
+                        $arrIDS = $session['IDS'];
+
+                        if (empty($arrIDS) || !\is_array($arrIDS)) {
+                            return;
+                        }
+
+                        $objEventsModel = $this->calendarEventsModel->findByPk($arrIDS[0]);
+
+                        if (null === $objEventsModel) {
+                            return;
+                        }
+
                         if (empty($objEventsModel->eventReleaseLevel)) {
                             return;
                         }
 
-                        // Get the first e.r.level of the e.r.l.package the event belongs to
                         $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($objEventsModel->id);
 
                         if (null === $objEventReleaseLevelPolicyModel) {
                             return;
                         }
 
-                        if ($objEventReleaseLevelPolicyModel->id !== $objEventsModel->eventReleaseLevel) {
-                            foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldName) {
-                                if (empty($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['inputType'])) {
-                                    continue;
-                                }
+                        if ($objEventReleaseLevelPolicyModel->id === $objEventsModel->eventReleaseLevel) {
+                            return;
+                        }
 
-                                if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
+                        $request = $this->requestStack->getCurrentRequest();
+
+                        foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] ?? []) as $fieldName) {
+                            if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
+                                if ('editAll' === $request->query->get('act')) {
                                     $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [\Markocupic\SacEventToolBundle\DataContainer\CalendarEvents::class, 'showFieldValue'];
+                                } else {
+                                    unset($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]);
                                 }
                             }
                         }
                     }
-                }
-            )();
-        }
-        // End prevent unauthorized editing
+                )();
 
-        // Check if user has the permission to cut events
-        if ('paste' === $request->query->get('act') && 'cut' === $request->query->get('mode') && $request->query->has('id')) {
-            $eventId = $request->query->get('id');
-            $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_CUT_EVENT, $eventId);
-
-            if (!$blnAllow) {
-                $this->message->addInfo(sprintf('Du hast keine Berechtigung den Event mit ID %d zu verschieben', $eventId));
-                $this->controller->redirect($this->system->getReferer());
-            }
-        }
-
-        // Check if user has the permission to cut events in the select all mode
-        if ('cutAll' === $request->query->get('act')) {
-            // An anonymous function increases the readability of the code
-            (
-                function (): void {
-                    $session = $this->requestStack->getSession()->get('CURRENT');
-                    $arrIDS = $session['IDS'];
-
-                    if (empty($arrIDS) || !\is_array($arrIDS)) {
-                        return;
-                    }
-
-                    $blnAllow = true;
-
-                    foreach ($arrIDS as $id) {
-                        $objEventsModel = $this->calendarEventsModel->findByPk($id);
-
-                        if (null === $objEventsModel) {
-                            $blnAllow = false;
-                            break;
-                        }
-
-                        if (!$this->security->isGranted(CalendarEventsVoter::CAN_CUT_EVENT, $id)) {
-                            $blnAllow = false;
-                            break;
-                        }
-                    }
-
-                    if (!$blnAllow) {
-                        $this->message->addError(sprintf('Keine Berechtigung die Events mit IDS %s zu verschieben.', implode(', ', $arrIDS)));
-                        $this->controller->redirect($this->system->getReferer());
-                    }
-                }
-            )();
-        }
-
-        // Allow select mode only, if an eventReleaseLevel filter is set
-        if ('select' === $request->query->get('act')) {
-            $objSessionBag = $request->getSession()->getBag('contao_backend');
-
-            $session = $objSessionBag->all();
-
-            $filter = DataContainer::MODE_PARENT === $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['mode'] ? 'tl_calendar_events_'.$dc->currentPid : 'tl_calendar_events';
-
-            if (!isset($session['filter'][$filter]['eventReleaseLevel'])) {
-                $this->message->addInfo('"Mehrere bearbeiten" nur möglich, wenn ein Freigabestufen-Filter gesetzt wurde."');
-                $this->controller->redirect($this->system->getReferer());
-            }
-        }
-
-        // Only list record if the currently logged-in backend user has write-permissions.
-        if ('select' === $request->query->get('act') || 'editAll' === $request->query->get('act')) {
-            $arrIDS = [0];
-
-            $ids = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar_events WHERE pid = ?', [$dc->currentPid]);
-
-            foreach ($ids as $id) {
-                if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $id)) {
-                    $arrIDS[] = $id;
-                }
-            }
-
-            $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['root'] = $arrIDS;
-        }
-
-        // Do not allow editing write-protected fields in editAll mode
-        // Use input_field_callback to only display the field values without the form input field
-        if ('editAll' === $request->query->get('act') || 'overrideAll' === $request->query->get('act')) {
-            // An anonymous function increases the readability of the code
-            (
-                function (): void {
-                    $session = $this->requestStack->getSession()->get('CURRENT');
-                    $arrIDS = $session['IDS'];
-
-                    if (empty($arrIDS) || !\is_array($arrIDS)) {
-                        return;
-                    }
-
-                    $objEventsModel = $this->calendarEventsModel->findByPk($arrIDS[0]);
-
-                    if (null === $objEventsModel) {
-                        return;
-                    }
-
-                    if (empty($objEventsModel->eventReleaseLevel)) {
-                        return;
-                    }
-
-                    $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($objEventsModel->id);
-
-                    if (null === $objEventReleaseLevelPolicyModel) {
-                        return;
-                    }
-
-                    if ($objEventReleaseLevelPolicyModel->id === $objEventsModel->eventReleaseLevel) {
-                        return;
-                    }
-
-                    $request = $this->requestStack->getCurrentRequest();
-
-                    foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] ?? []) as $fieldName) {
-                        if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
-                            if ('editAll' === $request->query->get('act')) {
-                                $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [\Markocupic\SacEventToolBundle\DataContainer\CalendarEvents::class, 'showFieldValue'];
-                            } else {
-                                unset($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]);
-                            }
-                        }
-                    }
-                }
-            )();
+                break;
         }
     }
 
@@ -336,19 +337,18 @@ class CalendarEvents
             return;
         }
 
-        $id = $request->query->get('id', 0);
-        $objEvent = $this->calendarEventsModel->findByPk($id);
+        $objEvent = $this->calendarEventsModel->findByPk($dc->id);
 
         if (null === $objEvent) {
-            throw new \RuntimeException(sprintf('Event with ID %d not found.', $id));
+            throw new \RuntimeException(sprintf('Event with ID %d not found.', $dc->id));
         }
 
         if ('upgradeEventReleaseLevel' === $action) {
-            if (!$this->security->isGranted(CalendarEventsVoter::CAN_UPGRADE_EVENT_RELEASE_LEVEL, $objEvent->id)) {
+            if (!$this->security->isGranted(CalendarEventsVoter::CAN_UPGRADE_EVENT_RELEASE_LEVEL, $dc->id)) {
                 $this->controller->redirect($this->system->getReferer());
             }
         } else {
-            if (!$this->security->isGranted(CalendarEventsVoter::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $objEvent->id)) {
+            if (!$this->security->isGranted(CalendarEventsVoter::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $dc->id)) {
                 $this->controller->redirect($this->system->getReferer());
             }
         }
@@ -356,12 +356,12 @@ class CalendarEvents
         $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
 
         if (null === $objReleaseLevelModel) {
-            throw new \RuntimeException(sprintf('Could not find a valid event release level for event with ID %d.', $id));
+            throw new \RuntimeException(sprintf('Could not find a valid event release level for event with ID %d.', $dc->id));
         }
 
         $targetReleaseLevel = 'upgradeEventReleaseLevel' === $action ? $objReleaseLevelModel->level + 1 : $objReleaseLevelModel->level - 1;
 
-        if (false === EventReleaseLevelPolicyModel::levelExists($objEvent->id, $targetReleaseLevel)) {
+        if (false === EventReleaseLevelPolicyModel::levelExists($dc->id, $targetReleaseLevel)) {
             $this->controller->redirect($this->system->getReferer());
         }
 

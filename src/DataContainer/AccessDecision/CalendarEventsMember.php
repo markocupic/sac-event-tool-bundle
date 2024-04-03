@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\DataContainer\AccessDescision;
+namespace Markocupic\SacEventToolBundle\DataContainer\AccessDecision;
 
 use Contao\Backend;
 use Contao\CalendarEventsModel;
@@ -65,7 +65,6 @@ class CalendarEventsMember
             return;
         }
 
-        // WHAT IS THE PHILOSOPHY?
         // Don't grant anything from scratch, but make exceptions for qualified users.
         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['closed'] = true;
         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCreatable'] = true;
@@ -88,13 +87,13 @@ class CalendarEventsMember
         // This should prevent deep link hacking attempts
         // (the user types the url manually to perform a certain action).
         if ($request->query->has('act')) {
-            $action = $request->query->get('act');
+            $act = $request->query->get('act');
 
             $blnAllow = false;
 
             // Allow: show, create, edit, toggle, delete
             // Do not allow: select, editAll, deleteAll, copyAll, overrideAll
-            switch ($action) {
+            switch ($act) {
                 case 'show':
                     $blnAllow = true;
                     break;
@@ -114,11 +113,9 @@ class CalendarEventsMember
                     break;
                 case 'delete':
                     if ($this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $dc->getCurrentRecord()['eventId'])) {
-                        $regId = $request->query->get('id');
-
                         $bookingType = $this->connection->fetchOne(
                             'SELECT bookingType FROM tl_calendar_events_member WHERE id = ?',
-                            [$regId],
+                            [$dc->id],
                         );
 
                         if (BookingType::MANUALLY === $bookingType) {
@@ -129,11 +126,12 @@ class CalendarEventsMember
                     break;
 
                 default:
-                    //Do not allow: select, editAll, deleteAll, copyAll, overrideAll
+                    // Do not allow: select, editAll, deleteAll, copyAll, overrideAll
+		            // $blnAllow = false;
             }
 
             if (!$blnAllow) {
-                throw new AccessDeniedException(sprintf('Not enough permissions to perform the "%s" action on the current event.', $action));
+                throw new AccessDeniedException(sprintf('Not enough permissions to perform the "%s" action on the current event.', $act));
             }
         }
     }
@@ -151,8 +149,6 @@ class CalendarEventsMember
             return;
         }
 
-        $user = $this->security->getUser();
-
         // Generally do not allow selectAll to non-admins.
         if (!$this->security->isGranted('ROLE_ADMIN')) {
             unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['all']);
@@ -169,12 +165,13 @@ class CalendarEventsMember
         $blnAllowTourReportButton = false;
         $blnAllowInstructorInvoiceButton = false;
 
-        $eventId = $request->query->get('id');
+        $eventId = $request->query->get('id', 0);
+
         $objEvent = $this->calendarEvents->findByPk($eventId);
 
         if (null !== $objEvent) {
             // Check if backend user is allowed
-            if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $user->id) {
+            if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id)) {
                 if (EventType::TOUR === $objEvent->eventType || EventType::LAST_MINUTE_TOUR === $objEvent->eventType) {
                     $href = $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'];
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'] = sprintf($href, $eventId);

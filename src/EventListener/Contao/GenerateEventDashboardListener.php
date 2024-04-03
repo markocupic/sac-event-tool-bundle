@@ -48,7 +48,6 @@ class GenerateEventDashboardListener
     {
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $request = $this->requestStack->getCurrentRequest();
-        $user = $this->security->getUser();
         $eventId = $objEvent->id;
         $calendarId = $objEvent->getRelated('pid')->id;
         $strBackendModule = $request->query->get('do');
@@ -96,7 +95,7 @@ class GenerateEventDashboardListener
         }
 
         // "Go to event participant list" button
-        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $eventId) || $objEvent->registrationGoesTo === $user->id) {
+        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $eventId)) {
             $href = $this->router->generate(
                 'contao_backend',
                 ['do' => $strBackendModule, 'table' => 'tl_calendar_events_member', 'id' => $eventId, 'rt' => $requestToken, 'ref' => $refererId],
@@ -112,7 +111,7 @@ class GenerateEventDashboardListener
         }
 
         // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und Vergütungsformular drucken und einreichen" button
-        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $eventId) || $objEvent->registrationGoesTo === $user->id) {
+        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $eventId)) {
             if (EventType::TOUR === $objEvent->eventType || EventType::LAST_MINUTE_TOUR === $objEvent->eventType) {
                 $href = $this->router->generate(
                     'contao_backend',
