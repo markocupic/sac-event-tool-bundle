@@ -174,6 +174,7 @@ class CalendarEvents
                 }
 
                 break;
+
             case 'toggle':
                 // Prevent unauthorized publishing
                 if ('published' === $request->query->get('field')) {
@@ -234,6 +235,7 @@ class CalendarEvents
                     }
                 )();
                 break;
+
             case 'cutAll':
                 (
                     function (): void {
@@ -337,56 +339,56 @@ class CalendarEvents
                 break;
 
             case 'overrideAll':
-                    (
-                        function (): void {
-                            // Do not allow editing write-protected fields in editAll mode
-                            // Use input_field_callback to only display the field values without the form input field
+                (
+                    function (): void {
+                        // Do not allow editing write-protected fields in editAll mode
+                        // Use input_field_callback to only display the field values without the form input field
 
-                            $session = $this->requestStack->getSession()->get('CURRENT');
+                        $session = $this->requestStack->getSession()->get('CURRENT');
 
-                            $arrIDS = $session['IDS'];
+                        $arrIDS = $session['IDS'];
 
-                            if (empty($arrIDS) || !\is_array($arrIDS)) {
-                                return;
-                            }
+                        if (empty($arrIDS) || !\is_array($arrIDS)) {
+                            return;
+                        }
 
-                            $arrFields = $session['tl_calendar_events'];
+                        $arrFields = $session['tl_calendar_events'];
 
-                            if (empty($arrFields) || !\is_array($arrFields)) {
-                                return;
-                            }
+                        if (empty($arrFields) || !\is_array($arrFields)) {
+                            return;
+                        }
 
-                            $objEventsModel = $this->calendarEventsModel->findByPk($arrIDS[0]);
+                        $objEventsModel = $this->calendarEventsModel->findByPk($arrIDS[0]);
 
-                            if (null === $objEventsModel) {
-                                return;
-                            }
+                        if (null === $objEventsModel) {
+                            return;
+                        }
 
-                            if (empty($objEventsModel->eventReleaseLevel)) {
-                                return;
-                            }
+                        if (empty($objEventsModel->eventReleaseLevel)) {
+                            return;
+                        }
 
-                            // Check if an "eventReleaseLevel" filter is set.
-                            $strIds = implode(',', array_map('\intval', $arrIDS));
-                            $arrEventReleaseLevel = $this->connection->fetchFirstColumn("SELECT eventReleaseLevel FROM tl_calendar_events WHERE id IN($strIds) GROUP BY eventReleaseLevel");
+                        // Check if an "eventReleaseLevel" filter is set.
+                        $strIds = implode(',', array_map('\intval', $arrIDS));
+                        $arrEventReleaseLevel = $this->connection->fetchFirstColumn("SELECT eventReleaseLevel FROM tl_calendar_events WHERE id IN($strIds) GROUP BY eventReleaseLevel");
 
-                            if (1 !== \count($arrEventReleaseLevel)) {
-                                throw new AccessDeniedException('Access to the action "overrideAll" denied, because no "eventReleaseLevel" filter has been set.');
-                            }
+                        if (1 !== \count($arrEventReleaseLevel)) {
+                            throw new AccessDeniedException('Access to the action "overrideAll" denied, because no "eventReleaseLevel" filter has been set.');
+                        }
 
-                            $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findByPk($arrEventReleaseLevel[0]);
+                        $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findByPk($arrEventReleaseLevel[0]);
 
-                            if (null === $objEventReleaseLevelPolicyModel) {
-                                return;
-                            }
+                        if (null === $objEventReleaseLevelPolicyModel) {
+                            return;
+                        }
 
-                            foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] ?? []) as $fieldName) {
-                                if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
-                                    unset($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]);
-                                }
+                        foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] ?? []) as $fieldName) {
+                            if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
+                                unset($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]);
                             }
                         }
-                    )();
+                    }
+                )();
 
                 break;
         }

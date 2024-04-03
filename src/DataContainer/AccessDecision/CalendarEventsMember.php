@@ -97,6 +97,7 @@ class CalendarEventsMember
                 case 'show':
                     $blnAllow = true;
                     break;
+
                 case 'create':
                     if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $dc->id)) {
                         $blnAllow = true;
@@ -104,6 +105,7 @@ class CalendarEventsMember
                         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['closed'] = false;
                     }
                     break;
+
                 case 'edit':
                 case 'toggle': // tl_calendar_events_member.hasParticipated
                     if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $dc->getCurrentRecord()['eventId'])) {
@@ -111,6 +113,7 @@ class CalendarEventsMember
                         $blnAllow = true;
                     }
                     break;
+					
                 case 'delete':
                     if ($this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $dc->getCurrentRecord()['eventId'])) {
                         $bookingType = $this->connection->fetchOne(
@@ -127,7 +130,7 @@ class CalendarEventsMember
 
                 default:
                     // Do not allow: select, editAll, deleteAll, copyAll, overrideAll
-		            // $blnAllow = false;
+                    // $blnAllow = false;
             }
 
             if (!$blnAllow) {
