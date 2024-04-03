@@ -54,7 +54,7 @@ class CalendarEvents
     private Adapter $system;
 
     public function __construct(
-		private readonly TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly EventDispatcherInterface $eventDispatcher,
@@ -121,9 +121,9 @@ class CalendarEvents
 
                             // User is not allowed to submit any data!
                             if ('tl_calendar_events' === $request->request->get('FORM_SUBMIT')) {
-	                            $this->message->addError($this->translator->trans('ERR.missingPermissionsToEditEvent', [$dc->id], 'contao_default'));
+                                $this->message->addError($this->translator->trans('ERR.missingPermissionsToEditEvent', [$dc->id], 'contao_default'));
 
-	                            $this->controller->redirect($this->system->getReferer());
+                                $this->controller->redirect($this->system->getReferer());
                             }
                         } else {
                             // User has write access to all fields on the first e.r.level.
@@ -168,9 +168,9 @@ class CalendarEvents
             case 'delete':
                 // Prevent unauthorized deletion
                 if (!$this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $dc->id)) {
-	                $this->message->addError($this->translator->trans('ERR.missingPermissionsToDeleteEvent', [$dc->id], 'contao_default'));
+                    $this->message->addError($this->translator->trans('ERR.missingPermissionsToDeleteEvent', [$dc->id], 'contao_default'));
 
-	                $this->controller->redirect($this->system->getReferer());
+                    $this->controller->redirect($this->system->getReferer());
                 }
 
                 break;
@@ -178,7 +178,7 @@ class CalendarEvents
                 // Prevent unauthorized publishing
                 if ('published' === $request->query->get('field')) {
                     if (!$this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $dc->id)) {
-	                    $this->message->addError($this->translator->trans('ERR.missingPermissionsToPublishOrUnpublishEvent', [$dc->id], 'contao_default'));
+                        $this->message->addError($this->translator->trans('ERR.missingPermissionsToPublishOrUnpublishEvent', [$dc->id], 'contao_default'));
                         $this->controller->redirect($this->system->getReferer());
                     }
                 }
@@ -191,9 +191,9 @@ class CalendarEvents
                     $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_CUT_EVENT, $dc->id);
 
                     if (!$blnAllow) {
-	                    $this->message->addError($this->translator->trans('ERR.missingPermissionsToCutEvent', [$dc->id], 'contao_default'));
+                        $this->message->addError($this->translator->trans('ERR.missingPermissionsToCutEvent', [$dc->id], 'contao_default'));
 
-	                    $this->controller->redirect($this->system->getReferer());
+                        $this->controller->redirect($this->system->getReferer());
                     }
                 }
 
@@ -202,9 +202,7 @@ class CalendarEvents
             case 'deleteAll':
                 (
                     function (): void {
-                        // Check if
-                        //
-                        // user has the permission to run deleteAll
+                        // Check if user has the permission to run "deleteAll"
                         $session = $this->requestStack->getSession()->get('CURRENT');
                         $arrIDS = $session['IDS'];
 
@@ -220,17 +218,17 @@ class CalendarEvents
                             }
 
                             if (!$this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $id)) {
-	                            $this->message->addError($this->translator->trans('ERR.missingPermissionsToEditEvent', [$id], 'contao_default'));
+                                $this->message->addError($this->translator->trans('ERR.missingPermissionsToDeleteEvent', [$id], 'contao_default'));
 
-	                            $this->controller->redirect($this->system->getReferer());
+                                $this->controller->redirect($this->system->getReferer());
                             }
 
                             $registrationId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$id]);
 
                             if ($registrationId) {
-	                            $this->message->addError($this->translator->trans('ERR.deleteEventMembersBeforeDeleteEvent', [$id], 'contao_default'));
+                                $this->message->addError($this->translator->trans('ERR.deleteEventMembersBeforeDeleteEvent', [$id], 'contao_default'));
 
-	                            $this->controller->redirect($this->system->getReferer());
+                                $this->controller->redirect($this->system->getReferer());
                             }
                         }
                     }
@@ -283,7 +281,7 @@ class CalendarEvents
                         $filter = DataContainer::MODE_PARENT === $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['mode'] ? 'tl_calendar_events_'.$dc->currentPid : 'tl_calendar_events';
 
                         if (!isset($session['filter'][$filter]['eventReleaseLevel'])) {
-                            $this->message->addError($this->translator->trans('ERR.setEvtRelLevelForSelectAll',[], 'contao_default'));
+                            $this->message->addError($this->translator->trans('ERR.setEvtRelLevelForSelectAll', [], 'contao_default'));
                             $this->controller->redirect($this->system->getReferer());
                         }
                     }
