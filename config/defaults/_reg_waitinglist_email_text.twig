@@ -1,0 +1,22 @@
+Hallo {{ participantFirstname }} {{ participantLastname }}
+
+{% if eventType == 'course' -%}
+Leider kann ich dir für den Kurs {% if courseId|default != '' %}{{ courseId }} {% endif %}"{{ eventName }}" im Moment noch keine Zusage erteilen. Du wirst auf die Warteliste gesetzt und sollte ein Platz frei werden, wieder kontaktiert.
+{% else %}
+Leider kann ich dir für den Event "{{ eventName }}" im Moment noch keine Zusage erteilen. Du wirst auf die Warteliste gesetzt und sollte ein Platz frei werden, wieder kontaktiert.
+{% endif %}
+
+Sollten sich zwischenzeitlich deine Pläne geändert haben, und du nicht am Event teilnehmen kannst, dann melde dich bitte wieder ab.
+
+Bitte antworte nicht auf diese Nachricht, sondern nutze für Rückfragen bitte folgende E-Mail-Adresse:
+{{ instructorEmail }}
+
+Beste Grüsse
+
+{{ instructorFirstname }} {{ instructorLastname }}
+
+
+--------------------------
+{{ eventName }}
+
+{{ eventUrl }}

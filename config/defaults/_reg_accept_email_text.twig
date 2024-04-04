@@ -1,0 +1,19 @@
+Hallo {{ participantFirstname }} {{ participantLastname }}
+
+{% if eventType == 'course' -%}
+Du bist für den Kurs {% if courseId|default != '' %}{{ courseId }} {% endif %}"{{ eventName }}" definitiv angemeldet und deine Teilnahme ist bestätigt.
+{% else %}
+Du bist für den Event "{{ eventName }}" definitiv angemeldet und deine Teilnahme ist bestätigt.
+{% endif %}
+Bitte antworte nicht auf diese Nachricht, sondern nutze für Rückfragen bitte folgende E-Mail-Adresse:
+{{ instructorEmail }}
+
+Beste Grüsse
+
+{{ instructorFirstname }} {{ instructorLastname }}
+
+
+-----------------------------------------------
+{{ eventName }}
+
+{{ eventUrl }}

@@ -1,0 +1,18 @@
+Hallo ##participantFirstname## ##participantLastname##
+
+Ich freue mich, dir mitzuteilen, dass du für den Anlass "##eventName##" vom ##eventDates## definitiv angemeldet bist.
+Bitte antworte nicht auf diese E-Mail. Kontaktiere mich bei Rückfragen unter folgender E-Mail-Adresse: ##instructorEmail##.
+
+Liebe Grüsse
+
+##instructorFirstname## ##instructorLastname##
+
+##instructorStreet##
+##instructorPostal## ##instructorCity##
+##instructorPhone##
+##instructorMobile##
+
+
+--------------------------------
+"##eventName##" vom ##eventDates##
+##eventUrl##'

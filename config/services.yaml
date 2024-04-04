@@ -32,6 +32,11 @@ services:
             $sacevtEventConfigAvalancheLevel: '%sacevt.event.config.avalanche_level%'
             $sacevtEventRegistrationConfigCarSeatInfo: '%sacevt.event_registration.config.car_seat_info%'
             $sacevtEventRegistrationConfigTicketInfo: '%sacevt.event_registration.config.ticket_info%'
+            $sacevtEventRegistrationConfigEmailAcceptTemplPath: '%sacevt.event_registration.config.email_accept_templ_path%'
+            $sacevtEventRegistrationConfigEmailCancelTemplPath: '%sacevt.event_registration.config.email_cancel_templ_path%'
+            $sacevtEventRegistrationConfigEmailRefuseTemplPath: '%sacevt.event_registration.config.email_refuse_templ_path%'
+            $sacevtEventRegistrationConfigEmailWaitinglistTemplPath: '%sacevt.event_registration.config.email_waitinglist_templ_path%'
+            $sacevtEventRegistrationConfigEmailAcceptCustomTemplPath: '%sacevt.event_registration.config.email_accept_custom_templ_path%'
 
     _instanceof:
         Symfony\Bundle\FrameworkBundle\Controller\AbstractController:

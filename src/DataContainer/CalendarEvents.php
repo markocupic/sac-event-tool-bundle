@@ -88,6 +88,7 @@ class CalendarEvents
         private readonly PasswordHasherFactoryInterface $passwordHasherFactory,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
+	    private readonly string $sacevtEventRegistrationConfigEmailAcceptCustomTemplPath,
     ) {
         // Adapters
         $this->arrayUtil = $this->framework->getAdapter(ArrayUtil::class);
@@ -441,7 +442,7 @@ class CalendarEvents
             $objEventsModel->instructor = serialize([['instructorId' => $user->id]]);
 
             // Set customEventRegistrationConfirmationEmailText
-            $objEventsModel->customEventRegistrationConfirmationEmailText = str_replace('{{br}}', "\n", $this->system->getContainer()->getParameter('sacevt.event.accept_registration_email_body'));
+            $objEventsModel->customEventRegistrationConfirmationEmailText = file_get_contents($this->sacevtEventRegistrationConfigEmailAcceptCustomTemplPath);
 
             $objEventsModel->save();
         }
