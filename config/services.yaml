@@ -26,6 +26,7 @@ services:
             $sacevtTempDir: '%sacevt.temp_dir%'
             $sacevtUserBackendHomeDir: '%sacevt.user.backend.home_dir%'
             $sacevtUserBackendResetPermissionsOnLogin: '%sacevt.user.backend.reset_permissions_on_login%'
+            $sacevtUserBackendRescissionCause: '%sacevt.user.backend.rescission_cause%'
             $sacevtUserFrontendAvatarDir: '%sacevt.user.frontend.avatar_dir%'
             $sacevtEventConfigDurationInfo: '%sacevt.event.config.duration_info%'
             $sacevtEventConfigAvalancheLevel: '%sacevt.event.config.avalanche_level%'
@@ -96,4 +97,7 @@ services:
         public: true
 
     Markocupic\SacEventToolBundle\Config\TicketInfo:
+        public: true
+
+    Markocupic\SacEventToolBundle\Config\BackendUserRescissionCause:
         public: true

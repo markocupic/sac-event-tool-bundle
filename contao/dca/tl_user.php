@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\DataContainer;
+use Contao\System;
+use Markocupic\SacEventToolBundle\Config\BackendUserRescissionCause;
 use Markocupic\SacEventToolBundle\Config\TourguideQualification;
 
 // Add tl_user.sacMemberId to index
@@ -380,7 +382,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['rescissionCause'] = [
 	'sorting'   => true,
 	'exclude'   => true,
 	'inputType' => 'select',
-	'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['userRescissionCause'],
+	'options'   => System::getContainer()->get(BackendUserRescissionCause::class)->getAll(),
 	'eval'      => ['includeBlankOption' => true, 'tl_class' => 'clr'],
 	'sql'       => "varchar(128) NOT NULL default ''",
 ];
