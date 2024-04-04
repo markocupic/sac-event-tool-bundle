@@ -18,7 +18,9 @@ use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\Bundle;
+use Markocupic\SacEventToolBundle\Config\CarSeatInfo;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
+use Markocupic\SacEventToolBundle\Config\TicketInfo;
 use Ramsey\Uuid\Uuid;
 
 System::loadLanguageFile('tl_member');
@@ -317,14 +319,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		'ticketInfo'                  => [
 			'exclude'   => true,
 			'inputType' => 'select',
-			'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
+			'options'   => System::getContainer()->get(TicketInfo::class)->getAll(),
 			'eval'      => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'carInfo'                     => [
 			'exclude'   => true,
 			'inputType' => 'select',
-			'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
+			'options'   => System::getContainer()->get(CarSeatInfo::class)->getAll(),
 			'eval'      => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],

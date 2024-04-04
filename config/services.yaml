@@ -29,6 +29,8 @@ services:
             $sacevtUserFrontendAvatarDir: '%sacevt.user.frontend.avatar_dir%'
             $sacevtEventConfigDurationInfo: '%sacevt.event.config.duration_info%'
             $sacevtEventConfigAvalancheLevel: '%sacevt.event.config.avalanche_level%'
+            $sacevtEventRegistrationConfigCarSeatInfo: '%sacevt.event_registration.config.car_seat_info%'
+            $sacevtEventRegistrationConfigTicketInfo: '%sacevt.event_registration.config.ticket_info%'
 
     _instanceof:
         Symfony\Bundle\FrameworkBundle\Controller\AbstractController:
@@ -88,4 +90,10 @@ services:
         public: true
 
     Markocupic\SacEventToolBundle\Config\AvalancheLevel:
+        public: true
+
+    Markocupic\SacEventToolBundle\Config\CarSeatInfo:
+        public: true
+
+    Markocupic\SacEventToolBundle\Config\TicketInfo:
         public: true

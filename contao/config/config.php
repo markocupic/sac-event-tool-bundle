@@ -136,27 +136,3 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['userRescissionCause'] = [
 	'recission', // Rücktritt
 	'leaving', // Austritt
 ];
-
-/*
- * Car seats info: We use that in the event registration form
- */
-$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'] = [
-	'kein Auto',
-	'2',
-	'3',
-	'4',
-	'5',
-	'6',
-	'7',
-	'8',
-	'9',
-];
-
-/*
- * Ticket info: We use that in the event registration form.
- */
-$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'] = [
-	'Nichts',
-	'GA',
-	'Halbtax-Abo',
-];

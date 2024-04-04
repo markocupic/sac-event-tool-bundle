@@ -38,9 +38,11 @@ use Contao\UserModel;
 use Contao\Validator;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\BookingType;
+use Markocupic\SacEventToolBundle\Config\CarSeatInfo;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
+use Markocupic\SacEventToolBundle\Config\TicketInfo;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
@@ -67,7 +69,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
     public const CHECKOUT_STEP_CONFIRM = 'confirm';
     public const CHECKOUT_STEP_REGISTRATION_INTERRUPTED = 'registration_interrupted';
 
-    private Adapter $messageAdapter;
     private Adapter $calendarEventsHelperAdapter;
     private Adapter $calendarEventsJourneyModelAdapter;
     private Adapter $calendarEventsMemberModelAdapter;
@@ -76,6 +77,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private Adapter $eventReleaseLevelPolicyModelAdapter;
     private Adapter $eventsAdapter;
     private Adapter $inputAdapter;
+    private Adapter $messageAdapter;
     private Adapter $userModelAdapter;
     private Adapter $validatorAdapter;
 
@@ -86,6 +88,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private UserModel|null $mainInstructorModel = null;
 
     public function __construct(
+		private readonly CarSeatInfo $carSeatInfo,
+		private readonly TicketInfo $ticketInfo,
         private readonly ContaoFramework $framework,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly RequestStack $requestStack,
@@ -96,7 +100,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
         private readonly UrlParser $urlParser,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
-        $this->messageAdapter = $this->framework->getAdapter(Message::class);
         $this->calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->calendarEventsJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
         $this->calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
@@ -105,6 +108,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $this->eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
         $this->eventsAdapter = $this->framework->getAdapter(Events::class);
         $this->inputAdapter = $this->framework->getAdapter(Input::class);
+        $this->messageAdapter = $this->framework->getAdapter(Message::class);
         $this->userModelAdapter = $this->framework->getAdapter(UserModel::class);
         $this->validatorAdapter = $this->framework->getAdapter(Validator::class);
     }
@@ -437,13 +441,13 @@ class EventRegistrationController extends AbstractFrontendModuleController
             'ticketInfo' => [
                 'label' => $this->translator->trans('FORM.evt_reg_ticketInfo', [], 'contao_default'),
                 'inputType' => 'select',
-                'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
+                'options' => $this->ticketInfo->getAll(),
                 'eval' => ['includeBlankOption' => true, 'blankOptionLabel' => $this->translator->trans('FORM.evt_reg_blankLabelTicketInfo', [], 'contao_default'), 'mandatory' => true],
             ],
             'carInfo' => [
                 'label' => $this->translator->trans('FORM.evt_reg_carInfo', [], 'contao_default'),
                 'inputType' => 'select',
-                'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
+                'options' => $this->carSeatInfo->getAll(),
                 'eval' => ['includeBlankOption' => true, 'mandatory' => true],
             ],
             'ahvNumber' => [

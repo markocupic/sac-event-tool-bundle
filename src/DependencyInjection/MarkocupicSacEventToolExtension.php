@@ -78,5 +78,8 @@ class MarkocupicSacEventToolExtension extends Extension
         $container->setParameter($rootKey.'.event.accept_registration_email_body', $config['event']['accept_registration_email_body']);
         $container->setParameter($rootKey.'.event.geo_link', $config['event']['geo_link']);
         $container->setParameter($rootKey.'.event.sac_route_portal_base_link', $config['event']['sac_route_portal_base_link']);
+	    $container->setParameter($rootKey.'.event_registration.config.car_seat_info', $config['event_registration']['config']['car_seat_info']);
+	    $container->setParameter($rootKey.'.event_registration.config.ticket_info', $config['event_registration']['config']['ticket_info']);
+
     }
 }
