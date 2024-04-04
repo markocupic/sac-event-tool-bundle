@@ -371,11 +371,11 @@ class CalendarEventsVoter extends Voter
             }
         }
 
-	    if (!empty($this->event->registrationGoesTo)) {
-		    if ($this->user->id === $this->event->registrationGoesTo) {
-			    return true;
-		    }
-	    }
+        if (!empty($this->event->registrationGoesTo)) {
+            if ($this->user->id === $this->event->registrationGoesTo) {
+                return true;
+            }
+        }
 
         // Check if the user is member of an allowed group
         $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupEventPerm, true);

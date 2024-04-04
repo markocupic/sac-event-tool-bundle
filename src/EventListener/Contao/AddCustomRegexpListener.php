@@ -28,7 +28,7 @@ readonly class AddCustomRegexpListener
     public function __construct(
         private ContaoFramework $framework,
         private RequestStack $requestStack,
-	    private EventDurationInfo $eventDurationInfo,
+        private EventDurationInfo $eventDurationInfo,
     ) {
     }
 
@@ -50,10 +50,10 @@ readonly class AddCustomRegexpListener
                 return true;
             }
 
-	        $arrDurationInfo = $this->eventDurationInfo->get($varValue);
-	        $countDates = \count($post['eventDates']);
+            $arrDurationInfo = $this->eventDurationInfo->get($varValue);
+            $countDates = \count($post['eventDates']);
 
-	        if ($arrDurationInfo['dateRows'] !== $countDates) {
+            if ($arrDurationInfo['dateRows'] !== $countDates) {
                 $objWidget->addError($GLOBALS['TL_LANG']['ERR']['invalidEventDurationInfo']);
 
                 return false;

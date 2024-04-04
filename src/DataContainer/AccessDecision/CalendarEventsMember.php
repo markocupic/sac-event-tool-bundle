@@ -113,7 +113,7 @@ class CalendarEventsMember
                         $blnAllow = true;
                     }
                     break;
-					
+
                 case 'delete':
                     if ($this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $dc->getCurrentRecord()['eventId'])) {
                         $bookingType = $this->connection->fetchOne(

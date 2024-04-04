@@ -46,7 +46,7 @@ class ExportEvents2Docx
     private array|null $arrDatarecord;
 
     public function __construct(
-		private readonly CourseLevels $courseLevels,
+        private readonly CourseLevels $courseLevels,
         private readonly BinaryFileDownload $binaryFileDownload,
         private readonly ContaoFramework $framework,
         private readonly string $projectDir,

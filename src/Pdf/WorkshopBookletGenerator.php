@@ -44,7 +44,7 @@ class WorkshopBookletGenerator
     private bool $printSingleEvent = false;
 
     public function __construct(
-		private readonly CourseLevels $courseLevels,
+        private readonly CourseLevels $courseLevels,
         private readonly BinaryFileDownload $binaryFileDownload,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,

@@ -80,7 +80,7 @@ class CalendarEvents
     private Adapter $userModel;
 
     public function __construct(
-	    private readonly CourseLevels $courseLevels,
+        private readonly CourseLevels $courseLevels,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly EventDurationInfo $eventDurationInfo,

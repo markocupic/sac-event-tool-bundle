@@ -62,7 +62,7 @@ class MarkocupicSacEventToolExtension extends Extension
         $container->setParameter($rootKey.'.user.frontend.home_dir', $config['user']['frontend']['home_dir']);
         $container->setParameter($rootKey.'.user.frontend.avatar_dir', $config['user']['frontend']['avatar_dir']);
         $container->setParameter($rootKey.'.event.config.duration_info', $config['event']['config']['duration_info']);
-	    $container->setParameter($rootKey.'.event.config.avalanche_level', $config['event']['config']['avalanche_level']);
+        $container->setParameter($rootKey.'.event.config.avalanche_level', $config['event']['config']['avalanche_level']);
         $container->setParameter($rootKey.'.event.course.levels', $config['event']['course']['levels']);
         $container->setParameter($rootKey.'.event.course.booklet_cover_image', $config['event']['course']['booklet_cover_image']);
         $container->setParameter($rootKey.'.event.course.booklet_filename_pattern', $config['event']['course']['booklet_filename_pattern']);

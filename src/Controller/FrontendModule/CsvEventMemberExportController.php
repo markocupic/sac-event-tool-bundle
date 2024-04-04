@@ -208,68 +208,76 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
         $value = '';
 
-		switch($field){
-			case 'password':
-				$value = '#######';
-				break;
-			case 'dateAdded':
-				$value = $date->parse('Y-m-d', $arrEventMember['dateAdded']);
-				break;
-			case 'dateOfBirth':
-				if (is_numeric($arrEventMember[$field])) {
-					$value = $date->parse($config->get('dateFormat'), $arrEventMember[$field]);
-				}
-				break;
-			case 'organizers':
-				$objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
-				if (null !== $objEvent) {
-					$arrOrganizer = $calendarEventsHelper->getEventOrganizersAsArray($objEvent, 'title');
-					$value = implode(', ', $arrOrganizer);
-				}				break;
-			case 'stateOfSubscription':
-				$value = $GLOBALS['TL_LANG']['MSC'][$arrEventMember[$field]] ?? $arrEventMember[$field];
-				break;
-			case 'startDate':
-				$objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
-				if (null !== $objEvent) {
-					$value = $date->parse('Y-m-d', $objEvent->startDate);
-				}				break;
-			case 'endDate':
-				$objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
-				if (null !== $objEvent) {
-					$value = $date->parse('Y-m-d', $objEvent->endDate);
-				}
-				break;
-			case 'executionState':
-			case 'eventState':
-				$controller->loadLanguageFile('tl_calendar_events');
-				$objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
-				if (null !== $objEvent) {
-					$value = $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] ?? $objEvent->$field;
-				}
-				break;
-			case 'mainInstructor':
-				$objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
-				if (null !== $objEvent) {
-					$value = $calendarEventsHelper->getMainInstructorName($objEvent);
-				}
-				break;
-			case 'mountainguide':
-				$objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
-				if (null !== $objEvent) {
-					$value = $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][$objEvent->$field];
-				}
-				break;
-			case 'phone':
-				$objMember = $memberModel->findOneBySacMemberId($arrEventMember['sacMemberId']);
-				if (null !== $objMember) {
-					$value = $objMember->$field;
-				}
-				break;
-			default:
-				$value = $arrEventMember[$field];
-				break;
-		}
+        switch ($field) {
+            case 'password':
+                $value = '#######';
+                break;
+            case 'dateAdded':
+                $value = $date->parse('Y-m-d', $arrEventMember['dateAdded']);
+                break;
+            case 'dateOfBirth':
+                if (is_numeric($arrEventMember[$field])) {
+                    $value = $date->parse($config->get('dateFormat'), $arrEventMember[$field]);
+                }
+                break;
+            case 'organizers':
+                $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+
+                if (null !== $objEvent) {
+                    $arrOrganizer = $calendarEventsHelper->getEventOrganizersAsArray($objEvent, 'title');
+                    $value = implode(', ', $arrOrganizer);
+                } break;
+            case 'stateOfSubscription':
+                $value = $GLOBALS['TL_LANG']['MSC'][$arrEventMember[$field]] ?? $arrEventMember[$field];
+                break;
+            case 'startDate':
+                $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+
+                if (null !== $objEvent) {
+                    $value = $date->parse('Y-m-d', $objEvent->startDate);
+                } break;
+            case 'endDate':
+                $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+
+                if (null !== $objEvent) {
+                    $value = $date->parse('Y-m-d', $objEvent->endDate);
+                }
+                break;
+            case 'executionState':
+            case 'eventState':
+                $controller->loadLanguageFile('tl_calendar_events');
+                $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+
+                if (null !== $objEvent) {
+                    $value = $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] ?? $objEvent->$field;
+                }
+                break;
+            case 'mainInstructor':
+                $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+
+                if (null !== $objEvent) {
+                    $value = $calendarEventsHelper->getMainInstructorName($objEvent);
+                }
+                break;
+            case 'mountainguide':
+                $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+
+                if (null !== $objEvent) {
+                    $value = $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][$objEvent->$field];
+                }
+                break;
+            case 'phone':
+                $objMember = $memberModel->findOneBySacMemberId($arrEventMember['sacMemberId']);
+
+                if (null !== $objMember) {
+                    $value = $objMember->$field;
+                }
+                break;
+
+            default:
+                $value = $arrEventMember[$field];
+                break;
+        }
 
         return (string) $value;
     }
