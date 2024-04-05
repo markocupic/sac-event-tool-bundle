@@ -253,19 +253,21 @@ class EventParticipantEmailController extends AbstractBackendController
         // Preset input fields "subject" and "text" with a default text
         if ('email_app_form' !== $request->request->get('FORM_SUBMIT')) {
             if (empty($form->getWidget('text')->value) && empty($form->getWidget('subject')->value)) {
-                $form->getWidget('text')->value = $this->twig->render(
-                    '@MarkocupicSacEventTool/EventRegistration/event_participant_email_text_template.twig',
+                $form->getWidget('subject')->value = $this->twig->render(
+                    '@MarkocupicSacEventTool/Email/EventRegistration/email_event_participant.twig',
                     [
+                        'renderEmailSubject' => true,
                         'event' => $this->event,
-                        'user' => $this->userModel->findByPk($this->user->id),
-                        'event_url' => $this->events->generateEventUrl($this->event, true),
                     ]
                 );
 
-                $form->getWidget('subject')->value = $this->twig->render(
-                    '@MarkocupicSacEventTool/EventRegistration/event_participant_email_subject_template.twig',
+                $form->getWidget('text')->value = $this->twig->render(
+                    '@MarkocupicSacEventTool/Email/EventRegistration/email_event_participant.twig',
                     [
+                        'renderEmailText' => true,
                         'event' => $this->event,
+                        'user' => $this->userModel->findByPk($this->user->id),
+                        'event_url' => $this->events->generateEventUrl($this->event, true),
                     ]
                 );
             }

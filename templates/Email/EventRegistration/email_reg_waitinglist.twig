@@ -1,6 +1,8 @@
+{%- if renderEmailSubject|default -%}Auf Warteliste für {{ eventType }} "{{ eventTitle }}"{%- endif -%}
+{% if renderEmailText|default %}
 Hallo {{ participantFirstname }} {{ participantLastname }}
 
-{% if eventType == 'course' -%}
+{% if eventType == 'course' %}
 Leider kann ich dir für den Kurs {% if courseId|default != '' %}{{ courseId }} {% endif %}"{{ eventName }}" im Moment noch keine Zusage erteilen. Du wirst auf die Warteliste gesetzt und sollte ein Platz frei werden, wieder kontaktiert.
 {% else %}
 Leider kann ich dir für den Event "{{ eventName }}" im Moment noch keine Zusage erteilen. Du wirst auf die Warteliste gesetzt und sollte ein Platz frei werden, wieder kontaktiert.
@@ -20,3 +22,4 @@ Beste Grüsse
 {{ eventName }}
 
 {{ eventUrl }}
+{% endif %}

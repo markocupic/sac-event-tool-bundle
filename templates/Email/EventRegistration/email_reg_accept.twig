@@ -1,6 +1,8 @@
+{%- if renderEmailSubject|default -%}Zusage für {{ eventType }} "{{ eventTitle }}"{%- endif -%}
+{% if renderEmailText|default %}
 Hallo {{ participantFirstname }} {{ participantLastname }}
 
-{% if eventType == 'course' -%}
+{% if eventType == 'course' %}
 Du bist für den Kurs {% if courseId|default != '' %}{{ courseId }} {% endif %}"{{ eventName }}" definitiv angemeldet und deine Teilnahme ist bestätigt.
 {% else %}
 Du bist für den Event "{{ eventName }}" definitiv angemeldet und deine Teilnahme ist bestätigt.
@@ -17,3 +19,4 @@ Beste Grüsse
 {{ eventName }}
 
 {{ eventUrl }}
+{% endif %}

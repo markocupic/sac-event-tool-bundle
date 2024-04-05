@@ -84,6 +84,6 @@ class MarkocupicSacEventToolExtension extends Extension
         $container->setParameter($rootKey.'.event_registration.config.email_cancel_templ_path', $config['event_registration']['config']['email_cancel_templ_path']);
         $container->setParameter($rootKey.'.event_registration.config.email_refuse_templ_path', $config['event_registration']['config']['email_refuse_templ_path']);
         $container->setParameter($rootKey.'.event_registration.config.email_waitinglist_templ_path', $config['event_registration']['config']['email_waitinglist_templ_path']);
-	    $container->setParameter($rootKey.'.event_registration.config.email_accept_custom_templ_path', $config['event_registration']['config']['email_accept_custom_templ_path']);
+        $container->setParameter($rootKey.'.event_registration.config.email_accept_custom_templ_path', $config['event_registration']['config']['email_accept_custom_templ_path']);
     }
 }

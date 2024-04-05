@@ -88,8 +88,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private UserModel|null $mainInstructorModel = null;
 
     public function __construct(
-		private readonly CarSeatInfo $carSeatInfo,
-		private readonly TicketInfo $ticketInfo,
+        private readonly CarSeatInfo $carSeatInfo,
+        private readonly TicketInfo $ticketInfo,
         private readonly ContaoFramework $framework,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly RequestStack $requestStack,

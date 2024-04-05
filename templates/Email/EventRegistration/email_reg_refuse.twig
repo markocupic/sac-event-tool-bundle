@@ -1,0 +1,23 @@
+{%- if renderEmailSubject|default -%}Anmeldeanfrage für {{ eventType }} "{{ eventTitle }}" abgelehnt{%- endif -%}
+{% if renderEmailText|default %}
+Hallo {{ participantFirstname }} {{ participantLastname }}
+
+{% if eventType == 'course' %}
+Leider kann ich dir für den Kurs {% if courseId|default != '' %}{{ courseId }} {% endif %}"{{ eventName }}" keine Zusage erteilen und deine Anmeldeanfrage ist abgelehnt. Ich danke dir für dein Verständnis.
+{% else %}
+Leider kann ich dir für den Event "{{ eventName }}" keine Zusage erteilen, und ich muss deine Anmeldeanfrage ablehnen. Ich danke dir für dein Verständnis.
+{% endif %}
+
+Bitte antworte nicht auf diese Nachricht, sondern nutze für Rückfragen bitte folgende E-Mail-Adresse:
+{{ instructorEmail }}
+
+Beste Grüsse
+
+{{ instructorFirstname }} {{ instructorLastname }}
+
+
+--------------------------
+{{ eventName }}
+
+{{ eventUrl }}
+{% endif %}

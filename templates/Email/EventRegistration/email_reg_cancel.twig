@@ -1,0 +1,23 @@
+{%- if renderEmailSubject|default -%}Anmeldeanfrage für {{ eventType }} "{{ eventTitle }}" storniert{%- endif -%}
+{% if renderEmailText|default %}
+Hallo {{ participantFirstname }} {{ participantLastname }}
+
+{% if eventType == 'course' %}
+Deine Registrierung für den Kurs {% if courseId|default != '' %}{{ courseId }} {% endif %}"{{ eventName }}" wurde storniert. Vielen Dank für Deine Kenntnisnahme.
+{% else %}
+Deine Registrierung für den Event "{{ eventName }}" wurde storniert. Vielen Dank für Deine Kenntnisnahme.
+{% endif %}
+
+Bitte antworte nicht auf diese Nachricht, sondern nutze für Rückfragen bitte folgende E-Mail-Adresse:
+{{ instructorEmail }}
+
+Beste Grüsse
+
+{{ instructorFirstname }} {{ instructorLastname }}
+
+
+--------------------------
+{{ eventName }}
+
+{{ eventUrl }}
+{% endif %}

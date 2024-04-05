@@ -54,9 +54,8 @@ use Twig\Environment as Twig;
  * Both files are converted from docx to pdf using the CloudConvert API before sending.
  *
  * involved files:
- * vendor/markocupic/sac-event-tool-bundle/contao/templates/backend/tl_calendar_events_member/be_event_participant_email.html.twig
- * vendor/markocupic/sac-event-tool-bundle/templates/EventRegistration/event_participant_email_subject_template.twig
- * vendor/markocupic/sac-event-tool-bundle/templates/EventRegistration/event_participant_email_text_template.twig
+ * vendor/markocupic/sac-event-tool-bundle/templates/backend/tl_calendar_events_member/be_event_participant_email.html.twig
+ * vendor/markocupic/sac-event-tool-bundle/templates/Email/EventRegistration/email_event_participant.twig
  * vendor/markocupic/sac-event-tool-bundle/contao/languages/en/default.php
  * vendor/markocupic/sac-event-tool-bundle/public/css/be_stylesheet.css
  */
@@ -146,7 +145,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
                 $view['info'] = $this->translator->trans('MSC.evt_strn_multiFormSubmitWarning', [$invoice->countNotifications, date('d.m.Y H:i', (int) $invoice->notificationSentOn)], 'contao_default');
             }
 
-            return $this->render('@MarkocupicSacEventTool/CalendarEventsInstructorInvoice/be_send_tour_rapport_notification.html.twig', $view);
+            return $this->render('@MarkocupicSacEventTool/TourRapport/tour_rapport_notification.twig', $view);
         }
 
         // Form inputs have passed validation:
@@ -441,9 +440,11 @@ class SendTourRapportNotificationController extends AbstractBackendController
             if (empty($form->getWidget('recipients')->value) && empty($form->getWidget('text')->value) && empty($form->getWidget('subject')->value)) {
                 $form->getWidget('recipients')->value = implode(',', $this->getRecipients($event));
 
+                // Render email subject
                 $subject = $this->twig->render(
-                    '@MarkocupicSacEventTool/CalendarEventsInstructorInvoice/send_tour_rapport_notification_subject_template.twig',
+                    '@MarkocupicSacEventTool/Email/TourRapport/email_tour_rapport.twig',
                     [
+                        'renderEmailSubject' => true,
                         'event' => $event,
                         'instructor' => $biller,
                     ]
@@ -453,9 +454,11 @@ class SendTourRapportNotificationController extends AbstractBackendController
 
                 $form->getWidget('subject')->value = $subject;
 
+                // Render email text
                 $text = $this->twig->render(
-                    '@MarkocupicSacEventTool/CalendarEventsInstructorInvoice/send_tour_rapport_notification_text_template.twig',
+                    '@MarkocupicSacEventTool/Email/TourRapport/email_tour_rapport.twig',
                     [
+                        'renderEmailText' => true,
                         'event' => $event,
                         'instructor' => $biller,
                         'event_url' => $this->events->generateEventUrl($event, true),

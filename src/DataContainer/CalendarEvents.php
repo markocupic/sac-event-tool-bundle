@@ -88,7 +88,7 @@ class CalendarEvents
         private readonly PasswordHasherFactoryInterface $passwordHasherFactory,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
-	    private readonly string $sacevtEventRegistrationConfigEmailAcceptCustomTemplPath,
+        private readonly string $sacevtEventRegistrationConfigEmailAcceptCustomTemplPath,
     ) {
         // Adapters
         $this->arrayUtil = $this->framework->getAdapter(ArrayUtil::class);

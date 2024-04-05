@@ -72,16 +72,16 @@ class NotifyEventRegistrationStateController
     private Adapter $validator;
 
     public function __construct(
-		private readonly Environment $twig,
+        private readonly Environment $twig,
         private readonly ContaoFramework $framework,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
         private readonly UrlParser $urlParser,
-		private readonly string $sacevtEventRegistrationConfigEmailAcceptTemplPath,
-	    private readonly string $sacevtEventRegistrationConfigEmailCancelTemplPath,
-	    private readonly string $sacevtEventRegistrationConfigEmailRefuseTemplPath,
-	    private readonly string $sacevtEventRegistrationConfigEmailWaitinglistTemplPath,
+        private readonly string $sacevtEventRegistrationConfigEmailAcceptTemplPath,
+        private readonly string $sacevtEventRegistrationConfigEmailCancelTemplPath,
+        private readonly string $sacevtEventRegistrationConfigEmailRefuseTemplPath,
+        private readonly string $sacevtEventRegistrationConfigEmailWaitinglistTemplPath,
         private readonly string $sacevtEventAdminEmail,
         private readonly string $sacevtEventAdminName,
     ) {
@@ -158,33 +158,29 @@ class NotifyEventRegistrationStateController
                 'formId' => strtolower(self::ACCEPT_WITH_EMAIL_ACTION).'_form',
                 'headline' => 'Anmeldeanfrage bestätigen',
                 'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_ACCEPTED,
-                'sessionInfoText' => 'Die Anmeldeanfrage wurde erfolgreich bestätigt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
+                'backendMessage' => 'Die Anmeldeanfrage wurde erfolgreich bestätigt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'templatePath' => $this->sacevtEventRegistrationConfigEmailAcceptTemplPath,
-                'emailSubject' => 'Zusage für %s "%s"',
             ],
             self::CANCEL_WITH_EMAIL_ACTION => [
                 'formId' => strtolower(self::CANCEL_WITH_EMAIL_ACTION).'_form',
                 'headline' => 'Anmeldeanfrage stornieren',
                 'stateOfSubscription' => EventSubscriptionState::USER_HAS_UNSUBSCRIBED,
-                'sessionInfoText' => 'Die Anmeldeanfrage wurde storniert und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
+                'backendMessage' => 'Die Anmeldeanfrage wurde storniert und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'templatePath' => $this->sacevtEventRegistrationConfigEmailCancelTemplPath,
-                'emailSubject' => 'Anmeldeanfrage für %s "%s" storniert',
-            ],
-            self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION => [
-	            'formId' => strtolower(self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION).'_form',
-	            'headline' => 'Anmeldestatus auf "Warteliste" ändern',
-	            'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST,
-	            'sessionInfoText' => 'Der Status dieser Registrierung wurde erfolgreich auf "Warteliste" gesetzt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
-	            'templatePath' => $this->sacevtEventRegistrationConfigEmailWaitinglistTemplPath,
-	            'emailSubject' => 'Auf Warteliste für %s "%s"',
             ],
             self::REFUSE_WITH_EMAIL_ACTION => [
-	            'formId' => strtolower(self::REFUSE_WITH_EMAIL_ACTION).'_form',
-	            'headline' => 'Anmeldeanfrage ablehnen',
-	            'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_REFUSED,
-	            'sessionInfoText' => 'Die Anmeldeanfrage wurde abgelehnt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
-	            'templatePath' => $this->sacevtEventRegistrationConfigEmailRefuseTemplPath,
-	            'emailSubject' => 'Anmeldeanfrage für %s "%s" abgelehnt',
+                'formId' => strtolower(self::REFUSE_WITH_EMAIL_ACTION).'_form',
+                'headline' => 'Anmeldeanfrage ablehnen',
+                'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_REFUSED,
+                'backendMessage' => 'Die Anmeldeanfrage wurde abgelehnt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
+                'templatePath' => $this->sacevtEventRegistrationConfigEmailRefuseTemplPath,
+            ],
+            self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION => [
+                'formId' => strtolower(self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION).'_form',
+                'headline' => 'Anmeldestatus auf "Warteliste" ändern',
+                'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST,
+                'backendMessage' => 'Der Status dieser Registrierung wurde erfolgreich auf "Warteliste" gesetzt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
+                'templatePath' => $this->sacevtEventRegistrationConfigEmailWaitinglistTemplPath,
             ],
         ];
 
@@ -221,27 +217,34 @@ class NotifyEventRegistrationStateController
 
         // Prefill email form from template
         if (!$request->isMethod('post')) {
-            $arrTokens = $this->getTokenArray();
+            $arrEmailTextTokens = $this->getTokenArray();
+
             if (self::ACCEPT_WITH_EMAIL_ACTION === $this->action && $this->event->customizeEventRegistrationConfirmationEmailText && !empty($this->event->customEventRegistrationConfirmationEmailText)) {
                 // Only for accept_with_email!!!
                 // Replace tags for custom notification set in the events settings (tags can be used case-insensitive!)
                 $emailBodyText = $this->event->customEventRegistrationConfirmationEmailText;
 
-                foreach ($arrTokens as $k => $v) {
+                foreach ($arrEmailTextTokens as $k => $v) {
                     $strPattern = '/##'.$k.'##/i';
                     $emailBodyText = preg_replace($strPattern, $v, $emailBodyText);
                 }
                 $emailBodyText = strip_tags($emailBodyText);
             } else {
-	            // Render email body text from twig template
-	            $emailBodyText = $this->twig->createTemplate(file_get_contents($this->configuration['templatePath']))->render($arrTokens);
+                // Render email body text from twig template
+                $arrEmailTextTokens['renderEmailText'] = true;
+                $emailBodyText = $this->twig->createTemplate(file_get_contents($this->configuration['templatePath']))->render($arrEmailTextTokens);
             }
 
             // Get event type
             $eventType = $this->translator->trans('MSC.'.$this->event->eventType, [], 'contao_default');
 
             // Add value to fields
-            $form->getWidget('subject')->value = sprintf($this->configuration['emailSubject'], $eventType, $this->event->title);
+            $arrSubjectTokens = [
+                'eventType' => $eventType,
+                'eventTitle' => $this->event->title,
+                'renderEmailSubject' => true,
+            ];
+            $form->getWidget('subject')->value = $this->twig->createTemplate(file_get_contents($this->configuration['templatePath']))->render($arrSubjectTokens);
             $form->getWidget('text')->value = $emailBodyText;
         }
 
@@ -298,7 +301,7 @@ class NotifyEventRegistrationStateController
             if ($email->sendTo($this->registration->email)) {
                 $this->registration->stateOfSubscription = $this->configuration['stateOfSubscription'];
                 $this->registration->save();
-                $this->message->addInfo($this->configuration['sessionInfoText']);
+                $this->message->addInfo($this->configuration['backendMessage']);
 
                 return true;
             }

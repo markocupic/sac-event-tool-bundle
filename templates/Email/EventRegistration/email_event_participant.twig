@@ -1,8 +1,8 @@
+{%- if renderEmailSubject|default -%}Details zu {{ event.title|default('') }}{%- endif -%}
+{% if renderEmailText|default %}
 Liebe Teilnehmende oder Angemeldete
 
-
 Hier kommt der Inhalt deiner E-Mail-Nachricht...
-
 
 Beste Grüsse
 
@@ -12,7 +12,7 @@ Beste Grüsse
 {{ user.email|default('') }}
 
 
-
 --------------------------
 {{ event.title }}
 {{ event_url }}
+{% endif %}
