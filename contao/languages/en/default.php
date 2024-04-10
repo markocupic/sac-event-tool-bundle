@@ -107,6 +107,8 @@ $GLOBALS['TL_LANG']['MSC']['goToPartcipantList'] = 'Möchten Sie zur Teilnehmerl
 $GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'Möchten Sie das Vergütungsformular bearbeiten/erstellen?';
 
 // tl_calendar_events error messages
+$GLOBALS['TL_LANG']['ERR']['eventDatesCannotBeEmpty'] = 'Bitte geben Sie mindestens ein gültiges Event-Datum ein. Pro Tag eine Zeile. Leere Felder/Zeilen müssen gelöscht werden.';
+$GLOBALS['TL_LANG']['ERR']['eventDatesNotCorrectlySorted'] = 'Bitte überprüfen Sie, ob die Event-Daten korrekt sortiert sind (erstes Datum zu oberst).';
 $GLOBALS['TL_LANG']['ERR']['invalidEventDurationInfo'] = 'Die Event-Dauer stimmt nicht mit der Anzahl Event-Daten überein. Setzen Sie für jeden Tag des Events eine Datumszeile oder korrigieren Sie die Event-Dauer.';
 $GLOBALS['TL_LANG']['ERR']['deleteEventMembersBeforeDeleteEvent'] = 'Für den Event mit ID %s sind Anmeldungen vorhanden. Bitte löschen Sie diese, bevor Sie den Event selber löschen.';
 $GLOBALS['TL_LANG']['ERR']['setEvtRelLevelForSelectAll'] = 'Mehrere bearbeiten" nur möglich, wenn ein Freigabestufen-Filter gesetzt wurde.';

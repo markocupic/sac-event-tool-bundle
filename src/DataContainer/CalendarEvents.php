@@ -59,6 +59,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CalendarEvents
 {
@@ -80,9 +81,10 @@ class CalendarEvents
     private Adapter $userModel;
 
     public function __construct(
-        private readonly CourseLevels $courseLevels,
+        private readonly TranslatorInterface $translator,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
+        private readonly CourseLevels $courseLevels,
         private readonly EventDurationInfo $eventDurationInfo,
         private readonly EventReleaseLevelUtil $eventReleaseLevelUtil,
         private readonly PasswordHasherFactoryInterface $passwordHasherFactory,
@@ -1215,6 +1217,41 @@ class CalendarEvents
             $strAuthor,
             $strRegistrations,
         );
+    }
+
+    /**
+     * - Event date fields can not be empty,
+     * - must contain one or more valid dates
+     * - and must be correctly sorted.
+     *
+     * @throws Exception
+     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventDates.save', priority: 100)]
+    public function validateEventDates(string $varValue, DataContainer $dc)
+    {
+        $arrDates = $this->stringUtil->deserialize($varValue, true);
+
+        if (!\count($arrDates)) {
+            throw new \Exception($this->translator->trans('ERR.eventDatesCannotBeEmpty', [], 'contao_default'));
+        }
+
+        foreach ($arrDates as $arrDate) {
+            if (isset($arrDate['new_repeat']) && !$arrDate['new_repeat'] > 0) {
+                throw new \Exception($this->translator->trans('ERR.eventDatesCannotBeEmpty', [], 'contao_default'));
+            }
+        }
+
+        // Check correct date order.
+        $tstampPrev = 0;
+
+        foreach ($arrDates as $arrDate) {
+            if ($tstampPrev >= $arrDate['new_repeat']) {
+                throw new \Exception($this->translator->trans('ERR.eventDatesNotCorrectlySorted', [], 'contao_default'));
+            }
+            $tstampPrev = $arrDate['new_repeat'];
+        }
+
+        return $varValue;
     }
 
     /**

@@ -34,8 +34,7 @@ return static function (ECSConfig $ecsConfig): void {
     ]);
 
     $ecsConfig->parallel();
-    $ecsConfig->lineEnding("\n");
-
-    $parameters = $ecsConfig->parameters();
+	$ecsConfig->lineEnding("\r\n");
+	$parameters = $ecsConfig->parameters();
     $parameters->set(Option::CACHE_DIRECTORY, sys_get_temp_dir().'/ecs_default_cache');
 };

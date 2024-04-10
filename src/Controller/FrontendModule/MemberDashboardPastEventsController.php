@@ -63,8 +63,8 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         private readonly string $sacevtTempDir,
         private readonly string $sacevtEventTemplateCourseConfirmation,
         private readonly string $sacevtEventCourseConfirmationFileNamePattern,
-		private readonly null|LoggerInterface $logger = null,
-	) {
+        private readonly LoggerInterface|null $logger = null,
+    ) {
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
@@ -153,7 +153,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
      */
     private function downloadCourseCertificate(): BinaryFileResponse
     {
-		// Set adapters
+        // Set adapters
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
@@ -195,10 +195,11 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     }
 
                     // Log
-					$this->logger?->log(LogLevel::INFO,
-						sprintf('New event confirmation download. SAC-User-ID: %d. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id),
-						['contao' => new ContaoContext(__METHOD__, Log::DOWNLOAD_CERTIFICATE_OF_ATTENDANCE)]
-					);
+                    $this->logger?->log(
+                        LogLevel::INFO,
+                        sprintf('New event confirmation download. SAC-User-ID: %d. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id),
+                        ['contao' => new ContaoContext(__METHOD__, Log::DOWNLOAD_CERTIFICATE_OF_ATTENDANCE)]
+                    );
 
                     $filenamePattern = str_replace('%%d', '%d', $this->sacevtEventCourseConfirmationFileNamePattern);
                     $filename = sprintf($filenamePattern, $objMember->sacMemberId, $objRegistration->id, 'docx');
@@ -230,7 +231,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                         ->convertTo('pdf')
                         ;
 
-					return $this->file($objSplFilePdf->getRealPath());
+                    return $this->file($objSplFilePdf->getRealPath());
                 }
 
                 throw new \Exception('There was an error while trying to generate the course confirmation.');
