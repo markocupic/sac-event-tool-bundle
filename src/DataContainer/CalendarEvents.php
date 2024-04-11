@@ -330,7 +330,11 @@ class CalendarEvents
                             $objJourney = $this->calendarEventsJourneyModel->findByPk($objEvent->{$field});
                             $arrRow[] = null !== $objJourney ? $objJourney->title : $objEvent->{$field};
                         } elseif ('courseLevel' === $field) {
-                            $arrRow[] = $this->courseLevels->get($objEvent->{$field});
+                            if (!\is_int($objEvent->{$field}) || !$this->courseLevels->has($objEvent->{$field}) || EventType::COURSE !== $objEvent->eventType) {
+                                $arrRow[] = '';
+                            } else {
+                                $arrRow[] = $this->courseLevels->get($objEvent->{$field});
+                            }
                         } elseif ('courseTypeLevel0' === $field) {
                             $arrRow[] = empty($objEvent->{$field}) ? '' : (string) $this->connection->fetchOne('SELECT name FROM tl_course_main_type WHERE id = ?', [$objEvent->{$field}]);
                         } elseif ('courseTypeLevel1' === $field) {
