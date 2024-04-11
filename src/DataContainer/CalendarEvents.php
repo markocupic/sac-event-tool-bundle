@@ -297,56 +297,87 @@ class CalendarEvents
                     $arrRow = [];
 
                     foreach ($arrFields as $field) {
-                        if ('eventType' === $field) {
-                            $arrRow[] = $GLOBALS['TL_LANG']['MSC'][$objEvent->{$field}] ?? $objEvent->{$field};
-                        } elseif ('mainInstructor' === $field) {
-                            $objUser = $this->userModel->findByPk($objEvent->{$field});
-                            $arrRow[] = null !== $objUser ? html_entity_decode($objUser->lastname.' '.$objUser->firstname) : '';
-                        } elseif ('tourTechDifficulty' === $field) {
-                            $arrDiff = $this->calendarEventsHelper->getTourTechDifficultiesAsArray($objEvent->current(), false, false);
-                            $arrRow[] = implode(' und ', $arrDiff);
-                        } elseif ('eventDates' === $field) {
-                            $arrTimestamps = $this->calendarEventsHelper->getEventTimestamps($objEvent->current());
-                            $arrDates = array_map(
-                                static fn ($tstamp) => Date::parse(Config::get('dateFormat'), $tstamp),
-                                $arrTimestamps
-                            );
-                            $arrRow[] = implode(',', $arrDates);
-                        } elseif ('eventDurationInDays' === $field) {
-                            $arrRow[] = \count($this->calendarEventsHelper->getEventTimestamps($objEvent->current()));
-                        } elseif ('organizers' === $field) {
-                            $arrOrganizers = $this->calendarEventsHelper->getEventOrganizersAsArray($objEvent->current(), 'title');
-                            $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
-                        } elseif ('instructor' === $field) {
-                            $arrInstructors = $this->calendarEventsHelper->getInstructorNamesAsArray($objEvent->current(), false, true);
-                            $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
-                        } elseif ('tourType' === $field) {
-                            $arrTourTypes = $this->calendarEventsHelper->getTourTypesAsArray($objEvent->current(), 'title');
-                            $arrRow[] = html_entity_decode(implode(',', $arrTourTypes));
-                        } elseif ('eventReleaseLevel' === $field) {
-                            $objFS = EventReleaseLevelPolicyModel::findByPk($objEvent->{$field});
-                            $arrRow[] = null !== $objFS ? $objFS->level : '';
-                        } elseif ('journey' === $field) {
-                            $objJourney = $this->calendarEventsJourneyModel->findByPk($objEvent->{$field});
-                            $arrRow[] = null !== $objJourney ? $objJourney->title : $objEvent->{$field};
-                        } elseif ('courseLevel' === $field) {
-                            if (!\is_int($objEvent->{$field}) || !$this->courseLevels->has($objEvent->{$field}) || EventType::COURSE !== $objEvent->eventType) {
-                                $arrRow[] = '';
-                            } else {
-                                $arrRow[] = $this->courseLevels->get($objEvent->{$field});
-                            }
-                        } elseif ('courseTypeLevel0' === $field) {
-                            $arrRow[] = empty($objEvent->{$field}) ? '' : (string) $this->connection->fetchOne('SELECT name FROM tl_course_main_type WHERE id = ?', [$objEvent->{$field}]);
-                        } elseif ('courseTypeLevel1' === $field) {
-                            $arrRow[] = empty($objEvent->{$field}) ? '' : (string) $this->connection->fetchOne('SELECT name FROM tl_course_sub_type WHERE id = ?', [$objEvent->{$field}]);
-                        } elseif ('executionState' === $field) {
-                            $arrRow[] = empty($objEvent->{$field}) ? '' : $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->{$field}] ?? $objEvent->{$field};
-                        } elseif ('eventState' === $field) {
-                            $arrRow[] = empty($objEvent->{$field}) ? '' : $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->{$field}][0] ?? $objEvent->{$field};
-                        } elseif (\in_array($field, ['teaser', 'tourDetailText', 'requirements'], true)) {
-                            $arrRow[] = str_replace(['<br>', '<br/>'], [' ', ' '], nl2br((string) $objEvent->{$field}));
-                        } else {
-                            $arrRow[] = $objEvent->{$field};
+                        switch ($field) {
+                            case 'eventType':
+                                $arrRow[] = $GLOBALS['TL_LANG']['MSC'][$objEvent->{$field}] ?? $objEvent->{$field};
+                                break;
+                            case 'mainInstructor':
+                                $objUser = $this->userModel->findByPk($objEvent->{$field});
+                                $arrRow[] = null !== $objUser ? html_entity_decode($objUser->lastname.' '.$objUser->firstname) : '';
+                                break;
+                            case 'tourTechDifficulty':
+                                $arrDiff = $this->calendarEventsHelper->getTourTechDifficultiesAsArray($objEvent->current(), false, false);
+                                $arrRow[] = implode(' und ', $arrDiff);
+                                break;
+                            case 'eventDates':
+                                $arrTimestamps = $this->calendarEventsHelper->getEventTimestamps($objEvent->current());
+                                $arrDates = array_map(
+                                    static fn ($tstamp) => Date::parse(Config::get('dateFormat'), $tstamp),
+                                    $arrTimestamps
+                                );
+                                $arrRow[] = implode(',', $arrDates);
+                                break;
+                            case 'eventDurationInDays':
+                                $arrRow[] = \count($this->calendarEventsHelper->getEventTimestamps($objEvent->current()));
+                                break;
+                            case 'organizers':
+                                $arrOrganizers = $this->calendarEventsHelper->getEventOrganizersAsArray($objEvent->current(), 'title');
+                                $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
+                                break;
+                            case 'instructor':
+                                $arrInstructors = $this->calendarEventsHelper->getInstructorNamesAsArray($objEvent->current(), false, true);
+                                $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
+                                break;
+                            case 'tourType':
+                                if (EventType::COURSE === $objEvent->eventType) {
+                                    $arrRow[] = '';
+                                } else {
+                                    $arrTourTypes = $this->calendarEventsHelper->getTourTypesAsArray($objEvent->current(), 'title');
+                                    $arrRow[] = html_entity_decode(implode(',', $arrTourTypes));
+                                }
+                                break;
+                            case 'eventReleaseLevel':
+                                $objFS = EventReleaseLevelPolicyModel::findByPk($objEvent->{$field});
+                                $arrRow[] = null !== $objFS ? $objFS->level : '';
+                                break;
+                            case 'journey':
+                                $objJourney = $this->calendarEventsJourneyModel->findByPk($objEvent->{$field});
+                                $arrRow[] = null !== $objJourney ? $objJourney->title : $objEvent->{$field};
+                                break;
+                            case 'courseLevel':
+                                if (EventType::COURSE !== $objEvent->eventType || !\is_int($objEvent->{$field}) || !$this->courseLevels->has($objEvent->{$field})) {
+                                    $arrRow[] = '';
+                                } else {
+                                    $arrRow[] = $this->courseLevels->get($objEvent->{$field});
+                                }
+                                break;
+                            case 'courseTypeLevel0':
+                                if (EventType::COURSE !== $objEvent->eventType) {
+                                    $arrRow[] = '';
+                                } else {
+                                    $arrRow[] = empty($objEvent->{$field}) ? '' : (string) $this->connection->fetchOne('SELECT name FROM tl_course_main_type WHERE id = ?', [$objEvent->{$field}]);
+                                }
+                                break;
+                            case 'courseTypeLevel1':
+                                if (EventType::COURSE !== $objEvent->eventType) {
+                                    $arrRow[] = '';
+                                } else {
+                                    $arrRow[] = empty($objEvent->{$field}) ? '' : (string) $this->connection->fetchOne('SELECT name FROM tl_course_sub_type WHERE id = ?', [$objEvent->{$field}]);
+                                }
+                                break;
+                            case 'executionState':
+                                $arrRow[] = empty($objEvent->{$field}) ? '' : $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->{$field}] ?? $objEvent->{$field};
+                                break;
+                            case 'eventState':
+                                $arrRow[] = empty($objEvent->{$field}) ? '' : $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->{$field}][0] ?? $objEvent->{$field};
+                                break;
+
+                            default:
+                                if (\in_array($field, ['teaser', 'tourDetailText', 'requirements'], true)) {
+                                    $arrRow[] = str_replace(['<br>', '<br/>'], [' ', ' '], nl2br((string) $objEvent->{$field}));
+                                } else {
+                                    $arrRow[] = $objEvent->{$field};
+                                }
                         }
                     }
 
