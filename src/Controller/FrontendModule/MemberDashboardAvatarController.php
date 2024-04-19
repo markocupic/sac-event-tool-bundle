@@ -67,6 +67,10 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
 
         $path = $this->avatar->getAvatarResourcePath($memberModelAdapter->findByPk($this->user->id), true);
 
+        if (strpos($path, 'heic')) {
+            return $template->getResponse();
+        }
+
         $image = $this->imageFactory->create($path);
 
         $figureBuilder = $this->studio

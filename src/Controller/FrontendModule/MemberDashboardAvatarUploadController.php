@@ -34,11 +34,14 @@ use Contao\PageModel;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Image\RotateImage;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
-#[AsFrontendModule(MemberDashboardAvatarUploadController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_avatar_upload')]
+#[AsFrontendModule(MemberDashboardAvatarUploadController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_member_dashboard_avatar_upload')]
 class MemberDashboardAvatarUploadController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_avatar_upload';
@@ -53,6 +56,8 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         private readonly Avatar $avatar,
         private readonly string $projectDir,
         private readonly string $sacevtUserFrontendAvatarDir,
+        #[Autowire('%contao.image.valid_extensions%')]
+        private readonly array $validExtensions,
     ) {
     }
 
@@ -119,7 +124,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         }
 
         // Generate avatar uploader
-        $this->template->avatarForm = $this->generateAvatarForm();
+        $this->template->form = $this->generateAvatarForm();
 
         $template->set('user', $arrUser);
         $template->set('userModel', $user);
@@ -156,9 +161,9 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
                 if (null === $objFile) {
                     $hasError = true;
-                }
-
-                if (!is_file($this->projectDir.'/'.$objFile->path)) {
+                } elseif (!is_file($this->projectDir.'/'.$objFile->path)) {
+                    $hasError = true;
+                } elseif (!\in_array($objFile->extension, $this->validExtensions, true)) {
                     $hasError = true;
                 } else {
                     $oFile = new File($objFile->path);
@@ -205,6 +210,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             'inputType' => 'upload',
             'eval' => ['class' => 'custom-input-file', 'mandatory' => false],
         ]);
+
         $objForm->addFormField('delete-avatar', [
             // Do not show the legend and display the label only
             'label' => ['', 'Profilbild löschen'],
@@ -222,52 +228,55 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         $dbafsAdapter->addResource($objUploadFolder->path);
 
         $objWidget = $objForm->getWidget('avatar');
-        $objWidget->extensions = 'jpg,jpeg,png,gif,svg';
         $objWidget->storeFile = true;
         $objWidget->uploadFolder = $filesModelAdapter->findByPath($objUploadFolder->path)->uuid;
-        $objWidget->addAttribute('accept', '.jpg,.jpeg,.png,.gif,.svg');
+        $objWidget->addAttribute('accept', '.jpg,.jpeg,.png');
+        $objWidget->extensions = 'jpg,jpeg,png';
+
+        $oMember = $memberModelAdapter->findByPk($this->user->id);
 
         // Delete avatar
-        if ('form-avatar-upload' === $inputAdapter->post('FORM_SUBMIT') && $inputAdapter->post('delete-avatar')) {
+        if ($objForm->getFormId() === $inputAdapter->post('FORM_SUBMIT') && $inputAdapter->post('delete-avatar')) {
             $objUploadFolder->purge();
-            $oMember = $memberModelAdapter->findByPk($this->user->id);
-
-            if (null !== $oMember) {
-                $oMember->avatar = '';
-                $oMember->save();
-            }
-        }
-
-        // Standardize name
-        if ('form-avatar-upload' === $inputAdapter->post('FORM_SUBMIT') && !empty($_FILES['avatar']['tmp_name'])) {
-            $objUploadFolder->purge();
-
-            $objFile = new File($_FILES['avatar']['name']);
-
-            // Rename upload to avatar-<user-id>.jpg
-            $strAvatarFileName = 'avatar-'.$this->user->id.'.'.strtolower($objFile->extension);
-
-            // Move uploaded file, so we can save the avatar uuid in tl_member.avatar
-            move_uploaded_file($_FILES['avatar']['tmp_name'], $this->projectDir.'/'.$objUploadFolder->path.'/'.$strAvatarFileName);
-
-            // Add file to DBAFS
-            $dbafsAdapter->addResource($objUploadFolder->path.'/'.$strAvatarFileName);
-
-            $fileModel = $filesModelAdapter->findByPath($objUploadFolder->path.'/'.$strAvatarFileName);
-
-            $oMember = $memberModelAdapter->findByPk($this->user->id);
-
-            if (null !== $oMember) {
-                $oMember->avatar = $fileModel->uuid;
-                $oMember->save();
-            }
+            $oMember->avatar = '';
+            $oMember->save();
         }
 
         if ($objForm->validate()) {
-            // Reload page after uploads
-            if ('form-avatar-upload' === $inputAdapter->post('FORM_SUBMIT')) {
-                $controllerAdapter->reload();
+            $widget = $objForm->getWidget('avatar');
+            $arrFile = $widget->value;
+
+            // Rename upload to avatar-<user-id>.jpg
+            $strAvatarRelPath = Path::canonicalize(sprintf(
+                '%s/avatar-%s.%s',
+                $objUploadFolder->path,
+                $this->user->id,
+                strtolower(Path::getExtension($arrFile['name']))
+            ));
+
+            // Remove the old avatar from fs and from db
+            if ($this->user->avatar) {
+                $avatarOld = FilesModel::findByUuid($this->user->avatar);
+
+                if (null !== $avatarOld) {
+                    if ($avatarOld->path !== $strAvatarRelPath) {
+                        $fs = new Filesystem();
+                        $fs->remove($avatarOld->getAbsolutePath());
+                        $avatarOld->delete();
+                    }
+                }
             }
+
+            // Assign the new avatar to the user
+            $fileModel = $dbafsAdapter->addResource($strAvatarRelPath);
+
+            if ($fileModel) {
+                $oMember->avatar = $fileModel->uuid;
+                $oMember->save();
+            }
+
+            // Reload page
+            $controllerAdapter->reload();
         }
 
         return $objForm->generate();
