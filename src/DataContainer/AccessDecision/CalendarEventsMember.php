@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\DataContainer\AccessDecision;
 
 use Contao\Backend;
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;
@@ -26,6 +27,7 @@ use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\EventType;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -140,10 +142,82 @@ class CalendarEventsMember
     }
 
     /**
+     * Make input fields readonly, if the registration is of type 'onlineForm'.
+     *
+     * @param DataContainer $dc
+     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 110)]
+    public function makeFieldsReadonly(DataContainer $dc): void
+    {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return;
+        }
+
+        if ($dc->id && null !== ($registration = CalendarEventsMemberModel::findByPk($dc->id))) {
+            if (BookingType::ONLINE_FORM !== $registration->bookingType) {
+                return;
+            }
+
+            $arrReadonly = [
+                'sacMemberId',
+                'gender',
+                'firstname',
+                'lastname',
+                'street',
+                'postal',
+                'city',
+                'phone',
+                'mobile',
+                'dateOfBirth',
+                'email',
+                'ahvNumber',
+                'emergencyPhone',
+                'emergencyPhoneName',
+                'notes',
+                'ticketInfo',
+                'foodHabits',
+                'dateAdded',
+                'agb',
+                'hasAcceptedPrivacyRules',
+                'hasLeadClimbingEducation',
+                'dateOfLeadClimbingEducation',
+                'sectionId',
+            ];
+
+            foreach ($arrReadonly as $fieldName) {
+                // Make the input field readonly.
+                $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields'][$fieldName]['eval']['readonly'] = true;
+
+                $inputType = $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields'][$fieldName]['inputType'] ?? '';
+
+                // A checkbox can not be readonly
+                // So let's transform it to a text input field.
+                if (\in_array($inputType, ['checkbox'], true)) {
+                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields'][$fieldName]['inputType'] = 'text';
+                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields'][$fieldName]['eval']['tl_class'] = 'w50';
+                }
+
+                // But this won't work if the field belongs to a subpalette.
+                // So remove the field from the subpalette and append it right after its selector.
+                if ('dateOfLeadClimbingEducation' === $fieldName) {
+                    PaletteManipulator::create()
+                        ->removeField('dateOfLeadClimbingEducation')
+                        ->applyToSubpalette('hasLeadClimbingEducation', 'tl_calendar_events_member')
+                    ;
+                    PaletteManipulator::create()
+                        ->addField('dateOfLeadClimbingEducation', 'hasLeadClimbingEducation', PaletteManipulator::POSITION_AFTER)
+                        ->applyToPalette('default', 'tl_calendar_events_member')
+                    ;
+                }
+            }
+        }
+    }
+
+    /**
      * Generate href for $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']
      * Generate href for $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice'].
      */
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 120)]
     public function setGlobalOperations(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();

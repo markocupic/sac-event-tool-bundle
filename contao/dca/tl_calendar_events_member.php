@@ -288,7 +288,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		'dateOfLeadClimbingEducation' => [
 			'exclude'   => true,
 			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+			'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'doNotCopy' => true, 'tl_class' => 'w50 wizard'],
 			'sql'       => "varchar(11) NOT NULL default ''",
 		],
 		'agb'                         => [

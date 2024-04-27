@@ -13,7 +13,13 @@
 document.addEventListener('DOMContentLoaded', () => {
 
 	let globalTimeout = null;
+
 	if (!document.querySelector('input[name="sacMemberId"]')) {
+		return;
+	}
+
+	// Do not run the application if the sac member id input element has the "readonly" attribute.
+	if (document.querySelector('input[name="sacMemberId"][readonly]')) {
 		return;
 	}
 
