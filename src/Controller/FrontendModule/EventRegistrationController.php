@@ -20,7 +20,6 @@ use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
-use Contao\CoreBundle\Exception\InternalServerErrorException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -136,7 +135,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
             try {
                 $this->eventModel = $this->calendarEventsModelAdapter->findByIdOrAlias($eventId);
             } catch (\Exception $e) {
-                throw new InternalServerErrorException('Could not find a valid event id/alias in the url.');
+                return new Response('No valid event id/alias could be found in the url parameters.', Response::HTTP_BAD_REQUEST);
             }
 
             // Get the main instructor object.
@@ -362,6 +361,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $arrData['eventName'] = $this->eventModel->title;
                 $arrData['eventId'] = $this->eventModel->id;
                 $arrData['dateAdded'] = time();
+                $arrData['tstamp'] = time();
                 $arrData['uuid'] = Uuid::uuid4()->toString();
                 $arrData['stateOfSubscription'] = $this->calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel) ? EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST : EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED;
                 $arrData['bookingType'] = BookingType::ONLINE_FORM;
