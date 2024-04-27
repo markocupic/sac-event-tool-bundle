@@ -28,6 +28,7 @@ use Contao\Events;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\Validator;
+use Contao\Versions;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
@@ -300,7 +301,17 @@ class NotifyEventRegistrationStateController
             // Send email notification
             if ($email->sendTo($this->registration->email)) {
                 $this->registration->stateOfSubscription = $this->configuration['stateOfSubscription'];
-                $this->registration->save();
+
+                if ($this->registration->isModified()) {
+                    $this->registration->tstamp = time();
+                    $this->registration->save();
+
+                    // Create new version
+                    $objVersions = new Versions($this->registration->getTable(), $this->registration->id);
+                    $objVersions->initialize();
+                    $objVersions->create();
+                }
+
                 $this->message->addInfo($this->configuration['backendMessage']);
 
                 return true;

@@ -30,6 +30,7 @@ use Contao\PageModel;
 use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
+use Contao\Versions;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
@@ -192,8 +193,15 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
             if (!$errorMsg) {
                 $objEventRegistration->stateOfSubscription = EventSubscriptionState::USER_HAS_UNSUBSCRIBED;
 
-                // Save data record in tl_calendar_events_member
-                $objEventRegistration->save();
+                if ($objEventRegistration->isModified()) {
+                    $objEventRegistration->tstamp = time();
+                    $objEventRegistration->save();
+
+                    // Create new version
+                    $objVersions = new Versions($objEventRegistration->getTable(), $objEventRegistration->id);
+                    $objVersions->initialize();
+                    $objVersions->create();
+                }
 
                 // Load language file
                 $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
