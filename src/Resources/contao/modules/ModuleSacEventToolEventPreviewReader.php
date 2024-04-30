@@ -37,6 +37,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Front end module "event reader".
@@ -80,14 +81,10 @@ class ModuleSacEventToolEventPreviewReader extends Events
 
         $eventId = Input::get('auto_item');
 
-        try {
-            $objEvent = CalendarEventsModel::findByIdOrAlias($eventId);
-        } catch (\Exception $e) {
-            throw new InternalServerErrorException('Could not find a valid event id/alias in the url.');
-        }
+        $objEvent = CalendarEventsModel::findByIdOrAlias($eventId ?? 0);
 
         if (null === $objEvent) {
-            throw new InternalServerErrorException('Event "'.$eventId.'" not found.');
+            return new Response('No valid event id/alias could be found in the url parameters.', Response::HTTP_BAD_REQUEST);
         }
 
         /** @var UriSigner $uriSigner */
