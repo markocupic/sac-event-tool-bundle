@@ -104,7 +104,7 @@ final class NotifyMemberOnEventRegistration
                 'participant_ahv_number' => html_entity_decode((string) ($this->arrData['ahvNumber'] ?? '')),
                 'participant_city' => html_entity_decode($this->memberModel->city),
                 'participant_contao_member_id' => $this->memberModel->id,
-                'participant_date_of_birth' => ($this->arrData['dateOfBirth'] ?? 0) > 0 ? date('d.m.Y', (int) $this->arrData['dateOfBirth']) : '---',
+                'participant_date_of_birth' => isset($this->arrData['dateOfBirth']) && '' !== $this->arrData['dateOfBirth'] ? date('d.m.Y', (int) $this->arrData['dateOfBirth']) : '---',
                 'participant_email' => $this->memberModel->email !== $this->arrData['email'] ? $this->arrData['email'] : $this->memberModel->email,
                 'participant_emergency_phone' => $this->arrData['emergencyPhone'],
                 'participant_emergency_phone_name' => html_entity_decode((string) ($this->arrData['emergencyPhoneName'] ?? '')),
