@@ -65,6 +65,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     {
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
 
         // Get logged in member object
         if (($user = $this->security->getUser()) instanceof FrontendUser) {
@@ -79,7 +80,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
         // Rotate image by 90°
         if ('rotate-image' === $inputAdapter->get('do') && '' !== $inputAdapter->get('fileId')) {
-            $objFiles = FilesModel::findOneById($inputAdapter->get('fileId'));
+            $objFiles = $filesModelAdapter->findOneById($inputAdapter->get('fileId'));
             $this->rotateImage->rotate($objFiles, 90);
 
             $controllerAdapter->redirect($page->getFrontendUrl());
@@ -107,7 +108,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
         $arrUser = $user->row();
 
-        $objUploadFolder = new Folder($this->getUploadDir());
+        $objUploadFolder = new Folder($this->getUserAvatarUploadDir());
 
         // Check for valid avatar image and valid upload directory
         $this->checkAvatar();
@@ -135,7 +136,30 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         return $this->template->getResponse();
     }
 
-    private function getUploadDir(): string
+    protected function deleteAvatar(): void
+    {
+        if (!$this->user instanceof FrontendUser) {
+            return;
+        }
+
+        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
+        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+        $objUploadFolder = new Folder($this->getUserAvatarUploadDir());
+
+        $oMember = $memberModelAdapter->findByPk($this->user->id);
+
+        // Delete from file system
+        $objUploadFolder->purge();
+
+        $objFile = $filesModelAdapter->findByUuid($oMember->avatar);
+
+        $objFile?->delete();
+
+        $oMember->avatar = '';
+        $oMember->save();
+    }
+
+    private function getUserAvatarUploadDir(): string
     {
         return sprintf(
             '%s/%s',
@@ -176,7 +200,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
                 if ($hasError) {
                     $this->user->avatar = '';
                     $this->user->save();
-                    $objUploadFolder = new Folder($this->getUploadDir());
+                    $objUploadFolder = new Folder($this->getUserAvatarUploadDir());
                     $objUploadFolder->purge();
                     $objUploadFolder->delete();
                 }
@@ -193,7 +217,6 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
         $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
 
@@ -224,53 +247,48 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         ]);
 
         // Create the folder if it not exists
-        $objUploadFolder = new Folder($this->getUploadDir());
+        $objUploadFolder = new Folder($this->getUserAvatarUploadDir());
         $dbafsAdapter->addResource($objUploadFolder->path);
 
         $objWidget = $objForm->getWidget('avatar');
-        $objWidget->storeFile = true;
-        $objWidget->uploadFolder = $filesModelAdapter->findByPath($objUploadFolder->path)->uuid;
         $objWidget->addAttribute('accept', '.jpg,.jpeg,.png');
         $objWidget->extensions = 'jpg,jpeg,png';
 
-        $oMember = $memberModelAdapter->findByPk($this->user->id);
-
-        // Delete avatar
-        if ($objForm->getFormId() === $inputAdapter->post('FORM_SUBMIT') && $inputAdapter->post('delete-avatar')) {
-            $objUploadFolder->purge();
-            $oMember->avatar = '';
-            $oMember->save();
-        }
-
         if ($objForm->validate()) {
+            // Delete avatar
+            if ($inputAdapter->post('delete-avatar')) {
+                $this->deleteAvatar();
+            }
+
             $widget = $objForm->getWidget('avatar');
             $arrFile = $widget->value;
 
-            // Rename upload to avatar-<user-id>.jpg
-            $strAvatarRelPath = Path::canonicalize(sprintf(
+            if (empty($arrFile['tmp_name'])) {
+                // Reload page
+                $controllerAdapter->reload();
+            }
+
+            $this->deleteAvatar();
+
+            // Generate target path
+            $strAvatarRelativePath = Path::canonicalize(sprintf(
                 '%s/avatar-%s.%s',
                 $objUploadFolder->path,
                 $this->user->id,
                 strtolower(Path::getExtension($arrFile['name']))
             ));
 
-            // Remove the old avatar from fs and from db
-            if ($this->user->avatar) {
-                $avatarOld = FilesModel::findByUuid($this->user->avatar);
+            $strAvatarAbsolutePath = Path::makeAbsolute($strAvatarRelativePath, $this->projectDir);
 
-                if (null !== $avatarOld) {
-                    if ($avatarOld->path !== $strAvatarRelPath) {
-                        $fs = new Filesystem();
-                        $fs->remove($avatarOld->getAbsolutePath());
-                        $avatarOld->delete();
-                    }
-                }
-            }
+            $fs = new Filesystem();
+            // Move picture from system temp dir to the target path.
+            $fs->rename($arrFile['tmp_name'], $strAvatarAbsolutePath);
 
             // Assign the new avatar to the user
-            $fileModel = $dbafsAdapter->addResource($strAvatarRelPath);
+            $fileModel = $dbafsAdapter->addResource($strAvatarRelativePath);
 
             if ($fileModel) {
+                $oMember = $memberModelAdapter->findByPk($this->user->id);
                 $oMember->avatar = $fileModel->uuid;
                 $oMember->save();
             }
