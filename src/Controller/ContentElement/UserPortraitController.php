@@ -22,6 +22,7 @@ use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\PageModel;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Exception\UserNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -46,18 +47,16 @@ class UserPortraitController extends AbstractContentElementController
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
 
         $user = null;
-
+	    $username = '';
         if ($request->query->has('username')) {
             $username = $request->query->get('username');
 
-            if (null === ($user = $userModelAdapter->findByUsername($username))) {
-                return new Response('', Response::HTTP_NO_CONTENT);
-            }
+	        $user = $userModelAdapter->findByUsername($username);
         }
 
-        // Do not display profile of a disabled user.
-        if (null === $user || $user->disable || $user->stop < time()) {
-            return new Response('', Response::HTTP_NO_CONTENT);
+        // Do not display the profile of a disabled or deleted user.
+        if (null === $user || $user->disable || ($user->stop !== '' AND $user->stop < time())) {
+            throw new UserNotFoundException(sprintf('User "%s" not found. It may have been deactivated or deleted.', $username));
         }
 
         $arrUser = $user->row();
