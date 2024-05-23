@@ -64,6 +64,11 @@ class EventMember
                         if ($objMember->isSacMember && !$objMember->disable) {
                             $isMember = true;
                         }
+
+                        if ('' !== $objMember->stop && $objMember->stop < time()) {
+                            $isMember = false;
+                        }
+
                         $strMemberInSection = '('.CalendarEventsHelper::getSectionMembershipAsString($objMember).')';
                     }
                     // Keep this var empty

@@ -40,6 +40,7 @@ use Contao\UserGroupModel;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Types\Types;
 use League\Csv\CannotInsertRecord;
 use League\Csv\CharsetConverter;
 use League\Csv\InvalidArgument;
@@ -992,8 +993,13 @@ class CalendarEvents
     public function getBackendUsers(): array
     {
         return $this->connection->fetchAllKeyValue(
-            'SELECT id, CONCAT(name, ", ", city) FROM tl_user WHERE disable = ? ORDER BY name',
-            [0],
+            'SELECT id, CONCAT(name, ", ", city) FROM tl_user WHERE disable = 0 AND (stop = "" OR stop > ?) ORDER BY name',
+            [
+                time(),
+            ],
+            [
+                Types::INTEGER,
+            ]
         );
     }
 
@@ -1032,7 +1038,15 @@ class CalendarEvents
     public function listInstructors(): array
     {
         $options = [];
-        $stmt = $this->connection->executeQuery('SELECT id,firstname,lastname,city FROM tl_user WHERE disable = ? && lastname != ? && firstname != ? ORDER BY lastname', [0, '', '']);
+        $stmt = $this->connection->executeQuery(
+            'SELECT id,firstname,lastname,city FROM tl_user WHERE disable = 0 AND (stop = "" OR stop > ?) && lastname != "" && firstname != "" ORDER BY lastname',
+            [
+                time(),
+            ],
+            [
+                Types::INTEGER,
+            ]
+        );
 
         while (false !== ($row = $stmt->fetchAssociative())) {
             $options[$row['id']] = $row['lastname'].' '.$row['firstname'].', '.$row['city'];

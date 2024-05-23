@@ -111,6 +111,10 @@ class User
             return;
         }
 
+        if ('' !== $arrMember['stop'] && time() > $arrMember['stop']) {
+            return;
+        }
+
         $arrReadonlyFields = ['gender', 'firstname', 'lastname', 'name', 'email', 'phone', 'mobile', 'street', 'postal', 'city', 'dateOfBirth'];
 
         foreach ($arrReadonlyFields as $fieldName) {

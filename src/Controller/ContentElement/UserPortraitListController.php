@@ -104,9 +104,15 @@ class UserPortraitListController extends AbstractContentElementController
 
             if (null !== $objUser) {
                 while ($objUser->next()) {
-                    if (!$objUser->disable) {
-                        $arrIDS[] = $objUser->id;
+                    if ('' !== $objUser->stop && $objUser->stop < time()) {
+                        continue;
                     }
+
+                    if ($objUser->disable) {
+                        continue;
+                    }
+
+                    $arrIDS[] = $objUser->id;
                 }
             }
         }
