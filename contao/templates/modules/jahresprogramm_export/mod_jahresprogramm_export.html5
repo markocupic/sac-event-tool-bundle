@@ -55,7 +55,7 @@
       <?= $arrEvent['courseTypeLevel1'] ?>
       <?php if (\Markocupic\SacEventToolBundle\Config\EventMountainguide::WITH_MOUNTAIN_GUIDE_OFFER === $arrEvent['mountainguide']): ?>, BF-A<?php endif; ?>
     </td>
-    <td class="event-export-instructors" colspan="3"><?= $arrEvent['instructors'] ?></td>
+    <td class="event-export-instructors" colspan="3"><?= !empty($arrEvent['instructors']) ? $arrEvent['instructors'] : 'Leiter wurde gelöscht' ?></td>
     <td class="event-export-instructors" style="min-width:150px;"><?= $arrEvent['courseId'] ?></td>
   </tr>
 
@@ -124,7 +124,7 @@
       <?php if ($arrEvent['journey'] === 'ÖV'): ?>, ÖV<?php endif; ?>
       <?php if (\Markocupic\SacEventToolBundle\Config\EventMountainguide::WITH_MOUNTAIN_GUIDE_OFFER === $arrEvent['mountainguide']): ?>, BF-A<?php endif; ?>
     </td>
-    <td class="event-export-instructors" colspan="3"><?= $arrEvent['instructors'] ?></td>
+    <td class="event-export-instructors" colspan="3"><?= !empty($arrEvent['instructors']) ? $arrEvent['instructors'] : 'Leiter wurde gelöscht' ?></td>
     <td class="event-export-instructors"><?= $arrEvent['eventId'] ?></td>
   </tr>
   <?php endif; ?>
@@ -222,7 +222,7 @@
     <td class="event-export-date"><?= $arrEvent['tourType'] ?>
       <?php if (\Markocupic\SacEventToolBundle\Config\EventMountainguide::WITH_MOUNTAIN_GUIDE_OFFER === $arrEvent['mountainguide']): ?>, BF-A<?php endif; ?>
     </td>
-    <td class="event-export-instructors" colspan="3"><?= $arrEvent['instructors'] ?></td>
+    <td class="event-export-instructors" colspan="3"><?= !empty($arrEvent['instructors']) ? $arrEvent['instructors'] : 'Leiter wurde gelöscht' ?></td>
     <td class="event-export-instructors"><?= $arrEvent['eventId'] ?></td>
   </tr>
   <?php endif; ?>

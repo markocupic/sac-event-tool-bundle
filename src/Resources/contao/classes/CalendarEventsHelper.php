@@ -577,6 +577,11 @@ class CalendarEventsHelper
                 if (true === $blnShowPublishedOnly && $objUser->disable) {
                     continue;
                 }
+
+                if (true === $blnShowPublishedOnly && ('' !== $objUser->stop && $objUser->stop < time())) {
+                    continue;
+                }
+
                 $arrInstructors[] = $objUser->id;
             }
         }

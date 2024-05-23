@@ -45,7 +45,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsFrontendModule(CsvUserExportController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_csv_user_export')]
+#[AsFrontendModule(CsvUserExportController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_csv_user_export')]
 class CsvUserExportController extends AbstractFrontendModuleController
 {
     public const TYPE = 'csv_user_export';
@@ -141,7 +141,15 @@ class CsvUserExportController extends AbstractFrontendModuleController
                     $strTable = 'tl_user';
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'leiterQualifikation', 'lastLogin', 'userRole'];
                     $strGroupFieldName = 'userRole';
-                    $result = $this->connection->executeQuery('SELECT * FROM tl_user ORDER BY lastname, firstname');
+                    $result = $this->connection->executeQuery(
+                        'SELECT * FROM tl_user WHERE disable = 0 AND (stop = "" OR stop > ?) ORDER BY lastname, firstname',
+                        [
+                            time(),
+                        ],
+                        [
+                            Types::INTEGER,
+                        ],
+                    );
 
                     throw new ResponseException($this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, UserRoleModel::class, $blnKeepGroupsInOneLine));
                 }
@@ -150,7 +158,15 @@ class CsvUserExportController extends AbstractFrontendModuleController
                     $strTable = 'tl_user';
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
-                    $result = $this->connection->executeQuery('SELECT * FROM tl_user ORDER BY lastname, firstname');
+                    $result = $this->connection->executeQuery(
+	                    'SELECT * FROM tl_user WHERE disable = 0 AND (stop = "" OR stop > ?) ORDER BY lastname, firstname',
+                        [
+                            time(),
+                        ],
+                        [
+                            Types::INTEGER,
+                        ],
+                    );
 
                     throw new ResponseException($this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, UserGroupModel::class, $blnKeepGroupsInOneLine));
                 }
@@ -198,8 +214,8 @@ class CsvUserExportController extends AbstractFrontendModuleController
 
         $arrFilterRoles = [];
 
-        if ($request->request->has('user-roles') && \is_array($request->request->get('user-roles'))) {
-            $arrFilterRoles = $request->request->get('user-roles');
+        if ($request->request->has('user-roles') && \is_array($request->request->all()['user-roles'])) {
+            $arrFilterRoles = $request->request->all()['user-roles'];
             $blnHasUserRoleFilter = true;
         }
 
@@ -225,22 +241,27 @@ class CsvUserExportController extends AbstractFrontendModuleController
                     if (!empty($arrGroupsUserBelongsTo)) {
                         // Write all groups/roles in one line
                         if ($blnKeepGroupsInOneLine) {
-                            $arrUser[] = implode(', ', array_filter(array_map(
-                                static function ($id) use ($groupModelAdapter) {
-                                    $objGroupModel = $groupModelAdapter->findByPk($id);
+                            $arrUser[] = implode(
+                                ', ',
+                                array_filter(
+                                    array_map(
+                                        static function ($id) use ($groupModelAdapter) {
+                                            $objGroupModel = $groupModelAdapter->findByPk($id);
 
-                                    if (null !== $objGroupModel) {
-                                        if (\strlen((string) $objGroupModel->name)) {
-                                            return $objGroupModel->name;
-                                        }
+                                            if (null !== $objGroupModel) {
+                                                if (\strlen((string) $objGroupModel->name)) {
+                                                    return $objGroupModel->name;
+                                                }
 
-                                        return $objGroupModel->title;
-                                    }
+                                                return $objGroupModel->title;
+                                            }
 
-                                    return '';
-                                },
-                                $arrGroupsUserBelongsTo
-                            )));
+                                            return '';
+                                        },
+                                        $arrGroupsUserBelongsTo
+                                    )
+                                )
+                            );
                         } else {
                             // Make a row for each group/role
                             $hasGroups = true;
