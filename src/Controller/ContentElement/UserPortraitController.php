@@ -56,7 +56,7 @@ class UserPortraitController extends AbstractContentElementController
         }
 
         // Do not display profile of a disabled user.
-        if (null === $user || $user->disable) {
+        if (null === $user || $user->disable || $user->stop < time()) {
             return new Response('', Response::HTTP_NO_CONTENT);
         }
 

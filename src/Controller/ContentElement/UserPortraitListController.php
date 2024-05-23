@@ -71,9 +71,13 @@ class UserPortraitListController extends AbstractContentElementController
 
             if (\count($arrSelectedRoles) > 0) {
                 $stmt = $this->connection->executeQuery(
-                    'SELECT * FROM tl_user  WHERE disable = ? AND hideInFrontendListings = ? ORDER BY lastname, firstname',
-                    [0, 0],
-                    [Types::INTEGER, Types::INTEGER],
+                    'SELECT * FROM tl_user WHERE disable = 0 AND (stop = "" OR stop > ?) AND hideInFrontendListings = 0 ORDER BY lastname, firstname',
+                    [
+                        time(),
+                    ],
+                    [
+                        Types::INTEGER,
+                    ],
                 );
 
                 if ('OR' === $queryType) {
