@@ -582,6 +582,10 @@ class CalendarEventsHelper
                     continue;
                 }
 
+	            if (true === $blnShowPublishedOnly && ('' !== $objUser->start && $objUser->start > time())) {
+		            continue;
+	            }
+
                 $arrInstructors[] = $objUser->id;
             }
         }

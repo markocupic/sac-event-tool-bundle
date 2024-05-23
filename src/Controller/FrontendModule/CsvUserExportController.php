@@ -142,11 +142,13 @@ class CsvUserExportController extends AbstractFrontendModuleController
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'leiterQualifikation', 'lastLogin', 'userRole'];
                     $strGroupFieldName = 'userRole';
                     $result = $this->connection->executeQuery(
-                        'SELECT * FROM tl_user WHERE disable = 0 AND (stop = "" OR stop > ?) ORDER BY lastname, firstname',
+                        'SELECT * FROM tl_user WHERE disable = 0 AND (start = "" OR start < ?) AND (stop = "" OR stop > ?) ORDER BY lastname, firstname',
                         [
+                            time(),
                             time(),
                         ],
                         [
+                            Types::INTEGER,
                             Types::INTEGER,
                         ],
                     );
@@ -159,11 +161,13 @@ class CsvUserExportController extends AbstractFrontendModuleController
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
                     $result = $this->connection->executeQuery(
-	                    'SELECT * FROM tl_user WHERE disable = 0 AND (stop = "" OR stop > ?) ORDER BY lastname, firstname',
+                        'SELECT * FROM tl_user WHERE disable = 0 AND (start = "" OR start < ?) AND (stop = "" OR stop > ?) ORDER BY lastname, firstname',
                         [
+                            time(),
                             time(),
                         ],
                         [
+                            Types::INTEGER,
                             Types::INTEGER,
                         ],
                     );

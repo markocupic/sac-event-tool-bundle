@@ -47,15 +47,16 @@ class UserPortraitController extends AbstractContentElementController
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
 
         $user = null;
-	    $username = '';
+        $username = '';
+
         if ($request->query->has('username')) {
             $username = $request->query->get('username');
 
-	        $user = $userModelAdapter->findByUsername($username);
+            $user = $userModelAdapter->findByUsername($username);
         }
 
         // Do not display the profile of a disabled or deleted user.
-        if (null === $user || $user->disable || ($user->stop !== '' AND $user->stop < time())) {
+        if (null === $user || $user->disable || ('' !== $user->start && $user->start > time()) || ('' !== $user->stop && $user->stop < time()) || ('' !== $user->start && $user->start > time())) {
             throw new UserNotFoundException(sprintf('User "%s" not found. It may have been deactivated or deleted.', $username));
         }
 

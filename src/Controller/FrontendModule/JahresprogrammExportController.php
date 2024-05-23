@@ -382,8 +382,8 @@ class JahresprogrammExportController extends AbstractPrintExportController
                 $arrUsers = [];
                 $objUser = $databaseAdapter
                     ->getInstance()
-                    ->prepare('SELECT * FROM tl_user WHERE disable = 0 AND (stop = "" OR stop > ?) ORDER BY lastname, firstname')
-                    ->execute(0)
+                    ->prepare('SELECT * FROM tl_user WHERE disable = 0 AND (start = "" OR start < ?) AND (stop = "" OR stop > ?) ORDER BY lastname, firstname')
+                    ->execute(time(),time())
                 ;
 
                 while ($objUser->next()) {
