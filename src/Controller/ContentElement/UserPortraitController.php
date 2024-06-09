@@ -49,11 +49,14 @@ class UserPortraitController extends AbstractContentElementController
 
         if ($request->query->has('username')) {
             $username = $request->query->get('username');
-            $user = $userModelAdapter->findByUsername($username);
+
+            if (null === ($user = $userModelAdapter->findByUsername($username))) {
+                return new Response('', Response::HTTP_NO_CONTENT);
+            }
         }
 
-        // Do not display the profile of a disabled or deleted user.
-        if (null === $user || $user->disable || ('' !== $user->start && $user->start > time()) || ('' !== $user->stop && $user->stop < time()) || ('' !== $user->start && $user->start > time())) {
+        // Do not display profile of a disabled user.
+        if (null === $user || $user->disable || $user->stop < time()) {
             return new Response('', Response::HTTP_NO_CONTENT);
         }
 

@@ -19,13 +19,14 @@ use Contao\FrontendUser;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
-use FTP\Connection as FtpConnection;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\DataContainer\Util;
 use Markocupic\SacEventToolBundle\String\PhoneNumber;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -36,7 +37,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class SyncSacMemberDatabase
 {
-    public const FTP_DB_DUMP_FILE_PATH = 'system/tmp/Adressen_0000%s.csv';
+    public const FTP_DB_DUMP_TARGET_PATH = '%s/system/tmp/Adressen_0000%d.csv';
     public const FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
     public const FTP_DB_DUMP_FIELD_DELIMITER = '$';
     public const STOP_WATCH_EVENT = 'sac_database_sync';
@@ -143,47 +144,54 @@ class SyncSacMemberDatabase
     {
         $fs = new Filesystem();
 
-        // Open FTP connection
-        $connId = $this->openFtpConnection();
-
         $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
 
+        $finder = new Finder();
+
+        $cred = sprintf('ftp://%s:%s@%s/', $this->ftp_username, $this->ftp_password, $this->ftp_hostname);
+
+        $finder->files()->in($cred)->name('*.csv');
+
+        $fileMap = [];
+
+        foreach ($finder as $file) {
+            // Extract the section id from filename: Adressen_00004250.csv -> 4250
+            $sectionId = (int) filter_var($file->getBasename(), FILTER_SANITIZE_NUMBER_INT);
+
+            $fileMap[$sectionId] = $file;
+        }
+
         foreach ($arrSectionIds as $sectionId) {
-            $localFile = $this->projectDir.'/'.sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId);
-            $remoteFile = basename($localFile);
+            $targetPath = sprintf(static::FTP_DB_DUMP_TARGET_PATH, $this->projectDir, $sectionId);
 
             // Delete old file
-            if ($fs->exists($localFile)) {
-                $fs->remove($localFile);
+            if ($fs->exists($targetPath)) {
+                $fs->remove($targetPath);
             }
 
-            // Fetch file
-            if (!ftp_get($connId, $localFile, $remoteFile, FTP_BINARY)) {
-                $msg = sprintf('Could not find db dump "%s" at "%s".', $remoteFile, $this->ftp_hostname);
-                $this->log(LogLevel::CRITICAL, $msg, __METHOD__, ContaoContext::ERROR);
+            $errMsg = sprintf('Could not find db dump "%s" at "%s".', basename($targetPath), $this->ftp_hostname);
+
+            if (!isset($fileMap[$sectionId])) {
+                $this->log(LogLevel::CRITICAL, $errMsg, __METHOD__, ContaoContext::ERROR);
+
+                throw new \Exception($errMsg);
+            }
+
+            $objSplFile = $fileMap[$sectionId];
+
+            try {
+                $fs->copy($objSplFile->getPathname(), $targetPath);
+            } catch (FileNotFoundException $e) {
+                $msg = sprintf('Could not find db dump "%s" at "%s".', basename($targetPath), $this->ftp_hostname);
+                $this->log(LogLevel::CRITICAL, $errMsg, __METHOD__, ContaoContext::ERROR);
 
                 throw new \Exception($msg);
+            } catch (\Exception $e) {
+                $this->log(LogLevel::CRITICAL, $e->getMessage(), __METHOD__, ContaoContext::ERROR);
+
+                throw $e;
             }
         }
-
-        ftp_close($connId);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    protected function openFtpConnection(): FtpConnection
-    {
-        $connId = ftp_connect($this->ftp_hostname);
-
-        if (!ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId) {
-            $msg = sprintf('Could not establish ftp connection to %s.', $this->ftp_hostname);
-            $this->log(LogLevel::CRITICAL, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_TRANSACTION_ERROR);
-
-            throw new \Exception($msg);
-        }
-
-        return $connId;
     }
 
     /**
@@ -209,7 +217,7 @@ class SyncSacMemberDatabase
             $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
 
             foreach ($arrSectionIds as $sectionId) {
-                $stream = fopen($this->projectDir.'/'.sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId), 'r');
+                $stream = fopen(sprintf(static::FTP_DB_DUMP_TARGET_PATH, $this->projectDir, $sectionId), 'r');
 
                 if ($stream) {
                     while (!feof($stream)) {

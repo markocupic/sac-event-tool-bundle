@@ -184,7 +184,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                 $this->template->events = $this->events;
                 $this->template->instructors = $this->instructors;
 
-                $arrayUserRoles = empty($request->request->all()['userRoles']) ? [] : $request->request->all()['userRoles'];
+                $arrayUserRoles = empty($request->request->get('userRoles')) ? [] : $request->request->get('userRoles');
                 $specialUsers = $this->getUsersByUserRole($arrayUserRoles);
                 $this->template->specialUsers = $specialUsers;
             }
@@ -382,8 +382,8 @@ class JahresprogrammExportController extends AbstractPrintExportController
                 $arrUsers = [];
                 $objUser = $databaseAdapter
                     ->getInstance()
-                    ->prepare('SELECT * FROM tl_user WHERE disable = 0 AND (start = "" OR start < ?) AND (stop = "" OR stop > ?) ORDER BY lastname, firstname')
-                    ->execute(time(),time())
+                    ->prepare('SELECT * FROM tl_user WHERE disable = 0 AND (stop = "" OR stop > ?) ORDER BY lastname, firstname')
+                    ->execute(time())
                 ;
 
                 while ($objUser->next()) {
