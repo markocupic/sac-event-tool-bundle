@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\Cron;
 use Contao\BackendTemplate;
 use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCronJob;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\String\SimpleTokenParser;
@@ -48,18 +49,22 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 readonly class SendNewsletterCron
 {
     public function __construct(
-        private readonly Connection $connection,
-        private readonly InsertTagParser $insertTagParser,
-        private readonly SimpleTokenParser $simpleTokenParser,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly string $projectDir,
-        private readonly LoggerInterface|null $contaoErrorLogger,
-        private readonly LoggerInterface|null $contaoCronLogger,
+        private readonly ContaoFramework $framework,
+        private Connection $connection,
+        private InsertTagParser $insertTagParser,
+        private SimpleTokenParser $simpleTokenParser,
+        private EventDispatcherInterface $eventDispatcher,
+        private string $projectDir,
+        private LoggerInterface|null $contaoErrorLogger,
+        private LoggerInterface|null $contaoCronLogger,
     ) {
     }
 
     public function __invoke(): void
     {
+        // Initialize Contao framework
+        $this->framework->initialize();
+
         $objNewsletter = $this->getNewsletter();
 
         if (null === $objNewsletter) {
