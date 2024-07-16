@@ -181,6 +181,10 @@ class EventFilterFormController extends AbstractFrontendModuleController
             $objForm->getWidget('publicTransportEvent')->template = 'form_bs_switch';
         }
 
+        if ($objForm->hasFormField('favoredEvent')) {
+            $objForm->getWidget('favoredEvent')->template = 'form_bs_switch';
+        }
+
         return $objForm;
     }
 }

@@ -1,0 +1,88 @@
+{% block favor_event_button_componenent %}
+    {% if not has_logged_in_frontend_user() %}
+        {# Trigger the login modal window for not logged in users #}
+        <button class="btn btn-block text-nowrap" data-sac-login-toggle="modal" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
+            <i class="fa-regular fa-lg fa-heart"></i>&nbsp;Zu Merkliste hinzufügen
+        </button>
+    {% else %}
+        {# Add Vue.js #}
+        {% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.global.prod.js?3.3.4') %}
+
+        {# Generate a random app id #}
+        {% set app_id = 'EventLikeBtn_'~random() %}
+
+        <div id="{{ app_id }}">
+            <button class="btn btn-block btn-outline-primary text-nowrap" @click="favorEvent()" v-bind:title="isFavored ? 'Aus Merkliste entfernen' : 'Zu Merkliste hinzufügen'">
+                <span v-if="!isFavored">
+                    <i class="fa-regular fa-lg fa-heart"></i>&nbsp;Zu Merkliste hinzufügen
+                </span>
+                <span v-if="isFavored">
+                    <i class="fa-solid fa-lg fa-heart text-danger"></i>&nbsp;Aus Merkliste entfernen
+                </span>
+            </button>
+        </div>
+
+        <script>
+            "use strict";
+
+            if (typeof VueEventLiker !== 'function') {
+
+                window.VueEventLiker = class {
+                    constructor(appId, eventId, isFavored, csrfToken) {
+
+                        const {createApp} = Vue
+
+                        // Instantiate vue.js application
+                        const app = createApp({
+                            data() {
+                                return {
+                                    // The element CSS ID
+                                    appId: appId,
+                                    eventId: eventId,
+                                    isFavored: isFavored,
+                                    csrfToken: csrfToken,
+                                };
+                            },
+
+                            mounted() {
+                                // Do nothing yet
+                                console.log('mounted');
+                            },
+
+                            methods: {
+
+                                favorEvent: function favorEvent() {
+                                    const formData = new FormData();
+                                    formData.append('REQUEST_TOKEN', this.csrfToken);
+
+                                    fetch('calendar_event/favor_event/' + this.eventId, {
+                                        method: 'POST',
+                                        body: formData,
+                                        headers: {
+                                            'x-requested-with': 'XMLHttpRequest',
+                                        },
+                                    }).then(response => {
+                                        if (response.ok) {
+                                            return response.json();
+                                        }
+                                    }).then(json => {
+                                        if (json['status'] === 'success') {
+                                            this.isFavored = json['isFavored'];
+                                        }
+                                    }).catch(error => {
+                                        console.error(error.message);
+                                    })
+                                },
+                            }
+                        });
+
+                        app.config.compilerOptions.delimiters = ['[[ ', ' ]]'];
+                        app.mount(appId);
+                    }
+                }
+            }
+
+            new VueEventLiker('#{{ app_id }}', {{ event_id }}, {{ is_favored ? 'true' : 'false' }}, '{{ get_csrf_token() }}');
+        </script>
+    {% endif %}
+{% endblock %}

@@ -59,6 +59,14 @@
                 });
             })();
 
+            // Re-initialize frontend login modal
+            await (() => {
+                return new Promise((resolve, reject) => {
+                    SacFrontendLoginModal.initialize();
+                    resolve('Re-initialize frontend login modal.');
+                });
+            })();
+
             // Use kind of a forward/backend cache (implemented with IndexedDB) to save already loaded items
             // And scroll to last position when returning to the event list from a detail page
             await (() => {
@@ -111,9 +119,9 @@
                                 });
 
                                 await db.eventStore
-                                .where("path")
-                                .equals(btoa(nextURL + '&modId=' + vue.modId))
-                                .delete()
+                                    .where("path")
+                                    .equals(btoa(nextURL + '&modId=' + vue.modId))
+                                    .delete()
                                 ;
 
                                 db.eventStore.put(

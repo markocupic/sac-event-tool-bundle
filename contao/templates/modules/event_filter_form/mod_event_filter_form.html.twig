@@ -11,7 +11,7 @@
                 {# start row #}
                 <div class="row">
                     {% for field in fields %}
-                        {% if field != 'suitableForBeginners' and field != 'publicTransportEvent'%}
+                        {% if field != 'suitableForBeginners' and field != 'publicTransportEvent' and field != 'favoredEvent' %}
                             {% if form.hasFormField(field) %}
                                 <!-- start widget {{ field }} -->
                                 <div class="filter-board-widget col-6 col-sm-4" id="{{ field }}">
@@ -31,6 +31,12 @@
                     {% if form.hasFormField('publicTransportEvent') %}
                         <div class="filter-board-widget col-6 col-sm-4" id="publicTransportEvent">
                             {{ form.getWidget('publicTransportEvent').parse()|raw }}
+                        </div>
+                    {% endif %}
+
+                    {% if has_logged_in_frontend_user() and form.hasFormField('favoredEvent') %}
+                        <div class="filter-board-widget col-6 col-sm-4" id="favoredEvent">
+                            {{ form.getWidget('favoredEvent').parse()|raw }}
                         </div>
                     {% endif %}
                 </div>

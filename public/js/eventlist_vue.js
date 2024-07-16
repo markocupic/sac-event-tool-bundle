@@ -1,6 +1,6 @@
 "use strict";
 
-if (typeof VueTourList !== 'function') {
+if (typeof VueEventList !== 'function') {
 
 	/*
 	 * This file is part of SAC Event Tool Bundle.
@@ -11,16 +11,18 @@ if (typeof VueTourList !== 'function') {
 	 * please view the LICENSE file that was distributed with this source code.
 	 * @link https://github.com/markocupic/sac-event-tool-bundle
 	 */
-	window.VueTourList = class {
+	window.VueEventList = class {
 		constructor(elId, opt) {
 			// Defaults
 			const defaults = {
 				'modId': null,
+				'csrfToken': null,
 				'apiParams': {
 					'organizers': [],
 					'eventType': ["tour", "generalEvent", "lastMinuteTour", "course"],
 					'suitableForBeginners': '',
 					'publicTransportEvent': '',
+					'favoredEvent': '',
 					'tourType': '',
 					'courseType': '',
 					'courseId': '',
@@ -39,6 +41,10 @@ if (typeof VueTourList !== 'function') {
 
 			// Merge options and defaults
 			const params = {...defaults, ...opt}
+
+			if (null === params.csrfToken) {
+				console.error('No CSRF token has been set.');
+			}
 
 			const {createApp} = Vue
 
@@ -82,6 +88,33 @@ if (typeof VueTourList !== 'function') {
 						}
 					},
 
+					favorEvent: function favorEvent(index) {
+						const affectedRow = this.rows[index];
+						const eventId = affectedRow.id;
+
+						const formData = new FormData();
+						formData.append('eventId', eventId);
+						formData.append('REQUEST_TOKEN', params.csrfToken);
+
+						fetch(window.location.href, {
+							method: 'POST',
+							body: formData,
+							headers: {
+								'x-requested-with': 'XMLHttpRequest',
+							},
+						}).then(response => {
+							if (response.ok) {
+								return response.json();
+							}
+						}).then(json => {
+							if (json['status'] === 'success') {
+								this.rows[index]['isFavoredEvent'] = json['isFavoredEvent'];
+							}
+						}).catch(error => {
+							console.error(error.message);
+						})
+					},
+
 					getTake: function getTake() {
 						const self = this;
 						const urlString = window.location.href;
@@ -103,8 +136,8 @@ if (typeof VueTourList !== 'function') {
 
 						// Delete expired data
 						await db.eventStore.where("expires")
-						.below(Math.round(+new Date() / 1000))
-						.delete()
+							.below(Math.round(+new Date() / 1000))
+							.delete()
 						;
 
 						const eventStoreData = await db.eventStore

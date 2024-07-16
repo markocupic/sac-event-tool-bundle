@@ -17,12 +17,14 @@ use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\PurgeEventFavoritesLinkController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
 
 // Content elements
 $GLOBALS['TL_LANG']['CTE'][UserPortraitController::TYPE] = ['SAC-User-Portrait'];
 $GLOBALS['TL_LANG']['CTE'][UserPortraitListController::TYPE] = ['SAC-User-Portrait-Liste'];
+$GLOBALS['TL_LANG']['CTE'][PurgeEventFavoritesLinkController::TYPE] = ['Vorgemerkte Events löschen Link'];
 
 // Override defaults
 $request = System::getContainer()->get('request_stack')->getCurrentRequest();
@@ -205,6 +207,7 @@ $GLOBALS['TL_LANG']['ERR']['invalidNumberOfPrivateArrivals'] = 'Die Zahl der pri
 // Miscellaneous
 $GLOBALS['TL_LANG']['MSC']['published'] = 'veröffentlicht';
 $GLOBALS['TL_LANG']['MSC']['unpublished'] = 'unveröffentlicht';
+$GLOBALS['TL_LANG']['MSC']['purgeEventFavorites'] = 'Vorgemerkte Events löschen';
 
 // Meta wizard
 $GLOBALS['TL_LANG']['MSC']['aw_photographer'] = 'Photograph';

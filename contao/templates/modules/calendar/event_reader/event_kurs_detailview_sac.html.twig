@@ -1,3 +1,5 @@
+{% use "@Contao_MarkocupicSacEventToolBundle/component/_favor_event_button.html.twig" %}
+
 {# Get the event model #}
 {% set model = get_event_by_pk(id) %}
 
@@ -154,28 +156,37 @@
                     {% endif %}
 
                     {# button bar #}
-                    <div class="d-flex flex-wrap">
-                        <div class="me-2 mt-3 mb-3">
-                            <a href="{{ path('sac_event_tool_download_event_ical', {'eventId': get_event_data(model, 'id')}) }}" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary">
-                                <i class="fa-light fa-calendar-plus"></i> iCal
-                            </a>
+                    <div class="overflow-hidden">
+                        <div class="overflow-x-scroll">
+                            <nav class="d-inline-flex flex-nowrap">
+                                {# Display the event subscribe button #}
+                                {% if not get_event_data(model, 'disableOnlineRegistration') %}
+                                    <div class="me-2 mt-3 mb-3">
+                                        {{ insert_tag('insert_module::408')|raw }}
+                                    </div>
+                                {% endif %}
+                                {# Display the like button for the current event #}
+                                {% if has_logged_in_frontend_user() %}
+                                    <div class="d-inline me-2 mt-3 mb-3">
+                                        {% with {event_id: get_event_data(model, 'id'), is_favored: get_event_data(model, 'isFavoredEvent') } %}{{ block('favor_event_button_componenent') }}{% endwith %}
+                                    </div>
+                                {% endif %}
+                                {# Display the download iCal button for the current event #}
+                                <div class="d-inline me-2 mt-3 mb-3">
+                                    <a href="{{ path('sac_event_tool_download_event_ical', {'eventId': get_event_data(model, 'id')}) }}" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary text-nowrap">
+                                        <i class="fa-light fa-calendar-plus"></i>&nbsp;iCal
+                                    </a>
+                                </div>
+                                {# Display the download details as PDF button for the current event #}
+                                <div class="d-inline me-2 mt-3 mb-3">
+                                    <a href="{{ path('sac_event_tool_download_print_workshop_details_as_pdf', {'eventId': get_event_data(model, 'id')}) }}" title="Details drucken" class="btn btn-block btn-outline-primary text-nowrap">
+                                        <i class="fa-light fa-print"></i>&nbsp;Detailinfos
+                                    </a>
+                                </div>
+                            </nav>
+                            {# end button bar #}
                         </div>
-
-                        <div class="me-2 mt-3 mb-3">
-                            <a href="{{ path('sac_event_tool_download_print_workshop_details_as_pdf', {'eventId': get_event_data(model, 'id')}) }}" title="Details drucken" class="btn btn-block btn-outline-primary">
-                                <i class="fa-light fa-print"></i> Detailinfos
-                            </a>
-                        </div>
-
-                        {% if not get_event_data(model, 'disableOnlineRegistration') %}
-                            <div class="me-2 mt-3 mb-3">
-                                {# book event button #}
-                                {{ insert_tag('insert_module::408')|raw }}
-                            </div>
-                        {% endif %}
-
                     </div>
-                    {# end button bar #}
                 </div>
             </div>
             {# End Anmeldung #}

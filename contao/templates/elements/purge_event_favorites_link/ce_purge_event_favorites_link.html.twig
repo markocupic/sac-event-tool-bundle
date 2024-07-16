@@ -1,0 +1,43 @@
+{% trans_default_domain 'contao_default' %}
+{% extends '@Contao/block_searchable' %}
+
+{% block content %}
+    <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-sm btn-danger"{% if link|default %} onclick="PurgeFavorites.purge(this)"{% endif %}>{{ 'MSC.purgeEventFavorites'|trans([]) }}</button>
+    </div>
+
+    {% if user|default %}
+        <div class="toast-container position-fixed top-0 start-0 p-3">
+            <div id="purgeFavoritesToast_{{ id }}" class="toast bg-white" role="alert" data-bs-delay="10000" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <i class="fa-solid fa-comment me-1 text-primary"></i>
+                    <strong class="me-auto">Hallo {{ user.firstname }}</strong>
+                    <small>vor 2s</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    <small>Deine Event-Merkliste wurde soeben erfolgreich gelöscht.</small>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if link|default %}
+        <script>
+            if (typeof PurgeFavorites !== 'object') {
+                window.PurgeFavorites = {
+                    purge: async function () {
+                        const response = await fetch('{{ link|raw }}');
+                        if (response.ok) {
+                            const purgeFavoritesToast = document.getElementById('purgeFavoritesToast_{{ id }}');
+                            if (purgeFavoritesToast) {
+                                const toast = new bootstrap.Toast(purgeFavoritesToast);
+                                toast.show()
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+    {% endif %}
+{% endblock %}

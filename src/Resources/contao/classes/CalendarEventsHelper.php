@@ -37,6 +37,7 @@ use Contao\System;
 use Contao\Template;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
@@ -52,6 +53,7 @@ use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Markocupic\SacEventToolBundle\Model\TourTypeModel;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Path;
 
 class CalendarEventsHelper
@@ -330,6 +332,10 @@ class CalendarEventsHelper
                 $value = static::getPublicTransportBadge($objEvent);
                 break;
 
+            case 'isFavoredEvent':
+                $value = static::isFavoredEvent($objEvent);
+                break;
+
             case 'gallery':
                 $value = static::getGallery([
                     'multiSRC' => $objEvent->multiSRC,
@@ -582,9 +588,9 @@ class CalendarEventsHelper
                     continue;
                 }
 
-	            if (true === $blnShowPublishedOnly && ('' !== $objUser->start && $objUser->start > time())) {
-		            continue;
-	            }
+                if (true === $blnShowPublishedOnly && ('' !== $objUser->start && $objUser->start > time())) {
+                    continue;
+                }
 
                 $arrInstructors[] = $objUser->id;
             }
@@ -1292,5 +1298,26 @@ class CalendarEventsHelper
         }
 
         return $strLevel;
+    }
+
+    public static function isFavoredEvent(CalendarEventsModel $objEvent): bool
+    {
+        /** @var Security $security */
+        $security = System::getContainer()->get('security.helper');
+
+        $frontendUser = $security->getUser();
+
+        if (!$frontendUser instanceof FrontendUser) {
+            return false;
+        }
+
+        /** @var Connection $conn */
+        $conn = System::getContainer()->get('database_connection');
+
+        return false !== $conn->fetchOne(
+            'SELECT id FROM tl_favored_events WHERE eventId = ? AND memberId = ?',
+            [$objEvent->id, $frontendUser->id],
+            [Types::INTEGER, Types::INTEGER],
+        );
     }
 }

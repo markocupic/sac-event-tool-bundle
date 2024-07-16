@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\Controller\Api;
 
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\FrontendUser;
 use Contao\StringUtil;
 use Contao\Validator;
 use Doctrine\DBAL\ArrayParameterType;
@@ -25,6 +26,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -32,10 +34,11 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class EventApiController extends AbstractController
 {
-    public const CACHE_MAX_AGE = 300;
+    public const CACHE_MAX_AGE = 10;
 
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly Security $security,
         private readonly Connection $connection,
     ) {
     }
@@ -136,10 +139,14 @@ class EventApiController extends AbstractController
         $response = new JsonResponse($arrJSON, 200, ['Access-Control-Allow-Origin' => '*']);
 
         // Enable cache
-        $response->setPublic();
-        $response->setSharedMaxAge(self::CACHE_MAX_AGE);
-        $response->setPrivate();
-        $response->setMaxAge(self::CACHE_MAX_AGE - 10);
+        $user = $this->security->getUser();
+
+        if (!$user instanceof FrontendUser) {
+            //$response->setPublic();
+            //$response->setSharedMaxAge(self::CACHE_MAX_AGE);
+            //$response->setPrivate();
+            //$response->setMaxAge(self::CACHE_MAX_AGE - 10);
+        }
 
         return $response;
     }
@@ -213,6 +220,7 @@ class EventApiController extends AbstractController
             'username' => $request->get('username'),
             'suitableForBeginners' => $request->get('suitableForBeginners') ? '1' : '',
             'publicTransportEvent' => $request->get('publicTransportEvent') ? '1' : '',
+            'favoredEvent' => $request->get('favoredEvent') ? '1' : '',
         ];
     }
 
@@ -266,10 +274,10 @@ class EventApiController extends AbstractController
             $qb->setParameter('arrIds', $params['arrIds'], ArrayParameterType::INTEGER);
         }
 
-        // Filter by event types "tour","course","generalEvent","lastMinuteTour"
+        // Filter by event types
         if (!empty($params['eventType'])) {
             $qb->andWhere($qb->expr()->in('t.eventType', ':eventType'));
-            $qb->setParameter('eventType', $params['eventType'], ArrayParameterType::INTEGER);
+            $qb->setParameter('eventType', $params['eventType'], ArrayParameterType::STRING);
         }
 
         // Filter by suitableForBeginners
@@ -316,6 +324,22 @@ class EventApiController extends AbstractController
 
             $qb->andWhere($qb->expr()->in('t.id', ':arrEvents'));
             $qb->setParameter('arrEvents', $arrEvents, ArrayParameterType::INTEGER);
+        }
+
+        // Show favored events only
+        if ('1' === $params['favoredEvent']) {
+            $user = $this->security->getUser();
+
+            if ($user instanceof FrontendUser) {
+                $arrFavoredEventsIds = $this->connection->fetchFirstColumn(
+                    'SELECT eventId FROM tl_favored_events WHERE memberId = ?',
+                    [$user->id],
+                    [Types::INTEGER],
+                );
+
+                $qb->andWhere($qb->expr()->in('t.id', ':arrFavoredEvents'));
+                $qb->setParameter('arrFavoredEvents', $arrFavoredEventsIds, ArrayParameterType::INTEGER);
+            }
         }
 
         // Search term (search for expression in tl_calendar_events.title and tl_calendar_events.teaser

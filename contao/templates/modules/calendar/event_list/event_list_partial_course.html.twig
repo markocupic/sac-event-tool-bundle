@@ -7,7 +7,7 @@
     <span v-if="blnIsBusy === true" class="ms-2 text-success"><small>Lade events...</small></span>
     <div class="event-container row g-3">
 
-        <div v-for="(row, index) of rows" class="col-xs-12 col-md-6 event-item event-item-course event layout_upcoming" data-aos="fade-down" data-aos-duration="600" data-aos-once="true" data-aos-anchor-placement="top-bottom" v-bind:data-selector="row.selector" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
+        <div v-for="(row, index) of rows" class="col-12 col-md-6 event-item event-item-course event layout_upcoming" data-aos="fade-down" data-aos-duration="600" data-aos-once="true" data-aos-anchor-placement="top-bottom" v-bind:data-selector="row.selector" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
             <div class="course-list-inner-box bg-white">
                 <div class="row gx-0">
                     <!-- Start left col -->
@@ -19,13 +19,34 @@
                     <!-- Start right col -->
                     <div class="col-12 col-xl-7 position-relative">
                         <div class="p-3">
-                            <div class="title">
-                                <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link lh-base">
-                                    <h4 class="d-flex headline m-0 p-0 lh-base">
-                                        <strong>[[ row.title ]]</strong>
-                                    </h4>
-                                </a>
+                            <div class="d-flex">
+                                <div class="title-col-1 flex-grow-1">
+                                    <div class="title">
+                                        <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link lh-base">
+                                            <h4 class="d-flex headline m-0 p-0 lh-base">
+                                                <strong>[[ row.title ]]</strong>
+                                            </h4>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="title-col-2 ms-2">
+                                    {% if not has_logged_in_frontend_user() %}
+                                        <button class="favor-event-btn p-0" data-sac-login-toggle="modal" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
+                                            <i class="fa-regular fa-heart"></i>
+                                        </button>
+                                    {% else %}
+                                        <button class="favor-event-btn p-0" @click="favorEvent(index)" v-bind:title="row.isFavoredEvent ? 'Aus Merkliste entfernen' : 'Zu Merkliste hinzufügen'">
+                                            <span v-if="!row.isFavoredEvent">
+                                                <i class="fa-regular fa-heart"></i>
+                                            </span>
+                                            <span v-if="row.isFavoredEvent">
+                                                <i class="fa-solid fa-heart text-danger"></i>
+                                            </span>
+                                        </button>
+                                    {% endif %}
+                                </div>
                             </div>
+
                             <div class="detail-item small mb-3">
                                 <strong><span class="small">[[ row.courseTypeLevel0Name ]]: [[ row.courseTypeLevel1Name ]]</span></strong>
                             </div>
@@ -84,24 +105,26 @@
 
 <!-- Set up the vue.js course list -->
 <script>
-    new VueTourList('#course-list', {
+    new VueEventList('#course-list', {
         'modId': {{ id }},
+        'csrfToken': '{{ csrfToken }}',
         'apiParams': {
-            'organizers': [{{ apiParam.organizers }}],
-            'eventType': ['{{ apiParam.eventType }}'],
-            'publicTransportEvent': '{{ apiParam.publicTransportEvent }}',
-            'tourType': '{{ apiParam.tourType }}',
-            'courseType': '{{ apiParam.courseType }}',
-            'courseId': '{{ apiParam.courseId }}',
-            'year': '{{ apiParam.year }}',
-            'dateStart': '{{ apiParam.dateStart }}',
-            'textSearch': '{{ apiParam.textSearch }}',
-            'eventId': '{{ apiParam.eventId }}',
             'arrIds': [{{ apiParam.arrIds }}],
-            'username': '{{ apiParam.username }}',
-            'calendarIds': [{{ apiParam.calendarIds }}],
+            'calendarIds': {{ apiParam.calendarIds }}, // json_encoded array [1, 2]
+            'courseId': '{{ apiParam.courseId }}',
+            'courseType': '{{ apiParam.courseType }}',
+            'dateStart': '{{ apiParam.dateStart }}',
+            'eventId': '{{ apiParam.eventId }}',
+            'eventType': {{ apiParam.eventType|raw }}, // json_encoded array ["tour", "generalEvent"]
+            'favoredEvent': '{{ apiParam.favoredEvent }}',
             'limit': '{{ apiParam.limit }}',
             'offset': '0',
+            'organizers': {{ apiParam.organizers }}, // json_encoded array [1, 2]
+            'publicTransportEvent': '{{ apiParam.publicTransportEvent }}',
+            'textSearch': '{{ apiParam.textSearch }}',
+            'tourType': '{{ apiParam.tourType }}',
+            'username': '{{ apiParam.username }}',
+            'year': '{{ apiParam.year }}',
         },
         'fields': [
             'id',
@@ -122,6 +145,7 @@
             'eventOrganizerLogos||50',
             'courseLevelName',
             'eventDuration',
+            'isFavoredEvent',
         ],
     });
 </script>

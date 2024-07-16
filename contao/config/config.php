@@ -28,6 +28,7 @@ use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyPackageModel;
 use Markocupic\SacEventToolBundle\Model\EventTypeModel;
+use Markocupic\SacEventToolBundle\Model\FavoredEventsModel;
 use Markocupic\SacEventToolBundle\Model\SacSectionModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
@@ -98,6 +99,7 @@ $GLOBALS['TL_MODELS'][EventOrganizerModel::getTable()] = EventOrganizerModel::cl
 $GLOBALS['TL_MODELS'][EventReleaseLevelPolicyModel::getTable()] = EventReleaseLevelPolicyModel::class;
 $GLOBALS['TL_MODELS'][EventReleaseLevelPolicyPackageModel::getTable()] = EventReleaseLevelPolicyPackageModel::class;
 $GLOBALS['TL_MODELS'][EventTypeModel::getTable()] = EventTypeModel::class;
+$GLOBALS['TL_MODELS'][FavoredEventsModel::getTable()] = FavoredEventsModel::class;
 $GLOBALS['TL_MODELS'][SacSectionModel::getTable()] = SacSectionModel::class;
 $GLOBALS['TL_MODELS'][TourDifficultyCategoryModel::getTable()] = TourDifficultyCategoryModel::class;
 $GLOBALS['TL_MODELS'][TourDifficultyModel::getTable()] = TourDifficultyModel::class;
