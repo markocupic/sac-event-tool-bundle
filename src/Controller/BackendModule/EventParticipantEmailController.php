@@ -237,7 +237,6 @@ class EventParticipantEmailController extends AbstractBackendController
                 $msg = $this->translator->trans('MSC.evt_epe_emailSentToEventMembers', [], 'contao_default');
                 $this->message->addInfo($msg);
 
-                $this->clearTemporaryCreatedAttachments();
                 $this->clearSessionBag();
 
                 // All ok! Redirect the user back to the event member list.
@@ -339,9 +338,11 @@ class EventParticipantEmailController extends AbstractBackendController
             $blnSend = false;
         } finally {
             // In any case, delete the temporarily created files.
-            foreach ($arrOrigFilenamePaths as $path) {
-                $fs->remove($path);
-            }
+            //foreach ($arrOrigFilenamePaths as $path) {
+                // $fs->remove($path);
+                // Because Symfony mailer works via messenger,
+                // the files will already been deleted, when Symfony mailer starts sending the email.
+            //}
         }
 
         return $blnSend;
@@ -601,19 +602,5 @@ class EventParticipantEmailController extends AbstractBackendController
         $bagAll = array_values($bagAll);
 
         $session->set(self::SESSION_BAG_KEY, $bagAll);
-    }
-
-    private function clearTemporaryCreatedAttachments(): void
-    {
-        $bag = $this->getSessionBag();
-        $files = $bag['attachments'] ?? [];
-
-        $fs = new Filesystem();
-
-        foreach ($files as $file) {
-            if (is_dir(\dirname($file['temp_storage_path']))) {
-                $fs->remove(\dirname($file['temp_storage_path']));
-            }
-        }
     }
 }
