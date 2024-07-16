@@ -1,7 +1,7 @@
 {% block favor_event_button_componenent %}
     {% if not has_logged_in_frontend_user() %}
         {# Trigger the login modal window for not logged in users #}
-        <button class="btn btn-block text-nowrap" data-sac-login-toggle="modal" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
+        <button class="btn btn-block btn-outline-primary text-nowrap" data-sac-login-toggle="modal" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
             <i class="fa-regular fa-lg fa-heart"></i>&nbsp;Zu Merkliste hinzufügen
         </button>
     {% else %}
