@@ -33,9 +33,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EventFilterFormController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_filter_form';
-
-    private array|null $arrAllowedFields = null;
-    private PageModel|null $objPage = null;
+    public const DATE_FORMAT = 'Y-m-d';
 
     public function __construct(
         private readonly ContaoFramework $framework,
@@ -47,8 +45,6 @@ class EventFilterFormController extends AbstractFrontendModuleController
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        $this->objPage = $page;
-
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
     }
@@ -64,38 +60,44 @@ class EventFilterFormController extends AbstractFrontendModuleController
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        $this->arrAllowedFields = $stringUtilAdapter->deserialize($model->eventFilterBoardFields, true);
+        // Clean the url query from an invalid param "dateStart" and reload the page
+        if ($request->query->has('dateStart')) {
+            if (!$this->validateDate($request->query->get('dateStart'), self::DATE_FORMAT)) {
+                $url = $this->urlParser->removeQueryString(['dateStart']);
+                // Reload the page with the fixed url
+                $controllerAdapter->redirect($url);
+            }
 
-        if ($environmentAdapter->get('isAjaxRequest')) {
-            // Clean the url query from the param "dateStart" and redirect
-            if ($request->query->get('year') > 0 && $request->query->has('dateStart')) {
+            if ($request->query->get('year') > 0) {
                 if ($request->query->get('year') !== date('Y', strtotime($request->query->get('dateStart')))) {
                     $url = $this->urlParser->removeQueryString(['dateStart']);
+                    // Reload the page with the fixed url
                     $controllerAdapter->redirect($url);
                 }
             }
 
-            // Clean the url query from the param "dateStart" and redirect
-            if (!$request->query->has('year') && $request->query->has('dateStart')) {
+            if (!$request->query->has('year')) {
                 if (date('Y') !== date('Y', strtotime($request->query->get('dateStart')))) {
                     $url = $this->urlParser->removeQueryString(['dateStart']);
+                    // Reload the page with the fixed url
                     $controllerAdapter->redirect($url);
                 }
             }
         }
 
-        $template->set('fields', $this->arrAllowedFields);
+        $arrAllowedFields = $stringUtilAdapter->deserialize($model->eventFilterBoardFields, true);
 
-        // Get the form
-        $template->set('form', $this->generateForm($request));
+        $template->set('fields', $arrAllowedFields);
+        $template->set('form', $this->generateForm($request, $arrAllowedFields));
 
-        // Datepicker
+        // Datepicker config
         $template->set('sacevt_locale', $this->sacevtLocale);
+        $template->set('date_format', self::DATE_FORMAT);
 
         return $template->getResponse();
     }
 
-    protected function generateForm(Request $request): Form
+    protected function generateForm(Request $request, array $arrAllowedFields): Form
     {
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
@@ -112,19 +114,20 @@ class EventFilterFormController extends AbstractFrontendModuleController
         );
 
         // Set the action attribute
-        $url = $this->objPage->getFrontendUrl();
+        $objPage = $request->attributes->get('pageModel');
+        $url = $objPage->getFrontendUrl();
         $objForm->setAction($url);
 
         $objForm->addFieldsFromDca(
             'tl_event_filter_form',
-            function ($strField, $arrDca) {
+            static function ($strField, $arrDca) use ($arrAllowedFields) {
                 // Make sure to skip elements without an input type
                 // otherwise we will run into an exception
                 if (!isset($arrDca['inputType'])) {
                     return false;
                 }
 
-                if (!\in_array($strField, $this->arrAllowedFields, true)) {
+                if (!\in_array($strField, $arrAllowedFields, true)) {
                     return false;
                 }
 
@@ -141,8 +144,8 @@ class EventFilterFormController extends AbstractFrontendModuleController
         ]);
 
         // Set form field value from $_GET
-        if (!empty($this->arrAllowedFields) && \is_array($this->arrAllowedFields)) {
-            foreach ($this->arrAllowedFields as $k) {
+        if (!empty($arrAllowedFields) && \is_array($arrAllowedFields)) {
+            foreach ($arrAllowedFields as $k) {
                 if ($request->query->has($k)) {
                     if ($objForm->hasFormField($k)) {
                         $objWidget = $objForm->getWidget($k);
@@ -186,5 +189,12 @@ class EventFilterFormController extends AbstractFrontendModuleController
         }
 
         return $objForm;
+    }
+
+    protected function validateDate(string $date, string $format = 'Y-m-d')
+    {
+        $objDate = \DateTime::createFromFormat($format, $date);
+
+        return $objDate && $objDate->format($format) === $date;
     }
 }

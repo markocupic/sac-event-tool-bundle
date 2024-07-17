@@ -1,4 +1,4 @@
-{% do addJavascriptResource(sacevt_asset_dir()~'/js/eventfilter.js|static') %}
+{% do addJavascriptResource(sacevt_asset_dir()~'/js/eventfilter.min.js|static') %}
 
 {% extends '@Contao/block_unsearchable' %}
 
@@ -60,6 +60,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             let options = {
                 'locale': '{{ sacevt_locale }}',
+                'dateFormat': '{{ date_format }}',
             }
 
             EventFilter.initialize(options);
