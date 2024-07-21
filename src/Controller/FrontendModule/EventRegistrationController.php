@@ -49,6 +49,7 @@ use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -96,6 +97,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
         private readonly TwigEnvironment $twig,
+        #[Autowire('%sacevt.event_registration.config.reg_start_time_offset%')]
+        private readonly int $regStartTimeOffset,
         private readonly UrlParser $urlParser,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
@@ -252,9 +255,9 @@ class EventRegistrationController extends AbstractFrontendModuleController
         } elseif (EventState::STATE_RESCHEDULED === $this->eventModel->eventState) {
             // Check if the event has been marked as "deferred".
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventDeferred', [], 'contao_default'));
-        } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationStartDate > time()) {
+        } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationStartDate + $this->regStartTimeOffset > time()) {
             // Check if registration is already allowed at this time.
-            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_registrationPossibleOn', [$this->eventModel->title, date('d.m.Y H:i', (int) $this->eventModel->registrationStartDate)], 'contao_default'));
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_registrationPossibleOn', [$this->eventModel->title, date('d.m.Y H:i', (int) $this->eventModel->registrationStartDate + $this->regStartTimeOffset)], 'contao_default'));
         } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationEndDate < time()) {
             // Check if registration is still allowed at this time.
             $strDate = date('d.m.Y', (int) $this->eventModel->registrationEndDate);

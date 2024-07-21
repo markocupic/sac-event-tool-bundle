@@ -134,7 +134,7 @@
                 {% if get_event_data(model, 'setRegistrationPeriod') %}
                     <div class="booking-time-span event-detail event-info-box icon-box-small">
                         <h5>Anmeldung möglich</h5>
-                        <p>Vom {{ get_event_data(model, 'registrationStartDateFormatted') }} bis zum {{ get_event_data(model, 'registrationEndDateFormatted') }}</p>
+                        <p>Vom {{ get_event_data(model, 'registrationStartTimeWithOffsetFormatted') }} bis zum {{ get_event_data(model, 'registrationEndDateFormatted') }}</p>
                     </div>
                 {% endif %}
 

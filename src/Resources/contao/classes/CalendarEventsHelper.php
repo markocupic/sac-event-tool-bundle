@@ -150,8 +150,14 @@ class CalendarEventsHelper
                 $value = static::getEventDuration($objEvent);
                 break;
 
-            case 'registrationStartDateFormatted':
-                $value = Date::parse(Config::get('dateFormat'), $objEvent->registrationStartDate);
+            case 'registrationStartDateWithOffsetFormatted':
+                $regStartTime = $objEvent->registrationStartDate + System::getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
+                $value = Date::parse(Config::get('dateFormat'), $regStartTime);
+                break;
+
+            case 'registrationStartTimeWithOffsetFormatted':
+                $regStartTime = $objEvent->registrationStartDate + System::getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
+                $value = Date::parse(Config::get('datimFormat'), $regStartTime);
                 break;
 
             case 'registrationEndDateFormatted':
@@ -484,7 +490,9 @@ class CalendarEventsHelper
         }
 
         // Booking not possible yet
-        if ($objEvent->setRegistrationPeriod && $objEvent->registrationStartDate > time()) {
+        $regStartTime = $objEvent->registrationStartDate + System::getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
+
+        if ($objEvent->setRegistrationPeriod && $regStartTime > time()) {
             return 'event_status_5';
         }
 
@@ -754,7 +762,9 @@ class CalendarEventsHelper
             $dateFormatEnd = Config::get('dateFormat');
         }
 
-        return Date::parse($dateFormatStart, $objEvent->registrationStartDate).' - '.Date::parse($dateFormatEnd, $objEvent->registrationEndDate);
+        $regStartTime = $objEvent->registrationStartDate + System::getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
+
+        return Date::parse($dateFormatStart, $regStartTime).' - '.Date::parse($dateFormatEnd, $objEvent->registrationEndDate);
     }
 
     public static function getEventTimestamps(CalendarEventsModel $objEvent): array

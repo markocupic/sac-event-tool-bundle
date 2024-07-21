@@ -22,6 +22,7 @@ use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
@@ -55,6 +56,8 @@ class CalendarEventsVoter extends Voter
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly Security $security,
+        #[Autowire('%sacevt.event_registration.config.reg_start_time_offset%')]
+        private readonly int $regStartTimeOffset,
     ) {
         // Adapters
         $this->calendarEvent = $this->framework->getAdapter(CalendarEventsModel::class);
@@ -426,7 +429,9 @@ class CalendarEventsVoter extends Voter
             return true;
         }
 
-        if ($this->event->setRegistrationPeriod && $this->event->registrationStartDate > time()) {
+        $regStartTime = $this->event->registrationStartDate + $this->regStartTimeOffset;
+
+        if ($this->event->setRegistrationPeriod && $regStartTime > time()) {
             return false;
         }
 

@@ -181,6 +181,10 @@ class Configuration implements ConfigurationInterface
                                     ->prototype('scalar')->end()
                                     ->defaultValue(['Nichts', 'GA', 'Halbtax-Abo'])
                                 ->end()
+                                ->integerNode('reg_start_time_offset')
+                                    ->info('Number of seconds to be added to tl_calendar_events-registrationStartTime to calculate the exact time from which registrations should be possible.')
+                                    ->defaultValue(6 * 60 * 60) // 6h
+                                ->end()
                             ->end()
                         ->end()
                     ->end()

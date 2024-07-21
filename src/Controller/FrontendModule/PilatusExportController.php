@@ -38,6 +38,7 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -68,6 +69,8 @@ class PilatusExportController extends AbstractPrintExportController
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly InsertTagParser $insertTagParser,
+        #[Autowire('%sacevt.event_registration.config.reg_start_time_offset%')]
+        private readonly int $regStartTimeOffset,
     ) {
         parent::__construct($this->framework);
     }
@@ -609,11 +612,13 @@ class PilatusExportController extends AbstractPrintExportController
             $endDate = $dateAdapter->parse('j.m.Y', $objEvent->registrationEndDate);
 
             if (abs($objEvent->registrationEndDate - strtotime($endDate)) === (24 * 3600) - 60) {
-                $formatedEndDate = $dateAdapter->parse('j.m.Y', $objEvent->registrationEndDate);
+                $formattedEndDate = $dateAdapter->parse('j.m.Y', $objEvent->registrationEndDate);
             } else {
-                $formatedEndDate = $dateAdapter->parse('j.m.Y H:i', $objEvent->registrationEndDate);
+                $formattedEndDate = $dateAdapter->parse('j.m.Y H:i', $objEvent->registrationEndDate);
             }
-            $arrRow['registrationPeriod'] = $dateAdapter->parse('j.m.Y', $objEvent->registrationStartDate).' bis '.$formatedEndDate;
+
+            $regStartTime = $objEvent->registrationStartDate + $this->regStartTimeOffset;
+            $arrRow['registrationPeriod'] = $dateAdapter->parse('j.m.Y', $regStartTime).' bis '.$formattedEndDate;
         }
 
         // MinMaxMembers
