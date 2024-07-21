@@ -130,7 +130,7 @@
                 'arrIds': [{{ apiParam.arrIds }}],
                 'calendarIds': {{ apiParam.calendarIds }}, //json_encoded array [1, 2]
                 'courseId': '{{ apiParam.courseId }}',
-                'courseType': '{{ apiParam.courseType }}',
+                'courseType': {{ apiParam.courseType }}, // json_encoded array [1, 2]
                 'dateStart': '{{ apiParam.dateStart }}',
                 'eventId': '{{ apiParam.eventId }}',
                 'eventType': {{ apiParam.eventType|raw }}, // json_encoded array ["tour", "generalEvent"]
@@ -141,7 +141,7 @@
                 'publicTransportEvent': '{{ apiParam.publicTransportEvent }}',
                 'suitableForBeginners': '{{ apiParam.suitableForBeginners }}',
                 'textSearch': '{{ apiParam.textSearch }}',
-                'tourType': '{{ apiParam.tourType }}',
+                'tourType': {{ apiParam.tourType }}, // json_encoded array [1, 2]
                 'username': '{{ apiParam.username }}',
                 'year': '{{ apiParam.year }}',
             },

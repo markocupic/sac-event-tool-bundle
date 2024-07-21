@@ -1,5 +1,3 @@
-{% do addJavascriptResource(sacevt_asset_dir()~'/js/eventfilter.min.js|static') %}
-
 {% extends '@Contao/block_unsearchable' %}
 
 {% block content %}
@@ -45,8 +43,10 @@
                     return;
                 }
 
-                if (e.detail.url) {
-                    let button = document.getElementById('{{ button_id }}');
+                let button = document.getElementById('{{ button_id }}');
+
+                if (button && e.detail.url) {
+
                     button.dataset.url = btoa(e.detail.url);
                     button.addEventListener("click", async (e) => {
 

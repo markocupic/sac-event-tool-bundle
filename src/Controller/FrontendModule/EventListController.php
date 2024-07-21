@@ -142,6 +142,8 @@ class EventListController extends AbstractFrontendModuleController
 
         switch ($strKey) {
             case 'organizers':
+            case 'tourType':
+            case 'courseType':
                 if (!empty($value)) {
                     if (!\is_array($value)) {
                         // It can be transmitted like this: organizers=5,7 or organizers[]=5&amp;organizers[]=7

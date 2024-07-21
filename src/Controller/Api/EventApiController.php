@@ -202,14 +202,14 @@ class EventApiController extends AbstractController
             // Arrays
             'organizers' => $request->get('organizers'),
             'eventType' => $request->get('eventType'),
+            'tourType' => $request->get('tourType'),
+            'courseType' => $request->get('courseType'),
             'calendarIds' => $request->get('calendarIds'),
             'fields' => $request->get('fields'),
             'arrIds' => $request->get('arrIds'),
             // Integers
             'offset' => empty($request->get('offset')) ? 0 : (int) $request->get('offset'),
             'limit' => empty($request->get('limit')) ? 0 : (int) $request->get('limit'),
-            'tourType' => (int) $request->get('tourType'),
-            'courseType' => (int) $request->get('courseType'),
             'year' => (int) $request->get('year'),
             // Strings
             'courseId' => $request->get('courseId'),
@@ -386,7 +386,7 @@ class EventApiController extends AbstractController
             }
         }
 
-        // Filter by organizers
+        // Filter by organizers (multiselect)
         if (!empty($params['organizers']) && \is_array($params['organizers'])) {
             $qbEvtOrg = $connection->createQueryBuilder();
             $qbEvtOrg->select('id')
@@ -418,15 +418,25 @@ class EventApiController extends AbstractController
             }
         }
 
-        // Filter by tour type
-        if (!empty($params['tourType']) && $params['tourType'] > 0) {
-            $qb->andWhere($qb->expr()->like('t.tourType', $qb->expr()->literal('%:"'.$params['tourType'].'";%')));
+        // Filter by tourType (multiselect)
+        if (!empty($params['tourType']) && \is_array($params['tourType'])) {
+            $arrOrExpr = [];
+
+            // Show event if its organizer is in the search param
+            foreach ($params['tourType'] as $tourTypeId) {
+                $arrOrExpr[] = $qb->expr()->like('t.tourType', $qb->expr()->literal('%:"'.$tourTypeId.'";%'));
+            }
+
+            if (!empty($arrOrExpr)) {
+                $qb->andWhere($qb->expr()->or(...$arrOrExpr));
+            }
         }
 
-        // Filter by course type
-        if (!empty($params['courseType']) && $params['courseType'] > 0) {
-            $qb->andWhere('t.courseTypeLevel1 = :courseType');
-            $qb->setParameter('courseType', $params['courseType'], Types::INTEGER);
+        // Filter by course type (multiselect)
+        if (!empty($params['courseType']) && \is_array($params['courseType'])) {
+            $arrIds = $params['courseType'];
+            $qb->andWhere($qb->expr()->in('t.courseTypeLevel1', ':ids'));
+            $qb->setParameter('ids', $arrIds, ArrayParameterType::INTEGER);
         }
 
         // Filter by course id

@@ -24,7 +24,22 @@ var EventFilter = {
 		self.options = opt;
 
 		// Initialize Select2 for organizer input
-		$('#ctrl_organizers').select2();
+		if (document.getElementById('ctrl_organizers')) {
+			$('#ctrl_organizers').select2();
+		}
+
+		// Initialize Select2 for tourType input
+		if (document.getElementById('ctrl_tourType')) {
+			$('#ctrl_tourType').select2();
+		}
+
+		// Initialize Select2 for courseType input
+		if (document.getElementById('ctrl_courseType')) {
+			$('#ctrl_courseType').select2();
+		}
+
+		$('#ctrl_tourType').select2();
+		$('#ctrl_courseType').select2();
 
 		if ($('#ctrl_year')) {
 			window.setInterval(() => {

@@ -145,25 +145,26 @@ class EventFilterFormController extends AbstractFrontendModuleController
                 if ($request->query->has($k)) {
                     if ($objForm->hasFormField($k)) {
                         $objWidget = $objForm->getWidget($k);
-
-                        if ('organizers' === $objWidget->name) {
+                        $arrMultiSelects = ['organizers', 'tourType', 'courseType'];
+                        // Multi selects
+                        if (\in_array($k, $arrMultiSelects, true)) {
                             // As of Symfony 6, non-scalar values are no longer supported
-                            // we must use $request->query->all()['organizers']
-                            $organizers = $request->query->all()['organizers'] ?? [];
+                            // we must use $request->query->all()[$k]
+                            $value = $request->query->all()[$k] ?? [];
 
-                            // The organizers GET param can be transmitted like this:
+                            // e.g the organizers GET param can be transmitted like this:
                             // organizers=5 or organizers[]=5&organizers[]=6 or organizers=5,6
-                            if (\is_scalar($organizers)) {
-                                $organizers = [$organizers];
-                            } elseif (!empty($organizers) && str_contains($organizers, ',')) {
-                                $organizers = explode(',', $organizers);
-                            } elseif (\is_array($organizers)) {
+                            if (\is_scalar($value)) {
+                                $value = [$value];
+                            } elseif (\is_array($value)) {
                                 // Do nothing if the value is an array
+                            } elseif (\is_string($value) && !empty($value) && str_contains($value, ',')) {
+                                $value = explode(',', $value);
                             } else {
-                                $organizers = $stringUtilAdapter->deserialize($organizers, true);
+                                $value = $stringUtilAdapter->deserialize($value, true);
                             }
 
-                            $objWidget->value = !empty($organizers) ? $organizers : '';
+                            $objWidget->value = !empty($value) ? $value : '';
                         } else {
                             $objWidget->value = $request->query->all()[$k];
                         }

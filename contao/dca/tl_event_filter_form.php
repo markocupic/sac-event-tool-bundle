@@ -38,12 +38,12 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
             'inputType'  => 'select',
             'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
             'foreignKey' => 'tl_tour_type.title',
-            'eval'       => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
+            'eval'       => ['multiple' => true, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
             'sql'        => "varchar(10) NOT NULL default ''",
         ],
         'courseType'           => [
             'inputType' => 'select',
-            'eval'      => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
+            'eval'      => ['multiple' => true, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
             'sql'       => "varchar(10) NOT NULL default ''",
         ],
         'organizers'           => [
