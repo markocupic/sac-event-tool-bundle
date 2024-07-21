@@ -29,6 +29,7 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardPastE
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardProfileController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardUpcomingEventsController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExportController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\PrintTourListButtonController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListController;
 
 // Add palettes (Contao 4 style)
@@ -51,6 +52,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardProfileController::TY
 $GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardUpcomingEventsController::TYPE] = '{title_legend},name,headline,type;{member_dashboard_upcoming_events_legend},unregisterFromEventNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][PilatusExportController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][TourDifficultyListController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][PrintTourListButtonController::TYPE] = '{title_legend},name,headline,type;{config_legend},watchEventListModule;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 
 // Add selectors
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'applyCalFilter';
@@ -184,4 +186,13 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventRegCheckoutLinkPage'] = [
     'eval'       => ['mandatory' => true, 'fieldType' => 'radio'],
     'sql'        => 'int(10) unsigned NOT NULL default 0',
     'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['watchEventListModule'] = [
+	'exclude'    => true,
+	'inputType'  => 'radio',
+	'foreignKey' => 'tl_module.name',
+	'eval'       => ['mandatory' => true, 'fieldType' => 'radio'],
+	'sql'        => 'int(10) unsigned NOT NULL default 0',
+	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];

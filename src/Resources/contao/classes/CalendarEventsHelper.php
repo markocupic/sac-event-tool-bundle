@@ -274,6 +274,11 @@ class CalendarEventsHelper
                 $value = static::getEventOrganizersLogoAsHtml($objEvent, $strInsertTag);
                 break;
 
+            case 'eventOrganizerLogoPaths':
+                $allowDuplicate = isset($arrArgs[1]) && (true === $arrArgs[1] || 'true' === $arrArgs[1] || 1 === $arrArgs[1] || '1' === $arrArgs[1]) ? true : false;
+                $value = static::getEventOrganizerLogoPaths($objEvent, $allowDuplicate);
+                break;
+
             case 'eventOrganizers':
                 $value = implode('<br>', static::getEventOrganizersAsArray($objEvent));
                 break;
@@ -311,21 +316,7 @@ class CalendarEventsHelper
                 break;
 
             case 'isPublicTransportEvent':
-                $value = false;
-
-                /** @var Connection $connection */
-                $connection = System::getContainer()->get('database_connection');
-
-                $idPublicTransportJourney = $connection->fetchOne(
-                    'SELECT id from tl_calendar_events_journey WHERE alias = ?',
-                    ['public-transport']
-                );
-
-                if ($idPublicTransportJourney) {
-                    if ((int) $objEvent->journey === (int) $idPublicTransportJourney) {
-                        $value = true;
-                    }
-                }
+                $value = static::isPublicTransportEvent($objEvent);
                 break;
 
             case 'getPublicTransportBadge':
@@ -361,6 +352,28 @@ class CalendarEventsHelper
         }
 
         return $value;
+    }
+
+    public static function isPublicTransportEvent(CalendarEventsModel $objEvent): bool
+    {
+        $isPublicTransport = false;
+
+        /** @var Connection $connection */
+        $connection = System::getContainer()->get('database_connection');
+
+        $idPublicTransportJourney = $connection->fetchOne(
+            'SELECT id from tl_calendar_events_journey WHERE alias = ?',
+            ['public-transport'],
+            [Types::STRING],
+        );
+
+        if ($idPublicTransportJourney) {
+            if ((int) $objEvent->journey === (int) $idPublicTransportJourney) {
+                $isPublicTransport = true;
+            }
+        }
+
+        return $isPublicTransport;
     }
 
     /**
@@ -1160,6 +1173,30 @@ class CalendarEventsHelper
         }
 
         return $arrHtml;
+    }
+
+    public static function getEventOrganizerLogoPaths(CalendarEventsModel $objEvent, bool $allowDuplicate = false): array
+    {
+        $projectDir = System::getContainer()->getParameter('kernel.project_dir');
+        $arrPaths = [];
+
+        $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
+
+        foreach ($arrOrganizers as $orgId) {
+            $objOrganizer = EventOrganizerModel::findByPk($orgId);
+
+            if (null !== $objOrganizer) {
+                if ($objOrganizer->addLogo && '' !== $objOrganizer->singleSRC) {
+                    $objFiles = FilesModel::findByUuid($objOrganizer->singleSRC);
+
+                    if (null !== $objFiles && is_file($projectDir.'/'.$objFiles->path)) {
+                        $arrPaths[] = $projectDir.'/'.$objFiles->path;
+                    }
+                }
+            }
+        }
+
+        return $allowDuplicate ? $arrPaths : array_unique($arrPaths);
     }
 
     /**

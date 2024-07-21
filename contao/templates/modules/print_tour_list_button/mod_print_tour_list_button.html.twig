@@ -1,0 +1,114 @@
+{% do addJavascriptResource(sacevt_asset_dir()~'/js/eventfilter.min.js|static') %}
+
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+    {% if watch_event_list_module|default %}
+        {% set button_id = 'button_'~ id %}
+        <div>
+            {% if not has_logged_in_frontend_user() %}
+                {# Trigger the login modal window for not logged in users #}
+                <button class="btn btn-sm btn-primary" data-sac-login-toggle="modal" data-sac-login-target="same-site" title="Tourliste drucken">
+                    <i class="ready fa-solid fa-fw fa-cloud-arrow-down"></i> Tour-Liste drucken
+                </button>
+            {% else %}
+                <button id="{{ button_id }}" class="btn btn-sm btn-primary" data-url title="Tourliste drucken">
+                    <i class="ready fa-solid fa-fw fa-cloud-arrow-down"></i>
+                    <i class="busy fa-solid fa-fw fa-sync fa-spin"></i> Tour-Liste drucken
+                </button>
+            {% endif %}
+        </div>
+
+        {% do addHtmlToHead('
+            <style>
+            .mod_print_tour_list_button button .ready {
+                display:inline;
+            }
+             .mod_print_tour_list_button button .busy {
+                display:none;
+            }
+            .mod_print_tour_list_button button[disabled] .ready {
+                display:none;
+            }
+            .mod_print_tour_list_button button[disabled] .busy {
+                display:inline;
+            }
+            </style>
+        ') %}
+
+        <script>
+            // Listen to sac_evt.event_list.pre_fetch event
+            // and inject the last fetch url to the buttons data-url attribute
+            document.addEventListener('sac_evt.event_list.pre_fetch', (e) => {
+
+                if (e.detail.modId.toString() !== '{{ watch_event_list_module }}') {
+                    return;
+                }
+
+                if (e.detail.url) {
+                    let button = document.getElementById('{{ button_id }}');
+                    button.dataset.url = btoa(e.detail.url);
+                    button.addEventListener("click", async (e) => {
+
+                        // Get the button element
+                        const btn = e.currentTarget;
+
+                        // Prevent multiple clicks
+                        button.setAttribute('disabled', '');
+
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        // base64 decode the url stored in the data-url attribute
+                        const url = decodeURI(atob(e.currentTarget.dataset.url));
+
+                        // Remove offset, limit and fields from param string
+                        strParams = Util.removeParam(url, ['offset', 'limit', 'fields', 'fields[]']);
+                        const href1 = window.location.protocol + '//' + window.location.hostname + '/eventApi/events?' + strParams;
+
+                        // Get the event IDS without limit and offset from the server!
+                        const response = await fetch(href1);
+                        const arrJSON = await response.json();
+                        const arrIDS = arrJSON.meta.arrEventIds;
+
+                        // Add an uuid
+                        const uuid = window.crypto.randomUUID();
+
+                        // Build url for the docx/pdf controller
+                        const href2 = window.location.protocol + '//' + window.location.hostname + '/_print_tour_list/download?ids=' + arrIDS.join(',') + '&uuid=' + uuid;
+
+                        // Poll the server to find out, whether the dowload is completed.
+                        const interval = setInterval(async () => {
+                            const href3 = window.location.protocol + '//' + window.location.hostname + '/_print_tour_list/download_status/' + uuid;
+                            const response = await fetch(href3);
+                            const arrJSON = await response.json();
+
+                            // Check if the download is completed
+                            if (arrJSON['status'] === 'ready') {
+                                clearInterval(interval);
+                                button.removeAttribute('disabled');
+                            }
+                        }, 2000);
+
+                        // Call the docx/pdf controller
+                        window.location.href = href2;
+                    });
+                }
+
+                Util = {
+                    removeParam: function (strUrl, arrParams) {
+                        const url = new URL(strUrl);
+                        const params = new URLSearchParams(url.search);
+
+                        for (const param of arrParams) {
+                            params.delete(param);
+                        }
+
+                        return params.toString();
+                    }
+                }
+            });
+        </script>
+    {% endif %}
+
+{% endblock %}

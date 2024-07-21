@@ -82,6 +82,11 @@ class Log
     public const DOWNLOAD_WORKSHOP_BOOKLET = 'DOWNLOAD_WORKSHOP_BOOKLET';
 
     /**
+     * DOWNLOAD: Log type when a user has downloaded the tour list booklet.
+     */
+    public const DOWNLOAD_TOUR_LIST_BOOKLET = 'DOWNLOAD_TOUR_LIST_BOOKLET';
+
+    /**
      * MEMBER_DASHBOARD_UPDATE_PROFILE: Log type when a frontend user has updated its profile.
      */
     public const MEMBER_DASHBOARD_UPDATE_PROFILE = 'MEMBER_DASHBOARD_UPDATE_PROFILE';

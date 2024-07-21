@@ -244,7 +244,18 @@ if (typeof VueEventList !== 'function') {
 						}
 
 						const urlParams = new URLSearchParams(Array.from(formData)).toString();
-						const url = 'eventApi/events?' + urlParams;
+						const url = window.location.protocol + '//' + window.location.hostname + '/eventApi/events?' + urlParams;
+
+						// Dispatch the fetchsacevents event
+						const event = new CustomEvent('sac_evt.event_list.pre_fetch', {
+							'detail': {
+								'url': url,
+								'modId': self.modId,
+								'instance': self,
+							}
+						});
+
+						document.dispatchEvent(event);
 
 						// Fetch
 						fetch(url, {

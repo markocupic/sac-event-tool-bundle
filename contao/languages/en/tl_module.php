@@ -30,3 +30,4 @@ $GLOBALS['TL_LANG']['tl_module']['eventType'] = ['Event Art', 'Legen Sie fest we
 $GLOBALS['TL_LANG']['tl_module']['imageClass'] = ['Bild CSS Klasse', 'Geben Sie eine oder mehrere Bildklassen an. Die Klassen werden dem img tag zugeordnet.'];
 $GLOBALS['TL_LANG']['tl_module']['print_export_allowedEventTypes'] = ['Anzuzeigende Event-Typen', 'Geben Sie die anzuzeigenden Event-Typen an.'];
 $GLOBALS['TL_LANG']['tl_module']['unregisterFromEventNotificationId'] = ['Notification Center: Benachrichtigungs-ID bei Eventabsage eines Mitglieds', 'Geben Sie eine Benachrichtigung aus dem Notification Center ein.'];
+$GLOBALS['TL_LANG']['tl_module']['watchEventListModule'] = ['Bezug zu Event-List-Modul', 'Geben Sie an zu welchem Event-List-Modul Bezug hergestellt werden soll.'];
