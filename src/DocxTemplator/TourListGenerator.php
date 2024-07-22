@@ -22,9 +22,11 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Events;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Types;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
@@ -60,6 +62,19 @@ class TourListGenerator extends AbstractController
 
     public function generate(array $arrIds, string $outputFormat = 'docx'): \SplFileObject
     {
+        $arrIds = array_filter(array_unique(array_map('intval', $arrIds)));
+
+        // Prevent hacking attempts
+        if (\count($arrIds)) {
+            $arrIdsChecked = $this->connection->fetchFirstColumn(
+                'SELECT id FROM tl_calendar_events WHERE (eventType = ? OR eventType = ? OR eventType = ?) AND id IN('.implode(',', $arrIds).') AND published = ?',
+                [EventType::GENERAL_EVENT, EventType::TOUR, EventType::LAST_MINUTE_TOUR, true],
+                [Types::STRING, Types::STRING, Types::STRING, Types::BOOLEAN],
+            );
+
+            $arrIds = array_intersect($arrIds, $arrIdsChecked);
+        }
+
         // Store the generated file in system/tmp
         $filename = md5(microtime().random_bytes(3));
 
@@ -126,7 +141,7 @@ class TourListGenerator extends AbstractController
         Controller::loadLanguageFile(CalendarEventsModel::getTable());
 
         // Count results
-        $templateProcessor->setValue('count_results', (string) \count($arrIds), 1);
+        $templateProcessor->setValue('count_results', 0 === \count($arrIds) ? 'keine' : (string) \count($arrIds), 1);
 
         $templateProcessor->cloneBlock('BLOCK_EVENT', \count($arrIds), true, true);
         $index_outer = 0;
