@@ -10,7 +10,7 @@
                     <i class="ready fa-solid fa-fw fa-cloud-arrow-down"></i> Tour-Liste drucken
                 </button>
             {% else %}
-                <button id="{{ button_id }}" class="btn btn-sm btn-primary" data-url title="Tourliste drucken">
+                <button id="{{ button_id }}" class="btn btn-sm btn-primary" disabled data-url title="Tourliste drucken">
                     <i class="ready fa-solid fa-fw fa-cloud-arrow-down"></i>
                     <i class="busy fa-solid fa-fw fa-sync fa-spin"></i> Tour-Liste drucken
                 </button>
@@ -22,7 +22,7 @@
             .mod_print_tour_list_button button .ready {
                 display:inline;
             }
-             .mod_print_tour_list_button button .busy {
+            .mod_print_tour_list_button button .busy {
                 display:none;
             }
             .mod_print_tour_list_button button[disabled] .ready {
@@ -46,6 +46,7 @@
                 let button = document.getElementById('{{ button_id }}');
 
                 if (button && e.detail.url) {
+                    button.removeAttribute('disabled');
 
                     button.dataset.url = btoa(e.detail.url);
                     button.addEventListener("click", async (e) => {
@@ -71,13 +72,19 @@
                         const arrJSON = await response.json();
                         const arrIDS = arrJSON.meta.arrEventIds;
 
+                        if (!arrIDS.length) {
+                            alert('Die Tourliste ist leer und kann nicht gedruckt werden. Ändern Sie die Filtereinstellungen.');
+                            button.removeAttribute('disabled', '');
+                            return;
+                        }
+
                         // Add an uuid
                         const uuid = window.crypto.randomUUID();
 
                         // Build url for the docx/pdf controller
                         const href2 = window.location.protocol + '//' + window.location.hostname + '/_print_tour_list/download?ids=' + arrIDS.join(',') + '&uuid=' + uuid;
 
-                        // Poll the server to find out, whether the dowload is completed.
+                        // Poll the server to find out, whether the download is completed.
                         const interval = setInterval(async () => {
                             const href3 = window.location.protocol + '//' + window.location.hostname + '/_print_tour_list/download_status/' + uuid;
                             const response = await fetch(href3);
