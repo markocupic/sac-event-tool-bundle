@@ -239,7 +239,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startTime']['sorting'] = fal
 
 // Override DCA: startDate
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startDate']['sorting'] = true;
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startDate']['flag'] = DataContainer::SORT_DAY_ASC;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startDate']['flag'] = DataContainer::SORT_DAY_BOTH;
 
 // Override DCA: teaser
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['rte'] = null;
