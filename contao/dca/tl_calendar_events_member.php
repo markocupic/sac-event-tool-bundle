@@ -170,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'flag'      => DataContainer::SORT_DAY_ASC,
             'sorting'   => true,
             'eval'      => ['rgxp' => 'date', 'datepicker' => true, 'doNotCopy' => true, 'tl_class' => 'w50 wizard'],
-            'sql'       => "bigint(20) unsigned NOT NULL default 0",
+            'sql'       => "bigint(11) NOT NULL default 0", // not unsigned, because negative integers are permitted
         ],
         'stateOfSubscription'         => [
             'exclude'   => true,
