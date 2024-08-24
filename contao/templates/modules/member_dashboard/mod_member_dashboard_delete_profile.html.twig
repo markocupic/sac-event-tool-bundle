@@ -41,7 +41,7 @@
 
         {{ deleteProfileForm|raw }}
 
-        <script>
+        <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
             document.addEventListener("DOMContentLoaded", () => {
                 $('.hasteform_form-clear-profile form ').submit(() => {
                     if (confirm("Möchtest du dein Profil endgültig und unwiderruflich löschen? Die Daten können danach nicht mehr wiederhergestellt werden.")) {
@@ -52,7 +52,7 @@
             });
         </script>
 
-        <script>
+        <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
             document.addEventListener("DOMContentLoaded", () => {
                 const toGo = document.getElementById('lastWarningAlert');
                 if (toGo) {

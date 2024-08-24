@@ -121,7 +121,7 @@
 </div>
 
 {# Set up the vue.js tour list #}
-<script>
+<script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
     window.addEventListener("DOMContentLoaded", (event) => {
         new VueEventList('#tour-list', {
             'modId': {{ id }},

@@ -33,7 +33,7 @@
     </div>
 </div>
 
-<script>
+<script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
     // Badges: Add the title attribute from data-title.
     const el = document.querySelectorAll('.event-detail-legend [data-title]');
     let i;

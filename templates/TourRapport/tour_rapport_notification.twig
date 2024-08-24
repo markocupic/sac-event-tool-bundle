@@ -88,7 +88,7 @@
 
     </style>
 
-    <script>
+    <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
         /**
          * Prevent multiple clicks
          * Disable Submit Button Upon Form Submission

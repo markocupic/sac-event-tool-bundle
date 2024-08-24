@@ -4,7 +4,7 @@
 
 <?= $this->form->generate() ?>
 
-<script>
+<script<?= $this->attr()->setIfExists('nonce', $this->nonce('script-src')) ?>>
   //Set Datepicker
   var opt = {
     dateFormat: "d.m.Y",
@@ -337,7 +337,7 @@
 <?php endif; ?>
 
 
-<script>
+<script<?= $this->attr()->setIfExists('nonce', $this->nonce('script-src')) ?>>
   $().ready(function () {
     "use strict";
     $('.do-not-show-row-when-empty').each(function () {
@@ -348,7 +348,7 @@
   });
 </script>
 
-<script>
+<script<?= $this->attr()->setIfExists('nonce', $this->nonce('script-src')) ?>>
   $().ready(function () {
     "use strict";
     /**

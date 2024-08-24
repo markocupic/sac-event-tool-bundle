@@ -6,7 +6,7 @@
 
 <?= $this->form->generate() ?>
 
-<script>
+<script<?= $this->attr()->setIfExists('nonce', $this->nonce('script-src')) ?>>
     //Set Datepicker
     var opt = {
         dateFormat: "d.m.Y",

@@ -55,7 +55,7 @@
         </form>
     </div>
 
-    <script>
+    <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
 
         document.addEventListener("DOMContentLoaded", function () {
             let options = {

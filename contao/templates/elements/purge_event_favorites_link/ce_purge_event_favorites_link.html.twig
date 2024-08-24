@@ -23,7 +23,7 @@
     {% endif %}
 
     {% if link|default %}
-        <script>
+        <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
             if (typeof PurgeFavorites !== 'object') {
                 window.PurgeFavorites = {
                     purge: async function () {

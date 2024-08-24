@@ -48,7 +48,7 @@
     </div>
 
     <script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() }}/assets/contao-component-vue-js/vue/dist/vue.global.prod.js"></script>
-    <script>
+    <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
         window.addEventListener('DOMContentLoaded', (event) => {
 
             const requestToken = '{{ request_token }}';
@@ -312,7 +312,7 @@
         });
     </script>
 
-    <script>
+    <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
         /**
          * Prevent multiple form submits
          * Disable submit button upon form submission

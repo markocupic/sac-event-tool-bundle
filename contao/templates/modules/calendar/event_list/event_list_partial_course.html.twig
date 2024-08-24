@@ -104,7 +104,7 @@
 </div>
 
 <!-- Set up the vue.js course list -->
-<script>
+<script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
     new VueEventList('#course-list', {
         'modId': {{ id }},
         'csrfToken': '{{ csrfToken }}',

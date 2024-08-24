@@ -9,7 +9,7 @@
 
 {{ form|raw }}
 
-<script>
+<script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
     jQuery(document).ready(function () {
         $('#ctrl_user-roles').selectize({
             plugins: ['remove_button']

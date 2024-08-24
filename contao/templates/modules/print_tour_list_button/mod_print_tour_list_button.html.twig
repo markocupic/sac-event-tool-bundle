@@ -34,7 +34,7 @@
             </style>
         ') %}
 
-        <script>
+        <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
             // Listen to sac_evt.event_list.pre_fetch event
             // and inject the last fetch url to the buttons data-url attribute
             document.addEventListener('sac_evt.event_list.pre_fetch', (e) => {

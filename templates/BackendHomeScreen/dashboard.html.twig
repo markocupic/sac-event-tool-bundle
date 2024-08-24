@@ -93,7 +93,7 @@
         <p>{{ 'MSC.bhs_dashb_guidesAndTutorialsText'|trans({}, 'contao_default') }}</p>
     </div>
 </div>
-<script>
+<script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
     // Badges: Add the title attribute from data-title.
     const el = document.querySelectorAll('#tl_backend_home_screen_my_events [data-title]');
     let i;

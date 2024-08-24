@@ -178,7 +178,7 @@
         </div>
         {# end form #}
 
-        <script>
+        <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
             document.addEventListener('DOMContentLoaded', (event) => {
 
                 const widgets = document.querySelectorAll('[data-reg-widget]');

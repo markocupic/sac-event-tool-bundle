@@ -56,7 +56,7 @@
         </table>
     </div>
 
-    <script>
+    <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
         let buttons = document.querySelectorAll('.sign-out-from-event-button');
         if (buttons)
         {

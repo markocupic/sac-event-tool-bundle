@@ -4,7 +4,7 @@
 
     {{ form|raw }}
 
-    <script>
+    <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
         document.addEventListener("DOMContentLoaded", function () {
 
             // Hide legend if it is a checkbox field
