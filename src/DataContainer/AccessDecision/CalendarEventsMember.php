@@ -74,6 +74,7 @@ class CalendarEventsMember
         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notDeletable'] = true;
 
         if (!$request->query->has('act') && $request->query->has('id')) {
+            // $dc->id references the event id.
             if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $dc->id)) {
                 $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['closed'] = false;
                 $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCreatable'] = false;
@@ -106,18 +107,26 @@ class CalendarEventsMember
                         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCreatable'] = false;
                         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['closed'] = false;
                     }
+
                     break;
 
                 case 'edit':
                 case 'toggle': // tl_calendar_events_member.hasParticipated
-                    if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $dc->getCurrentRecord()['eventId'])) {
-                        $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notEditable'] = false;
-                        $blnAllow = true;
+                    $rowEvent = $dc->getCurrentRecord();
+
+                    if ('hasParticipated' === $request->get('field')) {
+                        if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $rowEvent['eventId'])) {
+                            $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notEditable'] = false;
+                            $blnAllow = true;
+                        }
                     }
+
                     break;
 
                 case 'delete':
-                    if ($this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $dc->getCurrentRecord()['eventId'])) {
+                    $rowEvent = $dc->getCurrentRecord();
+
+                    if ($this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $rowEvent['eventId'])) {
                         $bookingType = $this->connection->fetchOne(
                             'SELECT bookingType FROM tl_calendar_events_member WHERE id = ?',
                             [$dc->id],
