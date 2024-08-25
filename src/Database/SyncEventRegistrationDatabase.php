@@ -56,11 +56,11 @@ class SyncEventRegistrationDatabase extends AbstractController
 
         if (null !== $this->contaoGeneralLogger) {
             $strText = sprintf(
-                'Successful update of the member data in the event registration table "tl_calendar_events_member": affected rows: %d, duration: %s.',
+                'Successful update of the member data in the event registration table "tl_calendar_events_member": affected rows: %d, errors: %d, duration: %s.',
                 $this->affected,
+                \count($this->errors),
                 $duration,
             );
-            $this->contaoErrorLogger->error(sprintf('There has been an error while trying to update event registrations from Contao member with ID %d.', 99));
 
             $this->contaoGeneralLogger->info($strText);
         }
@@ -167,7 +167,7 @@ class SyncEventRegistrationDatabase extends AbstractController
                 'error_message' => $e->getMessage(),
             ];
 
-            $this->contaoErrorLogger->error(sprintf('There has been an error while trying to update event registrations from Contao member with ID %d.', $arrMember['id']));
+            $this->contaoErrorLogger->error(sprintf('There has been an error while trying to update event registrations from Contao member with ID %d. Error: %s', $arrMember['id'], $e->getMessage()));
         }
     }
 }
