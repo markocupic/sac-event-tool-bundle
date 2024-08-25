@@ -18,19 +18,19 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCronJob;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Markocupic\SacEventToolBundle\Config\Log;
-use Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase;
+use Markocupic\SacEventToolBundle\Database\SyncMemberDatabase;
 use Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser;
 use Psr\Log\LoggerInterface;
 
 #[AsCronJob('1 4 * * *')]
 #[AsCronJob('1 5 * * *')]
-class SacMemberDatabaseSyncCron
+readonly class MemberDatabaseSyncCron
 {
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly SyncSacMemberDatabase $syncSacMemberDatabase,
-        private readonly SyncMemberWithUser $syncMemberWithUser,
-        private readonly LoggerInterface|null $logger = null,
+        private ContaoFramework $framework,
+        private SyncMemberDatabase $syncMemberDatabase,
+        private SyncMemberWithUser $syncMemberWithUser,
+        private LoggerInterface|null $logger = null,
     ) {
     }
 
@@ -46,18 +46,18 @@ class SacMemberDatabaseSyncCron
         $this->framework->initialize();
 
         // Sync from SAC member database (Bern) -> tl_member
-        $this->syncSacMemberDatabase();
+        $this->syncMemberDatabase();
 
         // Merge from tl_member -> tl_user
         $this->syncMemberWithUser();
     }
 
-    private function syncSacMemberDatabase(): void
+    private function syncMemberDatabase(): void
     {
-        $this->syncSacMemberDatabase->run();
+        $this->syncMemberDatabase->run();
 
         // Log
-        $arrLog = $this->syncSacMemberDatabase->getSyncLog();
+        $arrLog = $this->syncMemberDatabase->getSyncLog();
 
         $msg = sprintf(
             'Successfully completed the merging process from the SAC member database to tl_member. Processed %d data records. Total inserts: %d. Total updates: %d. Disabled %d user(s). Duration: %d s.',

@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\SacMemberDatabase;
+namespace Markocupic\SacEventToolBundle\Database;
 
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\FrontendUser;
@@ -35,7 +35,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  * Unidirectional sync
  * SAC Member Database Zentralverband Bern -> tl_member.
  */
-class SyncSacMemberDatabase
+class SyncMemberDatabase
 {
     public const FTP_DB_DUMP_TARGET_PATH = '%s/system/tmp/Adressen_0000%d.csv';
     public const FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';

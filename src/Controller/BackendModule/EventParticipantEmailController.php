@@ -162,7 +162,7 @@ class EventParticipantEmailController extends AbstractBackendController
             $view['error'] = $this->message->generateUnwrapped();
         }
 
-        return $this->render('@MarkocupicSacEventTool/BackendEventParticipantEmail/be_event_participant_email.html.twig', $view);
+        return $this->render('@MarkocupicSacEventTool/Backend/CustomRoutes/be_event_participant_email.html.twig', $view);
     }
 
     private function initialize(int $eventId, string $sid): void

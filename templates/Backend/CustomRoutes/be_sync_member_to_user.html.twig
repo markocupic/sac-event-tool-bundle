@@ -1,0 +1,53 @@
+{% extends "@Contao/be_main" %}
+
+{% block error %}
+    {% if error|default %}
+        {{ error|raw }}
+    {% endif %}
+{% endblock %}
+
+{% block main_content %}
+    <div id="syncMemberToUser">
+        <div id="tl_buttons">
+            <a href="{{ path('contao_backend') }}" class="header_back" title="" accesskey="b" onclick="Backend.getScrollOffset()">{{ 'MSC.backBTTitle'|trans({}, 'contao_default') }}</a>
+        </div>
+
+        <div class="sync-member-to-user-form">
+            <form id="tl_sync_member_to_user" class="tl_form tl_edit_form" method="post" enctype="application/x-www-form-urlencoded">
+                <div class="m12">
+                    <input type="hidden" name="FORM_SUBMIT" value="sync_member_to_user">
+                    <input type="hidden" name="REQUEST_TOKEN" value="{{ rt }}">
+                </div>
+
+                <div class="tl_listing_container">
+                    {% if result|default %}
+                        <div class="clr m12">
+                            <h2>Bericht</h2>
+                            <p></p>
+                            <p class="tl_green">{{ result|default }}</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="clr m12">Klicken Sie auf den Button &laquo;tl_user mit Daten aus tl_member updaten&raquo;, um die Contao Benutzerdaten mit den Contao Mitgliederdaten abzugleichen tl_member -> tl_user.</div>
+
+                    <div class="status-box hidden clr m12 tl_green">Das Datenbankupdate wird ausgeführt. Bitte haben Sie etwas Geduld. Schliessen Sie die Seite erst, wenn das Update abgeschlossen ist.</div>
+                </div>
+                <div class="tl_formbody_submit">
+                    <div class="tl_submit_container">
+                        <button type="submit" class="tl_submit" accesskey="s">tl_user mit Daten aus tl_member updaten</button>
+                    </div>
+                </div>
+            </form>
+
+            <script>
+                document.querySelector('form#tl_sync_event_registration_database').addEventListener('submit', (e) => {
+                    const btn = e.currentTarget.querySelector('.tl_submit');
+                    btn.setAttribute('disabled', 'true');
+
+                    const statusBox = e.currentTarget.querySelector('.status-box');
+                    statusBox.classList.remove('hidden');
+                });
+            </script>
+        </div>
+    </div>
+{% endblock %}

@@ -49,7 +49,7 @@ class MaintainBackendUser
             $this->maintainBackendUserPermissions->resetBackendUserPermissions($userIdentifier, [], true);
         }
 
-        if ($this->contaoGeneralLogger && true === $hasUsers) {
+        if (null !== $this->contaoGeneralLogger && true === $hasUsers) {
             $strText = 'Successfully reset backend permissions of all non-admin users.';
             $this->contaoGeneralLogger->info($strText);
         }

@@ -88,7 +88,7 @@ class DashboardController
             );
 
             $html = $this->twig->render(
-                '@MarkocupicSacEventTool/BackendHomeScreen/dashboard.html.twig',
+                '@MarkocupicSacEventTool/Backend/BackendHomeScreen/dashboard.html.twig',
                 [
                     'events' => $events,
                     'has_upcoming_events' => !empty($upcomingEvents),
