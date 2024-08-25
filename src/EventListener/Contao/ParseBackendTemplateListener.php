@@ -26,6 +26,7 @@ use Knp\Menu\MenuFactory;
 use Knp\Menu\Renderer\ListRenderer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Twig\Environment as Twig;
 
 /**
@@ -48,6 +49,8 @@ class ParseBackendTemplateListener
         // Set adapters
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
@@ -86,6 +89,32 @@ class ParseBackendTemplateListener
 
                         // Add legend to the listing table
                         $strBuffer = preg_replace('/<table class=\"tl_listing(.*)<\/table>/sU', '${0}'.$html, $strBuffer);
+                    }
+
+                    // Show a pop-up window if the participant is not confirmed and the instructor tries to change the participation status.
+                    if (preg_match_all('/<a href=\"\/contao\?do=calendar\&amp;id=(\\d+)&amp;table=tl_calendar_events_member&amp;act=toggle&amp;field=hasParticipated(.*)\"(.*)onclick="(.*)">(.*)<\/a>/sU', $strBuffer, $matches)) {
+                        foreach ($matches[0] as $k => $val) {
+                            $regId = $matches[1][$k];
+
+                            $registration = $calendarEventsMemberModelAdapter->findByPk($regId);
+                            $allowedSubscriptionStates = [EventSubscriptionState::SUBSCRIPTION_ACCEPTED];
+
+                            if (null !== $registration) {
+                                if (\in_array($registration->stateOfSubscription, $allowedSubscriptionStates, true)) {
+                                    continue;
+                                }
+
+                                $onClickAttr = sprintf("if(window.confirm('Der Anmeldestatus dieser Person hat nicht den Status &laquo;BESTÄTIGT&raquo;. Bist du sicher, dass du den Teilnahmestatus ändern willst?')){%s}else{return false}", $matches[4][$k]);
+                                $strLink = $matches[0][$k];
+                                $strLinkNew = str_replace(
+                                    'onclick="'.$matches[4][$k].'"',
+                                    sprintf('onclick="%s"', $onClickAttr),
+                                    $strLink,
+                                );
+
+                                $strBuffer = str_replace($strLink, $strLinkNew, $strBuffer);
+                            }
+                        }
                     }
                 }
             }
