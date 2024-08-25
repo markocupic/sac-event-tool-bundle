@@ -80,7 +80,7 @@ class ParseBackendTemplateListener
                         $arrRegistration['states'] = array_diff(EventSubscriptionState::ALL, [EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED]);
 
                         $html = $this->twig->render(
-                            '@MarkocupicSacEventTool/CalendarEventsMember/explanations.html.twig',
+                            '@MarkocupicSacEventTool/Backend/CalendarEventsMember/explanations.html.twig',
                             [
                                 'event' => $arrEvent,
                                 'registration' => $arrRegistration,
@@ -93,7 +93,7 @@ class ParseBackendTemplateListener
 
                     // Show a pop-up window if the participant is not confirmed and the instructor tries to change the participation status.
                     if (preg_match_all('/<a href=\"\/contao\?do=calendar\&amp;id=(\\d+)&amp;table=tl_calendar_events_member&amp;act=toggle&amp;field=hasParticipated(.*)\"(.*)onclick="(.*)">(.*)<\/a>/sU', $strBuffer, $matches)) {
-                        foreach ($matches[0] as $k => $val) {
+                        foreach (array_keys($matches[0]) as $k) {
                             $regId = $matches[1][$k];
 
                             $registration = $calendarEventsMemberModelAdapter->findByPk($regId);
