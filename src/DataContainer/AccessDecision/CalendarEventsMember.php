@@ -94,7 +94,7 @@ class CalendarEventsMember
 
             $blnAllow = false;
 
-            // Allow: show, create, edit, toggle, delete
+            // Allow only these actions: show, create, edit, toggle, delete
             // Do not allow: select, editAll, deleteAll, copyAll, overrideAll
             switch ($act) {
                 case 'show':
@@ -102,6 +102,7 @@ class CalendarEventsMember
                     break;
 
                 case 'create':
+                    // $dc->id refers to the event ID when the “create” action is executed!
                     if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $dc->id)) {
                         $blnAllow = true;
                         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCreatable'] = false;
@@ -111,37 +112,47 @@ class CalendarEventsMember
                     break;
 
                 case 'edit':
-                case 'toggle': // tl_calendar_events_member.hasParticipated
-                    $rowEvent = $dc->getCurrentRecord();
+                    $rowReg = $dc->getCurrentRecord();
 
+                    if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $rowReg['eventId'])) {
+                        $blnAllow = true;
+                        $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notEditable'] = false;
+                    }
+
+                    break;
+
+                case 'toggle': // toggle the tl_calendar_events_member.hasParticipated value
                     if ('hasParticipated' === $request->get('field')) {
-                        if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $rowEvent['eventId'])) {
-                            $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notEditable'] = false;
+                        $rowReg = $dc->getCurrentRecord();
+
+                        if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $rowReg['eventId'])) {
                             $blnAllow = true;
+                            $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notEditable'] = false;
                         }
                     }
 
                     break;
 
                 case 'delete':
-                    $rowEvent = $dc->getCurrentRecord();
+                    $rowReg = $dc->getCurrentRecord();
 
-                    if ($this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $rowEvent['eventId'])) {
+                    if ($this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $rowReg['eventId'])) {
                         $bookingType = $this->connection->fetchOne(
                             'SELECT bookingType FROM tl_calendar_events_member WHERE id = ?',
                             [$dc->id],
                         );
 
                         if (BookingType::MANUALLY === $bookingType) {
-                            $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notDeletable'] = false;
                             $blnAllow = true;
+                            $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notDeletable'] = false;
                         }
                     }
+
                     break;
 
                 default:
                     // Do not allow: select, editAll, deleteAll, copyAll, overrideAll
-                    // $blnAllow = false;
+                    // $blnAllow = false; // Variable already equals the assigned value
             }
 
             if (!$blnAllow) {
@@ -201,7 +212,7 @@ class CalendarEventsMember
 
                 // A checkbox can not be readonly
                 // So let's transform it to a text input field.
-                if (\in_array($inputType, ['checkbox'], true)) {
+                if ('checkbox' === $inputType) {
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields'][$fieldName]['inputType'] = 'text';
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields'][$fieldName]['eval']['tl_class'] = 'w50';
                 }

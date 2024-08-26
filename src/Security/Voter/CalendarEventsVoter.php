@@ -168,8 +168,6 @@ class CalendarEventsVoter extends Voter
         $this->event = $this->calendarEvent->findByPk($subject);
 
         if (null === $this->event) {
-            die($subject);
-
             return false;
         }
 
