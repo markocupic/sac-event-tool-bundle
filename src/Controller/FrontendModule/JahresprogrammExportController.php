@@ -214,6 +214,13 @@ class JahresprogrammExportController extends AbstractPrintExportController
             // Check if event is at least on second-highest level (Level 3/4)
             $eventModel = $calendarEventsModelAdapter->findByPk($objEvents->id);
 
+            // Do only list events with a duration of 4 days or more!
+            $arrTimestamps = $calendarEventsHelperAdapter->getEventTimestamps($eventModel);
+
+            if (\count($arrTimestamps) < 4) {
+                continue;
+            }
+
             if (!$this->hasValidReleaseLevel($eventModel, $this->eventReleaseLevel)) {
                 continue;
             }
@@ -229,6 +236,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
             if ($this->eventType !== $objEvents->eventType) {
                 continue;
             }
+
             $events[] = (int) ($objEvents->id);
         }
 

@@ -273,13 +273,6 @@ class PilatusExportController extends AbstractPrintExportController
                 continue;
             }
 
-            // Do only list events with a duration of 4 days and more!
-            $arrTimestamps = $calendarEventsHelperAdapter->getEventTimestamps($objEvent);
-
-            if (\count($arrTimestamps) < 4) {
-                continue;
-            }
-
             // Check if event is at least on second-highest level (Level 3/4)
             if (!$this->hasValidReleaseLevel($objEvent, $this->eventReleaseLevel)) {
                 continue;
