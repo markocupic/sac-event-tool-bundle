@@ -21,11 +21,9 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Date;
 use Contao\Environment;
-use Contao\Events;
 use Contao\FrontendTemplate;
 use Contao\ModuleModel;
 use Contao\PageModel;
@@ -34,10 +32,8 @@ use Contao\Validator;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -52,7 +48,6 @@ class PilatusExportController extends AbstractPrintExportController
     private int|null $startDate = null;
     private int|null $endDate = null;
     private int $eventReleaseLevel = self::DEFAULT_EVENT_RELEASE_LEVEL;
-    private string $dateFormat = 'j.';
     private array|null $htmlCourseTable = null;
     private array|null $htmlTourTable = null;
     private array $events = [];
@@ -64,12 +59,8 @@ class PilatusExportController extends AbstractPrintExportController
     private array $tourFeEditableFields = ['teaser', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous'];
 
     public function __construct(
-        private readonly CourseLevels $courseLevels,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
-        private readonly InsertTagParser $insertTagParser,
-        #[Autowire('%sacevt.event_registration.config.reg_start_time_offset%')]
-        private readonly int $regStartTimeOffset,
     ) {
         parent::__construct($this->framework);
     }
@@ -139,15 +130,16 @@ class PilatusExportController extends AbstractPrintExportController
 
         $arrRange = [];
         $arrRange[0] = '---';
-        $arrRange[1] = date('Y-m-01', strtotime(($year - 1).'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year - 1).'-12-01'));
-        $arrRange[2] = date('Y-m-01', strtotime($year.'-01-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-03-01'));
-        $arrRange[3] = date('Y-m-01', strtotime($year.'-04-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-06-01'));
-        $arrRange[4] = date('Y-m-01', strtotime($year.'-07-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-09-01'));
-        $arrRange[5] = date('Y-m-01', strtotime($year.'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-12-01'));
-        $arrRange[6] = date('Y-m-01', strtotime(($year + 1).'-01-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-03-01'));
-        $arrRange[7] = date('Y-m-01', strtotime(($year + 1).'-04-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-06-01'));
-        $arrRange[8] = date('Y-m-01', strtotime(($year + 1).'-07-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-09-01'));
-        $arrRange[9] = date('Y-m-01', strtotime(($year + 1).'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-12-01'));
+        $arrRange[1] = date('Y-m-01', strtotime(($year - 1).'-07-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year - 1).'-11-01'));
+        $arrRange[2] = date('Y-m-01', strtotime(($year - 1).'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year - 1).'-12-01'));
+        $arrRange[3] = date('Y-m-01', strtotime(($year - 1).'-12-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-05-01'));
+        $arrRange[4] = date('Y-m-01', strtotime($year.'-04-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-08-01'));
+        $arrRange[5] = date('Y-m-01', strtotime($year.'-07-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-11-01'));
+        $arrRange[6] = date('Y-m-01', strtotime($year.'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-12-01'));
+        $arrRange[7] = date('Y-m-01', strtotime($year.'-12-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-05-01'));
+        $arrRange[8] = date('Y-m-01', strtotime(($year + 1).'-04-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-08-01'));
+        $arrRange[9] = date('Y-m-01', strtotime(($year + 1).'-07-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-11-01'));
+        $arrRange[10] = date('Y-m-01', strtotime(($year + 1).'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-12-01'));
 
         $range = [];
 
@@ -281,6 +273,13 @@ class PilatusExportController extends AbstractPrintExportController
                 continue;
             }
 
+            // Do only list events with a duration of 4 days and more!
+            $arrTimestamps = $calendarEventsHelperAdapter->getEventTimestamps($objEvent);
+
+            if (\count($arrTimestamps) < 4) {
+                continue;
+            }
+
             // Check if event is at least on second-highest level (Level 3/4)
             if (!$this->hasValidReleaseLevel($objEvent, $this->eventReleaseLevel)) {
                 continue;
@@ -396,66 +395,5 @@ class PilatusExportController extends AbstractPrintExportController
         }
 
         return implode(', ', $arrDates);
-    }
-
-    /**
-     * Helper method.
-     *
-     * @throws \Exception
-     */
-    private function getEventDetails(CalendarEventsModel $objEvent): array
-    {
-        $dateAdapter = $this->framework->getAdapter(Date::class);
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-        $eventsAdapter = $this->framework->getAdapter(Events::class);
-        $calendarEventsJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
-
-        $arrRow = $objEvent->row();
-        $arrRow['url'] = $environmentAdapter->get('url').'/'.$eventsAdapter->generateEventUrl($objEvent);
-        $arrRow['eventState'] = '' !== $objEvent->eventState ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
-        $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate);
-        $arrRow['eventDates'] = $this->getEventPeriod($objEvent, $this->dateFormat);
-        $arrRow['weekday'] = $this->getEventPeriod($objEvent, 'D');
-        $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, true));
-        $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent, 'title'));
-        $arrRow['tourProfile'] = implode('<br>', $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent));
-        $arrRow['journey'] = null !== $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey) ? $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey)->title : '';
-
-        // If registration end time! is set to default --> 23:59 then only show registration end date!
-        if ($objEvent->setRegistrationPeriod) {
-            $endDate = $dateAdapter->parse('j.m.Y', $objEvent->registrationEndDate);
-
-            if (abs($objEvent->registrationEndDate - strtotime($endDate)) === (24 * 3600) - 60) {
-                $formattedEndDate = $dateAdapter->parse('j.m.Y', $objEvent->registrationEndDate);
-            } else {
-                $formattedEndDate = $dateAdapter->parse('j.m.Y H:i', $objEvent->registrationEndDate);
-            }
-
-            $regStartTime = $objEvent->registrationStartDate + $this->regStartTimeOffset;
-            $arrRow['registrationPeriod'] = $dateAdapter->parse('j.m.Y', $regStartTime).' bis '.$formattedEndDate;
-        }
-
-        // MinMaxMembers
-        $arrMinMaxMembers = [];
-
-        if ($objEvent->addMinAndMaxMembers && $objEvent->minMembers > 0) {
-            $arrMinMaxMembers[] = 'min. '.$objEvent->minMembers;
-        }
-
-        if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0) {
-            $arrMinMaxMembers[] = 'max. '.$objEvent->maxMembers;
-        }
-        $arrRow['minMaxMembers'] = implode('/', $arrMinMaxMembers);
-
-        $arrEvents = [];
-
-        foreach ($arrRow as $k => $v) {
-            $strValue = nl2br((string) $v);
-            // Replace Contao insert tags
-            $arrEvents[$k] = $this->insertTagParser->replaceInline($strValue);
-        }
-
-        return $arrEvents;
     }
 }
