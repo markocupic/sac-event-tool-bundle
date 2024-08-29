@@ -256,5 +256,7 @@ class TourListGenerator extends AbstractController
         if ((new QRCode($options))->render($url, $filepath)) {
             return $filepath;
         }
+
+        throw new \Exception(sprintf('Could not generate QR code from url "%s".', $url));
     }
 }
