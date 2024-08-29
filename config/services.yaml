@@ -45,7 +45,7 @@ services:
 
     Markocupic\SacEventToolBundle\:
         resource: ../src/
-        exclude: ../src/{ContaoManager,Session,Event,DependencyInjection,Resources,Model}
+        exclude: ../src/{ContaoManager,Session,Event,DependencyInjection,Model}
 
     # Override the Contao Backend User Provider
     # to enable login with the SAC member id
