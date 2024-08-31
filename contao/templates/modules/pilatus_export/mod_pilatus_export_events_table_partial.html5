@@ -19,7 +19,7 @@
   <?php if ($week != $arrEvent['week']): ?>
   <tr class="event-export-row-body">
     <?php $week = $arrEvent['week']; ?>
-    <td class="event-export-weeknumber" colspan="6" style="text-align:center"><strong>Woche <?= $arrEvent['week'] ?></strong></td>
+    <td class="event-export-weeknumber text-center" colspan="7"><strong>Woche <?= $arrEvent['week'] ?></strong></td>
   </tr>
   <?php endif; ?>
   <tr class="event-export-row-body" data-recurringevent="<?php if ($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
