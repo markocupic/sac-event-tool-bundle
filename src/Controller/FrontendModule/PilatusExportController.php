@@ -28,7 +28,6 @@ use Contao\FrontendTemplate;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Contao\Validator;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
@@ -117,11 +116,10 @@ class PilatusExportController extends AbstractPrintExportController
     {
         $dateAdapter = $this->framework->getAdapter(Date::class);
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
 
         $objForm = new Form(
             'form-pilatus-export',
-            'POST',
+            'GET',
         );
 
         $objForm->setAction($environmentAdapter->get('uri'));
@@ -149,7 +147,21 @@ class PilatusExportController extends AbstractPrintExportController
             $range[$key] = $strRange;
         }
 
-        // Now let's add form fields:
+        $strDateTimeRangeStart = '';
+
+        if ($request->query->has('timeRangeStart')) {
+            $tstamp = strtotime($request->query->get('timeRangeStart'));
+            $strDateTimeRangeStart = false !== $tstamp ? $request->query->has('timeRangeStart') : '';
+        }
+
+        $strDateTimeRangeEnd = '';
+
+        if ($request->query->has('timeRangeEnd')) {
+            $tstamp = strtotime($request->query->get('timeRangeEnd'));
+            $strDateTimeRangeEnd = false !== $tstamp ? $request->query->has('timeRangeEnd') : '';
+        }
+
+        // Now let's add the form fields:
         $objForm->addFormField('timeRange', [
             'label' => 'Zeitspanne (fixe Zeitspanne)',
             'inputType' => 'select',
@@ -160,15 +172,15 @@ class PilatusExportController extends AbstractPrintExportController
         $objForm->addFormField('timeRangeStart', [
             'label' => ['Zeitspanne manuelle Eingabe (Startdatum)'],
             'inputType' => 'text',
-            'eval' => ['mandatory' => false, 'maxlength' => '10', 'minlength' => 8, 'placeholder' => 'dd.mm.YYYY'],
-            'value' => $request->request->get('timeRangeStart'),
+            'eval' => ['mandatory' => false, 'maxlength' => '10', 'minlength' => 10, 'rgxp' => 'date', 'placeholder' => 'dd.mm.YYYY'],
+            'value' => $strDateTimeRangeStart,
         ]);
 
         $objForm->addFormField('timeRangeEnd', [
             'label' => 'Zeitspanne manuelle Eingabe (Enddatum)',
             'inputType' => 'text',
-            'eval' => ['mandatory' => false, 'maxlength' => '10', 'minlength' => 8, 'placeholder' => 'dd.mm.YYYY'],
-            'value' => $request->request->get('timeRangeEnd'),
+            'eval' => ['mandatory' => false, 'maxlength' => '10', 'minlength' => 10, 'rgxp' => 'date', 'placeholder' => 'dd.mm.YYYY'],
+            'value' => $strDateTimeRangeEnd,
         ]);
 
         $objForm->addFormField('eventReleaseLevel', [
@@ -186,45 +198,51 @@ class PilatusExportController extends AbstractPrintExportController
         // validate() also checks whether the form has been submitted
         if ($objForm->validate()) {
             // User has selected a predefined time range
-            if ($request->request->get('timeRange') && '---' !== $request->request->get('timeRange')) {
-                $arrRange = explode('|', $request->request->get('timeRange'));
+            if ($request->query->get('timeRange') && '---' !== $request->query->get('timeRange')) {
+                $arrRange = explode('|', $request->query->get('timeRange'));
                 $this->startDate = strtotime($arrRange[0]);
                 $this->endDate = strtotime($arrRange[1]);
+                $objForm->getWidget('timeRange')->value = $request->query->get('timeRange');
                 $objForm->getWidget('timeRangeStart')->value = '';
                 $objForm->getWidget('timeRangeEnd')->value = '';
             }
             // If the user has set the start & end date manually
-            elseif ('' !== $request->request->get('timeRangeStart') || '' !== $request->request->get('timeRangeEnd')) {
+            elseif (null !== $request->query->get('timeRangeStart') || null !== $request->query->get('timeRangeEnd')) {
                 $addError = false;
 
-                if (empty($request->request->get('timeRangeStart')) || empty($request->request->get('timeRangeEnd'))) {
+                if (null === $request->query->get('timeRangeStart') || null === $request->query->get('timeRangeEnd')) {
                     $addError = true;
-                } elseif (strtotime($request->request->get('timeRangeStart')) > 0 && strtotime($request->request->get('timeRangeStart')) > 0) {
+                } elseif (false !== strtotime($request->query->get('timeRangeStart')) && false !== strtotime($request->query->get('timeRangeStart'))) {
                     $objWidgetStart = $objForm->getWidget('timeRangeStart');
                     $objWidgetEnd = $objForm->getWidget('timeRangeEnd');
 
-                    $intStart = strtotime($request->request->get('timeRangeStart'));
-                    $intEnd = strtotime($request->request->get('timeRangeEnd'));
+                    // Set the value from GET
+                    $objWidgetStart->value = $request->query->get('timeRangeStart');
+                    $objWidgetEnd->value = $request->query->get('timeRangeEnd');
 
-                    if ($intStart > $intEnd || (!isset($arrRange) && (!$validatorAdapter->isDate($objWidgetStart->value) || !$validatorAdapter->isDate($objWidgetEnd->value)))) {
+                    // Get the timestamps
+                    $tstampStart = strtotime($request->query->get('timeRangeStart'));
+                    $tstampEnd = strtotime($request->query->get('timeRangeEnd'));
+
+                    if ($tstampStart > $tstampEnd) {
                         $addError = true;
                     } else {
-                        $this->startDate = $intStart;
-                        $this->endDate = $intEnd;
-                        $request->request->set('timeRange', '');
+                        $this->startDate = $tstampStart;
+                        $this->endDate = $tstampEnd;
+                        $request->query->set('timeRange', '');
                         $objForm->getWidget('timeRange')->value = '';
                     }
                 }
 
                 if ($addError) {
-                    $strError = 'Ungültige Datumseingabe. Gib das Datum im Format \'dd.mm.YYYY\' ein. Das Startdatum muss kleiner sein als das Enddatum.';
+                    $strError = 'Ungültige Datumseingabe. Das Datum muss im Format \'dd.mm.YYYY\' eingegeben werden, und das Startdatum muss zeitlich vor dem Enddatum liegen.';
                     $objForm->getWidget('timeRangeStart')->addError($strError);
                     $objForm->getWidget('timeRangeEnd')->addError($strError);
                 }
             }
 
             if ($this->startDate && $this->endDate) {
-                $this->eventReleaseLevel = empty($request->request->get('eventReleaseLevel')) ? $this->eventReleaseLevel : (int) $request->request->get('eventReleaseLevel');
+                $this->eventReleaseLevel = empty($request->query->get('eventReleaseLevel')) ? $this->eventReleaseLevel : (int) $request->query->get('eventReleaseLevel');
                 $this->htmlCourseTable = $this->generateEventTable([EventType::COURSE]);
                 $this->htmlTourTable = $this->generateEventTable([EventType::TOUR, EventType::GENERAL_EVENT]);
             }
