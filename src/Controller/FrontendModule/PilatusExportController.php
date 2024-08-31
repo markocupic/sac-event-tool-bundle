@@ -130,16 +130,17 @@ class PilatusExportController extends AbstractPrintExportController
 
         $arrRange = [];
         $arrRange[0] = '---';
-        $arrRange[1] = date('Y-m-01', strtotime(($year - 1).'-07-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year - 1).'-11-01'));
-        $arrRange[2] = date('Y-m-01', strtotime(($year - 1).'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year - 1).'-12-01'));
-        $arrRange[3] = date('Y-m-01', strtotime(($year - 1).'-12-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-05-01'));
-        $arrRange[4] = date('Y-m-01', strtotime($year.'-04-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-08-01'));
-        $arrRange[5] = date('Y-m-01', strtotime($year.'-07-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-11-01'));
-        $arrRange[6] = date('Y-m-01', strtotime($year.'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-12-01'));
-        $arrRange[7] = date('Y-m-01', strtotime($year.'-12-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-05-01'));
-        $arrRange[8] = date('Y-m-01', strtotime(($year + 1).'-04-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-08-01'));
-        $arrRange[9] = date('Y-m-01', strtotime(($year + 1).'-07-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-11-01'));
-        $arrRange[10] = date('Y-m-01', strtotime(($year + 1).'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-12-01'));
+        // date('Y-m-t') --> t returns the number of days in the month of a given date
+        $arrRange[1] = date('Y-m-01', strtotime(($year - 1).'-07-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year - 1).'-10-01'));
+        $arrRange[2] = date('Y-m-01', strtotime(($year - 1).'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year - 1).'-11-01'));
+        $arrRange[3] = date('Y-m-01', strtotime(($year - 1).'-12-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-04-01'));
+        $arrRange[4] = date('Y-m-01', strtotime($year.'-04-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-07-01'));
+        $arrRange[5] = date('Y-m-01', strtotime($year.'-07-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-10-01'));
+        $arrRange[6] = date('Y-m-01', strtotime($year.'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-11-01'));
+        $arrRange[7] = date('Y-m-01', strtotime($year.'-12-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-04-01'));
+        $arrRange[8] = date('Y-m-01', strtotime(($year + 1).'-04-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-07-01'));
+        $arrRange[9] = date('Y-m-01', strtotime(($year + 1).'-07-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-10-01'));
+        $arrRange[10] = date('Y-m-01', strtotime(($year + 1).'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-11-01'));
 
         $range = [];
 
