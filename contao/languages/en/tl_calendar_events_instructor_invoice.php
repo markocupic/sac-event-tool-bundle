@@ -19,14 +19,14 @@ $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['edit'] = ['Vergüt
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['delete'] = ['Vergütungsformular löschen', 'Vergütungsformular mit ID %s löschen.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['copy'] = ['Vergütungsformular kopieren', 'Vergütungsformular mit ID %s kopieren.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoicePdf'] = ['Vergütungsformular herunterladen PDF', 'PDF Vergütungsformular mit ID %s herunterladen.'];
-$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoiceDocx'] = ['Vergütungsformular herunterladen MsWord', 'MsWord Vergütungsformular mit ID %s herunterladen.'];
+//$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoiceDocx'] = ['Vergütungsformular herunterladen MsWord', 'MsWord Vergütungsformular mit ID %s herunterladen.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportPdf'] = ['Tourrapport herunterladen PDF', 'Tourrapport als PDF mit ID %s herunterladen.'];
-$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportDocx'] = ['Tourrapport herunterladen MsWord', 'Tourrapport als MsWord mit ID %s herunterladen.'];
+//$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportDocx'] = ['Tourrapport herunterladen MsWord', 'Tourrapport als MsWord mit ID %s herunterladen.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['sendRapport'] = ['Tourrapport und Vergütungsformlar per E-Mail einreichen', 'Tourrapport und Vergütungsformlar mit ID %s per E-Mail einreichen.'];
 
 // Operations confirm
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoicePdfConfirm'] = 'Möchten Sie das Vergütungsformular im PDF Format herunterladen?';
-$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoiceDocxConfirm'] = 'Möchten Sie das Vergütungsformular im MsWord Format herunterladen?';
+//$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoiceDocxConfirm'] = 'Möchten Sie das Vergütungsformular im MsWord Format herunterladen?';
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportPdfConfirm'] = 'Möchten Sie den Tourrapport im PDF Format herunterladen?';
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportDocxConfirm'] = 'Möchten Sie den Tourrapport im MsWord Format herunterladen?';
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['submitRapportConfirm'] = 'Möchten Sie den Tourrapport und das Vergütungsformular per E-Mail einreichen?';

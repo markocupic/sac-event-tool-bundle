@@ -77,9 +77,9 @@ readonly class CalendarEventsInstructorInvoice
         $action = $request->query->get('action', '');
 
         $arrOperations = [
-            'generateInvoiceDocx',
+            //'generateInvoiceDocx',
             'generateInvoicePdf',
-            'generateTourRapportDocx',
+            //'generateTourRapportDocx',
             'generateTourRapportPdf',
             'sendRapport',
         ];
@@ -153,16 +153,20 @@ readonly class CalendarEventsInstructorInvoice
                 /** @var TourRapportGenerator $objTemplator */
                 $objTemplator = $this->tourRapportGenerator;
 
+                /** @todo We will remove this action in the longer term */
                 if ('generateInvoiceDocx' === $request->query->get('action')) {
-                    throw new ResponseException($objTemplator->download('invoice', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern));
+                    throw new \RuntimeException('Action no more allowed!');
+                    //throw new ResponseException($objTemplator->download('invoice', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern));
                 }
 
                 if ('generateInvoicePdf' === $request->query->get('action')) {
                     throw new ResponseException($objTemplator->download('invoice', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern));
                 }
 
+                /** @todo We will remove this action in the longer term */
                 if ('generateTourRapportDocx' === $request->query->get('action')) {
-                    throw new ResponseException($objTemplator->download('rapport', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern));
+                    throw new \RuntimeException('Action no more allowed!');
+                    //throw new ResponseException($objTemplator->download('rapport', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern));
                 }
 
                 if ('generateTourRapportPdf' === $request->query->get('action')) {
