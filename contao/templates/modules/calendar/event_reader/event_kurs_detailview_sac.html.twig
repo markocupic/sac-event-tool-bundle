@@ -166,11 +166,9 @@
                                     </div>
                                 {% endif %}
                                 {# Display the like button for the current event #}
-                                {% if has_logged_in_frontend_user() %}
-                                    <div class="d-inline me-2 mt-3 mb-3">
-                                        {% with {event_id: get_event_data(model, 'id'), is_favored: get_event_data(model, 'isFavoredEvent') } %}{{ block('favor_event_button_componenent') }}{% endwith %}
-                                    </div>
-                                {% endif %}
+                                <div class="d-inline me-2 mt-3 mb-3">
+                                    {% with {event_id: get_event_data(model, 'id'), is_favored: get_event_data(model, 'isFavoredEvent') } %}{{ block('favor_event_button_componenent') }}{% endwith %}
+                                </div>
                                 {# Display the download iCal button for the current event #}
                                 <div class="d-inline me-2 mt-3 mb-3">
                                     <a href="{{ path('sac_event_tool_download_event_ical', {'eventId': get_event_data(model, 'id')}) }}" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary text-nowrap">
