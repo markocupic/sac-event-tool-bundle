@@ -14,19 +14,44 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Contao\Backend;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\DataContainer;
+use Contao\Image;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UserRole
+readonly class UserRole
 {
     public function __construct(
-        private readonly Connection $connection,
-        private readonly TranslatorInterface $translator,
+        private RequestStack $requestStack,
+        private Connection $connection,
+        private TranslatorInterface $translator,
     ) {
+    }
+
+    #[AsCallback(table: 'tl_user_role', target: 'config.onload', priority: 100)]
+    public function checkPermission(DataContainer $dc = null): void
+    {
+        if (null === $dc || !$dc->id) {
+            return;
+        }
+
+        $request = $this->requestStack->getCurrentRequest();
+
+        $act = $request->query->get('act');
+
+        switch ($act) {
+            case 'cut': // Do not allow the paste into mode
+                if ('1' !== $request->query->get('mode')) {
+                    throw new AccessDeniedException('The paste into operation is not allowed on this record!');
+                }
+                break;
+        }
     }
 
     /**
@@ -40,7 +65,7 @@ class UserRole
     {
         $arrRoles = [];
 
-        $arrUserRoles = $this->connection->fetchFirstColumn('SELECT userRole FROM tl_user', []);
+        $arrUserRoles = $this->connection->fetchFirstColumn('SELECT userRole FROM tl_user');
 
         if (!empty($arrUserRoles)) {
             foreach ($arrUserRoles as $roles) {
@@ -57,6 +82,21 @@ class UserRole
 
         $style = !$blnUsed ? sprintf(' title="%s" style="color:red"', htmlspecialchars($msg)) : '';
 
-        return sprintf('<span%s>%s</span> <span style="color:gray">%s</span>', $style, $row['title'], $row['email']);
+        return sprintf('<span%s>%s</span> <span style="color:grey">%s</span>', $style, $row['title'], $row['email']);
+    }
+
+    /**
+     * Do not show the paste into button.
+     */
+    #[AsCallback(table: 'tl_user_role', target: 'list.sorting.paste_button', priority: 100)]
+    public function pasteButtonCallback(DataContainer $dc, array $row, string $strTable, bool $blnCircularRef, array $arrClipboard, array|null $children, string|null $previousLabel, string|null $nextLabel): string
+    {
+        if (isset($arrClipboard['id']) && (int) $arrClipboard['id'] === (int) $row['id']) {
+            return Image::getHtml('pasteafter--disabled.svg').' ';
+        }
+
+        $imagePasteAfter = Image::getHtml('pasteafter.svg', $this->translator->trans('DCA.pasteafter.1', [$row['id']], 'contao_default'));
+
+        return '<a href="'.Backend::addToUrl('act='.$arrClipboard['mode'].'&amp;mode=1&amp;pid='.$row['id'].(!\is_array($arrClipboard['id']) ? '&amp;id='.$arrClipboard['id'] : '')).'" title="'.StringUtil::specialchars($this->translator->trans('DCA.pasteafter.1', [$row['id']], 'contao_default')).'" data-action="contao--scroll-offset#store">'.$imagePasteAfter.'</a> ';
     }
 }
