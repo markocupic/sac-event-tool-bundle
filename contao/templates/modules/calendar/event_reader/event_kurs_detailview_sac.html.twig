@@ -76,6 +76,11 @@
                     <div class="courseId event-detail event-info-box icon-box-small">
                         <h5>Kursnummer</h5>
                         <p>{{ get_event_data(model, 'courseId') }}</p>
+                        {#
+                        <div class="mt-3">
+                            <img src="{{ getEventQrCode(model) }}">
+                        </div>
+                        #}
                     </div>
                     <!-- indexer::stop -->
                 {% endif %}
@@ -187,6 +192,7 @@
                     </div>
                 </div>
             </div>
+
             {# End Anmeldung #}
             <div class="box-layout-white">
                 {% if not get_event_data(model, 'courseTypeLevel0Name') is empty and not get_event_data(model, 'courseTypeLevel1Name') is empty %}

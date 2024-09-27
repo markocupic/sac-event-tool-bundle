@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle;
 
+use chillerlan\QRCode\Common\Version;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use Code4Nix\UriSigner\UriSigner;
@@ -281,7 +282,7 @@ class CalendarEventsHelper
                 break;
 
             case 'eventOrganizerLogoPaths':
-                $allowDuplicate = isset($arrArgs[1]) && (true === $arrArgs[1] || 'true' === $arrArgs[1] || 1 === $arrArgs[1] || '1' === $arrArgs[1]) ? true : false;
+                $allowDuplicate = isset($arrArgs[1]) && \in_array($arrArgs[1], [true, 'true', 1, '1'], true);
                 $value = static::getEventOrganizerLogoPaths($objEvent, $allowDuplicate);
                 break;
 
@@ -334,15 +335,14 @@ class CalendarEventsHelper
                 break;
 
             case 'gallery':
-                $value = static::getGallery([
-                    'multiSRC' => $objEvent->multiSRC,
-                    'orderSRC' => $objEvent->orderSRC,
-                    'sortBy' => 'custom',
-                    'perRow' => 4,
-                    'size' => serialize([400, 400, 'center_center', 'proportional']),
-                    'fullsize' => true,
-                    'customTpl' => 'content_element/gallery/col_4_with_caption',
-                ]);
+                $rowEvent = $objEvent->row();
+                $rowEvent['sortBy'] = 'custom';
+                $rowEvent['perRow'] = 4;
+                $rowEvent['size'] = serialize([400, 400, 'center_center', 'proportional']);
+                $rowEvent['fullsize'] = true;
+                $rowEvent['customTpl'] = 'content_element/gallery/col_4_with_caption';
+
+                $value = static::getGallery($rowEvent);
                 break;
 
             default:
@@ -1209,9 +1209,6 @@ class CalendarEventsHelper
         return $allowDuplicate ? $arrPaths : array_unique($arrPaths);
     }
 
-    /**
-     * Not needed at the moment.
-     */
     public static function getEventQrCode(CalendarEventsModel $objEvent, array $arrOptions = [], bool $blnAbsoluteUrl = true, bool $blnCache = true): string|null
     {
         // Generate QR code folder
@@ -1230,7 +1227,7 @@ class CalendarEventsHelper
 
         // Defaults
         $opt = [
-            'version' => 5,
+            'version' => Version::AUTO,
             'scale' => 4,
             'outputType' => QRCode::OUTPUT_IMAGE_PNG,
             'eccLevel' => QRCode::ECC_L,
