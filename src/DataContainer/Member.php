@@ -60,8 +60,14 @@ class Member
     }
 
     #[AsCallback(table: 'tl_member', target: 'config.onload', priority: 100)]
-    public function doNotShowFieldIfCanNotEdit(DataContainer $dc): void
+    public function doNotShowFieldIfCanNotEdit(DataContainer $dc = null): void
     {
+        if (!$dc) {
+            // The ModulePersonalData frontend module is triggering tl_member onload callbacks as well,
+            // but without the DataContainer $dc method parameter.
+            return;
+        }
+
         $arrFieldNames = array_keys($GLOBALS['TL_DCA']['tl_member']['fields']);
 
         foreach ($arrFieldNames as $fieldName) {
