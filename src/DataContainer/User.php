@@ -18,11 +18,12 @@ use Contao\BackendUser;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Intl\Countries;
+use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\DataContainer;
 use Contao\Message;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory;
@@ -35,20 +36,17 @@ class User
     public const TABLE = 'tl_user';
 
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly Util $util,
-        private readonly RequestStack $requestStack,
         private readonly Connection $connection,
-        private readonly TranslatorInterface $translator,
+        private readonly ContaoFramework $framework,
         private readonly Countries $countries,
-        private readonly Security $security,
         private readonly MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory,
+        private readonly RequestStack $requestStack,
+        private readonly Security $security,
+        private readonly TranslatorInterface $translator,
+        private readonly Util $util,
     ) {
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
     #[AsCallback(table: 'tl_user', target: 'fields.sectionId.options', priority: 100)]
     public function listSacSections(): array
     {
@@ -76,11 +74,36 @@ class User
         }
     }
 
+    #[AsCallback(table: 'tl_user', target: 'config.onload', priority: 100)]
+    public function checkPermission(DataContainer $dc): void
+    {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return;
+        }
+
+        // Adding new records is not allowed to non admins.
+        $GLOBALS['TL_DCA']['tl_user']['config']['closed'] = true;
+        $GLOBALS['TL_DCA']['tl_user']['config']['notCopyable'] = true;
+        unset($GLOBALS['TL_DCA']['tl_user']['list']['operations']['copy']);
+
+        // Deleting records is not allowed to non admins.
+        $GLOBALS['TL_DCA']['tl_user']['config']['notDeletable'] = true;
+        unset($GLOBALS['TL_DCA']['tl_user']['list']['operations']['delete']);
+
+        // Do not show fields without write permission.
+        $arrFieldNames = array_keys($GLOBALS['TL_DCA']['tl_user']['fields']);
+
+        foreach ($arrFieldNames as $fieldName) {
+            if (!$this->security->isGranted(ContaoCorePermissions::USER_CAN_EDIT_FIELD_OF_TABLE, 'tl_user::'.$fieldName)) {
+                $GLOBALS['TL_DCA']['tl_user']['fields'][$fieldName]['eval']['doNotShow'] = true;
+            }
+        }
+    }
+
     /**
      * Make fields readonly in backend users profile.
      *
      * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
      */
     #[AsCallback(table: 'tl_user', target: 'config.onload', priority: 100)]
     public function makeFieldsReadonlyInUsersProfile(DataContainer $dc): void
@@ -142,7 +165,8 @@ class User
     /**
      * Set defaults and auto-create backend users home directory when creating a new user.
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
+     * @throws \Exception
      */
     #[AsCallback(table: 'tl_user', target: 'config.oncreate', priority: 100)]
     public function setDefaultsOnCreatingNew(string $strTable, int $id, array $arrSet): void
@@ -170,14 +194,13 @@ class User
 
     /**
      * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
      */
     #[AsCallback(table: 'tl_user', target: 'fields.userRole.options', priority: 100)]
     public function getUserRoles(): array
     {
         $options = [];
 
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_user_role ORDER BY sorting ASC');
+        $stmt = $this->connection->executeQuery('SELECT * FROM tl_user_role ORDER BY sorting');
 
         while (false !== ($row = $stmt->fetchAssociative())) {
             $options[$row['id']] = $row['title'];
