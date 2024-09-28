@@ -16,10 +16,9 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\DataContainer;
 use Contao\Message;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\RouterInterface;
@@ -32,7 +31,6 @@ class Member
     public function __construct(
         private readonly Security $security,
         private readonly ClearFrontendUserData $clearFrontendUserData,
-        private readonly Connection $connection,
         private readonly RouterInterface $router,
         private readonly TranslatorInterface $translator,
         private readonly Util $util,
@@ -67,15 +65,12 @@ class Member
         $arrFieldNames = array_keys($GLOBALS['TL_DCA']['tl_member']['fields']);
 
         foreach ($arrFieldNames as $fieldName) {
-            if (!$this->security->isGranted('contao_user.alexf', 'tl_member::'.$fieldName)) {
+            if (!$this->security->isGranted(ContaoCorePermissions::USER_CAN_EDIT_FIELD_OF_TABLE, 'tl_member::'.$fieldName)) {
                 $GLOBALS['TL_DCA']['tl_member']['fields'][$fieldName]['eval']['doNotShow'] = true;
             }
         }
     }
 
-    /**
-     * @throws Exception
-     */
     #[AsCallback(table: 'tl_member', target: 'fields.sectionId.options', priority: 100)]
     public function listSacSections(): array
     {
