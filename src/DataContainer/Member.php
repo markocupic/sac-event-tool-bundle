@@ -21,6 +21,7 @@ use Contao\Message;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -29,11 +30,12 @@ class Member
     public const TABLE = 'tl_member';
 
     public function __construct(
-        private readonly Connection $connection,
-        private readonly Util $util,
-        private readonly TranslatorInterface $translator,
+        private readonly Security $security,
         private readonly ClearFrontendUserData $clearFrontendUserData,
+        private readonly Connection $connection,
         private readonly RouterInterface $router,
+        private readonly TranslatorInterface $translator,
+        private readonly Util $util,
     ) {
     }
 
@@ -56,6 +58,18 @@ class Member
             Message::addError($arrErrorMsg);
 
             Controller::redirect($this->router->generate('contao_backend', ['do' => 'member']));
+        }
+    }
+
+    #[AsCallback(table: 'tl_member', target: 'config.onload', priority: 100)]
+    public function doNotShowFieldIfCanNotEdit(DataContainer $dc): void
+    {
+        $arrFieldNames = array_keys($GLOBALS['TL_DCA']['tl_member']['fields']);
+
+        foreach ($arrFieldNames as $fieldName) {
+            if (!$this->security->isGranted('contao_user.alexf', 'tl_member::'.$fieldName)) {
+                $GLOBALS['TL_DCA']['tl_member']['fields'][$fieldName]['eval']['doNotShow'] = true;
+            }
         }
     }
 

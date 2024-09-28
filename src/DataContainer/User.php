@@ -35,14 +35,14 @@ class User
     public const TABLE = 'tl_user';
 
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly Util $util,
-        private readonly RequestStack $requestStack,
         private readonly Connection $connection,
-        private readonly TranslatorInterface $translator,
+        private readonly ContaoFramework $framework,
         private readonly Countries $countries,
-        private readonly Security $security,
         private readonly MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory,
+        private readonly RequestStack $requestStack,
+        private readonly Security $security,
+        private readonly TranslatorInterface $translator,
+        private readonly Util $util,
     ) {
     }
 
@@ -73,6 +73,18 @@ class User
 
         if ('user' === $request->query->get('do') && 'edit' === $request->query->get('act') && '' !== $request->query->get('ref')) {
             $GLOBALS['TL_JAVASCRIPT'][] = Bundle::ASSET_DIR.'/js/backend_member_autocomplete.js';
+        }
+    }
+
+    #[AsCallback(table: 'tl_user', target: 'config.onload', priority: 100)]
+    public function doNotShowFieldIfCanNotEdit(DataContainer $dc): void
+    {
+        $arrFieldNames = array_keys($GLOBALS['TL_DCA']['tl_user']['fields']);
+
+        foreach ($arrFieldNames as $fieldName) {
+            if (!$this->security->isGranted('contao_user.alexf', 'tl_user::'.$fieldName)) {
+                $GLOBALS['TL_DCA']['tl_user']['fields'][$fieldName]['eval']['doNotShow'] = true;
+            }
         }
     }
 
