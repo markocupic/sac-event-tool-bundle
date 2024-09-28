@@ -75,8 +75,22 @@ class User
     }
 
     #[AsCallback(table: 'tl_user', target: 'config.onload', priority: 100)]
-    public function doNotShowFieldIfCanNotEdit(DataContainer $dc): void
+    public function checkPermission(DataContainer $dc): void
     {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return;
+        }
+
+        // Adding new records is not allowed to non admins.
+        $GLOBALS['TL_DCA']['tl_user']['config']['closed'] = true;
+        $GLOBALS['TL_DCA']['tl_user']['config']['notCopyable'] = true;
+        unset($GLOBALS['TL_DCA']['tl_user']['list']['operations']['copy']);
+
+        // Deleting records is not allowed to non admins.
+        $GLOBALS['TL_DCA']['tl_user']['config']['notDeletable'] = true;
+        unset($GLOBALS['TL_DCA']['tl_user']['list']['operations']['delete']);
+
+        // Do not show fields without write permission.
         $arrFieldNames = array_keys($GLOBALS['TL_DCA']['tl_user']['fields']);
 
         foreach ($arrFieldNames as $fieldName) {

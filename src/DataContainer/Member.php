@@ -60,14 +60,28 @@ class Member
     }
 
     #[AsCallback(table: 'tl_member', target: 'config.onload', priority: 100)]
-    public function doNotShowFieldIfCanNotEdit(DataContainer $dc = null): void
+    public function checkPermission(DataContainer $dc = null): void
     {
         if (!$dc) {
-            // The ModulePersonalData frontend module is triggering tl_member onload callbacks as well,
+            // The personal data frontend module is triggering the onload callbacks as well,
             // but without the DataContainer $dc method parameter.
             return;
         }
 
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return;
+        }
+
+        // Adding new records is not allowed to non admins.
+        $GLOBALS['TL_DCA']['tl_member']['config']['closed'] = true;
+        $GLOBALS['TL_DCA']['tl_member']['config']['notCopyable'] = true;
+        unset($GLOBALS['TL_DCA']['tl_member']['list']['operations']['copy']);
+
+        // Deleting records is not allowed to non admins.
+        $GLOBALS['TL_DCA']['tl_member']['config']['notDeletable'] = true;
+        unset($GLOBALS['TL_DCA']['tl_member']['list']['operations']['delete']);
+
+        // Do not show fields without write permission.
         $arrFieldNames = array_keys($GLOBALS['TL_DCA']['tl_member']['fields']);
 
         foreach ($arrFieldNames as $fieldName) {
