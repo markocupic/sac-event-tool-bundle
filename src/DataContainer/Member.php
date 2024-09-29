@@ -87,6 +87,9 @@ class Member
         foreach ($arrFieldNames as $fieldName) {
             if (!$this->security->isGranted(ContaoCorePermissions::USER_CAN_EDIT_FIELD_OF_TABLE, 'tl_member::'.$fieldName)) {
                 $GLOBALS['TL_DCA']['tl_member']['fields'][$fieldName]['eval']['doNotShow'] = true;
+                $GLOBALS['TL_DCA']['tl_member']['fields'][$fieldName]['sorting'] = false;
+                $GLOBALS['TL_DCA']['tl_member']['fields'][$fieldName]['filter'] = false;
+                $GLOBALS['TL_DCA']['tl_member']['fields'][$fieldName]['search'] = false;
             }
         }
     }
