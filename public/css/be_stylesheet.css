@@ -415,37 +415,36 @@ div.tl_header_tour_rapport table td {
 
 /** Event dashboard supplementary buttons **/
 /** Event dashboard supplementary buttons **/
-.event-dashboard .tl_submit_container {
-	& ul {
-		display: flex;
-		flex-wrap: wrap;
-		list-style: none;
-		padding-left: 0;
-
-		& li {
-			margin: 2px 4px 2px 2px;
-		}
-	}
+.event-dashboard .tl_submit_container ul {
+	display: inline-flex !important;
+	flex-wrap: wrap !important;
+	list-style: none !important;
+	padding-left: 0 !important;
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 
+.event-dashboard .tl_submit_container ul li {
+	margin: 2px 4px 2px 2px;
+	white-space: nowrap !important;
+}
 
 /** Stick navigation to the bottom for large screens **/
-@media (min-width: 1160px) {
+@media (min-width: 1240px) {
 	#main {
 		padding-bottom: 80px;
 	}
 
 	.event-dashboard {
-		position: fixed;
-		bottom: 0;
-		z-index: 900;
-		width: 100%;
+		position: fixed !important;
+		bottom: 0 !important;
+		left: 235px !important;
+		right: 15px !important;
+		z-index: 900 !important;
 	}
 
-	.event-dashboard {
-		& .tl_submit_container {
-			background-color: #172b3b !important;
-		}
+	.event-dashboard .tl_submit_container {
+		background-color: #172b3b !important;
 	}
 }
 
