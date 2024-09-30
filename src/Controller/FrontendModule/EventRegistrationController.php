@@ -451,7 +451,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 'label' => $this->translator->trans('FORM.evt_reg_carInfo', [], 'contao_default'),
                 'inputType' => 'select',
                 'options' => $this->carSeatInfo->getAll(),
-                'eval' => ['includeBlankOption' => true, 'mandatory' => true],
+                'eval' => ['includeBlankOption' => true, 'blankOptionLabel' => $this->translator->trans('FORM.evt_reg_blankLabelCarInfo', [], 'contao_default'), 'mandatory' => true],
             ],
             'ahvNumber' => [
                 'label' => $this->translator->trans('FORM.evt_reg_ahvNumber', [], 'contao_default'),
