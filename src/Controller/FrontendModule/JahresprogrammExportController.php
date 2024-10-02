@@ -101,8 +101,8 @@ class JahresprogrammExportController extends AbstractPrintExportController
         $objForm->setAction($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
-        $objForm->addFormField('eventDuration', [
-            'label' => 'Mindestdauer',
+        $objForm->addFormField('minEventDuration', [
+            'label' => 'Event-Mindestdauer',
             'inputType' => 'select',
             'options' => [4 => 'min. 4 Tage', 3 => 'min. 3 Tage', 2 => 'min. 2 Tage', 1 => 'min. 1 Tag (alle)'], // Do only list events with a duration of min. 4 days (default)
             'eval' => ['includeBlankOption' => false, 'mandatory' => true],
@@ -220,10 +220,13 @@ class JahresprogrammExportController extends AbstractPrintExportController
             // Check if event is at least on second-highest level (Level 3/4)
             $eventModel = $calendarEventsModelAdapter->findByPk($objEvents->id);
 
-            // Do only list events with a duration of 4 days or more!
             $arrTimestamps = $calendarEventsHelperAdapter->getEventTimestamps($eventModel);
 
-            if (\count($arrTimestamps) < 4) {
+            // Filter events by event duration
+            $minDurationInDays = (int) $request->request->get('minEventDuration');
+
+            // Do only list events with a duration of al least 4 days (default)!
+            if ($minDurationInDays > \count($arrTimestamps)) {
                 continue;
             }
 
@@ -241,15 +244,6 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
             if ($this->eventType !== $objEvents->eventType) {
                 continue;
-            }
-
-            // Filter events by event duration
-            $minDurationInDays = (int) $request->request->get('eventDuration');
-
-            if ($minDurationInDays > 1) {
-                if ($minDurationInDays > CalendarEventsHelper::getEventTimestamps($eventModel)) {
-                    continue;
-                }
             }
 
             $events[] = (int) ($objEvents->id);
