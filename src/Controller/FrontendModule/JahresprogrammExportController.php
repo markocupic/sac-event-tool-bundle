@@ -225,7 +225,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
             // Filter events by event duration
             $minDurationInDays = (int) $request->request->get('minEventDuration');
 
-            // Do only list events with a duration of al least 4 days (default)!
+            // Do only list events with a duration of at least 4 days (default)!
             if ($minDurationInDays > \count($arrTimestamps)) {
                 continue;
             }
