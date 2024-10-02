@@ -79,7 +79,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
         // Load language file
         $controllerAdapter->loadLanguageFile('tl_calendar_events');
 
-        $template->set('form', $this->generateForm());
+        $template->set('form', $this->generateForm($request));
 
         return $this->template->getResponse();
     }
@@ -87,9 +87,8 @@ class JahresprogrammExportController extends AbstractPrintExportController
     /**
      * @throws \Exception
      */
-    private function generateForm(): Form
+    private function generateForm(Request $request): Form
     {
-        $request = $this->requestStack->getCurrentRequest();
         $eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
         $databaseAdapter = $this->framework->getAdapter(Database::class);
@@ -102,6 +101,13 @@ class JahresprogrammExportController extends AbstractPrintExportController
         $objForm->setAction($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
+        $objForm->addFormField('eventDuration', [
+            'label' => 'Mindestdauer',
+            'inputType' => 'select',
+            'options' => [4 => 'min. 4 Tage', 3 => 'min. 3 Tage', 2 => 'min. 2 Tage', 1 => 'min. 1 Tag (alle)'], // Do only list events with a duration of min. 4 days (default)
+            'eval' => ['includeBlankOption' => false, 'mandatory' => true],
+        ]);
+
         $objForm->addFormField('eventType', [
             'label' => 'Event-Typ',
             'reference' => $GLOBALS['TL_LANG']['MSC'],
@@ -174,7 +180,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                 $this->eventReleaseLevel = empty($request->request->get('eventReleaseLevel')) ? $this->eventReleaseLevel : (int) $request->request->get('eventReleaseLevel');
 
                 // Get events and instructors (fill $this->events and $this->instructors)
-                $this->getEventsAndInstructors();
+                $this->getEventsAndInstructors($request);
 
                 $this->template->eventType = $this->eventType;
                 $this->template->eventTypeLabel = $GLOBALS['TL_LANG']['MSC'][$this->eventType];
@@ -196,7 +202,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
     /**
      * @throws \Exception
      */
-    private function getEventsAndInstructors(): void
+    private function getEventsAndInstructors(Request $request): void
     {
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
         $dateAdapter = $this->framework->getAdapter(Date::class);
@@ -235,6 +241,15 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
             if ($this->eventType !== $objEvents->eventType) {
                 continue;
+            }
+
+            // Filter events by event duration
+            $minDurationInDays = (int) $request->request->get('eventDuration');
+
+            if ($minDurationInDays > 1) {
+                if ($minDurationInDays > CalendarEventsHelper::getEventTimestamps($eventModel)) {
+                    continue;
+                }
             }
 
             $events[] = (int) ($objEvents->id);
