@@ -899,6 +899,8 @@ $allowEditingOnFirstReleaseLevelOnly = [
     'durationInfo',
     'tourType',
     'tourTechDifficulty',
+    'requirements',
+    'leistungen',
     'addMinAndMaxMembers',
     'minMembers',
     'maxMembers',
