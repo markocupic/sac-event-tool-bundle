@@ -187,10 +187,22 @@
                                     </a>
                                 </div>
                             </nav>
-                            {# end button bar #}
                         </div>
                     </div>
+                    {# end button bar #}
                 </div>
+
+                {% if not get_event_data(model, 'disableOnlineRegistration') %}
+                    <div class="booking-text event-detail event-info-box icon-box-small">    
+                        <h5>Abmeldung</h5>
+                        {% if get_event_data(model, 'allowDeregistration') %}
+                            <p>Online-Abmeldung mit einer Frist von {% if get_event_data(model, 'deregistrationLimit') %} Tagen möglich.</p>
+                        {% else %}
+                            <p>Keine Online-Abmeldung</p>
+                        {% endif %}
+                        <p><small>Es können ggf. Stornierungsgebühren anfallen (siehe AGBs).</small></p>
+                    </div>
+                {% endif %}
             </div>
 
             {# End Anmeldung #}
