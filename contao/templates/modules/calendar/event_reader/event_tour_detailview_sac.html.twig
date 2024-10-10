@@ -87,33 +87,34 @@
                 {% set is_with_mountainguide_offer = constant('\\Markocupic\\SacEventToolBundle\\Config\\EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER') == get_event_data(model, 'mountainguide') ? true : false %}
                 {% set is_with_mountainguide = constant('\\Markocupic\\SacEventToolBundle\\Config\\EventMountainGuide::WITH_MOUNTAIN_GUIDE') == get_event_data(model, 'mountainguide') ? true : false %}
 
-                {% if not get_event_data(model, 'leistungen') is empty or is_with_mountainguide_offer or is_with_mountainguide %}
-                    <div class="price event-detail event-info-box icon-box-small">
-                        <h5>Leistungen/Preis</h5>
+                <div class="price event-detail event-info-box icon-box-small">
+                    <h5>Leistungen/Preis</h5>
 
-                        {% if is_with_mountainguide_offer %}
-                            <p><strong>Mit Bergführer/in als Bergführerangebot</strong></p>
-                        {% endif %}
+                    {% if is_with_mountainguide_offer %}
+                        <p><strong>Mit Bergführer/in als Bergführerangebot</strong></p>
+                    {% endif %}
 
-                        {% if is_with_mountainguide %}
-                            <p><strong>Mit Bergführer/in</strong></p>
-                        {% endif %}
+                    {% if is_with_mountainguide %}
+                        <p><strong>Mit Bergführer/in</strong></p>
+                    {% endif %}
 
+                    {% if not get_event_data(model, 'leistungen') is empty %}
                         <p>{{ get_event_data(model, 'leistungen')|nl2br }}</p>
-                        <p>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">
-                                AGB (Auszug Kurs- und Tourenreglement)
-                            </a>
-                        </p>
+                    {% endif %}
 
-                        {# AGB Modal #}
-                        {{ render(controller(
-                            'Markocupic\\SacEventToolBundle\\Controller\\Agb\\CourseAndTourRegulationsModalController::getModal',
-                            { 'event': model }
-                        )) }}
-                        {# End AGB Modal #}
-                    </div>
-                {% endif %}
+                    <p>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">
+                            AGB (Auszug Kurs- und Tourenreglement)
+                        </a>
+                    </p>
+
+                    {# AGB Modal #}
+                    {{ render(controller(
+                        'Markocupic\\SacEventToolBundle\\Controller\\Agb\\CourseAndTourRegulationsModalController::getModal',
+                        { 'event': model }
+                    )) }}
+                    {# End AGB Modal #}
+                </div>
 
             </div>
 
