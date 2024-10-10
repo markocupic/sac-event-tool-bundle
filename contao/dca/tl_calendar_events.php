@@ -904,6 +904,8 @@ $allowEditingOnFirstReleaseLevelOnly = [
     'addMinAndMaxMembers',
     'minMembers',
     'maxMembers',
+    'setRegistrationPeriod',
+    'registrationStartDate', // do not add 'registrationEndDate'
     'disableOnlineRegistration',
     'allowDeregistration',
     'deregistrationLimit'
