@@ -902,6 +902,9 @@ $allowEditingOnFirstReleaseLevelOnly = [
     'addMinAndMaxMembers',
     'minMembers',
     'maxMembers',
+    'disableOnlineRegistration',
+    'allowDeregistration',
+    'deregistrationLimit'
 ];
 
 foreach ($allowEditingOnFirstReleaseLevelOnly as $field) {
