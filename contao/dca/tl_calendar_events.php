@@ -899,9 +899,16 @@ $allowEditingOnFirstReleaseLevelOnly = [
     'durationInfo',
     'tourType',
     'tourTechDifficulty',
+    'requirements',
+    'leistungen',
     'addMinAndMaxMembers',
     'minMembers',
     'maxMembers',
+    'setRegistrationPeriod',
+    'registrationStartDate', // do not add 'registrationEndDate'
+    'disableOnlineRegistration',
+    'allowDeregistration',
+    'deregistrationLimit'
 ];
 
 foreach ($allowEditingOnFirstReleaseLevelOnly as $field) {
