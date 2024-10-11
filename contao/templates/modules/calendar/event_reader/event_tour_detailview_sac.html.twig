@@ -144,7 +144,7 @@
                         <h5>Bestätigte Anmeldungen</h5>
                         <p>{{ get_event_data(model, 'bookingCounterAsText') }}</p>
                         {% if get_event_data(model, 'minMembers')|default(0) > 0 %}
-                            <p><small>(min. {{ get_event_data(model, 'minMembers') }} Teilnehmende)</small></p>
+                            <p><small>Es sind min. {{ get_event_data(model, 'minMembers') }} Teilnehmende erforderlich.</small></p>
                         {% endif %}
                     </div>
                 {% endif %}
