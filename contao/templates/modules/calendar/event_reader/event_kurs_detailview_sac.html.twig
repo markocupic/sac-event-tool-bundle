@@ -226,25 +226,25 @@
                 </div>
 
                 {% if not get_event_data(model, 'disableOnlineRegistration') %}
-                    <div class="booking-text event-detail event-info-box icon-box-small">    
-                        <h5>Abmeldung</h5>
-                        {% if get_event_data(model, 'allowDeregistration') %}
-                            <p>Online-Abmeldung mit einer Frist von {% if get_event_data(model, 'deregistrationLimit') %} Tagen möglich.</p>
-                        {% else %}
-                            <p>Keine Online-Abmeldung</p>
-                        {% endif %}
-                        <p><small>Es können ggf. Stornierungsgebühren anfallen (siehe AGBs).</small></p>
-                    </div>
+                <div class="booking-text event-detail event-info-box icon-box-small">
+                    <h5>Abmeldung</h5>
+                    {% if get_event_data(model, 'allowDeregistration') %}
+                    <p>Online-Abmeldung mit einer Frist von {% if get_event_data(model, 'deregistrationLimit') %} Tagen möglich.</p>
+                {% else %}
+                    <p>Keine Online-Abmeldung</p>
+                    {% endif %}
+                    <p><small>Es können ggf. Stornierungsgebühren anfallen (siehe AGBs).</small></p>
+                </div>
                 {% endif %}
             </div>
             {# End Anmeldung #}
-            
+
         </div>
         {# end col left #}
 
         {# begin col right #}
         <div class="col-md-6">
-            
+
             <div class="box-layout-white">
                 {% if not get_event_data(model, 'courseTypeLevel0Name') is empty and not get_event_data(model, 'courseTypeLevel1Name') is empty %}
                     <!-- indexer::continue -->
@@ -339,7 +339,7 @@
                     </div>
                 {% endif %}
             </div>
-            
+
         </div>
         {# end col right #}
     </div>
