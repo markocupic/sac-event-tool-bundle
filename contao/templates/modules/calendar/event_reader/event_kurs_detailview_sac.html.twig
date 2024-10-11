@@ -147,6 +147,38 @@
     <div class="row gx-3">
         {# begin col left #}
         <div class="col-md-6">
+            <div class="box-layout-white">
+                <div class="instructor event-detail event-info-box icon-box-small">
+                    <!-- indexer::continue -->
+                    <h5>Kursleitung</h5>
+                    <div class="row mt-3 g-2">
+                        {% if not get_event_data(model, 'instructorContactBoxes') is empty %}
+                            {{ get_event_data(model, 'instructorContactBoxes')|raw }}
+                        {% else %}
+                            <p>Leiter/in wurde gelöscht.</p>
+                        {% endif %}
+                    </div>
+                    <!-- indexer::stop -->
+                </div>
+
+                {% if get_event_data(model, 'setRegistrationPeriod') %}
+                    <div class="booking-text event-detail event-info-box icon-box-small">
+                        <h5>Anmeldung möglich</h5>
+                        <p>Vom {{ get_event_data(model, 'registrationStartTimeWithOffsetFormatted') }} bis zum {{ get_event_data(model, 'registrationEndDateFormatted') }}</p>
+                    </div>
+                {% endif %}
+
+                {% if not get_event_data(model, 'bookingCounterAsText') is empty %}
+                    <div class="booking-counter event-detail event-info-box icon-box-small">
+                        <h5>Bestätigte Anmeldungen</h5>
+                        <p>{{ get_event_data(model, 'bookingCounterAsText') }}</p>
+                        {% if get_event_data(model, 'minMembers')|default(0) > 0 %}
+                            <p><small>Es sind min. {{ get_event_data(model, 'minMembers') }} Teilnehmende erforderlich.</small></p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
             {# Start Anmeldung #}
             <div class="box-layout-white">
                 <div class="booking-text event-detail event-info-box icon-box-small">
@@ -205,8 +237,14 @@
                     </div>
                 {% endif %}
             </div>
-
             {# End Anmeldung #}
+            
+        </div>
+        {# end col left #}
+
+        {# begin col right #}
+        <div class="col-md-6">
+            
             <div class="box-layout-white">
                 {% if not get_event_data(model, 'courseTypeLevel0Name') is empty and not get_event_data(model, 'courseTypeLevel1Name') is empty %}
                     <!-- indexer::continue -->
@@ -301,43 +339,7 @@
                     </div>
                 {% endif %}
             </div>
-        </div>
-        {# end col left #}
-
-        {# begin col right #}
-        <div class="col-md-6">
-            <div class="box-layout-white">
-                <div class="instructor event-detail event-info-box icon-box-small">
-                    <!-- indexer::continue -->
-                    <h5>Kursleitung</h5>
-                    <div class="row mt-3 g-2">
-                        {% if not get_event_data(model, 'instructorContactBoxes') is empty %}
-                            {{ get_event_data(model, 'instructorContactBoxes')|raw }}
-                        {% else %}
-                            <p>Leiter/in wurde gelöscht.</p>
-                        {% endif %}
-                    </div>
-                    <!-- indexer::stop -->
-                </div>
-
-                {% if get_event_data(model, 'setRegistrationPeriod') %}
-                    <div class="booking-text event-detail event-info-box icon-box-small">
-                        <h5>Anmeldung möglich</h5>
-                        <p>Vom {{ get_event_data(model, 'registrationStartTimeWithOffsetFormatted') }} bis zum {{ get_event_data(model, 'registrationEndDateFormatted') }}</p>
-                    </div>
-                {% endif %}
-
-                {% if not get_event_data(model, 'bookingCounterAsText') is empty %}
-                    <div class="booking-counter event-detail event-info-box icon-box-small">
-                        <h5>Bestätigte Anmeldungen</h5>
-                        <p>{{ get_event_data(model, 'bookingCounterAsText') }}</p>
-                        {% if get_event_data(model, 'minMembers')|default(0) > 0 %}
-                            <p><small>Es sind min. {{ get_event_data(model, 'minMembers') }} Teilnehmende erforderlich.</small></p>
-                        {% endif %}
-                    </div>
-                {% endif %}
-
-            </div>
+            
         </div>
         {# end col right #}
     </div>
