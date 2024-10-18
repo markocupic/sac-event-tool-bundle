@@ -137,7 +137,7 @@ $GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReport'] = 'Tourrapport erfassen';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_editReport'] = 'Tourrapport bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReportDisabled'] = 'Tourrapport erfassen nicht verfügbar';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorials'] = 'Anleitungen und Tutorials';
-$GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorialsText'] = 'Die Seite "Anleitungen und Tutorials" beim Menüpunkt "Service" im Frontend/Website unterstützt Sie bei der Verwendung des SAC Event-Tools (Backend/Contao).';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorialsText'] = 'Die Seite "<a href="/service/anleitungen-und-tutorials.html" target="_blank">Anleitungen und Tutorials</a>" beim Menüpunkt "Service" im Frontend/Website unterstützt Sie bei der Verwendung des SAC Event-Tools (Backend/Contao).';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_noUpcomingEventsDetected'] = 'In nächster Zeit stehen bei Ihnen keine Events an, wo Sie eine Leitungsfunktion ausüben.';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_noPastEventsDetected'] = 'Es wurden keine Events gefunden, bei denen Sie in letzter Zeit eine Leitungsfunktion ausgeübt haben.';
 
