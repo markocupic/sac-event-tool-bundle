@@ -75,7 +75,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['miscellaneous'] = ['Sonstiges', 'Gebe
 $GLOBALS['TL_LANG']['tl_calendar_events']['isRecurringEvent'] = ['Sich wiederholender Event', 'Bitte geben Sie an, ob es sich bei diesem Event um einen sich wiederholenden Event handelt. <strong>Hinweis: Teilnehmer können sich nur vor der ersten Event-Durchführung für alle Eventdaten anmelden!</strong>'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventDates'] = ['Eventdaten', 'Geben Sie bitte die Eventdaten ein. <strong>Für jeden Tag eine Zeile hinzufügen</strong> (insb. bei mehrtägigen Events)! Hinweis: Erstellen Sie bei einem Serien-Event jeweils separate Events (Event kann kopiert/dupliziert werden)!'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'] = ['Event-Dauer', 'Geben Sie die Event-Dauer an.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['eventState'] = ['Event-Status', '<strong class="notice">!!! Teilnehmer müssen separat informiert werden !!!</strong> Geben Sie optional einen Event-Status an.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['eventState'] = ['Event-Status', '<strong class="notice">!!! Teilnehmer müssen separat per E-Mail informiert werden !!!</strong> Geben Sie optional einen Event-Status an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['rescheduledEventDate'] = ['Verschiebedatum', 'Geben Sie das Verschiebedatum ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['singleSRCBroschuere'] = ['Hintergrundbild für PDF-Kursbroschüre', 'Wählen Sie bitte ein Bild aus.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['allowDeregistration'] = ['Angemeldeter Teilnehmer darf sich online vom Event abmelden', 'Geben Sie dem angemeldeten Teilnehmer die Möglichkeit unter Einhaltung einer definierten Abmeldefrist sich online vom Event abzumelden.'];
