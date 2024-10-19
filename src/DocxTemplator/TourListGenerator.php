@@ -19,7 +19,9 @@ use chillerlan\QRCode\QROptions;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Dbafs;
 use Contao\Events;
+use Contao\FilesModel;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
@@ -30,37 +32,23 @@ use Markocupic\SacEventToolBundle\Config\EventType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
 
 class TourListGenerator extends AbstractController
 {
     private const TEMPLATE = 'vendor/markocupic/sac-event-tool-bundle/contao/templates/docx/tour_listing_booklet.docx';
     private const TEASER_LENGTH = 220;
+    private const STORAGE_DIR = 'files/sektion/tmp/tourlist_booklet/tmp';
 
     public function __construct(
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly ConvertFile $convertFile,
-        private string $projectDir,
+        private readonly string $projectDir,
     ) {
         $this->framework->initialize();
     }
 
-    #[Route('/$arrIds/download_status/{uuid}', name: self::class.'_send_download_status', defaults: ['_scope' => 'frontend', '_token_check' => false])]
-    public function sendDownloadStatusAction(Request $request, string $uuid): JsonResponse
-    {
-        $json = ['status' => 'busy'];
-
-        if (is_file($this->projectDir.'/system/tmp/.'.base64_encode($uuid))) {
-            $json = ['status' => 'ready'];
-        }
-
-        return new JsonResponse($json);
-    }
-
-    public function generate(array $arrIds, string $outputFormat = 'docx'): \SplFileObject
+    public function generate(array $arrIds, string $outputFormat = 'docx'): FilesModel
     {
         $arrIds = array_filter(array_unique(array_map('intval', $arrIds)));
 
@@ -78,7 +66,11 @@ class TourListGenerator extends AbstractController
         // Store the generated file in system/tmp
         $filename = md5(microtime().random_bytes(3));
 
-        $templateProcessor = new MsWordTemplateProcessor($this->projectDir.'/'.self::TEMPLATE, $this->projectDir.'/system/tmp/'.$filename.'.docx');
+        // Create the storage directory if not exists
+        $fs = new Filesystem();
+        $fs->mkdir(Path::join($this->projectDir, self::STORAGE_DIR));
+
+        $templateProcessor = new MsWordTemplateProcessor(Path::join($this->projectDir, self::TEMPLATE), Path::join($this->projectDir, self::STORAGE_DIR, $filename.'.docx'));
 
         //$this->addTourTypeSection($templateProcessor);
         //$this->addTourTechDiffSection($templateProcessor);
@@ -95,7 +87,13 @@ class TourListGenerator extends AbstractController
             ;
         }
 
-        return $splFileObject;
+        $filesModel = Dbafs::addResource(Path::makeRelative($splFileObject->getRealPath(), $this->projectDir));
+
+        if (null === $filesModel) {
+            throw new \Exception(sprintf('Could not add the file %s to DBAFS.', $splFileObject->getRealPath()));
+        }
+
+        return $filesModel;
     }
 
     protected function prepareString(string $string = ''): string
@@ -199,7 +197,7 @@ class TourListGenerator extends AbstractController
             $isPublicTransport = CalendarEventsHelper::isPublicTransportEvent($event);
 
             if ($isPublicTransport) {
-                $path = $this->projectDir.'/vendor/markocupic/sac-event-tool-bundle/public/icons/tour_booklet/oev-tour-badge.png';
+                $path = Path::join($this->projectDir, 'vendor/markocupic/sac-event-tool-bundle/public/icons/tour_booklet/oev-tour-badge.png');
                 $templateProcessor->setImageValue('oev_img_#'.$index_outer, $path);
             } else {
                 $templateProcessor->setValue('oev_img_#'.$index_outer.':50:50', '');
@@ -213,7 +211,7 @@ class TourListGenerator extends AbstractController
                     $pathinfo = pathinfo($arrOrgLogoPaths[$i]);
                     $dirname = $pathinfo['dirname'];
                     $filename = $pathinfo['filename'];
-                    $pngPath = Path::join($dirname, '/png/'.$filename.'.png');
+                    $pngPath = Path::join($dirname, sprintf('png/%s.png', $filename));
                     $templateProcessor->setImageValue('org_img_'.$i.'_#'.$index_outer, $pngPath);
                 } else {
                     $templateProcessor->setValue('org_img_'.$i.'_#'.$index_outer.':40:40', '');
@@ -229,10 +227,10 @@ class TourListGenerator extends AbstractController
     private function generateQRCode(CalendarEventsModel $event, array $arrOptions = [], bool $blnCache = true): string
     {
         $fs = new Filesystem();
-        $fs->mkdir($this->projectDir.'/system/tmp/qrcodes');
+        $fs->mkdir(Path::join($this->projectDir, 'system/tmp/qrcodes'));
 
         // Generate path
-        $filepath = sprintf($this->projectDir.'/system/tmp/qrcodes/event_booklet_event_qrcode_%s.png', $event->id);
+        $filepath = Path::join($this->projectDir, sprintf('system/tmp/qrcodes/event_booklet_event_qrcode_%s.png', $event->id));
 
         // Defaults
         $opt = [
@@ -252,7 +250,7 @@ class TourListGenerator extends AbstractController
         // Get event reader url
         $url = Events::generateEventUrl($event, true);
 
-        // Generate QR and return the image path
+        // Generate QR code and return the image path
         if ((new QRCode($options))->render($url, $filepath)) {
             return $filepath;
         }

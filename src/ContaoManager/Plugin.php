@@ -21,6 +21,7 @@ use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\ManagerPlugin\Routing\RoutingPluginInterface;
+use Markocupic\ContaoFrontendUserNotification\MarkocupicContaoFrontendUserNotification;
 use Markocupic\RssFeedGeneratorBundle\MarkocupicRssFeedGeneratorBundle;
 use Markocupic\SacEventToolBundle\MarkocupicSacEventToolBundle;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
@@ -43,6 +44,7 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
                     ContaoCalendarBundle::class,
                     Code4NixUriSigner::class,
                     MarkocupicRssFeedGeneratorBundle::class,
+                    MarkocupicContaoFrontendUserNotification::class,
                 ]),
         ];
     }

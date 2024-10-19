@@ -17,6 +17,25 @@
             {% endif %}
         </div>
 
+        <div class="toast-container position-fixed top-0 start-0 p-3">
+            <div id="download-info-toast" class="toast" role="alert" data-bs-autohide="false" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <span class="me-auto text-danger small">
+                        <i class="fa-solid fa-circle-info"></i> <strong>Hallo {{ insert_tag('user::firstname') }}!</strong>
+                    </span>
+                    <!--<small>11 mins ago</small>-->
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body bg-white">
+                    <small>
+                        Deine Tour-Liste wird jetzt im Hintergrund für dich zusammengestellt. Das kann je nach Anzahl gewählter Touren einige Minuten dauern.<br>
+                        Du darfst aber in dieser Zeit gerne auf https://www.sac-pilatus.ch weitersurfen, dich aber nicht abmelden.
+                        Sobald die Tour-Liste bereit ist für den Download, wirst du auf dieser Webseite wieder benachrichtigt.
+                    </small>
+                </div>
+            </div>
+        </div>
+
         {% do addHtmlToHead('
             <style>
             .mod_print_tour_list_button button .ready {
@@ -52,7 +71,7 @@
                     button.addEventListener("click", async (e) => {
 
                         // Get the button element
-                        const btn = e.currentTarget;
+                        //const btn = e.currentTarget;
 
                         // Prevent multiple clicks
                         button.setAttribute('disabled', '');
@@ -73,7 +92,7 @@
                         const arrIDS = arrJSON.meta.arrEventIds;
 
                         if (!arrIDS.length) {
-                            alert('Die Tourliste ist leer und kann nicht gedruckt werden. Ändern Sie die Filtereinstellungen.');
+                            alert('Die Tourliste ist leer und kann nicht gedruckt werden. Ändere die Filtereinstellungen.');
                             button.removeAttribute('disabled', '');
                             return;
                         }
@@ -82,23 +101,30 @@
                         const uuid = window.crypto.randomUUID();
 
                         // Build url for the docx/pdf controller
-                        const href2 = window.location.protocol + '//' + window.location.hostname + '/_print_tour_list/download?ids=' + arrIDS.join(',') + '&uuid=' + uuid;
+                        const href = '_print_tour_list/init_download?ids=' + arrIDS.join(',') + '&uuid=' + uuid;
 
-                        // Poll the server to find out, whether the download is completed.
-                        const interval = setInterval(async () => {
-                            const href3 = window.location.protocol + '//' + window.location.hostname + '/_print_tour_list/download_status/' + uuid;
-                            const response = await fetch(href3);
-                            const arrJSON = await response.json();
+                        try {
+                            // Call the docx/pdf controller
+                            //window.location.href = href2;
+                            const resp = await fetch(href);
 
-                            // Check if the download is completed
-                            if (arrJSON['status'] === 'ready') {
-                                clearInterval(interval);
+                            if (resp.ok) {
                                 button.removeAttribute('disabled');
-                            }
-                        }, 2000);
 
-                        // Call the docx/pdf controller
-                        window.location.href = href2;
+                                // Show info toast
+                                const toast = document.getElementById('download-info-toast');
+                                const toastInstance = new bootstrap.Toast(toast);
+                                toastInstance.show();
+                                function play(){
+                                    var audio = new Audio("https://res.cloudinary.com/dxfq3iotg/video/upload/v1557233294/info.mp3");
+                                    audio.play();
+                                }
+                                play();
+                            }
+                        } catch (e) {
+                            button.removeAttribute('disabled');
+                            alert('Die Tour-Liste kann nicht heruntergeladen werden.')
+                        }
                     });
                 }
 
