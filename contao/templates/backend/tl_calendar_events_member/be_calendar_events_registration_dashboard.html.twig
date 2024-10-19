@@ -5,7 +5,7 @@
 
 {% if show_email_buttons|default %}
     <div class="tl_submit_container change-state-of-subscription-with-email-box">
-        <h3>Teilnehmer benachrichtigen</h3>
+        <h3>Teilnehmer/in benachrichtigen</h3>
 
         {% if state_of_subscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::SUBSCRIPTION_ACCEPTED') and not event_is_fully_booked %}
             <a href="{{ button_hrefs.accept_with_email }}" onclick="if (!confirm('{{ onclick_confirm_C }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-accept-with-email">Bestätigen mit E-Mail</a>
@@ -17,7 +17,7 @@
 
         {% if state_of_subscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::SUBSCRIPTION_REFUSED') and state_of_subscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::USER_HAS_UNSUBSCRIBED') %}
             <a href="{{ button_hrefs.refuse_with_email }}" onclick="if (!confirm('{{ onclick_confirm_A }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-refuse-with-email">Ablehnen mit E-Mail</a>
-            <a href="{{ button_hrefs.cancel_with_email }}" onclick="if (!confirm('{{ onclick_confirm_B }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-cancel-with-email">Stornieren mit E-Mail</a>
+            <a href="{{ button_hrefs.cancel_with_email }}" onclick="if (!confirm('{{ onclick_confirm_B }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-cancel-with-email">Stornieren (abgemeldet) mit E-Mail</a>
         {% endif %}
     </div>
 
