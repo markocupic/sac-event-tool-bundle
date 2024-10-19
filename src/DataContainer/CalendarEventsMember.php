@@ -38,7 +38,6 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use League\Csv\CannotInsertRecord;
 use League\Csv\InvalidArgument;
-use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
@@ -49,6 +48,7 @@ use Markocupic\SacEventToolBundle\DocxTemplator\EventRegistrationListGeneratorDo
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\NotificationType\SubscriptionStateChangeNotificationType;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;

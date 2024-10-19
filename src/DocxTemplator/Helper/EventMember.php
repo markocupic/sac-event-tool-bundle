@@ -21,8 +21,8 @@ use Contao\MemberModel;
 use Contao\Model\Collection;
 use Contao\UserModel;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
-use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 
 class EventMember
 {

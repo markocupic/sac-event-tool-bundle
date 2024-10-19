@@ -1,7 +1,7 @@
 {
     "require": {
         "contao/calendar-bundle": "^5.3",
-        "contao/comments-bundle": "^4.13",
+        "contao/comments-bundle": "^5.3",
         "contao/core-bundle": "^5.3",
         "contao/newsletter-bundle": "^5.3",
         "chillerlan/php-qrcode": "^5.0",

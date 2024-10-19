@@ -21,9 +21,9 @@ use Contao\Events;
 use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\UserModel;
-use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Terminal42\NotificationCenterBundle\NotificationCenter;
 
