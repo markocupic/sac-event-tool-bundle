@@ -30,7 +30,7 @@ abstract class AbstractPrintExportController extends AbstractFrontendModuleContr
     ) {
     }
 
-    public function hasValidReleaseLevel(CalendarEventsModel $objEvent, int $minLevel = null): bool
+    public function hasValidReleaseLevel(CalendarEventsModel $objEvent, int|null $minLevel = null): bool
     {
         /** @var EventReleaseLevelPolicyModel $eventReleaseLevelPolicyModelAdapter */
         $eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);

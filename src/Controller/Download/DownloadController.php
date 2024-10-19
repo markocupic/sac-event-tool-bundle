@@ -69,7 +69,7 @@ class DownloadController extends AbstractController
      * /_download/print_workshop_details_as_docx/year=2017/89.
      */
     #[Route('/_download/print_workshop_details_as_docx/{year}/{eventId}', name: 'sac_event_tool_download_print_workshop_details_as_docx', defaults: ['_scope' => 'frontend', '_token_check' => false])]
-    public function printWorkshopDetailsAsDocxAction(int $year = 0, int $eventId = null): Response
+    public function printWorkshopDetailsAsDocxAction(int $year = 0, int|null $eventId = null): Response
     {
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);

@@ -39,7 +39,7 @@ class SyncMemberToUserController extends AbstractBackendController
     ) {
     }
 
-    public function __invoke(Request $request = null): Response
+    public function __invoke(Request|null $request = null): Response
     {
         if (!$this->security->isGranted('ROLE_ADMIN')) {
             $url = $this->router->generate(

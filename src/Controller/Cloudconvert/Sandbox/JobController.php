@@ -46,7 +46,7 @@ class JobController extends AbstractController
         $splFile = new \SplFileObject($this->projectDir.'/files/file.docx');
         $this->upload($splFile);
 
-        return new Response('An new conversion job has been sent to Cloudconvert!'.$output);
+        return new Response('An new conversion job has been sent to Cloudconvert!');
     }
 
     private function upload(\SplFileObject $splFile): void

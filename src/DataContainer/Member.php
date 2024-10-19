@@ -60,7 +60,7 @@ class Member
     }
 
     #[AsCallback(table: 'tl_member', target: 'config.onload', priority: 100)]
-    public function checkPermission(DataContainer $dc = null): void
+    public function checkPermission(DataContainer|null $dc = null): void
     {
         if (!$dc) {
             // The personal data frontend module is triggering the onload callbacks as well,

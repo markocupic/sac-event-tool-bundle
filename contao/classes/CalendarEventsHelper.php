@@ -64,7 +64,7 @@ class CalendarEventsHelper
      *
      * @return array|bool|CalendarEventsModel|int|mixed|string|null
      */
-    public static function getEventData(CalendarEventsModel $objEvent, string $strProperty, Template $objTemplate = null)
+    public static function getEventData(CalendarEventsModel $objEvent, string $strProperty, Template|null $objTemplate = null)
     {
         // Load language files
         Controller::loadLanguageFile('tl_calendar_events');

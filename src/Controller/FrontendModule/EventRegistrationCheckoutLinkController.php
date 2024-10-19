@@ -40,7 +40,7 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
     ) {
     }
 
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+    public function __invoke(Request $request, ModuleModel $model, string $section, array|null $classes = null, PageModel|null $page = null): Response
     {
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);

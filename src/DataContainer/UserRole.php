@@ -35,7 +35,7 @@ readonly class UserRole
     }
 
     #[AsCallback(table: 'tl_user_role', target: 'config.onload', priority: 100)]
-    public function checkPermission(DataContainer $dc = null): void
+    public function checkPermission(DataContainer|null $dc = null): void
     {
         if (null === $dc || !$dc->id) {
             return;

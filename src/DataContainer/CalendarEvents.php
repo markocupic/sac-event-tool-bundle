@@ -1398,7 +1398,7 @@ class CalendarEvents
      * @throws \Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventType.save', priority: 80)]
-    public function saveCallbackEventType(string $strEventType, DataContainer $dc, int $intId = null): string
+    public function saveCallbackEventType(string $strEventType, DataContainer $dc, int|null $intId = null): string
     {
         if ('' !== $strEventType) {
             if ($dc->activeRecord->id > 0) {

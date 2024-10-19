@@ -48,7 +48,7 @@ class MemberDashboardProfileController extends AbstractFrontendModuleController
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }
 
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+    public function __invoke(Request $request, ModuleModel $model, string $section, array|null $classes = null, PageModel|null $page = null): Response
     {
         // Get logged in member object
         if (($objUser = $this->security->getUser()) instanceof FrontendUser) {

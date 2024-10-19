@@ -45,7 +45,7 @@ class EventListController extends AbstractFrontendModuleController
     ) {
     }
 
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+    public function __invoke(Request $request, ModuleModel $model, string $section, array|null $classes = null, PageModel|null $page = null): Response
     {
         $this->model = $model;
 

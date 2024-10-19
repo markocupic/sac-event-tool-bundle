@@ -44,7 +44,7 @@ class UserPortraitListController extends AbstractContentElementController
     ) {
     }
 
-    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response
+    public function __invoke(Request $request, ContentModel $model, string $section, array|null $classes = null, PageModel|null $pageModel = null): Response
     {
         return parent::__invoke($request, $model, $section, $classes);
     }

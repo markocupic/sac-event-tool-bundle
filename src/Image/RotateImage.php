@@ -35,7 +35,7 @@ class RotateImage
     /**
      * @throws \ImagickException
      */
-    public function rotate(FilesModel $filesModel = null, int $angle = 90, string $target = ''): bool
+    public function rotate(FilesModel|null $filesModel = null, int $angle = 90, string $target = ''): bool
     {
         if (null === $filesModel) {
             return false;

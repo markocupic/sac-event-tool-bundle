@@ -28,6 +28,7 @@ return static function (ECSConfig $ecsConfig): void {
 
     $ecsConfig->skip([
 		'*/contao/dca*',
+		'*/src/Controller/Cloudconvert/Sandbox/*',
 		MethodChainingIndentationFixer::class => [
             'DependencyInjection/Configuration.php',
         ],

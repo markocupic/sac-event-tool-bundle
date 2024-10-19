@@ -1,5 +1,6 @@
 <?php
 
+// phpcs:ignoreFile
 declare(strict_types=1);
 
 /*
@@ -61,7 +62,8 @@ class WebhookController extends AbstractController
 
         $job = $webhookEvent->getJob();
 
-        $tag = $job->getTag(); // can be used to store an ID
+        // can be used to store an ID
+        $tag = $job->getTag();
 
         $exportTask = $job->getTasks()
             ->whereStatus(Task::STATUS_FINISHED) // get the task with 'finished' status ...

@@ -57,7 +57,7 @@ class ExportEvents2Docx
     /**
      * @throws Exception
      */
-    public function generate(int $year, string $eventId = null): BinaryFileResponse
+    public function generate(int $year, string|null $eventId = null): BinaryFileResponse
     {
         $this->strTable = 'tl_calendar_events';
         Controller::loadDataContainer('tl_calendar_events');
