@@ -83,10 +83,6 @@ readonly class GenerateTourListBookletHandler
             'notificationId' => $notificationModel->id,
         ], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        if (str_starts_with($url, 'https://sac')) {
-            $url = str_replace('https://', 'https://www.', $url);
-        }
-
         $urlSigned = $this->uriSigner->sign($url);
 
         $text = sprintf('<div class="lh-lg mb-3 small">Du kannst dein persönliches Tourenprogramm jetzt herunterladen:<br><a href="%s" title="Download starten">%s</a></div>', $urlSigned, $filename);
