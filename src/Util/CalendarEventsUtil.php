@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle;
+namespace Markocupic\SacEventToolBundle\Util;
 
 use chillerlan\QRCode\Common\Version;
 use chillerlan\QRCode\QRCode;
@@ -57,7 +57,7 @@ use Markocupic\SacEventToolBundle\Model\TourTypeModel;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Path;
 
-class CalendarEventsHelper
+class CalendarEventsUtil
 {
     /**
      * @throws \Exception

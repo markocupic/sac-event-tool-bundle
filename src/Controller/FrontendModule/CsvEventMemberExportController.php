@@ -32,7 +32,7 @@ use League\Csv\CannotInsertRecord;
 use League\Csv\Exception;
 use League\Csv\InvalidArgument;
 use League\Csv\Writer;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Symfony\Component\HttpFoundation\Request;
@@ -202,7 +202,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $date = $this->framework->getAdapter(Date::class);
         $config = $this->framework->getAdapter(Config::class);
         $controller = $this->framework->getAdapter(Controller::class);
-        $calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $memberModel = $this->framework->getAdapter(MemberModel::class);
 
@@ -224,7 +224,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                 $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
 
                 if (null !== $objEvent) {
-                    $arrOrganizer = $calendarEventsHelper->getEventOrganizersAsArray($objEvent, 'title');
+                    $arrOrganizer = $calendarEventsUtil->getEventOrganizersAsArray($objEvent, 'title');
                     $value = implode(', ', $arrOrganizer);
                 } break;
             case 'stateOfSubscription':
@@ -256,7 +256,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                 $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
 
                 if (null !== $objEvent) {
-                    $value = $calendarEventsHelper->getMainInstructorName($objEvent);
+                    $value = $calendarEventsUtil->getMainInstructorName($objEvent);
                 }
                 break;
             case 'mountainguide':

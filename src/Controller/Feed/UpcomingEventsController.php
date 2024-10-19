@@ -28,7 +28,7 @@ use Doctrine\DBAL\Types\Types;
 use Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory;
 use Markocupic\RssFeedGeneratorBundle\Item\Item;
 use Markocupic\RssFeedGeneratorBundle\Item\ItemGroup;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Path;
@@ -38,7 +38,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class UpcomingEventsController extends AbstractController
 {
     private readonly Adapter $calendarEventsModel;
-    private readonly Adapter $calendarEventsHelper;
+    private readonly Adapter $calendarEventsUtil;
     private readonly Adapter $events;
     private readonly Adapter $environment;
     private readonly Adapter $stringUtil;
@@ -51,7 +51,7 @@ class UpcomingEventsController extends AbstractController
         private readonly string $projectDir,
     ) {
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->events = $this->framework->getAdapter(Events::class);
         $this->environment = $this->framework->getAdapter(Environment::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
@@ -161,7 +161,7 @@ class UpcomingEventsController extends AbstractController
                     new Item('link', $this->stringUtil->specialchars($this->events->generateEventUrl($eventsModel, true))),
                     new Item('description', strip_tags(preg_replace('/[\n\r]+/', ' ', $arrEvent['teaser'])), ['cdata' => true]),
                     new Item('pubDate', date('r', (int) $eventsModel->startDate)),
-                    new Item('author', implode(', ', $this->calendarEventsHelper->getInstructorNamesAsArray($eventsModel))),
+                    new Item('author', implode(', ', $this->calendarEventsUtil->getInstructorNamesAsArray($eventsModel))),
                     new Item('guid', $this->stringUtil->specialchars($this->events->generateEventUrl($eventsModel, true))),
                     new Item('tourdb:startdate', date('Y-m-d', (int) $eventsModel->startDate)),
                     new Item('tourdb:enddate', date('Y-m-d', (int) $eventsModel->endDate)),

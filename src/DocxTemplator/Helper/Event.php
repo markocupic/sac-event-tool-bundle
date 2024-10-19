@@ -27,7 +27,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventType;
@@ -57,8 +57,8 @@ class Event
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        /** @var CalendarEventsUtil $calendarEventsUtilAdapter */
+        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
 
         // Event data
         $objPhpWord->replace('eventTitle', $this->prepareString($objEvent->title));
@@ -72,7 +72,7 @@ class Event
 
         // Generate event duration string
         $arrEventDates = [];
-        $eventTimestamps = $calendarEventsHelperAdapter->getEventTimestamps($objEvent);
+        $eventTimestamps = $calendarEventsUtilAdapter->getEventTimestamps($objEvent);
 
         foreach ($eventTimestamps as $i => $v) {
             if (\count($eventTimestamps) - 1 === $i) {
@@ -85,7 +85,7 @@ class Event
         $strEventDuration = implode(', ', $arrEventDates);
 
         // Get tour profile
-        $arrTourProfile = $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent);
+        $arrTourProfile = $calendarEventsUtilAdapter->getTourProfileAsArray($objEvent);
         $strTourProfile = implode("\r\n", $arrTourProfile);
         $strTourProfile = str_replace('Tag: ', 'Tag:'."\r\n", $strTourProfile);
 
@@ -114,7 +114,7 @@ class Event
 
         $objPhpWord->replace('eventDates', $this->prepareString($strEventDuration));
         $objPhpWord->replace('eventMeetingpoint', $this->prepareString($objEvent->meetingPoint));
-        $objPhpWord->replace('eventTechDifficulties', $this->prepareString(implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent, false, false))));
+        $objPhpWord->replace('eventTechDifficulties', $this->prepareString(implode(', ', $calendarEventsUtilAdapter->getTourTechDifficultiesAsArray($objEvent, false, false))));
         $objPhpWord->replace('eventEquipment', $this->prepareString($objEvent->equipment), ['multiline' => true]);
         $objPhpWord->replace('eventTourProfile', $this->prepareString($strTourProfile), ['multiline' => true]);
         $objPhpWord->replace('emergencyConcept', $this->prepareString($strEmergencyConcept), ['multiline' => true]);
@@ -133,8 +133,8 @@ class Event
         /** @var System $systemAdapter */
         $systemAdapter = $this->framework->getAdapter(System::class);
 
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        /** @var CalendarEventsUtil $calendarEventsUtilAdapter */
+        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
 
         /** @var CalendarEventsJourneyModel $calendarEventsJourneyModel */
         $calendarEventsJourneyModel = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
@@ -169,7 +169,7 @@ class Event
         $countParticipants = $countFemale + $countMale;
 
         // Count instructors
-        $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent, false);
+        $arrInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent, false);
         $countInstructors = \count($arrInstructors);
         $objUser = $userModel->findMultipleByIds($arrInstructors);
 

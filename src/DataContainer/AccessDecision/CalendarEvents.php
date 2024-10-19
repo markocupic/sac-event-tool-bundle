@@ -29,7 +29,7 @@ use Contao\System;
 use Contao\Versions;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\EventReleaseLevelUtil;
 use Markocupic\SacEventToolBundle\Event\ChangeEventReleaseLevelEvent;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
@@ -45,7 +45,7 @@ class CalendarEvents
 {
     // Adapters
     private Adapter $backend;
-    private Adapter $calendarEventsHelper;
+    private Adapter $calendarEventsUtil;
     private Adapter $calendarEventsModel;
     private Adapter $controller;
     private Adapter $image;
@@ -65,7 +65,7 @@ class CalendarEvents
     ) {
         // Adapters
         $this->backend = $this->framework->getAdapter(Backend::class);
-        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->image = $this->framework->getAdapter(Image::class);
@@ -582,7 +582,7 @@ class CalendarEvents
     {
         $eventModel = $this->calendarEventsModel->findByPk($row['id']);
 
-        $href = $this->calendarEventsHelper->generateEventPreviewUrl($eventModel);
+        $href = $this->calendarEventsUtil->generateEventPreviewUrl($eventModel);
 
         return '<a href="'.$href.'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }

@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Twig\Extension;
 
 use Contao\CalendarEventsModel;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -45,6 +45,6 @@ class TwigQrCodeManager extends AbstractExtension
             $event = $varEvent;
         }
 
-        return CalendarEventsHelper::getEventQrCode($event) ?? '';
+        return CalendarEventsUtil::getEventQrCode($event) ?? '';
     }
 }

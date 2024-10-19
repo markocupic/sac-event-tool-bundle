@@ -19,14 +19,14 @@ use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Events;
 use Contao\FrontendTemplate;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class TwigSchemaOrgDataManager extends AbstractExtension
 {
-    private Adapter $calendarEventsHelper;
+    private Adapter $calendarEventsUtil;
     private Adapter $events;
 
     public function __construct(
@@ -34,7 +34,7 @@ class TwigSchemaOrgDataManager extends AbstractExtension
         private readonly RequestStack $requestStack,
         private readonly string $sacevtSectionName,
     ) {
-        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->events = $this->framework->getAdapter(Events::class);
     }
 
@@ -61,12 +61,12 @@ class TwigSchemaOrgDataManager extends AbstractExtension
 
         $jsonLd = $this->events->getSchemaOrgData($model);
         $jsonLd['location'] = $model->location;
-        $jsonLd['tourguide'] = implode(', ', $this->calendarEventsHelper->getInstructorNamesAsArray($model));
+        $jsonLd['tourguide'] = implode(', ', $this->calendarEventsUtil->getInstructorNamesAsArray($model));
 
         $mainSection = $this->sacevtSectionName;
         $organizers = array_map(
             static fn ($el) => $mainSection.': '.$el,
-            $this->calendarEventsHelper->getEventOrganizersAsArray($model, 'title'),
+            $this->calendarEventsUtil->getEventOrganizersAsArray($model, 'title'),
         );
 
         $jsonLd['organizer'] = [

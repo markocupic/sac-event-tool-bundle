@@ -30,7 +30,7 @@ use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
@@ -70,7 +70,7 @@ class EventParticipantEmailController extends AbstractBackendController
 
     // Adapters
     private Adapter $calendarEvents;
-    private Adapter $calendarEventsHelper;
+    private Adapter $calendarEventsUtil;
     private Adapter $calendarEventsMember;
     private Adapter $controller;
     private Adapter $environment;
@@ -92,7 +92,7 @@ class EventParticipantEmailController extends AbstractBackendController
         private readonly string $sacevtEventAdminName,
     ) {
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->environment = $this->framework->getAdapter(Environment::class);
@@ -501,7 +501,7 @@ class EventParticipantEmailController extends AbstractBackendController
         $options = [];
 
         // Get the instructors
-        $arrInstrIds = $this->calendarEventsHelper->getInstructorsAsArray($this->event);
+        $arrInstrIds = $this->calendarEventsUtil->getInstructorsAsArray($this->event);
 
         foreach ($arrInstrIds as $userId) {
             $objInstructor = $this->userModel->findByPk($userId);

@@ -45,7 +45,7 @@ use League\Csv\CannotInsertRecord;
 use League\Csv\CharsetConverter;
 use League\Csv\InvalidArgument;
 use League\Csv\Writer;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
 use Markocupic\SacEventToolBundle\Config\EventState;
@@ -66,7 +66,7 @@ class CalendarEvents
 {
     // Adapters
     private Adapter $arrayUtil;
-    private Adapter $calendarEventsHelper;
+    private Adapter $calendarEventsUtil;
     private Adapter $calendarEventsJourneyModel;
     private Adapter $calendarEventsModel;
     private Adapter $calendarModel;
@@ -95,7 +95,7 @@ class CalendarEvents
     ) {
         // Adapters
         $this->arrayUtil = $this->framework->getAdapter(ArrayUtil::class);
-        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsJourneyModel = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarModel = $this->framework->getAdapter(CalendarModel::class);
@@ -307,11 +307,11 @@ class CalendarEvents
                                 $arrRow[] = null !== $objUser ? html_entity_decode($objUser->lastname.' '.$objUser->firstname) : '';
                                 break;
                             case 'tourTechDifficulty':
-                                $arrDiff = $this->calendarEventsHelper->getTourTechDifficultiesAsArray($objEvent->current(), false, false);
+                                $arrDiff = $this->calendarEventsUtil->getTourTechDifficultiesAsArray($objEvent->current(), false, false);
                                 $arrRow[] = implode(' und ', $arrDiff);
                                 break;
                             case 'eventDates':
-                                $arrTimestamps = $this->calendarEventsHelper->getEventTimestamps($objEvent->current());
+                                $arrTimestamps = $this->calendarEventsUtil->getEventTimestamps($objEvent->current());
                                 $arrDates = array_map(
                                     static fn ($tstamp) => Date::parse(Config::get('dateFormat'), $tstamp),
                                     $arrTimestamps
@@ -319,21 +319,21 @@ class CalendarEvents
                                 $arrRow[] = implode(',', $arrDates);
                                 break;
                             case 'eventDurationInDays':
-                                $arrRow[] = \count($this->calendarEventsHelper->getEventTimestamps($objEvent->current()));
+                                $arrRow[] = \count($this->calendarEventsUtil->getEventTimestamps($objEvent->current()));
                                 break;
                             case 'organizers':
-                                $arrOrganizers = $this->calendarEventsHelper->getEventOrganizersAsArray($objEvent->current(), 'title');
+                                $arrOrganizers = $this->calendarEventsUtil->getEventOrganizersAsArray($objEvent->current(), 'title');
                                 $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
                                 break;
                             case 'instructor':
-                                $arrInstructors = $this->calendarEventsHelper->getInstructorNamesAsArray($objEvent->current(), false, true);
+                                $arrInstructors = $this->calendarEventsUtil->getInstructorNamesAsArray($objEvent->current(), false, true);
                                 $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
                                 break;
                             case 'tourType':
                                 if (EventType::COURSE === $objEvent->eventType) {
                                     $arrRow[] = '';
                                 } else {
-                                    $arrTourTypes = $this->calendarEventsHelper->getTourTypesAsArray($objEvent->current(), 'title');
+                                    $arrTourTypes = $this->calendarEventsUtil->getTourTypesAsArray($objEvent->current(), 'title');
                                     $arrRow[] = html_entity_decode(implode(',', $arrTourTypes));
                                 }
                                 break;
@@ -1238,7 +1238,7 @@ class CalendarEvents
             $strAuthor = ' <span style="color:#b3b3b3;padding-left:3px">[Hauptleiter: '.$objUser->name.']</span><br>';
         }
 
-        $strRegistrations = $this->calendarEventsHelper->getEventStateOfSubscriptionBadgesString($objEvent);
+        $strRegistrations = $this->calendarEventsUtil->getEventStateOfSubscriptionBadgesString($objEvent);
 
         if ('' !== $strRegistrations) {
             $strRegistrations = '<br>'.$strRegistrations;

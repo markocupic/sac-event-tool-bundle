@@ -38,7 +38,7 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use League\Csv\CannotInsertRecord;
 use League\Csv\InvalidArgument;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
@@ -63,7 +63,7 @@ class CalendarEventsMember
 
     // Adapters
     private Adapter $calendarEvents;
-    private Adapter $calendarEventsHelper;
+    private Adapter $calendarEventsUtil;
     private Adapter $calendarEventsMember;
     private Adapter $controller;
     private Adapter $events;
@@ -92,7 +92,7 @@ class CalendarEventsMember
     ) {
         // Adapters
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->events = $this->framework->getAdapter(Events::class);
@@ -274,7 +274,7 @@ class CalendarEventsMember
                     }
                 }
 
-                if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $varValue && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && $this->calendarEventsHelper->areBookingDatesOccupied($objEvent, $objMember)) {
+                if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $varValue && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && $this->calendarEventsUtil->areBookingDatesOccupied($objEvent, $objMember)) {
                     $this->message->addError('Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".');
                     $varValue = $objEventMemberModel->stateOfSubscription;
                 } elseif ($this->validator->isEmail($objEventMemberModel->email)) {
@@ -452,7 +452,7 @@ class CalendarEventsMember
                         $template->button_hrefs = $hrefs;
                         $template->event = $event->row();
                         $template->show_email_buttons = true;
-                        $template->event_is_fully_booked = $this->calendarEventsHelper->eventIsFullyBooked($event);
+                        $template->event_is_fully_booked = $this->calendarEventsUtil->eventIsFullyBooked($event);
 
                         return $template->parse();
                     }

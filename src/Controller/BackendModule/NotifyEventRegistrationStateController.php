@@ -29,7 +29,7 @@ use Contao\MemberModel;
 use Contao\Message;
 use Contao\Validator;
 use Contao\Versions;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -63,7 +63,7 @@ class NotifyEventRegistrationStateController
 
     // Adapters
     private Adapter $calendarEvents;
-    private Adapter $calendarEventsHelper;
+    private Adapter $calendarEventsUtil;
     private Adapter $calendarEventsMember;
     private Adapter $config;
     private Adapter $controller;
@@ -87,7 +87,7 @@ class NotifyEventRegistrationStateController
         private readonly string $sacevtEventAdminName,
     ) {
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->config = $this->framework->getAdapter(Config::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
@@ -281,7 +281,7 @@ class NotifyEventRegistrationStateController
             self::ACCEPT_WITH_EMAIL_ACTION === $this->action &&
             null !== $objMember &&
             !$this->registration->allowMultiSignUp &&
-            $this->calendarEventsHelper->areBookingDatesOccupied($this->event, $objMember)
+            $this->calendarEventsUtil->areBookingDatesOccupied($this->event, $objMember)
         ) {
             $this->message->addError(
                 'Es ist ein Fehler aufgetreten. '.
@@ -337,7 +337,7 @@ class NotifyEventRegistrationStateController
     private function getTokenArray(): array
     {
         // Get event dates as a comma separated string
-        $eventDates = $this->calendarEventsHelper->getEventTimestamps($this->event);
+        $eventDates = $this->calendarEventsUtil->getEventTimestamps($this->event);
         $df = $this->config->get('dateFormat');
         $strDates = implode(
             ', ',

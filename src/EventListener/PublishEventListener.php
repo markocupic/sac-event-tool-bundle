@@ -23,7 +23,7 @@ use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Email;
 use Contao\StringUtil;
 use Contao\UserModel;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Event\PublishEventEvent;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -103,7 +103,7 @@ final readonly class PublishEventListener
 
         $arrEvent = array_map(static fn ($val) => StringUtil::revertInputEncoding((string) $val), $objEvent->row());
 
-        $objInstructor = CalendarEventsHelper::getMainInstructor($objEvent);
+        $objInstructor = CalendarEventsUtil::getMainInstructor($objEvent);
 
         if (null === $objInstructor) {
             throw new \RuntimeException(sprintf('Could not find a main instructor for event with ID %d.', $objEvent->id));

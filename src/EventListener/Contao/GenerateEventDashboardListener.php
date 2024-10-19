@@ -19,7 +19,7 @@ use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Knp\Menu\MenuItem;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -46,7 +46,7 @@ class GenerateEventDashboardListener
      */
     public function __invoke(MenuItem $menu, CalendarEventsModel $objEvent): void
     {
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
         $request = $this->requestStack->getCurrentRequest();
         $eventId = $objEvent->id;
         $calendarId = $objEvent->getRelated('pid')->id;
@@ -83,7 +83,7 @@ class GenerateEventDashboardListener
         ;
 
         // "Go to event-preview" button
-        if (($href = $calendarEventsHelperAdapter->generateEventPreviewUrl($objEvent)) !== '') {
+        if (($href = $calendarEventsUtilAdapter->generateEventPreviewUrl($objEvent)) !== '') {
             $menu->addChild('Vorschau', ['uri' => $href])
                 ->setLinkAttribute('role', 'button')
                 ->setLinkAttribute('class', 'tl_submit')

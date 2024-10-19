@@ -34,7 +34,7 @@ use Contao\System;
 use Contao\Validator;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
@@ -158,7 +158,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
         $dateAdapter = $this->framework->getAdapter(Date::class);
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
 
         if (null !== $this->objUser) {
             $objRegistration = $calendarEventsMemberModelAdapter->findByPk($inputAdapter->get('id'));
@@ -184,7 +184,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 
                                 return $dateAdapter->parse('d.m.Y', $tstmp);
                             },
-                            $calendarEventsHelperAdapter->getEventTimestamps($objEvent)
+                            $calendarEventsUtilAdapter->getEventTimestamps($objEvent)
                         );
 
                         // Course id

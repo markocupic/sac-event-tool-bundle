@@ -27,13 +27,13 @@ use Eluceo\iCal\Domain\ValueObject\Location;
 use Eluceo\iCal\Domain\ValueObject\SingleDay;
 use Eluceo\iCal\Domain\ValueObject\Uri;
 use Eluceo\iCal\Presentation\Factory\CalendarFactory;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 
 class EventICal
 {
-    private Adapter $calendarEventsHelper;
+    private Adapter $calendarEventsUtil;
     private Adapter $events;
     private Adapter $stringUtil;
 
@@ -41,7 +41,7 @@ class EventICal
         private readonly ContaoFramework $framework,
         private readonly InsertTagParser $insertTagParser,
     ) {
-        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->events = $this->framework->getAdapter(Events::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }
@@ -60,7 +60,7 @@ class EventICal
         $url = $this->events->generateEventUrl($objEvent, true);
 
         $arrEvents = [];
-        $arrEventTimestamps = $this->calendarEventsHelper->getEventTimestamps($objEvent);
+        $arrEventTimestamps = $this->calendarEventsUtil->getEventTimestamps($objEvent);
 
         foreach ($arrEventTimestamps as $timestamp) {
             $occurrence = new SingleDay(

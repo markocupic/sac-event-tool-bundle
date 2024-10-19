@@ -24,7 +24,7 @@ use Contao\System;
 use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\Renderer\ListRenderer;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Twig\Environment as Twig;
@@ -51,7 +51,7 @@ class ParseBackendTemplateListener
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
 
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         if ('be_main' === $strTemplate) {
@@ -73,8 +73,8 @@ class ParseBackendTemplateListener
                         $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
                         $arrEvent = $objEvent->row();
-                        $arrEvent['time_span'] = $calendarEventsHelperAdapter->getEventPeriod($objEvent);
-                        $arrEvent['instructors'] = $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent);
+                        $arrEvent['time_span'] = $calendarEventsUtilAdapter->getEventPeriod($objEvent);
+                        $arrEvent['instructors'] = $calendarEventsUtilAdapter->getInstructorNamesAsArray($objEvent);
 
                         $arrRegistration = [];
                         $arrRegistration['states'] = array_diff(EventSubscriptionState::ALL, [EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED]);

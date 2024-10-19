@@ -28,7 +28,7 @@ use Contao\Environment;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
@@ -209,7 +209,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
         $courseMainTypeModelAdapter = $this->framework->getAdapter(CourseMainTypeModel::class);
         $courseSubTypeModelAdapter = $this->framework->getAdapter(CourseSubTypeModel::class);
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
         $databaseAdapter = $this->framework->getAdapter(Database::class);
         $eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
 
@@ -220,7 +220,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
             // Check if event is at least on second-highest level (Level 3/4)
             $eventModel = $calendarEventsModelAdapter->findByPk($objEvents->id);
 
-            $arrTimestamps = $calendarEventsHelperAdapter->getEventTimestamps($eventModel);
+            $arrTimestamps = $calendarEventsUtilAdapter->getEventTimestamps($eventModel);
 
             // Filter events by event duration
             $minDurationInDays = (int) $request->request->get('minEventDuration');
@@ -263,10 +263,10 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
             if (null !== $objEvent) {
                 while ($objEvent->next()) {
-                    $arrInstructors = array_merge($arrInstructors, $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent->current()));
+                    $arrInstructors = array_merge($arrInstructors, $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent->current()));
 
                     // tourType && date format
-                    $arrTourType = $calendarEventsHelperAdapter->getTourTypesAsArray($objEvent->current(), 'shortcut', false);
+                    $arrTourType = $calendarEventsUtilAdapter->getTourTypesAsArray($objEvent->current(), 'shortcut', false);
                     $dateFormat = 'D, j.';
 
                     if (EventType::COURSE === $objEvent->eventType) {
@@ -314,8 +314,8 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
                     $arrData = $objEvent->row();
 
-                    $arrData['eventId'] = $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'eventId');
-                    $arrData['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->current(), 'title'));
+                    $arrData['eventId'] = $calendarEventsUtilAdapter->getEventData($objEvent->current(), 'eventId');
+                    $arrData['organizers'] = implode(', ', $calendarEventsUtilAdapter->getEventOrganizersAsArray($objEvent->current(), 'title'));
                     $arrData['organizerTitle'] = $organizerTitle;
                     $arrData['organizerTitlePrint'] = $organizerTitlePrint;
                     $arrData['courseLevel'] = $objEvent->courseLevel ? $this->courseLevels->get($objEvent->courseLevel) : '';
@@ -323,23 +323,23 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $arrData['courseTypeLevel1'] = null !== $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1) ? $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1)->name : '';
                     $arrData['date'] = $this->getEventPeriod($objEvent->current(), $dateFormat);
                     $arrData['month'] = $dateAdapter->parse('F', $objEvent->startDate);
-                    $arrData['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->current(), false, true));
+                    $arrData['instructors'] = implode(', ', $calendarEventsUtilAdapter->getInstructorNamesAsArray($objEvent->current(), false, true));
                     $arrData['tourType'] = implode(', ', $arrTourType);
-                    $arrData['difficulty'] = implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent->current()));
+                    $arrData['difficulty'] = implode(', ', $calendarEventsUtilAdapter->getTourTechDifficultiesAsArray($objEvent->current()));
                     // Layout settings
                     $arrData['showHeadline'] = $showHeadline;
                     $arrData['showTeaser'] = $showTeaser;
                     $arrData['showDetails'] = $showDetails;
 
                     // Details
-                    $arrData['arrTourProfile'] = $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'arrTourProfile');
-                    $arrData['journey'] = $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'journey');
+                    $arrData['arrTourProfile'] = $calendarEventsUtilAdapter->getEventData($objEvent->current(), 'arrTourProfile');
+                    $arrData['journey'] = $calendarEventsUtilAdapter->getEventData($objEvent->current(), 'journey');
                     $arrData['minMaxMembers'] = implode('/', $minMax);
 
-                    $arrData['bookingInfo'] = 'Event-Nummer '.$calendarEventsHelperAdapter->getEventData($objEvent->current(), 'eventId');
+                    $arrData['bookingInfo'] = 'Event-Nummer '.$calendarEventsUtilAdapter->getEventData($objEvent->current(), 'eventId');
 
                     if (EventType::COURSE === $objEvent->eventType) {
-                        $arrData['bookingInfo'] = 'Kurs-Nummer '.$calendarEventsHelperAdapter->getEventData($objEvent->current(), 'courseId');
+                        $arrData['bookingInfo'] = 'Kurs-Nummer '.$calendarEventsUtilAdapter->getEventData($objEvent->current(), 'courseId');
                     }
                     $arrEvents[] = $arrData;
                 }
@@ -448,7 +448,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
     private function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = ''): string
     {
         $dateAdapter = $this->framework->getAdapter(Date::class);
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
         $configAdapter = $this->framework->getAdapter(Config::class);
         $calendarAdapter = $this->framework->getAdapter(Calendar::class);
 
@@ -464,28 +464,28 @@ class JahresprogrammExportController extends AbstractPrintExportController
             $dateFormatShortened = $dateFormat;
         }
 
-        $eventDuration = \count($calendarEventsHelperAdapter->getEventTimestamps($objEvent));
-        $span = $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($objEvent), $calendarEventsHelperAdapter->getEndDate($objEvent)) + 1;
+        $eventDuration = \count($calendarEventsUtilAdapter->getEventTimestamps($objEvent));
+        $span = $calendarAdapter->calculateSpan($calendarEventsUtilAdapter->getStartDate($objEvent), $calendarEventsUtilAdapter->getEndDate($objEvent)) + 1;
 
         if (1 === $eventDuration) {
-            return $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getStartDate($objEvent));
+            return $dateAdapter->parse($dateFormat, $calendarEventsUtilAdapter->getStartDate($objEvent));
         }
 
         if (2 === $eventDuration && $span !== $eventDuration) {
-            return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent)).' + '.$dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent));
+            return $dateAdapter->parse($dateFormatShortened, $calendarEventsUtilAdapter->getStartDate($objEvent)).' + '.$dateAdapter->parse($dateFormat, $calendarEventsUtilAdapter->getEndDate($objEvent));
         }
 
         if ($span === $eventDuration) {
             // Check if event dates are not in the same month
-            if ($dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getStartDate($objEvent)) === $dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getEndDate($objEvent))) {
-                return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent)).' - '.$dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent));
+            if ($dateAdapter->parse('n.Y', $calendarEventsUtilAdapter->getStartDate($objEvent)) === $dateAdapter->parse('n.Y', $calendarEventsUtilAdapter->getEndDate($objEvent))) {
+                return $dateAdapter->parse($dateFormatShortened, $calendarEventsUtilAdapter->getStartDate($objEvent)).' - '.$dateAdapter->parse($dateFormat, $calendarEventsUtilAdapter->getEndDate($objEvent));
             }
 
-            return $dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getStartDate($objEvent)).' - '.$dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getEndDate($objEvent));
+            return $dateAdapter->parse('j.n.', $calendarEventsUtilAdapter->getStartDate($objEvent)).' - '.$dateAdapter->parse('j.n.', $calendarEventsUtilAdapter->getEndDate($objEvent));
         }
 
         $arrDates = [];
-        $dates = $calendarEventsHelperAdapter->getEventTimestamps($objEvent);
+        $dates = $calendarEventsUtilAdapter->getEventTimestamps($objEvent);
 
         foreach ($dates as $date) {
             $arrDates[] = $dateAdapter->parse($dateFormat, $date);

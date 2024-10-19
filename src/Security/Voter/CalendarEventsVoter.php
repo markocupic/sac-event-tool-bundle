@@ -19,7 +19,7 @@ use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -46,7 +46,7 @@ class CalendarEventsVoter extends Voter
 
     // Adapters
     private Adapter $calendarEvent;
-    private Adapter $calendarEventsHelper;
+    private Adapter $calendarEventsUtil;
     private Adapter $eventReleaseLevelPolicy;
     private Adapter $stringUtil;
 
@@ -61,7 +61,7 @@ class CalendarEventsVoter extends Voter
     ) {
         // Adapters
         $this->calendarEvent = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->eventReleaseLevelPolicy = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }
@@ -100,7 +100,7 @@ class CalendarEventsVoter extends Voter
             return true;
         }
 
-        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($eventsModel);
+        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($eventsModel);
 
         if ((int) $user->id === (int) $eventsModel->author || \in_array($user->id, $arrEventInstructors, false)) {
             if ($eventReleaseLevelPolicyModel->allowWriteAccessToAuthor) {
@@ -221,7 +221,7 @@ class CalendarEventsVoter extends Voter
             }
         }
 
-        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event);
+        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($this->event);
 
         if ($releaseLevelPolicy->allowDeleteAccessToInstructors) {
             if (\in_array($this->user->id, $arrEventInstructors, false)) {
@@ -291,7 +291,7 @@ class CalendarEventsVoter extends Voter
             }
         }
 
-        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event);
+        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($this->event);
 
         if ($releaseLevelPolicy->allowCutAccessToInstructors) {
             if (\in_array($this->user->id, $arrEventInstructors, false)) {
@@ -362,7 +362,7 @@ class CalendarEventsVoter extends Voter
             }
         }
 
-        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event);
+        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($this->event);
 
         if ($releaseLevelPolicy->allowWriteAccessToInstructors) {
             if (\in_array($this->user->id, $arrEventInstructors, false)) {
@@ -445,7 +445,7 @@ class CalendarEventsVoter extends Voter
             }
         }
 
-        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event);
+        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($this->event);
 
         if ($releaseLevelPolicy->allowAdministerEventRegistrationsToInstructors) {
             if (\in_array($this->user->id, $arrEventInstructors, true)) {

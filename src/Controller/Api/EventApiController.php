@@ -24,7 +24,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -55,7 +55,7 @@ class EventApiController extends AbstractController
     {
         $this->framework->initialize();
 
-        $calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
 
         // Get query filter params from request
@@ -121,7 +121,7 @@ class EventApiController extends AbstractController
                         $oData = new \stdClass();
 
                         foreach ($arrFields as $field) {
-                            $v = $calendarEventsHelper->getEventData($objEvent, $field);
+                            $v = $calendarEventsUtil->getEventData($objEvent, $field);
                             $aField = explode('||', $field);
                             $field = $aField[0];
                             $oData->{$field} = $this->prepareValue($v);
@@ -163,7 +163,7 @@ class EventApiController extends AbstractController
         $this->framework->initialize();
 
         $calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
-        $calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
 
         $eventId = (int) $request->request->get('id');
         $arrFields = '' !== $request->get('fields') ? explode(',', $request->get('fields')) : [];
@@ -187,7 +187,7 @@ class EventApiController extends AbstractController
                     }
                 }
 
-                $arrEvent[$k] = $this->prepareValue($calendarEventsHelper->getEventData($objEvent, $k));
+                $arrEvent[$k] = $this->prepareValue($calendarEventsUtil->getEventData($objEvent, $k));
             }
             $arrJSON['arrEventData'] = $arrEvent;
         }

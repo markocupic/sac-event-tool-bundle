@@ -30,7 +30,7 @@ use Contao\System;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\SendTourRapportNotificationController;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
 use Markocupic\SacEventToolBundle\DocxTemplator\TourRapportGenerator;
@@ -373,10 +373,10 @@ readonly class CalendarEventsInstructorInvoice
 
         $countParticipants = $objEventMember->count();
 
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
 
         // Count instructors
-        $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent);
+        $arrInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent);
         $countInstructors = \count($arrInstructors);
 
         $countParticipantsTotal = $countParticipants + $countInstructors;

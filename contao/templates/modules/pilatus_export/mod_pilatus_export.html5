@@ -126,7 +126,7 @@
       {{br}}<?= $arrEvent['bookingEvent'] ?>
       <?php endif; ?>
       <?php if ($arrEvent['generateMainInstructorContactDataFromDb']): ?>
-      {{br}}<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateMainInstructorContactDataFromDb(\Contao\CalendarEventsModel::findByPk($arrEvent['id'])) ?>
+      {{br}}<?= Markocupic\SacEventToolBundle\Util\CalendarEventsUtil::generateMainInstructorContactDataFromDb(\Contao\CalendarEventsModel::findByPk($arrEvent['id'])) ?>
       <?php endif; ?>
     </td>
   </tr>
@@ -296,14 +296,14 @@
     <?php endif; ?>
     <!-- end experimental --->
 
-    <?php if (($strBookingPeriod = Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingPeriod((int) $arrEvent['id'], 'd.m.', 'd.m.Y')) != ''): ?>
+    <?php if (($strBookingPeriod = Markocupic\SacEventToolBundle\Util\CalendarEventsUtil::getBookingPeriod((int) $arrEvent['id'], 'd.m.', 'd.m.Y')) != ''): ?>
     <?php $arrText[] = 'Anmeldezeitraum: <time>'.$strBookingPeriod.'
   </time>
   '; ?>
   <?php endif; ?>
 
   <?php if ($arrEvent['generateMainInstructorContactDataFromDb']): ?>
-  <?php $arrText[] = Markocupic\SacEventToolBundle\CalendarEventsHelper::generateMainInstructorContactDataFromDb(\Contao\CalendarEventsModel::findByPk($arrEvent['id'])); ?>
+  <?php $arrText[] = Markocupic\SacEventToolBundle\Util\CalendarEventsUtil::generateMainInstructorContactDataFromDb(\Contao\CalendarEventsModel::findByPk($arrEvent['id'])); ?>
   <?php endif; ?>
   <?php if (empty($arrText)): ?>
   <?php $arrText[] = 'Kontaktdaten siehe JP'; ?>

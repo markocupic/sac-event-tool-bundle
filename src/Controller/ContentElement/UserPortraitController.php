@@ -21,7 +21,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\PageModel;
 use Contao\UserModel;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -43,7 +43,7 @@ class UserPortraitController extends AbstractContentElementController
     protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
 
         $user = null;
 
@@ -58,7 +58,7 @@ class UserPortraitController extends AbstractContentElementController
         }
 
         $arrUser = $user->row();
-        $arrUser['mainQualification'] = $calendarEventsHelperAdapter->getMainQualification($user);
+        $arrUser['mainQualification'] = $calendarEventsUtilAdapter->getMainQualification($user);
         $template->set('user', $arrUser);
         $template->set('userModel', $user);
 

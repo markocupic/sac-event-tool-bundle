@@ -23,7 +23,7 @@ use Contao\Environment;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventType;
@@ -242,7 +242,7 @@ class ExportEvents2Docx
             }
 
             if ('instructor' === $field) {
-                $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent);
+                $arrInstructors = CalendarEventsUtil::getInstructorsAsArray($objEvent);
                 $arrValue = array_map(
                     static fn ($v) => UserModel::findByPk($v)->name,
                     $arrInstructors
@@ -279,7 +279,7 @@ class ExportEvents2Docx
             // Kusdatendaten in der Form d.m.Y, d.m.Y, ...
             if ('eventDates' === $field) {
                 $objEvent = CalendarEventsModel::findByPk($this->arrDatarecord['id']);
-                $arr = CalendarEventsHelper::getEventTimestamps($objEvent);
+                $arr = CalendarEventsUtil::getEventTimestamps($objEvent);
                 $arr = array_map(
                     static fn ($tstamp) => Date::parse('d.m.Y', $tstamp),
                     $arr

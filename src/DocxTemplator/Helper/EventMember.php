@@ -21,7 +21,7 @@ use Contao\MemberModel;
 use Contao\Model\Collection;
 use Contao\UserModel;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 
 class EventMember
@@ -42,13 +42,13 @@ class EventMember
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
         /** @var $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        /** @var CalendarEventsUtil $calendarEventsUtilAdapter */
+        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
 
         $i = 0;
 
         // TL
-        $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent, false);
+        $arrInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent, false);
 
         if (!empty($arrInstructors) && \is_array($arrInstructors)) {
             foreach ($arrInstructors as $userId) {
@@ -69,7 +69,7 @@ class EventMember
                             $isMember = false;
                         }
 
-                        $strMemberInSection = '('.CalendarEventsHelper::getSectionMembershipAsString($objMember).')';
+                        $strMemberInSection = '('.CalendarEventsUtil::getSectionMembershipAsString($objMember).')';
                     }
                     // Keep this var empty
                     $transportInfo = '';
@@ -133,7 +133,7 @@ class EventMember
                         if ($objMemberModel->isSacMember && !$objMemberModel->disable) {
                             $strIsActiveMember = ' ';
                         }
-                        $strMemberInSection = '('.CalendarEventsHelper::getSectionMembershipAsString($objMemberModel).')';
+                        $strMemberInSection = '('.CalendarEventsUtil::getSectionMembershipAsString($objMemberModel).')';
                     }
                 }
 
@@ -176,7 +176,7 @@ class EventMember
         }
 
         // Event instructors
-        $aInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent, false);
+        $aInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent, false);
 
         $arrInstructors = array_map(
             function ($id) {

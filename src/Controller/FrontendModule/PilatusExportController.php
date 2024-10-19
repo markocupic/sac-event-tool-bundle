@@ -30,7 +30,7 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -257,8 +257,8 @@ class PilatusExportController extends AbstractPrintExportController
     private function generateEventTable(array $arrAllowedEventType): array|null
     {
         $dateAdapter = $this->framework->getAdapter(Date::class);
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-        $calendarEventsHelperJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
+        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
+        $calendarEventsJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
@@ -303,17 +303,17 @@ class PilatusExportController extends AbstractPrintExportController
             $arrRow['eventDates'] = $this->getEventPeriod($objEvent, 'd.');
             $arrRow['weekday'] = $this->getEventPeriod($objEvent, 'D');
             $arrRow['title'] = $objEvent->title.(EventType::LAST_MINUTE_TOUR === $objEvent->eventType ? ' (LAST MINUTE TOUR!)' : '');
-            $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, true));
-            $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent, 'titlePrint'));
+            $arrRow['instructors'] = implode(', ', $calendarEventsUtilAdapter->getInstructorNamesAsArray($objEvent, false, true));
+            $arrRow['organizers'] = implode(', ', $calendarEventsUtilAdapter->getEventOrganizersAsArray($objEvent, 'titlePrint'));
             $arrRow['eventId'] = date('Y', (int) $objEvent->startDate).'-'.$objEvent->id;
-            $arrRow['journey'] = null !== $calendarEventsHelperJourneyModelAdapter->findByPk($objEvent->journey) ? $calendarEventsHelperJourneyModelAdapter->findByPk($objEvent->journey)->title : null;
+            $arrRow['journey'] = null !== $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey) ? $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey)->title : null;
 
             if (EventType::COURSE === $objEvent->eventType) {
                 $arrRow['eventId'] = $objEvent->courseId;
             }
 
             // tourType
-            $arrEventType = $calendarEventsHelperAdapter->getTourTypesAsArray($objEvent, 'shortcut', false);
+            $arrEventType = $calendarEventsUtilAdapter->getTourTypesAsArray($objEvent, 'shortcut', false);
 
             if (EventType::COURSE === $objEvent->eventType) {
                 // KU = Kurs
@@ -356,7 +356,7 @@ class PilatusExportController extends AbstractPrintExportController
     private function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = ''): string
     {
         $dateAdapter = $this->framework->getAdapter(Date::class);
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
         $configAdapter = $this->framework->getAdapter(Config::class);
         $calendarAdapter = $this->framework->getAdapter(Calendar::class);
 
@@ -383,24 +383,24 @@ class PilatusExportController extends AbstractPrintExportController
             $dateFormatShortened['to'] = 'j.m.';
         }
 
-        $eventDuration = \count($calendarEventsHelperAdapter->getEventTimestamps($objEvent));
+        $eventDuration = \count($calendarEventsUtilAdapter->getEventTimestamps($objEvent));
         // !!! Type casting is necessary here
-        $span = (int) $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($objEvent), $calendarEventsHelperAdapter->getEndDate($objEvent)) + 1;
+        $span = (int) $calendarAdapter->calculateSpan($calendarEventsUtilAdapter->getStartDate($objEvent), $calendarEventsUtilAdapter->getEndDate($objEvent)) + 1;
 
         if (1 === $eventDuration) {
-            return $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getStartDate($objEvent));
+            return $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsUtilAdapter->getStartDate($objEvent));
         }
 
         if (2 === $eventDuration && $span !== $eventDuration) {
-            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($objEvent)).' & '.$dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($objEvent));
+            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsUtilAdapter->getStartDate($objEvent)).' & '.$dateAdapter->parse($dateFormatShortened['to'], $calendarEventsUtilAdapter->getEndDate($objEvent));
         }
 
         if ($span === $eventDuration) {
-            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($objEvent)).'-'.$dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($objEvent));
+            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsUtilAdapter->getStartDate($objEvent)).'-'.$dateAdapter->parse($dateFormatShortened['to'], $calendarEventsUtilAdapter->getEndDate($objEvent));
         }
 
         $arrDates = [];
-        $dates = $calendarEventsHelperAdapter->getEventTimestamps($objEvent);
+        $dates = $calendarEventsUtilAdapter->getEventTimestamps($objEvent);
 
         foreach ($dates as $date) {
             $arrDates[] = $dateAdapter->parse($dateFormatShortened['to'], $date);

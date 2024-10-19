@@ -21,7 +21,7 @@ use Contao\Events;
 use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\UserModel;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -32,7 +32,7 @@ final class NotifyMemberOnEventRegistration
 {
     public const PRIORITY = 10000;
 
-    private Adapter $calendarEventsHelperAdapter;
+    private Adapter $calendarEventsUtilAdapter;
     private Adapter $eventsAdapter;
     private Adapter $userModelAdapter;
 
@@ -47,7 +47,7 @@ final class NotifyMemberOnEventRegistration
         private readonly NotificationCenter $notificationCenter,
         private readonly string $sacevtLocale,
     ) {
-        $this->calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->eventsAdapter = $this->framework->getAdapter(Events::class);
         $this->userModelAdapter = $this->framework->getAdapter(UserModel::class);
     }
@@ -115,7 +115,7 @@ final class NotifyMemberOnEventRegistration
                 'participant_notes' => html_entity_decode((string) ($this->arrData['notes'] ?? '')),
                 'participant_postal' => $this->memberModel->postal,
                 'participant_sac_member_id' => $this->memberModel->sacMemberId,
-                'participant_section_membership' => $this->calendarEventsHelperAdapter->getSectionMembershipAsString($this->memberModel),
+                'participant_section_membership' => $this->calendarEventsUtilAdapter->getSectionMembershipAsString($this->memberModel),
                 'participant_state_of_subscription' => html_entity_decode((string) $GLOBALS['TL_LANG']['MSC'][$this->eventMemberModel->stateOfSubscription]),
                 'participant_street' => html_entity_decode($this->memberModel->street),
             ];

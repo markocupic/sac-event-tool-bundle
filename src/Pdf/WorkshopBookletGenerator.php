@@ -24,7 +24,7 @@ use Contao\System;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
@@ -242,7 +242,7 @@ class WorkshopBookletGenerator
         $strDates = '';
 
         if (null !== $objEvent) {
-            $arr = CalendarEventsHelper::getEventTimestamps($objEvent);
+            $arr = CalendarEventsUtil::getEventTimestamps($objEvent);
 
             if (!empty($arr)) {
                 $arrValue = [];
@@ -327,13 +327,13 @@ class WorkshopBookletGenerator
         $objPartial->location = $this->nl2br($objEvent->location);
 
         // Instructors
-        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent);
+        $arrInstructors = CalendarEventsUtil::getInstructorsAsArray($objEvent);
         $arrItems = array_map(
             static function ($userId) {
                 $objUser = UserModel::findByPk($userId);
 
                 if (null !== $objUser) {
-                    $strQuali = '' !== CalendarEventsHelper::getMainQualification($objUser) ? ' ('.CalendarEventsHelper::getMainQualification($objUser).')' : '';
+                    $strQuali = '' !== CalendarEventsUtil::getMainQualification($objUser) ? ' ('.CalendarEventsUtil::getMainQualification($objUser).')' : '';
 
                     return $objUser->name.$strQuali;
                 }

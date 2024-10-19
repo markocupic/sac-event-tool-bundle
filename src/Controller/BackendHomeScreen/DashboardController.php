@@ -26,7 +26,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmailController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -40,7 +40,7 @@ use Twig\Error\SyntaxError;
 
 class DashboardController
 {
-    private Adapter $calendarEventsHelperAdapter;
+    private Adapter $calendarEventsUtilAdapter;
     private Adapter $calendarEventsModelAdapter;
     private Adapter $configAdapter;
     private Adapter $stringUtilAdapter;
@@ -57,7 +57,7 @@ class DashboardController
         private readonly RouterInterface $router,
     ) {
         // Adapters
-        $this->calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->configAdapter = $this->framework->getAdapter(Config::class);
         $this->stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
@@ -187,15 +187,15 @@ class DashboardController
 
             $event = [];
             $event['row_class'] = $rowClass;
-            $event['badge'] = $this->calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($eventModel);
+            $event['badge'] = $this->calendarEventsUtilAdapter->getEventStateOfSubscriptionBadgesString($eventModel);
             $event['title'] = $title;
             $event['date'] = date($this->configAdapter->get('dateFormat'), (int) $eventModel->startDate);
-            $event['state_icon'] = $this->calendarEventsHelperAdapter->getEventStateIcon($eventModel);
-            $event['release_level'] = $this->calendarEventsHelperAdapter->getEventReleaseLevelAsString($eventModel);
+            $event['state_icon'] = $this->calendarEventsUtilAdapter->getEventStateIcon($eventModel);
+            $event['release_level'] = $this->calendarEventsUtilAdapter->getEventReleaseLevelAsString($eventModel);
             $event['href_eventListing'] = $hrefEventListing;
             $event['href_email'] = $this->generateEmailHref($eventModel);
             $event['href_event'] = $hrefEvent;
-            $event['href_preview'] = $this->calendarEventsHelperAdapter->generateEventPreviewUrl($eventModel);
+            $event['href_preview'] = $this->calendarEventsUtilAdapter->generateEventPreviewUrl($eventModel);
             $event['href_print_report'] = $this->generatePrintReportHref($eventModel);
             $event['href_registrations'] = $hrefRegistrations;
             $event['href_report'] = $this->generateReportHref($eventModel);

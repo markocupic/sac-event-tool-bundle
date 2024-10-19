@@ -46,7 +46,7 @@
             "Markocupic\\SacEventToolBundle\\": "src/"
         },
         "classmap": [
-            "contao"
+            "contao/modules"
         ]
     },
     "extra": {
