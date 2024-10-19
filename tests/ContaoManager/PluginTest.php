@@ -20,6 +20,7 @@ use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\DelegatingParser;
 use Contao\TestCase\ContaoTestCase;
+use Markocupic\ContaoFrontendUserNotification\MarkocupicContaoFrontendUserNotification;
 use Markocupic\RssFeedGeneratorBundle\MarkocupicRssFeedGeneratorBundle;
 use Markocupic\SacEventToolBundle\ContaoManager\Plugin;
 use Markocupic\SacEventToolBundle\MarkocupicSacEventToolBundle;
@@ -50,10 +51,11 @@ class PluginTest extends ContaoTestCase
         $this->assertSame(MarkocupicSacEventToolBundle::class, $bundles[2]->getName());
         $this->assertSame(
             [
-				Code4NixUriSigner::class,
+				ContaoCoreBundle::class,
 				ContaoCalendarBundle::class,
-                ContaoCoreBundle::class,
-                MarkocupicRssFeedGeneratorBundle::class,
+				Code4NixUriSigner::class,
+				MarkocupicRssFeedGeneratorBundle::class,
+				MarkocupicContaoFrontendUserNotification::class,
             ],
             $bundles[2]->getLoadAfter()
         );
