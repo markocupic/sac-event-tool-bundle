@@ -19,17 +19,12 @@ use Contao\FrontendUser;
 
 readonly class GenerateTourListBookletMessage implements LowPriorityMessageInterface
 {
-    private function __construct(
+    public function __construct(
         private array $ids,
         private string $outputFormat,
         private string $filename,
         private FrontendUser $user,
     ) {
-    }
-
-    public static function create(array $ids, string $outputFormat, string $filename, FrontendUser $user): self
-    {
-        return new self($ids, $outputFormat, $filename, $user);
     }
 
     public function getIds(): array

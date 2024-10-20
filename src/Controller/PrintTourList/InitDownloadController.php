@@ -48,7 +48,7 @@ class InitDownloadController extends AbstractController
         $outputFormat = 'pdf';
         $filename = 'Mein persönliches Tourenprogramm.'.$outputFormat;
 
-        $this->messageBus->dispatch(GenerateTourListBookletMessage::create($ids, $outputFormat, $filename, $user));
+        $this->messageBus->dispatch(new GenerateTourListBookletMessage($ids, $outputFormat, $filename, $user));
 
         return $this->json(['success' => true]);
     }
