@@ -146,11 +146,18 @@ class SyncMemberDatabase
 
         $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
 
-        $finder = new Finder();
-
         $cred = sprintf('ftp://%s:%s@%s/', $this->ftp_username, $this->ftp_password, $this->ftp_hostname);
 
-        $finder->files()->in($cred)->name('*.csv');
+        $finder = new Finder();
+        $finder
+            ->files()
+            ->in($cred)
+            ->name('*.csv')
+        ;
+
+        if (!$finder->hasResults()) {
+            throw new \RuntimeException('Could not load CSV spreadsheets from remote. Database sync failed.');
+        }
 
         $fileMap = [];
 
