@@ -1,5 +1,4 @@
 "use strict";
-
 if (typeof VueEventList !== 'function') {
 
 	/*
@@ -49,7 +48,7 @@ if (typeof VueEventList !== 'function') {
 			const {createApp} = Vue
 
 			// Instantiate vue.js application
-			const app = createApp({
+			let app = createApp({
 				data() {
 					return {
 						// The element CSS ID selector: e.g. #myList
@@ -72,12 +71,15 @@ if (typeof VueEventList !== 'function') {
 						loadedItems: 0,
 						// all events loaded bool
 						blnAllEventsLoaded: false,
+						// The last (fetch) request url
+						lastRequestUrl: '',
 					};
 				},
 				mounted() {
 					const self = this;
 					self.prepareRequest();
 				},
+
 				methods: {
 					// Prepare ajax request
 					prepareRequest: function prepareRequest() {
@@ -162,6 +164,7 @@ if (typeof VueEventList !== 'function') {
 							console.log('Loaded events from the indexed database.');
 
 							self.rows = vueData.rows;
+							self.lastRequestUrl = vueData.lastRequestUrl;
 							self.arrEventIds = vueData.arrEventIds;
 							self.itemsTotal = vueData.itemsTotal;
 							self.loadedItems = vueData.loadedItems;
@@ -170,11 +173,23 @@ if (typeof VueEventList !== 'function') {
 
 							await self.$nextTick();
 
-							// Create the on insert event
-							const onInsertEvent = new CustomEvent("sac_evt.event_list.insert", {
+							// Dispatch the sacevt::event_list.indexed_db_load
+							const event = new CustomEvent('sacevt::event_list.indexed_db_load', {
 								detail: {
-									'vueInstance': self,
-									'json': null,
+									elId: self.elId,
+									storage: vueData,
+									vueInstance: self,
+								},
+							});
+
+							document.dispatchEvent(event);
+
+							// Create the on insert event
+							const onInsertEvent = new CustomEvent('sacevt::event_list.insert', {
+								detail: {
+									elId: self.elId,
+									vueInstance: self,
+									json: null,
 								},
 							});
 
@@ -246,12 +261,14 @@ if (typeof VueEventList !== 'function') {
 						const urlParams = new URLSearchParams(Array.from(formData)).toString();
 						const url = window.location.protocol + '//' + window.location.hostname + '/eventApi/events?' + urlParams;
 
-						// Dispatch the fetchsacevents event
-						const event = new CustomEvent('sac_evt.event_list.pre_fetch', {
+						self.lastRequestUrl = url;
+
+						// Dispatch the sacevt::event_list.pre_fetch event
+						const event = new CustomEvent('sacevt::event_list.pre_fetch', {
 							'detail': {
-								'url': url,
-								'modId': self.modId,
-								'instance': self,
+								url: url,
+								modId: self.modId,
+								instance: self,
 							}
 						});
 
@@ -317,10 +334,10 @@ if (typeof VueEventList !== 'function') {
 							return json;
 
 						}).then(function (json) {
-							const onInsertEvent = new CustomEvent("sac_evt.event_list.insert", {
+							const onInsertEvent = new CustomEvent('sacevt::event_list.insert', {
 								detail: {
 									vueInstance: self,
-									'json': json,
+									json: json,
 								},
 							});
 

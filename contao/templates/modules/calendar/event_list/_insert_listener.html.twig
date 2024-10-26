@@ -1,5 +1,5 @@
 <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-    document.querySelector('{{ elId }}').addEventListener('sac_evt.event_list.insert', (e) => {
+    document.querySelector('{{ elId }}').addEventListener('sacevt::event_list.insert', (e) => {
 
         const vue = e.detail.vueInstance;
         //const json = e.detail.json ?? null;
@@ -101,6 +101,7 @@
 
                             const vueData = {
                                 'rows': vue.rows,
+                                'lastRequestUrl': vue.lastRequestUrl,
                                 'arrEventIds': vue.arrEventIds,
                                 'itemsTotal': vue.itemsTotal,
                                 'loadedItems': vue.loadedItems,

@@ -54,81 +54,13 @@
         ') %}
 
         <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-            // Listen to sac_evt.event_list.pre_fetch event
-            // and inject the last fetch url to the buttons data-url attribute
-            document.addEventListener('sac_evt.event_list.pre_fetch', (e) => {
 
-                if (e.detail.modId.toString() !== '{{ watch_event_list_module }}') {
-                    return;
-                }
+            const eventListId = '{{ watch_event_list_module }}';
+            const buttonId = '{{ button_id }}';
 
-                let button = document.getElementById('{{ button_id }}');
+            document.addEventListener('DOMContentLoaded', () => {
 
-                if (button && e.detail.url) {
-                    button.removeAttribute('disabled');
-
-                    button.dataset.url = btoa(e.detail.url);
-                    button.addEventListener("click", async (e) => {
-
-                        // Get the button element
-                        //const btn = e.currentTarget;
-
-                        // Prevent multiple clicks
-                        button.setAttribute('disabled', '');
-
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        // base64 decode the url stored in the data-url attribute
-                        const url = decodeURI(atob(e.currentTarget.dataset.url));
-
-                        // Remove offset, limit and fields from param string
-                        strParams = Util.removeParam(url, ['offset', 'limit', 'fields', 'fields[]']);
-                        const href1 = window.location.protocol + '//' + window.location.hostname + '/eventApi/events?' + strParams;
-
-                        // Get the event IDS without limit and offset from the server!
-                        const response = await fetch(href1);
-                        const arrJSON = await response.json();
-                        const arrIDS = arrJSON.meta.arrEventIds;
-
-                        if (!arrIDS.length) {
-                            alert('Die Tourliste ist leer und kann nicht gedruckt werden. Ändere die Filtereinstellungen.');
-                            button.removeAttribute('disabled', '');
-                            return;
-                        }
-
-                        // Add an uuid
-                        const uuid = window.crypto.randomUUID();
-
-                        // Build url for the docx/pdf controller
-                        const href = '_print_tour_list/init_download?ids=' + arrIDS.join(',') + '&uuid=' + uuid;
-
-                        try {
-                            // Call the docx/pdf controller
-                            //window.location.href = href2;
-                            const resp = await fetch(href);
-
-                            if (resp.ok) {
-                                button.removeAttribute('disabled');
-
-                                // Show info toast
-                                const toast = document.getElementById('download-info-toast');
-                                const toastInstance = new bootstrap.Toast(toast);
-                                toastInstance.show();
-                                function play(){
-                                    var audio = new Audio("https://res.cloudinary.com/dxfq3iotg/video/upload/v1557233294/info.mp3");
-                                    audio.play();
-                                }
-                                play();
-                            }
-                        } catch (e) {
-                            button.removeAttribute('disabled');
-                            alert('Die Tour-Liste kann nicht heruntergeladen werden.')
-                        }
-                    });
-                }
-
-                Util = {
+                TourListUtil = {
                     removeParam: function (strUrl, arrParams) {
                         const url = new URL(strUrl);
                         const params = new URLSearchParams(url.search);
@@ -138,8 +70,115 @@
                         }
 
                         return params.toString();
+                    },
+                    initDownload: function (button) {
+                        button.addEventListener("click", async (e) => {
+
+                            // Get the button element
+                            //const btn = e.currentTarget;
+
+                            // Prevent multiple clicks
+                            button.setAttribute('disabled', '');
+
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            // base64 decode the url stored in the data-url attribute
+                            const url = decodeURI(atob(e.currentTarget.dataset.url));
+
+                            // Remove offset, limit and fields from param string
+                            strParams = TourListUtil.removeParam(url, ['offset', 'limit', 'fields', 'fields[]']);
+                            const href1 = window.location.protocol + '//' + window.location.hostname + '/eventApi/events?' + strParams;
+
+                            // Get the event IDS without limit and offset from the server!
+                            const response = await fetch(href1);
+                            const arrJSON = await response.json();
+                            const arrIDS = arrJSON.meta.arrEventIds;
+
+                            if (!arrIDS.length) {
+                                alert('Die Tourliste ist leer und kann nicht gedruckt werden. Ändere die Filtereinstellungen.');
+                                button.removeAttribute('disabled', '');
+                                return;
+                            }
+
+                            // Add an uuid
+                            const uuid = window.crypto.randomUUID();
+
+                            // Build url for the docx/pdf controller
+                            const href2 = '_print_tour_list/init_download?ids=' + arrIDS.join(',') + '&uuid=' + uuid;
+
+                            try {
+                                // Call the docx/pdf controller
+                                const resp = await fetch(href2);
+
+                                if (resp.ok) {
+                                    button.removeAttribute('disabled');
+
+                                    // Show info toast
+                                    const toast = document.getElementById('download-info-toast');
+                                    const toastInstance = new bootstrap.Toast(toast);
+                                    toastInstance.show();
+
+                                    function play() {
+                                        var audio = new Audio("https://res.cloudinary.com/dxfq3iotg/video/upload/v1557233294/info.mp3");
+                                        audio.play();
+                                    }
+
+                                    play();
+                                }
+                            } catch (e) {
+                                button.removeAttribute('disabled');
+                                alert('Die Tour-Liste kann nicht heruntergeladen werden.')
+                            }
+                        });
                     }
                 }
+
+                // Listen to sacevt::event_list.indexed_db_load event
+                // and inject the last fetch url to the buttons data-url attribute
+                document.addEventListener('sacevt::event_list.indexed_db_load', (e) => {
+                    if (e.detail.vueInstance.elId !== '#tour-list' && !e.detail.vueInstance.lastRequestUrl) {
+                        return;
+                    }
+
+                    let button = document.getElementById(buttonId);
+
+                    if (typeof button === 'undefined') {
+                        return;
+                    }
+
+                    if (
+                        typeof e.detail.vueInstance.lastRequestUrl === 'undefined' ||
+                        e.detail.vueInstance.lastRequestUrl === ''
+                    ) {
+                        return;
+                    }
+
+                    if (e.detail.vueInstance.lastRequestUrl) {
+                        button.removeAttribute('disabled');
+
+                        button.dataset.url = btoa(e.detail.vueInstance.lastRequestUrl);
+                        TourListUtil.initDownload(button);
+                    }
+                });
+
+                // Listen to sacevt::event_list.pre_fetch event
+                // and inject the last fetch url to the buttons data-url attribute
+                document.addEventListener('sacevt::event_list.pre_fetch', (e) => {
+
+                    if (e.detail.modId.toString() !== eventListId) {
+                        return;
+                    }
+
+                    let button = document.getElementById(buttonId);
+
+                    if (button && e.detail.url) {
+                        button.removeAttribute('disabled');
+
+                        button.dataset.url = btoa(e.detail.url);
+                        TourListUtil.initDownload(button);
+                    }
+                });
             });
         </script>
     {% endif %}
