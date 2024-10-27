@@ -86,11 +86,11 @@ class CalendarEventsVoter extends Voter
         }
 
         if ('up' === $direction) {
-            if ($eventReleaseLevelPolicyModel === $eventReleaseLevelPolicyModel::findHighestLevelByEventId($eventsModel->id)) {
+            if ($eventReleaseLevelPolicyModel === $eventReleaseLevelPolicyModel::findMaxLevelByEventId($eventsModel->id)) {
                 return false;
             }
         } else {
-            if ($eventReleaseLevelPolicyModel === $eventReleaseLevelPolicyModel::findLowestLevelByEventId($eventsModel->id)) {
+            if ($eventReleaseLevelPolicyModel === $eventReleaseLevelPolicyModel::findMinLevelByEventId($eventsModel->id)) {
                 return false;
             }
         }

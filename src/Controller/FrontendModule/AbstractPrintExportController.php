@@ -47,7 +47,7 @@ abstract class AbstractPrintExportController extends AbstractFrontendModuleContr
                     if (null === $minLevel) {
                         /** @var EventReleaseLevelPolicyModel $nextLevelModel */
                         $nextLevelModel = $eventReleaseLevelPolicyModelAdapter->findNextLevel($objEvent->eventReleaseLevel);
-                        $lastLevelModel = $eventReleaseLevelPolicyModelAdapter->findHighestLevelByEventId($objEvent->id);
+                        $lastLevelModel = $eventReleaseLevelPolicyModelAdapter->findMaxLevelByEventId($objEvent->id);
 
                         if (null !== $nextLevelModel && null !== $lastLevelModel) {
                             if ($nextLevelModel->id === $lastLevelModel->id) {

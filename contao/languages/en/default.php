@@ -109,6 +109,8 @@ $GLOBALS['TL_LANG']['MSC']['goToPartcipantList'] = 'Möchten Sie zur Teilnehmerl
 $GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'Möchten Sie das Vergütungsformular bearbeiten/erstellen?';
 
 // tl_calendar_events error messages
+$GLOBALS['TL_LANG']['ERR']['pushingToHighestEventReleaseLevelNotAllowedBeforeDate'] = 'Sie können die Freigabestufe für Event "%s" (ID: %d) nicht vor dem %s auf FS %s hochstufen.';
+$GLOBALS['TL_LANG']['ERR']['selectedEventReleaseLevelIsNotCompatibleWithTheEventType'] = 'Die Freigabestufe für Event "%s" (ID: %d) konnte nicht auf "%s" geändert werden, weil diese Freigabestufe zum Event-Typ ungültig ist.';
 $GLOBALS['TL_LANG']['ERR']['eventDatesCannotBeEmpty'] = 'Bitte geben Sie mindestens ein gültiges Event-Datum ein. Pro Tag eine Zeile. Leere Felder/Zeilen müssen gelöscht werden.';
 $GLOBALS['TL_LANG']['ERR']['eventDatesNotCorrectlySorted'] = 'Bitte überprüfen Sie, ob die Event-Daten korrekt sortiert sind (erstes Datum zu oberst).';
 $GLOBALS['TL_LANG']['ERR']['invalidEventDurationInfo'] = 'Die Event-Dauer stimmt nicht mit der Anzahl Event-Daten überein. Setzen Sie für jeden Tag des Events eine Datumszeile oder korrigieren Sie die Event-Dauer.';

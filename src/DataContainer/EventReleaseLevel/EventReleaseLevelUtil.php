@@ -25,21 +25,21 @@ use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventReleaseLevelUtil
 {
-    // Adapters
     private Adapter $config;
     private Adapter $date;
     private Adapter $message;
 
     public function __construct(
-        private readonly Security $security,
         private readonly ContaoFramework $framework,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly RequestStack $requestStack,
+        private readonly Security $security,
+        private readonly TranslatorInterface $translator,
     ) {
-        // Adapters
         $this->config = $this->framework->getAdapter(Config::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->date = $this->framework->getAdapter(Date::class);
@@ -47,37 +47,50 @@ class EventReleaseLevelUtil
 
     public function hasValidEventReleaseLevel(CalendarEventsModel $objEvent, int $eventReleaseLevelId): bool
     {
-        $highestValidEventReleaseModel = EventReleaseLevelPolicyModel::findHighestLevelByEventId($objEvent->id);
+        $maxEventReleaseModel = EventReleaseLevelPolicyModel::findMaxLevelByEventId($objEvent->id);
 
-        if (0 === $eventReleaseLevelId && null === $highestValidEventReleaseModel) {
+        if (0 === $eventReleaseLevelId && null === $maxEventReleaseModel) {
             return true;
         }
 
-        if (0 === $eventReleaseLevelId && null !== $highestValidEventReleaseModel) {
+        if (0 === $eventReleaseLevelId && null !== $maxEventReleaseModel) {
             return false;
         }
 
         $eventReleaseModel = EventReleaseLevelPolicyModel::findByPk($eventReleaseLevelId);
 
-        return $highestValidEventReleaseModel->pid === $eventReleaseModel->pid;
+        return $maxEventReleaseModel->pid === $eventReleaseModel->pid;
     }
 
     public function publishOrUnpublishEventDependingOnEventReleaseLevel(CalendarEventsModel $objEvent, int $targetEventReleaseLevelId): int
     {
+        $calendar = $objEvent->getRelated('pid');
+
+        $except = sprintf(
+            'Could not find the parent calendar for event "%s" (ID: %d).',
+            $objEvent->title,
+            $objEvent->id,
+        );
+
+        if (null === $calendar) {
+            throw new \Exception($except);
+        }
+
         $targetEventReleaseModel = EventReleaseLevelPolicyModel::findByPk($targetEventReleaseLevelId);
-        $lowestPossibleEventReleaseModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($objEvent->id);
+        $minEventReleaseModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($objEvent->id);
 
         if (!$this->hasValidEventReleaseLevel($objEvent, $targetEventReleaseLevelId)) {
-            if (null === $lowestPossibleEventReleaseModel) {
-                // If no ev.rel.level policy package is assigned to the calendar,
-                // we set the ev.rel.level ID to 0
+            if (null === $minEventReleaseModel) {
+                // If we have no event release level policy package
+                // assigned to the event,
+                // we set the event release level to 0 (undefined).
                 $objEvent->eventReleaseLevel = 0;
             } else {
-                // Set the lowest ev.rel.level ID
-                $objEvent->eventReleaseLevel = $lowestPossibleEventReleaseModel->id;
+                // Set the lowest possible event release level.
+                $objEvent->eventReleaseLevel = $minEventReleaseModel->id;
             }
 
-            // Unpublish event because evt.rel.level is invalid or 0.
+            // Un-publish event because the event release level is invalid or 0.
             $objEvent->published = 0;
 
             if ($objEvent->isModified()) {
@@ -85,21 +98,24 @@ class EventReleaseLevelUtil
                 $objEvent->save();
             }
 
-            $this->message->addError(
-                sprintf(
-                    'Die Freigabestufe für Event "%s (ID: %s)" konnte nicht auf "%s" geändert werden, weil diese Freigabestufe zum Event-Typ ungültig ist.',
+            $msg = $this->translator->trans(
+                'ERR.selectedEventReleaseLevelIsNotCompatibleWithTheEventType',
+                [
                     $objEvent->title,
                     $objEvent->id,
-                    null !== $targetEventReleaseModel ? $targetEventReleaseModel->title : 'undefined',
-                )
+                    null !== $targetEventReleaseModel ? 'FS '.$targetEventReleaseModel->level : 'undefined',
+                ],
+                'contao_default',
             );
+
+            $this->message->addError($msg);
 
             return $objEvent->eventReleaseLevel;
         }
 
-        // No evt.rel.level ID is valid
-        // if is no evt.rel.level.package is assigned
-        // to the calendar the event belongs to
+        // Accept 0,
+        // if we have no event release level policy package
+        // assigned to the event.
         if (0 === $targetEventReleaseLevelId) {
             $objEvent->published = 0;
 
@@ -111,40 +127,53 @@ class EventReleaseLevelUtil
             return $targetEventReleaseLevelId;
         }
 
-        $highestEventReleaseModel = EventReleaseLevelPolicyModel::findHighestLevelByEventId($objEvent->id);
+        $maxEventReleaseModel = EventReleaseLevelPolicyModel::findMaxLevelByEventId($objEvent->id);
 
-        if (null === $highestEventReleaseModel) {
-            throw new \RuntimeException(sprintf('Could not determine the highest event release level for the event with ID %d.', $objEvent->id));
+        if (null === $maxEventReleaseModel) {
+            $except = sprintf(
+                'Could not determine the highest event release level for the event "%s" (ID: %d).',
+                $objEvent->title,
+                $objEvent->id,
+            );
+
+            throw new \RuntimeException($except);
         }
 
-        if ($highestEventReleaseModel->id === $targetEventReleaseLevelId) {
-            $calendar = $objEvent->getRelated('pid');
+        if ($maxEventReleaseModel->id === $targetEventReleaseLevelId) {
+            // Do not allow non-admins to shift
+            // the event release level to the top level.
+            if (
+                !$this->security->isGranted('ROLE_ADMIN') &&
+                $calendar->enableMaxEventReleaseLevelProtection &&
+                time() < $calendar->maxEventReleaseLevelTimeLimit
+            ) {
+                $objEvent->published = 0;
 
-            // Do not allow to non-admins to shift the event release level to the top level
-            if (!$this->security->isGranted('ROLE_ADMIN') && null !== $calendar) {
-                if ($calendar->enableMaxEventReleaseLevelProtection && $calendar->maxEventReleaseLevelTimeLimit > time()) {
-                    $objEvent->published = 0;
-
-                    if ($objEvent->isModified()) {
-                        $objEvent->save();
-                    }
-
-                    $this->message->addError(
-                        sprintf(
-                            'Sie können die Freigabestufe für Event "%s" nicht vor dem %s auf FS %s hochstufen.',
-                            $objEvent->title,
-                            $this->date->parse($this->config->get('datimFormat'), $calendar->maxEventReleaseLevelTimeLimit),
-                            $targetEventReleaseModel->level,
-                        )
-                    );
-
-                    return $objEvent->eventReleaseLevel;
+                if ($objEvent->isModified()) {
+                    $objEvent->save();
                 }
+
+                $msg = $this->translator->trans(
+                    'ERR.pushingToHighestEventReleaseLevelNotAllowedBeforeDate',
+                    [
+                        $objEvent->title,
+                        $objEvent->id,
+                        $this->date->parse($this->config->get('datimFormat'), $calendar->maxEventReleaseLevelTimeLimit),
+                        $targetEventReleaseModel->level,
+                    ],
+                    'contao_default',
+                );
+
+                $this->message->addError($msg);
+
+                return $objEvent->eventReleaseLevel;
             }
 
             if (!$objEvent->published) {
                 $objEvent->published = 1;
-                $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
+
+                $msg = $this->translator->trans('MSC.publishedEvent', [$objEvent->id], 'contao_default');
+                $this->message->addInfo($msg);
 
                 // Dispatch PublishEventEvent
                 $event = new PublishEventEvent($this->requestStack->getCurrentRequest(), $objEvent);
@@ -153,7 +182,9 @@ class EventReleaseLevelUtil
         } else {
             if ($objEvent->published) {
                 $objEvent->published = 0;
-                $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
+
+                $msg = $this->translator->trans('MSC.unpublishedEvent', [$objEvent->id], 'contao_default');
+                $this->message->addInfo($msg);
             }
         }
 

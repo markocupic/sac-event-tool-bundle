@@ -504,7 +504,7 @@ class CalendarEvents
 
             // Set eventReleaseLevel
             if ('' !== $objEventsModel->eventType) {
-                $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($objEventsModel->id);
+                $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($objEventsModel->id);
 
                 if (null !== $objEventReleaseLevelPolicyModel) {
                     $objEventsModel->eventReleaseLevel = $objEventReleaseLevelPolicyModel->id;
@@ -622,7 +622,7 @@ class CalendarEvents
         }
 
         // Set releaseLevel to level 1
-        $eventReleaseLevelModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($dc->activeRecord->id);
+        $eventReleaseLevelModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($dc->activeRecord->id);
 
         if (null !== $eventReleaseLevelModel) {
             $set = ['eventReleaseLevel' => $eventReleaseLevelModel->id];
@@ -686,7 +686,7 @@ class CalendarEvents
                         $objEventReleaseLevelPackage = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($objEvent->id);
                         // Change eventReleaseLevel when changing eventType...
                         if ($objEventReleaseLevel->pid !== $objEventReleaseLevelPackage->id) {
-                            $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($objEvent->id);
+                            $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($objEvent->id);
 
                             if (null !== $oEventReleaseLevelModel) {
                                 $set = [
@@ -699,7 +699,7 @@ class CalendarEvents
                     }
                 } else {
                     // Add eventReleaseLevel when creating a new event...
-                    $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($objEvent->id);
+                    $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($objEvent->id);
 
                     $set = ['eventReleaseLevel' => $oEventReleaseLevelModel->id];
                     $dc->activeRecord->eventReleaseLevel = $oEventReleaseLevelModel->id;
@@ -1418,7 +1418,7 @@ class CalendarEvents
             $objEvent->save();
 
             if (null === EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel)) {
-                $objEventReleaseModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($objEvent->id);
+                $objEventReleaseModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($objEvent->id);
 
                 if (null !== $objEventReleaseModel) {
                     $objEvent->eventReleaseLevel = $objEventReleaseModel->id;

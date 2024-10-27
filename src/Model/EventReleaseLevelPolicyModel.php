@@ -59,7 +59,7 @@ class EventReleaseLevelPolicyModel extends Model
     /**
      * @param $eventId
      */
-    public static function findLowestLevelByEventId($eventId): static|null
+    public static function findMinLevelByEventId($eventId): static|null
     {
         $objEvent = CalendarEventsModel::findByPk($eventId);
 
@@ -100,7 +100,7 @@ class EventReleaseLevelPolicyModel extends Model
     /**
      * @param $eventId
      */
-    public static function findHighestLevelByEventId($eventId): static|null
+    public static function findMaxLevelByEventId($eventId): static|null
     {
         $objEvent = CalendarEventsModel::findByPk($eventId);
 

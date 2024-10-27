@@ -143,7 +143,7 @@ class CalendarEvents
                             }
 
                             // Get the first e.r.level of the e.r.l.package the event belongs to
-                            $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($dc->id);
+                            $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($dc->id);
 
                             if (null === $objEventReleaseLevelPolicyModel) {
                                 return;
@@ -457,8 +457,8 @@ class CalendarEvents
             $this->controller->redirect($this->system->getReferer());
         }
 
-		// Publish or unpublish event
-		$objEvent->eventReleaseLevel = $this->eventReleaseLevelUtil->publishOrUnpublishEventDependingOnEventReleaseLevel($objEvent, $objReleaseLevelModelTarget->id);
+        // Publish or unpublish event
+        $objEvent->eventReleaseLevel = $this->eventReleaseLevelUtil->publishOrUnpublishEventDependingOnEventReleaseLevel($objEvent, $objReleaseLevelModelTarget->id);
 
         if ($objEvent->isModified()) {
             $objEvent->tstamp = time();
