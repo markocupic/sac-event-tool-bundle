@@ -6,11 +6,25 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
 	const urlParams = new URLSearchParams(window.location.search);
-	if (urlParams.has('do') && urlParams.has('act')) {
-		if (urlParams.get('act') === 'overrideAll' || urlParams.get('act') === 'editAll') {
-			new EditAllNavbarHelper();
-		}
+
+	if (!urlParams.has('do')) {
+		return;
 	}
+
+	if (!urlParams.has('act')) {
+		return;
+	}
+
+	if (urlParams.get('act') !== 'overrideAll' && urlParams.get('act') !== 'editAll') {
+		return;
+	}
+
+	if (urlParams.has('fields')) {
+		return;
+	}
+
+	new EditAllNavbarHelper();
+
 });
 
 class EditAllNavbarHelper {
