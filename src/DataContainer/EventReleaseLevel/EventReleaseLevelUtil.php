@@ -29,7 +29,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class EventReleaseLevelUtil
 {
     // Adapters
-    private Adapter $calendarEventsModel;
     private Adapter $config;
     private Adapter $date;
     private Adapter $message;
@@ -41,20 +40,13 @@ class EventReleaseLevelUtil
         private readonly RequestStack $requestStack,
     ) {
         // Adapters
-        $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->config = $this->framework->getAdapter(Config::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->date = $this->framework->getAdapter(Date::class);
     }
 
-    public function hasValidEventReleaseLevel(int $eventId, int $eventReleaseLevelId): bool
+    public function hasValidEventReleaseLevel(CalendarEventsModel $objEvent, int $eventReleaseLevelId): bool
     {
-        $objEvent = $this->calendarEventsModel->findByPk($eventId);
-
-        if (null === $objEvent) {
-            throw new \RuntimeException('Event not found.');
-        }
-
         $highestValidEventReleaseModel = EventReleaseLevelPolicyModel::findHighestLevelByEventId($objEvent->id);
 
         if (0 === $eventReleaseLevelId && null === $highestValidEventReleaseModel) {
@@ -70,21 +62,12 @@ class EventReleaseLevelUtil
         return $highestValidEventReleaseModel->pid === $eventReleaseModel->pid;
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function publishOrUnpublishEventDependingOnEventReleaseLevel(int $eventId, int $targetEventReleaseLevelId): int
+    public function publishOrUnpublishEventDependingOnEventReleaseLevel(CalendarEventsModel $objEvent, int $targetEventReleaseLevelId): int
     {
-        $objEvent = $this->calendarEventsModel->findByPk($eventId);
-
-        if (null === $objEvent) {
-            throw new \Exception('Event not found.');
-        }
-
         $targetEventReleaseModel = EventReleaseLevelPolicyModel::findByPk($targetEventReleaseLevelId);
         $lowestPossibleEventReleaseModel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($objEvent->id);
 
-        if (!$this->hasValidEventReleaseLevel($eventId, $targetEventReleaseLevelId)) {
+        if (!$this->hasValidEventReleaseLevel($objEvent, $targetEventReleaseLevelId)) {
             if (null === $lowestPossibleEventReleaseModel) {
                 // If no ev.rel.level policy package is assigned to the calendar,
                 // we set the ev.rel.level ID to 0
@@ -138,10 +121,8 @@ class EventReleaseLevelUtil
             $calendar = $objEvent->getRelated('pid');
 
             // Do not allow to non-admins to shift the event release level to the top level
-            // if tl_calendar::maxEventReleaseLevelTimeLimit > time()
             if (!$this->security->isGranted('ROLE_ADMIN') && null !== $calendar) {
                 if ($calendar->enableMaxEventReleaseLevelProtection && $calendar->maxEventReleaseLevelTimeLimit > time()) {
-                    $objEvent->eventReleaseLevel = EventReleaseLevelPolicyModel::findLowestLevelByEventId($objEvent->id)->id;
                     $objEvent->published = 0;
 
                     if ($objEvent->isModified()) {
@@ -150,11 +131,10 @@ class EventReleaseLevelUtil
 
                     $this->message->addError(
                         sprintf(
-                            'Sie können die Freigabestufe für Event "%s" nicht vor dem %s auf FS %s hochstufen. Der Event wurde deshalb auf FS %d heruntergestuft.',
+                            'Sie können die Freigabestufe für Event "%s" nicht vor dem %s auf FS %s hochstufen.',
                             $objEvent->title,
                             $this->date->parse($this->config->get('datimFormat'), $calendar->maxEventReleaseLevelTimeLimit),
                             $targetEventReleaseModel->level,
-                            $lowestPossibleEventReleaseModel->level,
                         )
                     );
 
@@ -170,21 +150,16 @@ class EventReleaseLevelUtil
                 $event = new PublishEventEvent($this->requestStack->getCurrentRequest(), $objEvent);
                 $this->eventDispatcher->dispatch($event);
             }
-
-            if ($objEvent->isModified()) {
-                $objEvent->tstamp = time();
-                $objEvent->save();
-            }
         } else {
             if ($objEvent->published) {
                 $objEvent->published = 0;
                 $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
             }
+        }
 
-            if ($objEvent->isModified()) {
-                $objEvent->tstamp = time();
-                $objEvent->save();
-            }
+        if ($objEvent->isModified()) {
+            $objEvent->tstamp = time();
+            $objEvent->save();
         }
 
         return $targetEventReleaseLevelId;

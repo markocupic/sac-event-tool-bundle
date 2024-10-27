@@ -457,7 +457,8 @@ class CalendarEvents
             $this->controller->redirect($this->system->getReferer());
         }
 
-        $objEvent->eventReleaseLevel = $objReleaseLevelModelTarget->id;
+		// Publish or unpublish event
+		$objEvent->eventReleaseLevel = $this->eventReleaseLevelUtil->publishOrUnpublishEventDependingOnEventReleaseLevel($objEvent, $objReleaseLevelModelTarget->id);
 
         if ($objEvent->isModified()) {
             $objEvent->tstamp = time();
@@ -466,9 +467,6 @@ class CalendarEvents
             // Dispatch ChangeEventReleaseLevelEvent event
             $event = new ChangeEventReleaseLevelEvent($request, $objEvent, 'upgradeEventReleaseLevel' === $action ? 'up' : 'down');
             $this->eventDispatcher->dispatch($event);
-
-            // Publish or unpublish event
-            $this->eventReleaseLevelUtil->publishOrUnpublishEventDependingOnEventReleaseLevel((int) $objEvent->id, (int) $objEvent->eventReleaseLevel);
 
             // Create new version
             $objVersions = new Versions('tl_calendar_events', $objEvent->id);

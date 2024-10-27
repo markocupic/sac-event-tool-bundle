@@ -1363,7 +1363,9 @@ class CalendarEvents
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventReleaseLevel.save', priority: 90)]
     public function saveCallbackEventReleaseLevel(int $targetEventReleaseLevelId, DataContainer $dc): int
     {
-        return $this->eventReleaseLevelUtil->publishOrUnpublishEventDependingOnEventReleaseLevel((int) $dc->activeRecord->id, $targetEventReleaseLevelId);
+        $objEvent = CalendarEventsModel::findByPk($dc->id);
+
+        return $this->eventReleaseLevelUtil->publishOrUnpublishEventDependingOnEventReleaseLevel($objEvent, $targetEventReleaseLevelId);
     }
 
     /**
