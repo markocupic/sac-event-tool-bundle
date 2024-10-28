@@ -38,7 +38,6 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use League\Csv\CannotInsertRecord;
 use League\Csv\InvalidArgument;
-use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmailController;
@@ -52,6 +51,7 @@ use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -79,14 +79,15 @@ class CalendarEventsMember
         private readonly EventRegistrationListGeneratorCsv $registrationListGeneratorCsv,
         private readonly EventRegistrationListGeneratorDocx $registrationListGeneratorDocx,
         private readonly EventRegistrationUtil $eventRegistrationUtil,
+        private readonly NotificationCenter $notificationCenter,
+        private readonly Packages $packages,
         private readonly RequestStack $requestStack,
+        private readonly RouterInterface $router,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
+        private readonly UriSigner $uriSigner,
         private readonly UrlParser $urlParser,
         private readonly Util $util,
-        private readonly UriSigner $uriSigner,
-        private readonly NotificationCenter $notificationCenter,
-        private readonly RouterInterface $router,
         private readonly string $sacevtLocale,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
@@ -111,7 +112,7 @@ class CalendarEventsMember
         $request = $this->requestStack->getCurrentRequest();
 
         if ('calendar' === $request->query->get('do') && '' !== $request->query->get('ref')) {
-            $GLOBALS['TL_JAVASCRIPT'][] = Bundle::ASSET_DIR.'/js/backend_member_autocomplete.js';
+            $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('js/backend_member_autocomplete.js', 'markocupic_sac_event_tool');
         }
     }
 

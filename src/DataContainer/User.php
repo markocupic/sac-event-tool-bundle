@@ -25,9 +25,9 @@ use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
-use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -40,6 +40,7 @@ class User
         private readonly ContaoFramework $framework,
         private readonly Countries $countries,
         private readonly MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory,
+        private readonly Packages $packages,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
@@ -70,7 +71,7 @@ class User
         $request = $this->requestStack->getCurrentRequest();
 
         if ('user' === $request->query->get('do') && 'edit' === $request->query->get('act') && '' !== $request->query->get('ref')) {
-            $GLOBALS['TL_JAVASCRIPT'][] = Bundle::ASSET_DIR.'/js/backend_member_autocomplete.js';
+            $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('js/backend_member_autocomplete.js', 'markocupic_sac_event_tool');
         }
     }
 

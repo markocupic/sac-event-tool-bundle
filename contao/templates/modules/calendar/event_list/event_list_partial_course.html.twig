@@ -1,6 +1,6 @@
-{% do addJavascriptResource(sacevt_asset_dir()~'/js/dexie/dexie.min.js', null, true) %}
-{% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.global.prod.js?3.3.4') %}
-{% do addJavascriptResource(sacevt_asset_dir()~'/js/eventlist_vue.js', null, true) %}
+{% do addJavascriptResource(insert_tag('asset::dexie/dist/dexie.min.js::markocupic_sac_event_tool')) %}
+{% do addJavascriptResource(insert_tag('asset::vue/dist/vue.global.prod.js::markocupic_sac_event_tool')) %}
+{% do addJavascriptResource(insert_tag('asset::eventlist/eventlist_vue.js::markocupic_sac_event_tool')) %}
 
 <div id="course-list" data-moduleid="{{ id|default }}" v-cloak>
     <span v-if="itemsTotal > 0" class="text-muted mb-3"><small>Zu deiner Suchanfrage wurden [[ itemsTotal ]] Events gefunden. </small></span>

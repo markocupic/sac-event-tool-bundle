@@ -24,7 +24,6 @@
         "markocupic/cloudconvert-bundle": "^2.0",
         "markocupic/composer-file-copier-plugin": "^0.2",
         "markocupic/contao-component-fontawesome-free": "^6.0",
-        "markocupic/contao-component-vue-js": "^3.3",
         "markocupic/contao-custom-global-operation": "^1.0",
         "markocupic/contao-frontend-user-notification": "^1.0",
         "markocupic/contao-twig-assets": "^1.0",
@@ -35,6 +34,7 @@
         "menatwork/contao-multicolumnwizard-bundle": "^3.5",
         "ramsey/uuid": "^3.8 || ^4.3",
         "symfony/stopwatch": "*",
+        "symfony/asset": "*",
         "tecnickcom/tcpdf": "^6.4",
         "terminal42/notification_center": "^2.0"
     },

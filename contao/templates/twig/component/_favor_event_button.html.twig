@@ -6,7 +6,7 @@
         </button>
     {% else %}
         {# Add Vue.js #}
-        {% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.global.prod.js?3.3.4') %}
+        {% do addJavascriptResource(insert_tag('asset::vue/dist/vue.global.prod.js::markocupic_sac_event_tool')) %}
 
         {# Generate a random app id #}
         {% set app_id = 'EventLikeBtn_'~random() %}

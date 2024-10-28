@@ -1,0 +1,583 @@
+/** General **/
+.text-decoration-underline {
+	text-decoration: underline;
+}
+
+/** improve the readability of textareas in the backend **/
+.be_main {
+	.tl_textarea, .textarea {
+		line-height: 2;
+	}
+}
+
+/** Make fields with incorrect entries more recognizable **/
+.tl_form.tl_edit_form {
+	& .error.tl_select,
+	& .error.tl_text,
+	& .error.tl_textarea,
+	& .error.tl_chosen > ul.chzn-choices {
+		border-width: 2px;
+		animation: border_color_change_on_widget_error 1s step-start infinite !important;
+	}
+}
+
+@keyframes border_color_change_on_widget_error {
+	50% {
+		border-color: var(--red);
+	}
+}
+
+/** multicolumn wizard fix: Fix cutted of sentences issue on small screens in the bottom-/tooltip section */
+[class*="mcwColumnCount_"] .tl_help.tl_tip {
+	height: auto !important;
+}
+
+/** End multicolumn wizard fix */
+
+#tl_buttons {
+	display: flex;
+	text-align: left;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	line-height: 2;
+}
+
+/** editAll & overrideAll navbar */
+#editAllNavbarHelper {
+	position: fixed;
+	bottom: 3rem;
+	right: 0;
+	background-color: #f47c00;
+	z-index: 2000;
+	font-family: -apple-system, system-ui, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif;
+}
+
+#editAllNavbarHelper ul {
+	display: flex;
+}
+
+#editAllNavbarHelper ul, #editAllNavbarHelper li {
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+}
+
+#editAllNavbarHelper button {
+	margin: 15px 8px;
+	padding: 6px;
+	background-color: #000;
+	color: #fff;
+	border: 0;
+}
+
+#editAllNavbarHelper button:hover {
+	background-color: #aa0000;
+}
+
+/** new_repeat im multicolumn wizard ausblenden**/
+table#ctrl_eventDates thead tr:first-child {
+	display: none;
+}
+
+/** Highlight main instructor **/
+#tl_calendar_events #ctrl_instructor tr:first-child td #ctrl_instructor_row0_instructorId_chzn {
+	& a {
+		background-color: #589b0e;
+
+		& > span {
+			color: white;
+		}
+	}
+}
+
+#tl_navigation .group-sac_be_modules {
+	background: url(../../markocupicsaceventtool/icons/sac-event-tool-backend-module-icon.svg) 3px 2px no-repeat;
+}
+
+/** Global operations**/
+#tl_buttons .header_icon.download_event_registration_list,
+#tl_buttons .header_icon.send_email,
+#tl_buttons .header_icon.global_op_icon_class {
+	background-size: 16px 16px;
+	padding: 3px 0 3px 21px;
+	background-position: left center;
+	background-repeat: no-repeat;
+	margin-left: 15px;
+}
+
+/** Subscription state legend and participation state legend in tl_calendar_events_member **/
+/** Subscription state legend and participation state legend in tl_calendar_events_member **/
+div.legend-box {
+	padding-top: 16px;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	column-gap: 16px;
+	row-gap: 16px;
+	position: relative;
+
+	& h3 {
+		margin-bottom: 0.75rem;
+	}
+
+	& li {
+		line-height: 1.5;
+	}
+
+	& > .event-detail-legend {
+		width: 100%;
+	}
+
+	& > .subscription-state-legend {
+		width: 100%;
+
+		& ul {
+			list-style: none;
+			padding-left: 0
+		}
+	}
+
+	& > .participation-state-legend {
+		& ul {
+			list-style: none;
+			padding-left: 0
+		}
+	}
+}
+
+@media (min-width: 600px) {
+	div.legend-box {
+		& > .event-detail-legend {
+			flex: 1 1 0;
+		}
+
+		& > .subscription-state-legend {
+			flex: 1 1 0;
+		}
+
+		& > .participation-state-legend {
+			width: 100%;
+		}
+	}
+}
+
+@media (min-width: 1200px) {
+	div.legend-box {
+		& > .participation-state-legend {
+			flex: 2 1 0;
+		}
+	}
+}
+
+/** End subscription state legend and participation state legend in tl_calendar_events_member **/
+/** End subscription state legend and participation state legend in tl_calendar_events_member **/
+
+/** Start autocomplete box event member registration Contao backend */
+/** Start autocomplete box event member registration Contao backend */
+#acceptAutocompleteBox {
+	padding: 15px 0;
+}
+
+#acceptAutocompleteBox .autocompleteBtn {
+	margin-right: 20px;
+}
+
+#acceptAutocompleteBox strong {
+	font-weight: bold;
+	color: var(--text);
+}
+
+#acceptAutocompleteBox .autocompleteInfo {
+	color: green
+}
+
+/** End autocomplete box event member registration Contao backend */
+/** End autocomplete box event member registration Contao backend */
+
+/** Start readonly fields FS 2-4 **/
+/** Start readonly fields FS 2-4 **/
+.tl_formbody_edit div.readonly {
+	margin: 0 15px;
+	position: relative;
+	width: calc(100% - 30px);
+
+	& .field-content-box {
+		margin-top: 3px;
+		margin-bottom: 3px;
+		padding: 8px 5px;
+		background-color: var(--form-bg-disabled);
+		box-sizing: border-box;
+		border: 1px solid var(--form-border-disabled);
+		border-radius: 2px;
+		width: 100%;
+		line-height: 1.4;
+		min-height: 37px;
+		color: var(--form-text-disabled);
+	}
+}
+
+/** End readonly fields FS 2-4 **/
+/** End readonly fields FS 2-4 **/
+
+
+div.tl_header_tour_rapport {
+	background-color: #f3f3f5;
+	display: block;
+	border-top: 1px solid grey;
+	border-bottom: 1px solid grey;
+}
+
+div.tl_header_tour_rapport table td {
+	padding: 10px;
+}
+
+/** tl_calendar_events Show subscription state **/
+.subscription-badge {
+	background-color: #4e4e4e;
+	font-size: x-small;
+	font-weight: bold;
+	border-radius: 5px;
+	padding: 3px 8px;
+	margin-left: 20px;
+	cursor: pointer;
+}
+
+.subscription-badge.not-confirmed {
+	background-color: #4e4e4e;
+	color: white;
+	animation: blinker 2s step-start infinite;
+}
+
+.col_stateOfSubscription img[alt="subscription-not-confirmed"] {
+	animation: blinker 2s step-start infinite;
+}
+
+@keyframes blinker {
+	50% {
+		opacity: 0;
+	}
+}
+
+.subscription-badge.accepted {
+	background-color: #589b0e;
+	color: white;
+}
+
+.subscription-badge.on-waiting-list {
+	background-color: #006df0;
+	color: white;
+}
+
+.subscription-badge.refused {
+	background-color: #d80027;
+	color: white;
+}
+
+.subscription-badge.unsubscribed-user {
+	background-color: #d86811;
+	color: white;
+}
+
+#tl_calendar_events_member .tl_submit.btn-accept-with-email {
+	background-color: #589b0e;
+	color: white;
+	border-color: #2C4F07;
+}
+
+#tl_calendar_events_member .tl_submit.btn-add-to-waitinglist-with-email {
+	background-color: #006df0;
+	color: white;
+	border-color: #006df0;
+}
+
+#tl_calendar_events_member .tl_submit.btn-refuse-with-email {
+	background-color: #d80027;
+	color: white;
+	border-color: #d80027;
+}
+
+#tl_calendar_events_member .tl_submit.btn-cancel-with-email {
+	background-color: #d86811;
+	color: white;
+	border-color: #d86811;
+}
+
+/** backend home screen - start */
+/** backend home screen - start */
+#tl_backend_home_screen_my_events h2 {
+	margin: 18px 0 12px;
+}
+
+#tl_backend_home_screen_my_events {
+	overflow-x: auto;
+	padding: 0 15px 4px;
+	border-bottom: 1px solid #e6e6e8;
+}
+
+#tl_backend_home_screen_my_events_inner {
+	width: auto;
+	min-width: 700px;
+
+	& td.separator {
+		padding-top: 2rem;
+		font-weight: 600;
+		color: #222;
+	}
+
+	& td.text-align-left {
+		text-align: left;
+	}
+
+	& td.text-align-center {
+		text-align: center;
+	}
+
+	& td.my-events-badge-col {
+		width: 130px;
+	}
+
+	& td.my-events-date-col {
+		width: 68px;
+	}
+
+	& td.my-events-state-col {
+		width: 16px;
+		padding: 0;
+	}
+
+	& td.my-events-icon-col {
+		width: 18px;
+	}
+
+	& td.my-events-icon-col > * {
+		color: #1A6B99;
+	}
+
+	/** https://isotropic.co/tool/hex-color-to-css-filter/ */
+
+	& td .filter-brightened {
+		color: #6F7685;
+	}
+
+	/** https://isotropic.co/tool/hex-color-to-css-filter/ */
+
+	& td .filter-green {
+		color: #589B0F;
+	}
+
+	/** https://isotropic.co/tool/hex-color-to-css-filter/ */
+
+	& td .filter-red {
+		color: #D80128;
+	}
+
+	& .subscription-badge {
+		margin-left: 4px !important;
+	}
+
+	& td, & th {
+		padding: 10px 6px;
+	}
+}
+
+/** backend home screen - end */
+/** backend home screen - end */
+
+/** alerts **/
+/** alerts **/
+.alert {
+	margin: 15px;
+	padding: 15px;
+}
+
+.alert.alert-danger {
+	background: red;
+	color: white;
+}
+
+.alert.alert-primary {
+	background: #cce5ff;
+	color: #000;
+}
+
+.alert.alert-success {
+	background: #d4edda;
+	color: #000;
+}
+
+.notice {
+	font-weight: bold;
+	color: red !important;
+}
+
+/** alerts **/
+/** alerts **/
+
+/** Event dashboard supplementary buttons **/
+/** Event dashboard supplementary buttons **/
+.event-dashboard .tl_submit_container ul {
+	display: inline-flex !important;
+	flex-wrap: wrap !important;
+	list-style: none !important;
+	padding-left: 0 !important;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.event-dashboard .tl_submit_container ul li {
+	margin: 2px 4px 2px 2px;
+	white-space: nowrap !important;
+}
+
+/** Stick navigation to the bottom for large screens **/
+@media (min-width: 1240px) {
+	#main {
+		padding-bottom: 80px;
+	}
+
+	.event-dashboard {
+		position: fixed !important;
+		bottom: 0 !important;
+		left: 235px !important;
+		right: 15px !important;
+		z-index: 900 !important;
+	}
+
+	.event-dashboard .tl_submit_container {
+		background-color: #172b3b !important;
+	}
+}
+
+/** End event dashboard supplementary buttons **/
+/** End event dashboard supplementary buttons **/
+
+
+/** tl_help additions **/
+.tl_full_height {
+	height: auto !important;
+}
+
+.tl_gerror {
+	display: none;
+}
+
+/** Send emails to participants */
+/** Send emails to participants */
+#eventParticipantEmail {
+	& #selectAllBox {
+		display: block;
+		margin: 8px 0;
+	}
+
+	& #selectAllBox a {
+		text-decoration: underline;
+	}
+
+	& #fileUploader[v-cloak] {
+		opacity: 0;
+	}
+
+	& #fileUploader {
+		transition: opacity 1.5s linear;
+	}
+
+	& {
+		margin: 15px;
+	}
+
+	& label {
+		font-weight: 600;
+	}
+
+	& legend {
+		display: flex;
+	}
+
+	& .widget {
+		margin: 1.5rem 0 !important;
+	}
+
+	& .widget-text, & .widget-textarea {
+		display: flex;
+		flex-direction: column;
+
+		& .text, & .textarea {
+			border: 1px solid var(--form-border);
+			background-color: var(--form-bg);
+		}
+	}
+
+	& input[type="text"], & textarea {
+		padding: 5px 6px;
+		margin-top: 4px;
+	}
+
+	& .widget-checkbox span {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+
+	& .widget.tl_submit {
+		background: 0 !important;
+		border: 0;
+		padding: 0;
+	}
+
+	& .tl_checkbox_container span > * {
+		margin: .5rem .5rem .5rem 0 !important;
+	}
+
+	& .email-attachment-list {
+		margin: 2rem 0 1rem 0;
+	}
+
+	& .email-attachment-list li {
+		margin: .75rem 0;
+		display: flex;
+		align-items: flex-start;
+	}
+
+	& .delete-attachment-btn span {
+		border: 0;
+		padding: 0;
+		margin: 0 .5rem 0 0;
+		height: 16px;
+		width: 16px;
+		display: inline-block;
+		background-image: url("../../../system/themes/flexible/icons/delete.svg");
+		background-repeat: no-repeat;
+	}
+
+	& .pending-upload-indicator, & .ajax-message-success {
+		color: green;
+	}
+
+	& .upload-error-box {
+		margin: 2rem 0 0 0;
+	}
+
+	& .blink {
+		animation: blinker 1s linear infinite;
+	}
+
+	& .cc-info {
+		margin: 32px 0 16px 0;
+		color: green;
+	}
+
+	& p.error {
+		margin: 16px 0;
+		color: red;
+	}
+}
+
+@keyframes blinker {
+	50% {
+		opacity: 0;
+	}
+}
+
+/** End Send emails to participants */
+/** End Send emails to participants */
