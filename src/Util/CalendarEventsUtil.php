@@ -685,7 +685,9 @@ class CalendarEventsUtil
         if ('' !== $objEvent->singleSRC) {
             $objFile = FilesModel::findByUuid($objEvent->singleSRC);
 
-            if (null !== $objFile && is_file($projectDir.'/'.$objFile->path)) {
+            $path = Path::join($projectDir, $objFile->path);
+
+            if (null !== $objFile && is_file($path)) {
                 return $objFile->path;
             }
         }
@@ -709,7 +711,9 @@ class CalendarEventsUtil
         }
 
         $eventDuration = \count(self::getEventTimestamps($objEvent));
+
         // Typecast is required here, this although PhpCodeSniffer claims the opposite.
+        // Calendar::calculateSpan() returns "double" not "integer"
         $span = (int) Calendar::calculateSpan(self::getStartDate($objEvent), self::getEndDate($objEvent)) + 1;
 
         if (1 === $eventDuration) {
@@ -1199,8 +1203,10 @@ class CalendarEventsUtil
                 if ($objOrganizer->addLogo && '' !== $objOrganizer->singleSRC) {
                     $objFiles = FilesModel::findByUuid($objOrganizer->singleSRC);
 
-                    if (null !== $objFiles && is_file($projectDir.'/'.$objFiles->path)) {
-                        $arrPaths[] = $projectDir.'/'.$objFiles->path;
+                    $path = Path::join($projectDir, $objFiles->path);
+
+                    if (null !== $objFiles && is_file($path)) {
+                        $arrPaths[] = $path;
                     }
                 }
             }
@@ -1220,7 +1226,7 @@ class CalendarEventsUtil
         $relWebDir = Path::makeRelative($webDir, $projectDir); // public
 
         // Symlink (target: 'system/qrcodes', link: 'public/system/qrcodes')
-        SymlinkUtil::symlink($objFolder->path, $relWebDir.'/'.$objFolder->path, $projectDir);
+        SymlinkUtil::symlink($objFolder->path, Path::join($relWebDir, $objFolder->path), $projectDir);
 
         // Generate path
         $filepath = sprintf($objFolder->path.'/'.'eventQRcode_%s.png', $objEvent->id);
