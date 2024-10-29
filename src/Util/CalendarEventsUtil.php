@@ -682,13 +682,15 @@ class CalendarEventsUtil
         $projectDir = System::getContainer()->getParameter('kernel.project_dir');
         System::getContainer()->get('contao.framework')->initialize();
 
-        if ('' !== $objEvent->singleSRC) {
+        if (!empty($objEvent->singleSRC)) {
             $objFile = FilesModel::findByUuid($objEvent->singleSRC);
 
-            $path = Path::join($projectDir, $objFile->path);
+            if (null !== $objFile) {
+                $path = Path::join($projectDir, $objFile->path);
 
-            if (null !== $objFile && is_file($path)) {
-                return $objFile->path;
+                if (is_file($path)) {
+                    return $objFile->path;
+                }
             }
         }
 
