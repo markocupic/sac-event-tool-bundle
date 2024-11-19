@@ -711,6 +711,9 @@ class CalendarEvents
     }
 
     /**
+     * Only shows the content/value of the field, and not the form widget.
+     * Is used if the field can not be edited because the release level (FS) is too high.
+     *
      * @throws Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.alias.input_field', priority: 100)]
@@ -720,6 +723,7 @@ class CalendarEvents
 
         $strTable = 'tl_calendar_events';
 
+        // Do not show the field in the overrideAll mode
         if (!$dc->activeRecord->id) {
             return '';
         }
