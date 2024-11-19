@@ -344,11 +344,14 @@ class EventApiController extends AbstractController
 
         // Search term (search for expression in tl_calendar_events.title and tl_calendar_events.teaser
         if (!empty($params['textSearch'])) {
-            $arrOrExpr = [];
+
 
             // Support multiple search expressions
+			// Only return these events in which each search term (needle) was found.
             foreach (explode(' ', $params['textSearch']) as $strNeedle) {
-                if (empty(trim($strNeedle))) {
+				$arrOrExpr = [];
+
+				if (empty(trim($strNeedle))) {
                     continue;
                 }
 
@@ -379,10 +382,10 @@ class EventApiController extends AbstractController
                     );
                     $qb->setParameter('qbStInstructorId'.$instrId, $instrId, Types::INTEGER);
                 }
-            }
 
-            if (!empty($arrOrExpr)) {
-                $qb->andWhere($qb->expr()->or(...$arrOrExpr));
+				if (!empty($arrOrExpr)) {
+					$qb->andWhere($qb->expr()->or(...$arrOrExpr));
+				}
             }
         }
 
