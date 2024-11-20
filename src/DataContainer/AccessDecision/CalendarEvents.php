@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2024 <m.cupic@gmx.ch>
+ * (c) Marko Cupic <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -18,7 +18,6 @@ use Contao\Backend;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
-use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
@@ -284,6 +283,8 @@ class CalendarEvents
 
                         if (!isset($session['filter'][$filter]['eventReleaseLevel'])) {
                             $this->message->addError($this->translator->trans('ERR.setEvtRelLevelForSelectAll', [], 'contao_default'));
+
+                            // Redirect the user back to the previously called page if no event release leve is set.
                             $this->controller->redirect($this->system->getReferer());
                         }
                     }
@@ -307,45 +308,18 @@ class CalendarEvents
                 )();
 
                 (
-                    function () use ($act): void {
-                        // Do not allow editing write-protected fields in editAll mode
+                    function () use ($act, $request): void {
+                        // Do not allow editing write-protected fields in editAll/overrideAll mode
                         // Use input_field_callback to only display the field values without the form input field
                         if ('editAll' !== $act) {
                             return;
                         }
 
-                        $session = $this->requestStack->getSession()->get('CURRENT');
-                        $arrIDS = $session['IDS'];
-
-                        if (empty($arrIDS) || !\is_array($arrIDS)) {
+                        if ('1' === !$request->query->get('fields')) {
                             return;
                         }
 
-                        // !!! Whether an eventReleaseLevel filter is set
-                        // has already been checked above.
-
-                        $request = $this->requestStack->getCurrentRequest();
-
-                        foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] ?? []) as $fieldName) {
-                            if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
-                                if ('editAll' === $request->query->get('act')) {
-                                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [\Markocupic\SacEventToolBundle\DataContainer\CalendarEvents::class, 'showFieldValue'];
-                                }
-                            }
-                        }
-                    }
-                )();
-
-                break;
-
-            case 'overrideAll':
-                (
-                    function (): void {
-                        // Do not allow editing write-protected fields in editAll mode
-                        // Use input_field_callback to only display the field values without the form input field
-
                         $session = $this->requestStack->getSession()->get('CURRENT');
-
                         $arrIDS = $session['IDS'];
 
                         if (empty($arrIDS) || !\is_array($arrIDS)) {
@@ -358,33 +332,84 @@ class CalendarEvents
                             return;
                         }
 
-                        $objEventsModel = $this->calendarEventsModel->findByPk($arrIDS[0]);
+                        // It is sufficient if we only snap the release level of the first event of the entire selection.
+                        // As the event release level filter is set, the other events all have the same release level anyway.
+                        $eventModel = CalendarEventsModel::findByPk($arrIDS[0]);
 
-                        if (null === $objEventsModel) {
+                        if (null === $eventModel) {
+                            throw new \RuntimeException(sprintf('Event with ID %d not found.', $arrIDS[0]));
+                        }
+
+                        // Find the lowest possible event release level for any event from this selection.
+                        $minEventReleaseLevel = EventReleaseLevelPolicyModel::findMinLevelByEventId($eventModel->id);
+
+                        if (null === $minEventReleaseLevel) {
+                            throw new \LogicException('Events in this selection do not belong to an event release level policy. As the event release level filter is set, all events in this selection must be assigned to an event release level policy.');
+                        }
+
+                        if ($minEventReleaseLevel->id === $eventModel->eventReleaseLevel) {
+                            // No edit restrictions if the event release level is on the lowest possible level.
                             return;
                         }
 
-                        if (empty($objEventsModel->eventReleaseLevel)) {
-                            return;
-                        }
-
-                        // Check if an "eventReleaseLevel" filter is set.
-                        $strIds = implode(',', array_map('\intval', $arrIDS));
-                        $arrEventReleaseLevel = $this->connection->fetchFirstColumn("SELECT eventReleaseLevel FROM tl_calendar_events WHERE id IN($strIds) GROUP BY eventReleaseLevel");
-
-                        if (1 !== \count($arrEventReleaseLevel)) {
-                            throw new AccessDeniedException('Access to the action "overrideAll" denied, because no "eventReleaseLevel" filter has been set.');
-                        }
-
-                        $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findByPk($arrEventReleaseLevel[0]);
-
-                        if (null === $objEventReleaseLevelPolicyModel) {
-                            return;
-                        }
-
+                        // Whether an event release level filter is set has already been checked above.
                         foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] ?? []) as $fieldName) {
                             if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
-                                unset($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]);
+                                $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [\Markocupic\SacEventToolBundle\DataContainer\CalendarEvents::class, 'showFieldValue'];
+                            }
+                        }
+                    }
+                )();
+
+                break;
+
+            case 'overrideAll':
+                (
+                    function () use ($request): void {
+                        // Do not allow editing write-protected fields in editAll/overrideAll mode
+                        // Use input_field_callback to only display the field values without the form input field
+                        if ('1' === !$request->query->get('fields')) {
+                            return;
+                        }
+
+                        $session = $this->requestStack->getSession()->get('CURRENT');
+                        $arrIDS = $session['IDS'];
+
+                        if (empty($arrIDS) || !\is_array($arrIDS)) {
+                            return;
+                        }
+
+                        $arrFields = $session['tl_calendar_events'];
+
+                        if (empty($arrFields) || !\is_array($arrFields)) {
+                            return;
+                        }
+
+                        // It is sufficient if we only snap the release level of the first event of the entire selection.
+                        // As the event release level filter is set, the other events all have the same release level anyway.
+                        $eventModel = CalendarEventsModel::findByPk($arrIDS[0]);
+
+                        if (null === $eventModel) {
+                            throw new \RuntimeException(sprintf('Event with ID %d not found.', $arrIDS[0]));
+                        }
+
+                        // Find the lowest possible event release level for any event from this selection.
+                        $minEventReleaseLevel = EventReleaseLevelPolicyModel::findMinLevelByEventId($eventModel->id);
+
+                        if (null === $minEventReleaseLevel) {
+                            throw new \LogicException('Events in this selection do not belong to an event release level policy. As the event release level filter is set, all events in this selection must be assigned to an event release level policy.');
+                        }
+
+                        if ($minEventReleaseLevel->id === $eventModel->eventReleaseLevel) {
+                            // No edit restrictions if the event release level is on the lowest possible level.
+                            return;
+                        }
+
+                        // Whether an event release level filter is set has already been checked above.
+                        foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] ?? []) as $fieldName) {
+                            if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
+                                // Do not show the widget in the overrideAll mode.
+                                $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [\Markocupic\SacEventToolBundle\DataContainer\CalendarEvents::class, 'showFieldValue'];
                             }
                         }
                     }

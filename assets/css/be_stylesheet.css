@@ -74,8 +74,8 @@
 	background-color: #aa0000;
 }
 
-/** new_repeat im multicolumn wizard ausblenden**/
-table#ctrl_eventDates thead tr:first-child {
+/** hide the thead (new_repeat) in the mcw **/
+table#ctrl_eventDates thead {
 	display: none;
 }
 
