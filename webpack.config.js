@@ -10,7 +10,7 @@ Encore
 
 	.copyFiles({
 		from: './assets/css',
-		to: 'css/[path][name].[ext]'
+		to: 'css/[path][name].[hash:8].[ext]'
 	})
 	.copyFiles({
 		from: './assets/eventfilter',
