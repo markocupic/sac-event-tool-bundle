@@ -34,7 +34,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class EventApiController extends AbstractController
 {
-    public const CACHE_MAX_AGE = 10;
+    public const CACHE_MAX_AGE = 60;
 
     public function __construct(
         private readonly ContaoFramework $framework,
@@ -138,14 +138,14 @@ class EventApiController extends AbstractController
         // Allow cross domain requests
         $response = new JsonResponse($arrJSON, 200, ['Access-Control-Allow-Origin' => '*']);
 
-        // Enable cache
+        // Enable cache for not logged in frontend users (guests)
         $user = $this->security->getUser();
 
         if (!$user instanceof FrontendUser) {
-            //$response->setPublic();
-            //$response->setSharedMaxAge(self::CACHE_MAX_AGE);
-            //$response->setPrivate();
-            //$response->setMaxAge(self::CACHE_MAX_AGE - 10);
+            $response->setPublic();
+            $response->setSharedMaxAge(self::CACHE_MAX_AGE);
+            $response->setPrivate();
+            $response->setMaxAge(self::CACHE_MAX_AGE);
         }
 
         return $response;
@@ -342,14 +342,14 @@ class EventApiController extends AbstractController
             }
         }
 
-        // Search term (search for expression in tl_calendar_events.title and tl_calendar_events.teaser
+        // Search term (search for expression in tl_calendar_events.title and tl_calendar_events.teaser)
         if (!empty($params['textSearch'])) {
-            // Support multiple search expressions
-			// Only return these events in which each search term (needle) was found.
+            // Support multiple search terms
+            // Only return these events in which each search term (needle) was found.
             foreach (explode(' ', $params['textSearch']) as $strNeedle) {
-				$arrOrExpr = [];
+                $arrOrExpr = [];
 
-				if (empty(trim($strNeedle))) {
+                if (empty(trim($strNeedle))) {
                     continue;
                 }
 
@@ -381,9 +381,9 @@ class EventApiController extends AbstractController
                     $qb->setParameter('qbStInstructorId'.$instrId, $instrId, Types::INTEGER);
                 }
 
-				if (!empty($arrOrExpr)) {
-					$qb->andWhere($qb->expr()->or(...$arrOrExpr));
-				}
+                if (!empty($arrOrExpr)) {
+                    $qb->andWhere($qb->expr()->or(...$arrOrExpr));
+                }
             }
         }
 
