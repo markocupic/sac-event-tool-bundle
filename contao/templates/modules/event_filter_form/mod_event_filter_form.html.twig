@@ -53,7 +53,7 @@
         </form>
     </div>
 
-    <script src="{{ insert_tag('asset::eventfilter/eventfilter.min.js::markocupic_sac_event_tool') }}"></script>
+    <script src="{{ insert_tag('asset::eventfilter/eventfilter.js::markocupic_sac_event_tool') }}"></script>
     <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
 
         document.addEventListener("DOMContentLoaded", function () {

@@ -1,7 +1,18 @@
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/sac-event-tool-bundle
+ */
+
 "use strict";
 
-/**
- * Selected checkboxes can be saved in the users session,
+/*
+ * What is?
+ * Selected fields (tl_calendar_events) can be saved in the users session,
  * when using the Contao backend in the "editAll" or "overrideAll" mode.
  */
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	new EditAllNavbarHelper();
-
 });
 
 class EditAllNavbarHelper {
@@ -158,4 +168,3 @@ class EditAllNavbarHelper {
 		})
 	}
 }
-

@@ -6,39 +6,41 @@ Encore
 	.setManifestKeyPrefix('')
 
 	//.addEntry('backend', './assets/backend.js')
-	//.addEntry('frontend', './assets/filepond.js')
+	//.addEntry('frontend', './assets/frontend.js')
 
 	.copyFiles({
 		from: './assets/css',
-		to: 'css/[path][name].[hash:8].[ext]'
+		to: 'css/[path][name].[hash:8].[ext]',
 	})
 	.copyFiles({
 		from: './assets/eventfilter',
-		to: 'eventfilter/[path][name].[hash:8].[ext]'
+		to: 'eventfilter/[path][name].[hash:8].[ext]',
 	})
 	.copyFiles({
 		from: './assets/eventlist',
-		to: 'eventlist/[path][name].[hash:8].[ext]'
+		to: 'eventlist/[path][name].[hash:8].[ext]',
 	})
 	.copyFiles({
 		from: './assets/js',
-		to: 'js/[path][name].[hash:8].[ext]'
+		to: 'js/[path][name].[hash:8].[ext]',
 	})
 	.copyFiles({
 		from: './assets/icons',
-		to: 'icons/[path][name].[ext]'
+		to: 'icons/[path][name].[ext]',
 	})
 	.copyFiles({
 		from: './assets/images',
-		to: 'images/[path][name].[ext]'
+		to: 'images/[path][name].[ext]',
 	})
 	.copyFiles({
 		from: './node_modules/dexie/dist',
-		to: 'dexie/dist/[path][name].[hash:8].[ext]'
+		to: 'dexie/dist/[path][name].[hash:8].[ext]',
+		pattern: /(dexie\.js)$/,
 	})
 	.copyFiles({
 		from: './node_modules/vue/dist',
-		to: 'vue/dist/[path][name].[hash:8].[ext]'
+		to: 'vue/dist/[path][name].[hash:8].[ext]',
+		pattern: /(vue\.global\.prod\.js)$/,
 	})
 
 	.disableSingleRuntimeChunk()
