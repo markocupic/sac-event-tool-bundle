@@ -16,7 +16,7 @@ indent_size = 4
 [*.{html5,svg,min.css,min.js}]
 insert_final_newline = false
 
-[*.{css,js,php}]
+[*.{css,php}]
 indent_style = tab
 
 [*/contao/**.html5]
