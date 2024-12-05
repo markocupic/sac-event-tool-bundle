@@ -35,6 +35,7 @@
         "ramsey/uuid": "^3.8 || ^4.3",
         "symfony/stopwatch": "*",
         "symfony/asset": "*",
+        "symfony/webpack-encore-bundle": "^v2.0",
         "tecnickcom/tcpdf": "^6.4",
         "terminal42/notification_center": "^2.0"
     },
