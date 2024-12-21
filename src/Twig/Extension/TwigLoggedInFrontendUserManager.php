@@ -16,9 +16,8 @@ namespace Markocupic\SacEventToolBundle\Twig\Extension;
 
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\FrontendUser;
+use Contao\CoreBundle\Security\Authentication\Token\TokenChecker;
 use Contao\MemberModel;
-use Symfony\Bundle\SecurityBundle\Security;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -28,7 +27,7 @@ class TwigLoggedInFrontendUserManager extends AbstractExtension
 
     public function __construct(
         private readonly ContaoFramework $framework,
-        private readonly Security $security,
+        private readonly TokenChecker $tokenChecker,
     ) {
         $this->member = $this->framework->getAdapter(MemberModel::class);
     }
@@ -51,7 +50,7 @@ class TwigLoggedInFrontendUserManager extends AbstractExtension
      */
     public function hasLoggedInFrontendUser(): bool
     {
-        return null !== $this->getLoggedInFrontendUser();
+        return $this->tokenChecker->hasFrontendUser();
     }
 
     /**
@@ -66,10 +65,8 @@ class TwigLoggedInFrontendUserManager extends AbstractExtension
      */
     public function getLoggedInFrontendUser(): MemberModel|null
     {
-        $user = $this->security->getUser();
-
-        if ($user instanceof FrontendUser) {
-            if (null !== ($model = $this->member->findByPk($user->id))) {
+        if ($this->tokenChecker->hasFrontendUser()) {
+            if (null !== ($model = $this->member->findByUsername($this->tokenChecker->getFrontendUsername()))) {
                 return $model;
             }
         }
