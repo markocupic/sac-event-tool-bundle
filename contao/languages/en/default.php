@@ -125,7 +125,7 @@ $GLOBALS['TL_LANG']['ERR']['missingPermissionsToCutEvent'] = 'Sie haben nicht di
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_sacEvents'] = 'SAC Events';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_yourUpcomingEvents'] = 'Ihre nächsten Events';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_yourPastEvents'] = 'Ihre vergangenen Events';
-$GLOBALS['TL_LANG']['MSC']['bhs_dashb_howToEditReadonlyProfileData'] = 'Änderungen an Name, Adresse, Telefon und E-Mail müssen auf der Webseite des SAC Zentralverbandes (https://sac-cas.ch) gemacht werden.';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_howToEditReadonlyProfileData'] = 'Änderungen an Name, Adresse, Telefon und E-Mail müssen im SAC-Portal des Zentralverbandes (<a href="https://portal.sac-cas.ch/de" target="_blank" style="text-decoration:underline">portal.sac-cas.ch</a>) gemacht werden.';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_editEvent'] = 'Event bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_editReleaseLevel'] = 'Freigabestufe ändern';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_eventListing'] = 'Event-Liste';
