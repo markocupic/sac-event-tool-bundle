@@ -49,7 +49,7 @@ class ReplaceInsertTagsListener
                     $label = $elements[2];
                 }
 
-                return sprintf('<a href="%s" target="_blank">%s</a>', $href, $label);
+                return sprintf('<a href="%s" target="_blank" rel="noopener">%s</a>', $href, $label);
             }
         }
 

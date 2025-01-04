@@ -125,7 +125,7 @@ $GLOBALS['TL_LANG']['ERR']['missingPermissionsToCutEvent'] = 'Sie haben nicht di
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_sacEvents'] = 'SAC Events';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_yourUpcomingEvents'] = 'Ihre nächsten Events';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_yourPastEvents'] = 'Ihre vergangenen Events';
-$GLOBALS['TL_LANG']['MSC']['bhs_dashb_howToEditReadonlyProfileData'] = 'Änderungen an Name, Adresse, Telefon und E-Mail müssen im SAC-Portal des Zentralverbandes (<a href="https://portal.sac-cas.ch/de" target="_blank" style="text-decoration:underline">portal.sac-cas.ch</a>) gemacht werden.';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_howToEditReadonlyProfileData'] = 'Änderungen an Name, Adresse, Telefon und E-Mail müssen im SAC-Portal des Zentralverbandes (<a href="https://portal.sac-cas.ch/de" rel="noopener" target="_blank" style="text-decoration:underline">portal.sac-cas.ch</a>) gemacht werden.';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_editEvent'] = 'Event bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_editReleaseLevel'] = 'Freigabestufe ändern';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_eventListing'] = 'Event-Liste';
@@ -139,7 +139,7 @@ $GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReport'] = 'Tourrapport erfassen';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_editReport'] = 'Tourrapport bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReportDisabled'] = 'Tourrapport erfassen nicht verfügbar';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorials'] = 'Anleitungen und Tutorials';
-$GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorialsText'] = 'Die Seite "<a href="/service/anleitungen-und-tutorials.html" target="_blank" style="text-decoration:underline" title="Anleitungen und Tutorials"><strong>Anleitungen und Tutorials</strong></a>" beim Menüpunkt "Service" im Frontend/Website unterstützt Sie bei der Verwendung des SAC Event-Tools (Backend/Contao).';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorialsText'] = 'Die Seite "<a href="/service/anleitungen-und-tutorials.html" rel="noopener" target="_blank" style="text-decoration:underline" title="Anleitungen und Tutorials"><strong>Anleitungen und Tutorials</strong></a>" beim Menüpunkt "Service" im Frontend/Website unterstützt Sie bei der Verwendung des SAC Event-Tools (Backend/Contao).';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_noUpcomingEventsDetected'] = 'In nächster Zeit stehen bei Ihnen keine Events an, wo Sie eine Leitungsfunktion ausüben.';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_noPastEventsDetected'] = 'Es wurden keine Events gefunden, bei denen Sie in letzter Zeit eine Leitungsfunktion ausgeübt haben.';
 

@@ -210,7 +210,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle']['showIn
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['preview'] = [
     'href'       => 'action=preview', // use a button callback to generate the url
-    'attributes' => 'target="_blank"',
+    'attributes' => 'target="_blank" rel="noopener"',
     'icon'       => Bundle::ASSET_DIR.'/icons/fontawesome/default/presentation-screen-solid.svg',
 ];
 

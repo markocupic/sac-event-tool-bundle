@@ -64,6 +64,7 @@ class GenerateEventDashboardListener
             ->setLinkAttribute('role', 'button')
             ->setLinkAttribute('class', 'tl_submit')
             ->setLinkAttribute('target', '_blank')
+            ->setLinkAttribute('rel', 'noopener')
             //->setLinkAttribute('accesskey', 'm')
             ->setLinkAttribute('title', 'Event bearbeiten')
         ;
@@ -78,6 +79,7 @@ class GenerateEventDashboardListener
             ->setLinkAttribute('role', 'button')
             ->setLinkAttribute('class', 'tl_submit')
             ->setLinkAttribute('target', '_blank')
+            ->setLinkAttribute('rel', 'noopener')
             //->setLinkAttribute('accesskey', 'm')
             ->setLinkAttribute('title', 'Eventliste anzeigen')
         ;
@@ -88,6 +90,7 @@ class GenerateEventDashboardListener
                 ->setLinkAttribute('role', 'button')
                 ->setLinkAttribute('class', 'tl_submit')
                 ->setLinkAttribute('target', '_blank')
+                ->setLinkAttribute('rel', 'noopener')
                 ->setLinkAttribute('accesskey', 'p')
                 ->setLinkAttribute('title', 'Vorschau anzeigen [ALT + p]')
                 ->setLinkAttribute('onclick', 'return confirm(\'Wollen Sie diese Seite wirklich verlassen? Eventuell gemachte Änderungen am Event werden NICHT gespeichert.\')')
@@ -105,6 +108,7 @@ class GenerateEventDashboardListener
                 ->setAttribute('role', 'button')
                 ->setLinkAttribute('class', 'tl_submit')
                 ->setLinkAttribute('target', '_blank')
+                ->setLinkAttribute('rel', 'noopener')
                 ->setLinkAttribute('accesskey', 'm')
                 ->setLinkAttribute('title', 'Teilnehmerliste anzeigen und bearbeiten [ALT + m]')
             ;
@@ -122,6 +126,7 @@ class GenerateEventDashboardListener
                     ->setLinkAttribute('role', 'button')
                     ->setLinkAttribute('class', 'tl_submit')
                     ->setLinkAttribute('target', '_blank')
+                    ->setLinkAttribute('rel', 'noopener')
                     ->setLinkAttribute('accesskey', 'r')
                     ->setLinkAttribute('title', 'Tourrapport anzeigen und bearbeiten [ALT + r]')
                 ;
@@ -135,6 +140,7 @@ class GenerateEventDashboardListener
                     ->setAttribute('role', 'button')
                     ->setLinkAttribute('class', 'tl_submit')
                     ->setLinkAttribute('target', '_blank')
+                    ->setLinkAttribute('rel', 'noopener')
                     ->setLinkAttribute('accesskey', 'i')
                     ->setLinkAttribute('title', 'Vergütungsformular und Tourrapport anzeigen und drucken [ALT + i]')
                 ;
