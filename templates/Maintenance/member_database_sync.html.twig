@@ -1,0 +1,144 @@
+<div{{ attrs().addClass('maintenance_' ~ (is_active ? 'active' : 'inactive')) }}>
+    <h2 class="sub_headline sub_headline_index">Synchronisation SAC Mitgliederdatenbank Zentralverband -> Contao Mitglieder Datenbank</h2>
+
+    {% if is_running %}
+        <div class="inner">
+            <div id="memberDatabaseSyncApp">
+                <div class="tl_box">
+                    <div class="widget">
+                        <div v-if="isRunning" class="tl_message">
+                            <p class="tl_info">
+                                Die Datenbank Synchronisierung wurde gestartet [[ time ]] s.<br>
+                                Bitte beachten Sie, dass der Vorgang mehrere Minuten Zeit in Anspruch nehmen kann.<br>
+                                Bleiben Sie auf der Seite und schliessen Sie das Fenster erst, wenn Sie dazu aufgefordert werden.
+                            </p>
+                        </div>
+                        <div v-if="isSuccess" class="tl_message">
+                            <p class="tl_confirm">Die Datenbank Synchronisierung konnte erfolgreich abgeschlossen werden. Sie können das Fenster jetzt schliessen.</p>
+                            <p></p>
+                            <div class="tl_tbox">
+                                <table v-if="log" class="with-border with-padding">
+                                    <tbody>
+                                    <tr>
+                                        <td>Zeit:</td>
+                                        <td>[[ log.duration ]] s</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Anz. verarbeiteter Datensätze:</td>
+                                        <td>[[ log.processed ]]</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Deaktiviert:</td>
+                                        <td>[[ log.disabled ]]</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Updates:</td>
+                                        <td>[[ log.updates ]]</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Inserts:</td>
+                                        <td>[[ log.inserts ]]</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div v-if="isError" class="tl_message">
+                            <p class="tl_error">Datenbank Synchronisierung konnte nicht erfolgreich abgeschlossen werden.</p>
+                        </div>
+                        <div>
+                            <br>
+                            <img src="{{ asset('icons/maintenance/member_database_sync/db_sync.svg', 'markocupic_sac_event_tool') }}" aria-hidden="true" alt="member database sync" width="300">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="{{ asset('vue/dist/vue.global.prod.js', 'markocupic_sac_event_tool') }}"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                new MemberDatabaseSyncMaintenance('#memberDatabaseSyncApp');
+            });
+
+            MemberDatabaseSyncMaintenance = class {
+                constructor(appId) {
+                    const {createApp} = Vue
+
+                    let app = createApp({
+                        data() {
+                            return {
+                                timer: null,
+                                time: 0,
+                                isRunning: false,
+                                isError: false,
+                                isSuccess: false,
+                                log: null,
+                            };
+                        },
+                        mounted() {
+                            this.run();
+                        },
+                        methods: {
+                            run: async function run() {
+                                this.startTimer();
+                                this.isRunning = true;
+                                const url = window.location.href;
+
+                                try {
+                                    const response = await fetch(url, {
+                                        headers: {
+                                            "X-Requested-With": "XMLHttpRequest",
+                                        },
+                                    });
+
+                                    if (!response.ok) {
+                                        this.isRunning = false;
+                                        this.isError = true;
+                                        this.resetTimer();
+                                        throw new Error(`Response status: ${response.status}`);
+                                    }
+
+                                    this.log = await response.json();
+                                    this.isSuccess = true;
+                                    this.isRunning = false;
+                                    this.stopTimer();
+                                } catch (error) {
+                                    this.resetTimer();
+                                }
+                            },
+                            startTimer: function startTimer() {
+                                this.resetTimer();
+
+                                this.timer = window.setInterval(() => {
+                                    this.time++;
+                                }, 1000);
+                            },
+                            resetTimer: function resetTimer() {
+                                clearInterval(this.timer);
+                                this.timer = null;
+                                this.timer = 0;
+                            },
+                            stopTimer: function resetTimer() {
+                                clearInterval(this.timer);
+                                this.timer = null;
+                            },
+                        }
+                    });
+                    app.config.compilerOptions.delimiters = ['[[ ', ' ]]'];
+                    app.mount(appId);
+                }
+            }
+        </script>
+    {% else %}
+        <form class="tl_form" method="get">
+            <div class="tl_formbody_edit">
+                <input type="hidden" name="do" value="maintenance">
+                <input type="hidden" name="act" value="memberDatabaseSync">
+                <input type="hidden" name="rt" value="{{ csrf_token }}">
+            </div>
+            <div class="tl_submit_container">
+                <button type="submit" class="tl_submit">Mitglieder-Datenbank Synchronisierung starten</button>
+            </div>
+        </form>
+    {% endif %}
+</div>
