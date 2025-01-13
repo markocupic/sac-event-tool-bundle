@@ -189,6 +189,8 @@ $GLOBALS['TL_LANG']['ERR']['evt_strn_linkExpired'] = 'Der Link ist abgelaufen. L
 $GLOBALS['TL_LANG']['ERR']['evt_strn_sendNotificationFailed'] = 'Die E-Mail konnte nicht versandt werden, weil es zu einem unerwarteten Fehler gekommen ist. Bitte probieren Sie den selben Vorgang nochmals auszuführen. Kontaktieren Sie bitte den Administrator dieser Webseite, sollte der Fehler erneut auftreten.';
 $GLOBALS['TL_LANG']['ERR']['evt_strn_cloudconvConversionCreditUsedUp'] = 'Die E-Mail konnte nicht versandt werden, weil bei der DOCX zu PDF Konvertierung von "%s" ein Fehler aufgetreten ist. Die Anzahl der täglich erlaubten Konvertierungen wurde überschritten.';
 $GLOBALS['TL_LANG']['ERR']['evt_strn_cloudconvUnexpectedError'] = 'Die E-Mail konnte nicht versandt werden, weil bei der DOCX zu PDF Konvertierung von "%s" ein unerwarteter Fehler aufgetreten ist. Probieren Sie den selben Vorgang noch einmal durchzuführen. Kontaktieren Sie bitte den Administrator dieser Webseite, sollte der Fehler erneut auftreten.';
+$GLOBALS['TL_LANG']['ERR']['evt_strn_eventHasNoMember'] = 'Bitte überprüfe die Teilnehmerliste. Es wurden keine Teilnehmer gefunden, die am Event teilgenommen haben. Falls du den Event abgesagt hast, musst du dies unter Event Status beim Event selber vermerken.';
+$GLOBALS['TL_LANG']['ERR']['evt_strn_eventRapportNotFilledOutCorrectly'] = 'Bitte füllen Sie den Tourrapport vollständig aus, bevor Sie das Vergütungsformular herunterladen.';
 $GLOBALS['TL_LANG']['MSC']['evt_strn_multiFormSubmitWarning'] = 'Sie haben diese Benachrichtigung bereits %dx versendet. Das letzte Mal am %s. Möchten Sie die Benachrichtigung wirklich ein weiteres Mal versenden?';
 
 // Booking states/Subscription states

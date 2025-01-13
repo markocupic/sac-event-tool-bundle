@@ -32,6 +32,8 @@ use Contao\Model\Collection;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
+use Markocupic\SacEventToolBundle\DocxTemplator\Exception\EventHasNoMemberException;
+use Markocupic\SacEventToolBundle\DocxTemplator\Exception\EventRapportNotFilledOutCorrectlyException;
 use Markocupic\SacEventToolBundle\DocxTemplator\TourRapportGenerator;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
@@ -149,12 +151,13 @@ class SendTourRapportNotificationController extends AbstractBackendController
         }
 
         // Form inputs have passed validation:
-        // I. Generate tour report file and convert from docx to pdf using the Cloudconvert API.
-        // II. Generate tour invoice file and convert from docx to pdf using the Cloudconvert API.
+        // I. Generate tour report file and convert from docx to pdf using the CloudConvert API.
+        // II. Generate tour invoice file and convert from docx to pdf using the CloudConvert API.
         // III. Send notification via email.
         // IV. Redirect back to the referer page
 
-        // I. Generate tour report file and convert from docx to pdf using the Cloudconvert API.
+        // I. Generate tour report file and convert from docx to pdf using the
+        //  API.
         try {
             $rapportFile = $this->tourRapportGenerator
                 ->generate(
@@ -169,22 +172,25 @@ class SendTourRapportNotificationController extends AbstractBackendController
             if (false === $rapportFile->getSize() || 5000 > $rapportFile->getSize()) {
                 throw new \Exception(sprintf('File conversion failed. File size of the converted file "%s" is too small. File size: %d bytes!', $rapportFile->getFilename(), $rapportFile->getSize()));
             }
-        } catch (HttpClientException $e) {
-            $pdfConversionError = $this->translator->trans('ERR.evt_strn_cloudconvConversionCreditUsedUp', ['Tourrapport'], 'contao_default');
-            $this->notifyAdminOnError($e, $rapport_id);
-        } catch (\Exception $e) {
-            $pdfConversionError = $this->translator->trans('ERR.evt_strn_cloudconvUnexpectedError', ['Tourrapport'], 'contao_default');
-            $this->notifyAdminOnError($e, $rapport_id);
-        }
+        } catch (EventHasNoMemberException|EventRapportNotFilledOutCorrectlyException|HttpClientException|\Exception $e) {
+            $message = match (\get_class($e)) {
+                EventHasNoMemberException::class => $this->translator->trans('ERR.evt_strn_eventHasNoMember', [], 'contao_default'),
+                EventRapportNotFilledOutCorrectlyException::class => $this->translator->trans('ERR.evt_strn_eventRapportNotFilledOutCorrectly', [], 'contao_default'),
+                HttpClientException::class => $this->translator->trans('ERR.evt_strn_cloudconvConversionCreditUsedUp', ['Tourrapport'], 'contao_default'),
+                default => $this->translator->trans('ERR.evt_strn_cloudconvUnexpectedError', ['Tourrapport'], 'contao_default'),
+            };
 
-        if (!empty($pdfConversionError)) {
-            $this->message->addError($pdfConversionError);
+            $this->message->addError($message);
+
+            if (!$e instanceof EventHasNoMemberException && !$e instanceof EventRapportNotFilledOutCorrectlyException) {
+                $this->notifyAdminOnError($e, $rapport_id);
+            }
 
             // IV. Redirect back to the referer page
             return $this->redirectBackToRefererPage($request);
         }
 
-        // II. Generate tour invoice file and convert from docx to pdf using the Cloudconvert API.
+        // II. Generate tour invoice file and convert from docx to pdf using the CloudConvert API.
         try {
             $invoiceFile = $this->tourRapportGenerator
                 ->generate(
@@ -199,17 +205,19 @@ class SendTourRapportNotificationController extends AbstractBackendController
             if (false === $invoiceFile->getSize() || 5000 > $invoiceFile->getSize()) {
                 throw new \Exception(sprintf('File conversion failed. File size of the converted file "%s" is too small. File size: %d bytes!', $invoiceFile->getFilename(), $invoiceFile->getSize()));
             }
-        } catch (HttpClientException $e) {
-            $pdfConversionError = $this->translator->trans('ERR.evt_strn_cloudconvConversionCreditUsedUp', ['Vergütungsformular'], 'contao_default');
-            $this->notifyAdminOnError($e, $rapport_id);
-        } catch (\Exception $e) {
-            $pdfConversionError = $this->translator->trans('ERR.evt_strn_cloudconvUnexpectedError', ['Vergütungsformular'], 'contao_default');
-            $this->notifyAdminOnError($e, $rapport_id);
-        }
+        } catch (EventHasNoMemberException|EventRapportNotFilledOutCorrectlyException|HttpClientException|\Exception $e) {
+            $message = match (\get_class($e)) {
+                EventHasNoMemberException::class => $this->translator->trans('ERR.evt_strn_eventHasNoMember', [], 'contao_default'),
+                EventRapportNotFilledOutCorrectlyException::class => $this->translator->trans('ERR.evt_strn_eventRapportNotFilledOutCorrectly', [], 'contao_default'),
+                HttpClientException::class => $this->translator->trans('ERR.evt_strn_cloudconvConversionCreditUsedUp', ['Tourrapport'], 'contao_default'),
+                default => $this->translator->trans('ERR.evt_strn_cloudconvUnexpectedError', ['Tourrapport'], 'contao_default'),
+            };
 
-        if (!empty($pdfConversionError)) {
-            // If docx to pdf conversion fails...
-            $this->message->addError($pdfConversionError);
+            $this->message->addError($message);
+
+            if (!$e instanceof EventHasNoMemberException && !$e instanceof EventRapportNotFilledOutCorrectlyException) {
+                $this->notifyAdminOnError($e, $rapport_id);
+            }
 
             // IV. Redirect back to the referer page
             return $this->redirectBackToRefererPage($request);

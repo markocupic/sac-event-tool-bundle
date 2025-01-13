@@ -15,15 +15,14 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DocxTemplator;
 
 use Contao\CalendarEventsModel;
-use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Message;
-use Contao\System;
 use Contao\UserModel;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\Config\EventState;
+use Markocupic\SacEventToolBundle\DocxTemplator\Exception\EventHasNoMemberException;
+use Markocupic\SacEventToolBundle\DocxTemplator\Exception\EventRapportNotFilledOutCorrectlyException;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
@@ -40,7 +39,6 @@ class TourRapportGenerator
 
     private Adapter $calendarEventsModel;
     private Adapter $userModel;
-    private Adapter $message;
 
     public function __construct(
         private readonly ContaoFramework $framework,
@@ -56,7 +54,6 @@ class TourRapportGenerator
         // Adapters
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->userModel = $this->framework->getAdapter(UserModel::class);
-        $this->message = $this->framework->getAdapter(Message::class);
     }
 
     /**
@@ -73,15 +70,11 @@ class TourRapportGenerator
         }
 
         if (!$this->docxEventHelper->checkEventRapportHasFilledInCorrectly($eventInvoice)) {
-            $this->message->addError('Bitte füllen Sie den Tourrapport vollständig aus, bevor Sie das Vergütungsformular herunterladen.');
-
-            throw new RedirectResponseException(System::getReferer());
+            throw new EventRapportNotFilledOutCorrectlyException('Tourrapport not filled out correctly.');
         }
 
         if (EventState::STATE_CANCELED !== $event->eventState && null === $this->docxEventMemberHelper->getParticipatedEventMembers($event)) {
-            $this->message->addError('Bitte überprüfe die Teilnehmerliste. Es wurden keine Teilnehmer gefunden, die am Event teilgenommen haben. Falls du den Event abgesagt hast, musst du dies unter Event Status beim Event selber vermerken.');
-
-            throw new RedirectResponseException(System::getReferer());
+            throw new EventHasNoMemberException('Event has no member.');
         }
 
         // "Zahlungsempfänger"
