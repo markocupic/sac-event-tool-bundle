@@ -29,6 +29,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
  * Class SyncMemberDatabase.
@@ -70,7 +71,7 @@ class SyncMemberDatabase
         private readonly string $sacevtLocale,
         private readonly LoggerInterface|null $logger = null,
     ) {
-        $this->prepare();
+        $this->setFtpOptions();
     }
 
     /**
@@ -78,17 +79,32 @@ class SyncMemberDatabase
      */
     public function run(): void
     {
-        $stopWatchEvent = (new Stopwatch())->start(self::STOP_WATCH_EVENT);
-
+        $stopWatchEvent = $this->stopWatchStart();
         $this->resetSyncLog();
         $this->fetchFilesFromFtp();
         $this->syncContaoDatabase();
         $this->syncLog['duration'] = round($stopWatchEvent->stop()->getDuration() / 1000);
+
+        $log = sprintf(
+            'Successfully synced members from SAC Zentralverband database (Bern) to the Contao database (tl_member). Processed: %d, Inserts: %d, Updates: %d, Disabled: %d, Duration: %d s',
+            $this->syncLog['processed'],
+            $this->syncLog['inserts'],
+            $this->syncLog['updates'],
+            $this->syncLog['disabled'],
+            $this->syncLog['duration'],
+        );
+
+        $this->log(LogLevel::INFO, $log, __METHOD__, Log::MEMBER_DATABASE_SYNC_SUCCESS);
     }
 
     public function getSyncLog(): array
     {
         return $this->syncLog;
+    }
+
+    protected function stopWatchStart(): StopwatchEvent
+    {
+        return (new Stopwatch())->start(self::STOP_WATCH_EVENT);
     }
 
     protected function generateHashedRandomPassword(): string
@@ -99,7 +115,7 @@ class SyncMemberDatabase
             ;
     }
 
-    protected function prepare(): void
+    protected function setFtpOptions(): void
     {
         $this->ftp_hostname = (string) $this->sacevtMemberSyncCredentials['hostname'];
         $this->ftp_username = (string) $this->sacevtMemberSyncCredentials['username'];
@@ -122,12 +138,12 @@ class SyncMemberDatabase
     {
         $fs = new Filesystem();
 
-        $cred = sprintf('ftp://%s:%s@%s/', $this->ftp_username, $this->ftp_password, $this->ftp_hostname);
+        $ftpUrl = sprintf('ftp://%s:%s@%s/', $this->ftp_username, $this->ftp_password, $this->ftp_hostname);
 
         $finder = new Finder();
         $finder
             ->files()
-            ->in($cred)
+            ->in($ftpUrl)
             ->name('*.csv')
         ;
 
@@ -164,10 +180,10 @@ class SyncMemberDatabase
             try {
                 $fs->copy($objSplFile->getPathname(), $targetPath);
             } catch (FileNotFoundException $e) {
-                $msg = sprintf('Could not find the CSV file "%s" at "%s".', basename($targetPath), $this->ftp_hostname);
-                $this->log(LogLevel::CRITICAL, $msg, __METHOD__, ContaoContext::ERROR);
+                $errMsg = sprintf('Could not find the CSV file "%s" at "%s".', basename($targetPath), $this->ftp_hostname);
+                $this->log(LogLevel::CRITICAL, $errMsg, __METHOD__, ContaoContext::ERROR);
 
-                throw new \Exception($msg);
+                throw new \Exception($errMsg);
             } catch (\Exception $e) {
                 $this->log(LogLevel::CRITICAL, $e->getMessage(), __METHOD__, ContaoContext::ERROR);
 
@@ -213,7 +229,7 @@ class SyncMemberDatabase
 
     protected function getSectionIds(): array
     {
-        return $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
+        return $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section');
     }
 
     /**
@@ -289,14 +305,14 @@ class SyncMemberDatabase
                     $rowTemp['password'] = $this->generateHashedRandomPassword();
 
                     if ($this->connection->insert('tl_member', $rowTemp)) {
-                        $msg = sprintf(
+                        $log = sprintf(
                             'Inserted new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.',
                             $rowTemp['firstname'],
                             $rowTemp['lastname'],
                             $rowTemp['sacMemberId'],
                         );
 
-                        $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER);
+                        $this->log(LogLevel::INFO, $log, __METHOD__, Log::MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER);
 
                         ++$this->syncLog['inserts'];
                     }
@@ -314,14 +330,14 @@ class SyncMemberDatabase
 
                         $this->connection->update('tl_member', $set, ['sacMemberId' => $sacMemberId]);
 
-                        $msg = sprintf(
+                        $log = sprintf(
                             'Updated SAC-member "%s %s" with SAC-User-ID: %s in tl_member.',
                             $rowTemp['firstname'],
                             $rowTemp['lastname'],
                             $rowTemp['sacMemberId'],
                         );
 
-                        $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_UPDATE_NEW_MEMBER);
+                        $this->log(LogLevel::INFO, $log, __METHOD__, Log::MEMBER_DATABASE_SYNC_UPDATE_NEW_MEMBER);
 
                         ++$this->syncLog['updates'];
                     }
@@ -333,13 +349,19 @@ class SyncMemberDatabase
                             'password' => $this->generateHashedRandomPassword(),
                             'tstamp' => time(),
                         ],
-                        ['password' => '', 'sacMemberId' => $sacMemberId],
+                        [
+                            'password' => '',
+                            'sacMemberId' => $sacMemberId,
+                        ],
                     );
                 }
             }
 
             // Disable members that could not be found in the CSV files.
             $this->disableAllNonMemberAccounts();
+
+            // Drop the temporary table.
+            $this->dropTempTable();
 
             $this->connection->commit();
             $this->connection->executeStatement('UNLOCK TABLES;');
@@ -348,16 +370,14 @@ class SyncMemberDatabase
             $this->connection->rollBack();
             $this->connection->executeStatement('UNLOCK TABLES;');
 
-            $msg = 'Error during the database sync process. Starting transaction rollback now. Error message: '.$e->getMessage();
-            $this->log(LogLevel::CRITICAL, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_TRANSACTION_ERROR);
+            $errMsg = 'Error during the database sync process. Starting transaction rollback now. Error message: '.$e->getMessage();
+            $this->log(LogLevel::CRITICAL, $errMsg, __METHOD__, Log::MEMBER_DATABASE_SYNC_TRANSACTION_ERROR);
 
             // Throw exception
             throw $e;
         }
 
         $this->syncLog['processed'] = \count($arrAllTemp);
-
-        $this->dropTempTable();
     }
 
     /**
@@ -489,14 +509,14 @@ class SyncMemberDatabase
                 $rowDisabledMember = $this->connection->fetchAssociative('SELECT * FROM tl_member WHERE id = ?', [$memberId], [Types::INTEGER]);
 
                 if (false !== $rowDisabledMember) {
-                    $msg = sprintf(
+                    $log = sprintf(
                         'Disable SAC-Member "%s %s" SAC-User-ID: %s during the sync process. User not found in the CSV dump from SAC Zentralverband Bern.',
                         $rowDisabledMember['firstname'],
                         $rowDisabledMember['lastname'],
                         $rowDisabledMember['sacMemberId']
                     );
 
-                    $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_DISABLE_MEMBER);
+                    $this->log(LogLevel::INFO, $log, __METHOD__, Log::MEMBER_DATABASE_SYNC_DISABLE_MEMBER);
                 }
 
                 ++$this->syncLog['disabled'];
