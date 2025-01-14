@@ -32,18 +32,20 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
- * Mirror/Update tl_member from SAC Member Database Zentralverband Bern
- * Unidirectional sync
- * SAC Member Database Zentralverband Bern -> tl_member.
+ * Class SyncMemberDatabase.
+ *
+ * Handles the synchronization of member data by fetching, processing CSV files from an FTP server,
+ * and integrating the data into a MySQL database. Provides functionalities such as preparing FTP
+ * credentials, managing temporary files, and ensuring secure database operations.
  */
 class SyncMemberDatabase
 {
-    public const FTP_DB_DUMP_TARGET_PATH = '%s/system/tmp/Adressen_0000%d.csv';
-    public const FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
-    public const FTP_DB_DUMP_FIELD_DELIMITER = '$';
-    public const STOP_WATCH_EVENT = 'sac_database_sync';
-
-    public const SYNC_TABLE_NAME = 'tl_member_sync';
+    public const string FTP_DB_DUMP_TARGET_PATH = '%s/system/tmp/Adressen_0000%d.csv';
+    public const string FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
+    public const string FTP_DB_DUMP_FIELD_DELIMITER = '$';
+    public const string STOP_WATCH_EVENT = 'sac_database_sync';
+    public const string SYNC_TABLE_NAME = 'tl_member_sync';
+    private const int DISABLE_THRESHOLD_PERCENT = 5;
 
     private string|null $ftp_hostname = null;
     private string|null $ftp_username = null;
@@ -82,55 +84,20 @@ class SyncMemberDatabase
         $this->prepare();
         $this->fetchFilesFromFtp();
         $this->syncContaoDatabase();
-        $this->setPassword();
         $this->syncLog['duration'] = round($stopWatchEvent->stop()->getDuration() / 1000);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function setPassword(int $limit = 20): int
-    {
-        if (!$limit) {
-            return $limit;
-        }
-
-        $count = 0;
-
-        try {
-            $this->connection->executeStatement('LOCK TABLES tl_member WRITE;');
-            $this->connection->beginTransaction();
-
-            $result = $this->connection->executeQuery("SELECT id FROM tl_member WHERE password = ? LIMIT 0,$limit", ['']);
-
-            while (false !== ($id = $result->fetchOne())) {
-                $password = $this->passwordHasherFactory
-                    ->getPasswordHasher(FrontendUser::class)
-                    ->hash(uniqid())
-                ;
-
-                $set = ['password' => $password];
-
-                if ($this->connection->update('tl_member', $set, ['id' => $id])) {
-                    ++$count;
-                }
-            }
-
-            $this->connection->commit();
-            $this->connection->executeStatement('UNLOCK TABLES;');
-        } catch (\Exception $e) {
-            $this->connection->rollBack();
-            $this->connection->executeStatement('UNLOCK TABLES;');
-
-            throw $e;
-        }
-
-        return $count;
     }
 
     public function getSyncLog(): array
     {
         return $this->syncLog;
+    }
+
+    protected function generateHashedRandomPassword(): string
+    {
+        return $this->passwordHasherFactory
+            ->getPasswordHasher(FrontendUser::class)
+            ->hash(uniqid())
+            ;
     }
 
     protected function prepare(): void
@@ -141,13 +108,20 @@ class SyncMemberDatabase
     }
 
     /**
-     * @throws Exception
+     * Fetches CSV files from the FTP server and processes them.
+     *
+     * This method connects to the FTP server using the provided credentials to search for
+     * CSV files. For each CSV file found, section IDs are extracted from the filenames
+     * and mapped. The files are then copied to the local target path, replacing
+     * any existing files. If a required file is missing or cannot be copied, appropriate
+     * exceptions are thrown to signal failure.
+     *
+     * @throws \RuntimeException
+     * @throws \Exception
      */
     protected function fetchFilesFromFtp(): void
     {
         $fs = new Filesystem();
-
-        $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
 
         $cred = sprintf('ftp://%s:%s@%s/', $this->ftp_username, $this->ftp_password, $this->ftp_hostname);
 
@@ -159,7 +133,7 @@ class SyncMemberDatabase
         ;
 
         if (!$finder->hasResults()) {
-            throw new \RuntimeException('Could not load CSV spreadsheets from remote. Database sync failed.');
+            throw new \RuntimeException(sprintf('Could not load CSV from "%s". Database sync failed.', $this->ftp_hostname));
         }
 
         $fileMap = [];
@@ -171,7 +145,7 @@ class SyncMemberDatabase
             $fileMap[$sectionId] = $file;
         }
 
-        foreach ($arrSectionIds as $sectionId) {
+        foreach ($this->getSectionIds() as $sectionId) {
             $targetPath = sprintf(static::FTP_DB_DUMP_TARGET_PATH, $this->projectDir, $sectionId);
 
             // Delete old file
@@ -180,7 +154,7 @@ class SyncMemberDatabase
             }
 
             if (!isset($fileMap[$sectionId])) {
-                $errMsg = sprintf('Could not find db dump "%s" at "%s".', basename($targetPath), $this->ftp_hostname);
+                $errMsg = sprintf('Could not find the CSV file "%s" at "%s".', basename($targetPath), $this->ftp_hostname);
                 $this->log(LogLevel::CRITICAL, $errMsg, __METHOD__, ContaoContext::ERROR);
 
                 throw new \Exception($errMsg);
@@ -191,7 +165,7 @@ class SyncMemberDatabase
             try {
                 $fs->copy($objSplFile->getPathname(), $targetPath);
             } catch (FileNotFoundException $e) {
-                $msg = sprintf('Could not find db dump "%s" at "%s".', basename($targetPath), $this->ftp_hostname);
+                $msg = sprintf('Could not find the CSV file "%s" at "%s".', basename($targetPath), $this->ftp_hostname);
                 $this->log(LogLevel::CRITICAL, $msg, __METHOD__, ContaoContext::ERROR);
 
                 throw new \Exception($msg);
@@ -204,9 +178,64 @@ class SyncMemberDatabase
     }
 
     /**
-     * Sync tl_member with SAC Zentralverband Database.
+     * Retrieves a list of CSV files from the temporary directory
+     * and validates their existence, readability, and size.
      *
-     * @throws Exception
+     * @throws \RuntimeException
+     *
+     * @return array<\SplFileObject>
+     */
+    protected function getCsvFilesFromTempDir(): array
+    {
+        $arrFiles = [];
+
+        foreach ($this->getSectionIds() as $sectionId) {
+            $targetPath = sprintf(static::FTP_DB_DUMP_TARGET_PATH, $this->projectDir, $sectionId);
+
+            if (!is_file($targetPath)) {
+                throw new \RuntimeException(sprintf('Could not find the CSV file "%s".', $targetPath));
+            }
+
+            $objSplFile = new \SplFileObject($targetPath);
+
+            if (!$objSplFile->isReadable()) {
+                throw new \RuntimeException(sprintf('Could not read the CSV file "%s".', $targetPath));
+            }
+
+            if ($objSplFile->getSize() < 1000) {
+                throw new \RuntimeException(sprintf('The CSV file "%s" seems to be empty or incomplete.', $targetPath));
+            }
+
+            $arrFiles[$sectionId] = $objSplFile;
+        }
+
+        return $arrFiles;
+    }
+
+    protected function getSectionIds(): array
+    {
+        return $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
+    }
+
+    /**
+     * Syncs the Contao database with the data from the CSV files.
+     *
+     * This method processes CSV files, extracts SAC member information, and updates the Contao database
+     * by inserting new members, updating existing ones, and disabling members that are no longer present
+     * in the provided data. It uses a temporary table for intermediate storage before final synchronization.
+     *
+     * - Creates a temporary table to store imported data.
+     * - Reads CSV files from a temporary directory and parses their contents.
+     * - Inserts rows into the temporary table.
+     * - Synchronizes data between the temporary table and the `tl_member` table in the database:
+     *   - Inserts new members.
+     *   - Updates existing members.
+     *   - Disables members not found in the imported data.
+     * - Ensures database consistency by using transactions and locking relevant tables during the operation.
+     * - Logs events, such as newly inserted or updated members and errors.
+     *
+     * @throws \RuntimeException
+     * @throws \Exception
      */
     protected function syncContaoDatabase(): void
     {
@@ -216,14 +245,13 @@ class SyncMemberDatabase
             $this->connection->executeStatement('LOCK TABLES tl_member WRITE, tl_sac_section WRITE;');
             $this->connection->beginTransaction();
 
-            $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
+            $arrFiles = $this->getCsvFilesFromTempDir();
 
-            foreach ($arrSectionIds as $sectionId) {
-                $targetPath = sprintf(static::FTP_DB_DUMP_TARGET_PATH, $this->projectDir, $sectionId);
-                $stream = fopen($targetPath, 'r');
+            foreach ($arrFiles as $objSplFile) {
+                $stream = fopen($objSplFile->getRealPath(), 'r');
 
                 if (!$stream) {
-                    throw new \RuntimeException(sprintf('Could not open file "%s".', $targetPath));
+                    throw new \RuntimeException(sprintf('Could not open file "%s".', $objSplFile->getRealPath()));
                 }
 
                 while (!feof($stream)) {
@@ -239,8 +267,7 @@ class SyncMemberDatabase
                             continue;
                         }
 
-                        // Add row to the temp table.
-                        $this->insertRowIntoTempTable($this->parseRow($arrLine));
+                        $this->insertOrUpdateTempMember($this->parseLine($arrLine));
                     }
                 }
                 fclose($stream);
@@ -260,7 +287,7 @@ class SyncMemberDatabase
                     $rowTemp['isSacMember'] = 1;
                     $rowTemp['login'] = 1;
                     $rowTemp['disable'] = 0;
-                    $rowTemp['password'] = $this->passwordHasherFactory->getPasswordHasher(FrontendUser::class)->hash(uniqid());
+                    $rowTemp['password'] = $this->generateHashedRandomPassword();
 
                     if ($this->connection->insert('tl_member', $rowTemp)) {
                         $msg = sprintf(
@@ -294,28 +321,36 @@ class SyncMemberDatabase
                             $rowTemp['lastname'],
                             $rowTemp['sacMemberId'],
                         );
+
                         $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_UPDATE_NEW_MEMBER);
 
                         ++$this->syncLog['updates'];
                     }
+
+                    // Add a random password if there is none.
+                    $this->connection->update(
+                        'tl_member',
+                        [
+                            'password' => $this->generateHashedRandomPassword(),
+                            'tstamp' => time(),
+                        ],
+                        ['password' => '', 'sacMemberId' => $sacMemberId],
+                    );
                 }
             }
 
-            // Disable members that could not be found in the database dump.
-            $this->disableNonMembers();
+            // Disable members that could not be found in the CSV files.
+            $this->disableNonMemberAccounts();
 
             $this->connection->commit();
             $this->connection->executeStatement('UNLOCK TABLES;');
         } catch (\Exception $e) {
-            $msg = 'Error during the database sync process. Starting transaction rollback now.';
-            $this->log(LogLevel::CRITICAL, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_TRANSACTION_ERROR);
-
-            $this->syncLog['with_error'] = true;
-            $this->syncLog['exception'] = $e->getMessage();
-
             // Transaction rollback
             $this->connection->rollBack();
             $this->connection->executeStatement('UNLOCK TABLES;');
+
+            $msg = 'Error during the database sync process. Starting transaction rollback now. Error message: '.$e->getMessage();
+            $this->log(LogLevel::CRITICAL, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_TRANSACTION_ERROR);
 
             // Throw exception
             throw $e;
@@ -327,42 +362,44 @@ class SyncMemberDatabase
     }
 
     /**
-     * Return a CSV line as an associative array.
+     * Parses a line of data and maps it to a structured user array.
      */
-    protected function parseRow(array $arrLine): array
+    protected function parseLine(array $arrLine): array
     {
-        $row = [];
-        $row['sacMemberId'] = (int) $arrLine[0]; // int
-        $row['username'] = (string) ($arrLine[0]); // string
-        // Remove leading zeros 00004253 -> 4253 and convert to string again
-        $row['sectionId'] = [(string) (int) ($arrLine[1])]; // array => allow multi membership
-        $row['firstname'] = $arrLine[3]; // string
-        $row['lastname'] = $arrLine[2]; // string
-        $row['addressExtra'] = $arrLine[4]; // string
-        $row['street'] = trim($arrLine[5]); // string
-        $row['streetExtra'] = $arrLine[6]; // string
-        $row['postal'] = $arrLine[7]; // string
-        $row['city'] = $arrLine[8]; // string
-        $row['country'] = empty($arrLine[9]) ? 'CH' : strtoupper($arrLine[9]); // string
-        $row['dateOfBirth'] = (string) strtotime($arrLine[10]); // string!
-        $row['phoneBusiness'] = PhoneNumber::beautify($arrLine[11]); // string
-        $row['phone'] = PhoneNumber::beautify($arrLine[12]); // string
-        $row['mobile'] = PhoneNumber::beautify($arrLine[14]); // string
-        $row['fax'] = $arrLine[15]; // string
-        $row['email'] = $arrLine[16]; // string
-        $row['gender'] = 'weiblich' === strtolower($arrLine[17]) ? 'female' : 'male'; // string
-        $row['profession'] = $arrLine[18]; // string
-        $row['language'] = 'd' === strtolower($arrLine[19]) ? $this->sacevtLocale : strtolower($arrLine[19]); // string
-        $row['entryYear'] = $arrLine[20]; // string
-        $row['membershipType'] = $arrLine[23]; // string
-        $row['sectionInfo1'] = $arrLine[24]; // string
-        $row['sectionInfo2'] = $arrLine[25]; // string
-        $row['sectionInfo3'] = $arrLine[26]; // string
-        $row['sectionInfo4'] = $arrLine[27]; // string
-        $row['debit'] = $arrLine[28]; // string
-        $row['memberStatus'] = $arrLine[29]; // string
+        $defaultCountry = 'CH';
 
-        $row = array_map(
+        $rowUser = [];
+        $rowUser['sacMemberId'] = (int) $arrLine[0]; // int
+        $rowUser['username'] = (string) ($arrLine[0]); // string
+        // Remove leading zeros 00004253 -> 4253 and convert to string again
+        $rowUser['sectionId'] = [(string) (int) ($arrLine[1])]; // array => allow multi membership
+        $rowUser['firstname'] = $arrLine[3]; // string
+        $rowUser['lastname'] = $arrLine[2]; // string
+        $rowUser['addressExtra'] = $arrLine[4]; // string
+        $rowUser['street'] = trim($arrLine[5]); // string
+        $rowUser['streetExtra'] = $arrLine[6]; // string
+        $rowUser['postal'] = $arrLine[7]; // string
+        $rowUser['city'] = $arrLine[8]; // string
+        $rowUser['country'] = empty($arrLine[9]) ? $defaultCountry : strtoupper($arrLine[9]); // string
+        $rowUser['dateOfBirth'] = (string) strtotime($arrLine[10]); // string!
+        $rowUser['phoneBusiness'] = PhoneNumber::beautify($arrLine[11]); // string
+        $rowUser['phone'] = PhoneNumber::beautify($arrLine[12]); // string
+        $rowUser['mobile'] = PhoneNumber::beautify($arrLine[14]); // string
+        $rowUser['fax'] = $arrLine[15]; // string
+        $rowUser['email'] = $arrLine[16]; // string
+        $rowUser['gender'] = 'weiblich' === strtolower($arrLine[17]) ? 'female' : 'male'; // string
+        $rowUser['profession'] = $arrLine[18]; // string
+        $rowUser['language'] = 'd' === strtolower($arrLine[19]) ? $this->sacevtLocale : strtolower($arrLine[19]); // string
+        $rowUser['entryYear'] = $arrLine[20]; // string
+        $rowUser['membershipType'] = $arrLine[23]; // string
+        $rowUser['sectionInfo1'] = $arrLine[24]; // string
+        $rowUser['sectionInfo2'] = $arrLine[25]; // string
+        $rowUser['sectionInfo3'] = $arrLine[26]; // string
+        $rowUser['sectionInfo4'] = $arrLine[27]; // string
+        $rowUser['debit'] = $arrLine[28]; // string
+        $rowUser['memberStatus'] = $arrLine[29]; // string
+
+        $rowUser = array_map(
             static function ($value) {
                 if (empty($value) || is_numeric($value) || \is_array($value)) {
                     return $value;
@@ -370,38 +407,39 @@ class SyncMemberDatabase
 
                 return mb_convert_encoding(trim($value), 'UTF-8', 'ISO-8859-1');
             },
-            $row
+            $rowUser
         );
 
-        return $row;
+        return $rowUser;
     }
 
-    protected function insertRowIntoTempTable(array $arrData): void
+    protected function insertOrUpdateTempMember(array $arrData): void
     {
         if (empty($arrData['sacMemberId'])) {
             return;
         }
 
-        $arrTempMember = $this->connection
+        $existingMember = $this->connection
             ->fetchAssociative(
-                'SELECT id,sectionId FROM '.self::SYNC_TABLE_NAME.' WHERE sacMemberId = ?',
+                sprintf('SELECT id,sectionId FROM %s WHERE sacMemberId = ?', self::SYNC_TABLE_NAME),
                 [$arrData['sacMemberId']],
                 [Types::INTEGER],
             )
         ;
 
-        if (false === $arrTempMember) {
+        if (false === $existingMember) {
+            // Insert new temp member
             $arrData['sectionId'] = serialize($this->formatSectionId($arrData['sectionId']));
             $this->connection->insert(self::SYNC_TABLE_NAME, $arrData);
         } else {
-            // The user is a member of multiple sections
-            // Add the additional sectionId
-            $arrSectionIds = array_merge(unserialize($arrTempMember['sectionId']), $arrData['sectionId']);
+            // The user is a member of multiple sections and already exists in the temp table
+            // Then we append the section id only.
+            $arrSectionIds = array_merge(unserialize($existingMember['sectionId']), $arrData['sectionId']);
             $set = [
                 'sectionId' => serialize($this->formatSectionId($arrSectionIds)),
             ];
 
-            $this->connection->update(self::SYNC_TABLE_NAME, $set, ['id' => $arrTempMember['id']]);
+            $this->connection->update(self::SYNC_TABLE_NAME, $set, ['id' => $existingMember['id']]);
         }
     }
 
@@ -410,26 +448,36 @@ class SyncMemberDatabase
      *
      * @throws Exception
      */
-    protected function disableNonMembers(): void
+    protected function disableNonMemberAccounts(): void
     {
-        $arrDisabledIDS = $this->connection
+        $totalMembers = $this->connection->fetchOne('SELECT COUNT(*) FROM tl_member');
+
+        if (0 === $totalMembers) {
+            return;
+        }
+
+        $disabledMemberIds = $this->connection
             ->fetchFirstColumn('SELECT id FROM tl_member WHERE sacMemberId NOT IN (SELECT sacMemberId FROM tl_member_sync)')
         ;
 
-        foreach ($arrDisabledIDS as $id) {
+        if (\count($disabledMemberIds) / $totalMembers * 100 > self::DISABLE_THRESHOLD_PERCENT) {
+            throw new \RuntimeException('Should disable more than 5% of the members. Aborting sync process.');
+        }
+
+        foreach ($disabledMemberIds as $memberId) {
             $set = [
                 'disable' => 1,
                 'isSacMember' => 0,
                 'login' => 0,
             ];
 
-            if (1 === $this->connection->update('tl_member', $set, ['id' => $id], [Types::INTEGER])) {
+            if (1 === $this->connection->update('tl_member', $set, ['id' => $memberId], [Types::INTEGER])) {
                 $set = [
                     'tstamp' => time(),
                 ];
 
-                $this->connection->update('tl_member', $set, ['id' => $id], [Types::INTEGER]);
-                $rowDisabledMember = $this->connection->fetchAssociative('SELECT * FROM tl_member WHERE id = ?', [$id], [Types::INTEGER]);
+                $this->connection->update('tl_member', $set, ['id' => $memberId], [Types::INTEGER]);
+                $rowDisabledMember = $this->connection->fetchAssociative('SELECT * FROM tl_member WHERE id = ?', [$memberId], [Types::INTEGER]);
 
                 if (false !== $rowDisabledMember) {
                     $msg = sprintf(
@@ -480,19 +528,19 @@ class SyncMemberDatabase
      */
     protected function formatSectionId(array $arrValue): array
     {
-        $arrAll = array_map('strval', array_keys($this->util->listSacSections()));
+        $availableSections = array_map('strval', array_keys($this->util->listSacSections()));
 
-        $arrValue = array_filter(
-            $arrAll,
-            static fn ($v, $k) => \in_array(
-                $v,
+        $filteredSections = array_filter(
+            $availableSections,
+            static fn (string $sectionId) => \in_array(
+                $sectionId,
                 $arrValue,
                 true,
             ),
             ARRAY_FILTER_USE_BOTH,
         );
 
-        return array_map('strval', $arrValue);
+        return array_map('strval', $filteredSections);
     }
 
     protected function dropTempTable(): void
