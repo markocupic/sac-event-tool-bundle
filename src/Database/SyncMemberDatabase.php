@@ -17,7 +17,6 @@ namespace Markocupic\SacEventToolBundle\Database;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\FrontendUser;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\Log;
@@ -47,9 +46,9 @@ class SyncMemberDatabase
     public const string SYNC_TABLE_NAME = 'tl_member_sync';
     private const int DISABLE_THRESHOLD_PERCENT = 5;
 
-    private string|null $ftp_hostname = null;
-    private string|null $ftp_username = null;
-    private string|null $ftp_password = null;
+    private string $ftp_hostname;
+    private string $ftp_username;
+    private string $ftp_password;
     private array $syncLog = [
         'log' => [],
         'processed' => 0,
@@ -71,6 +70,7 @@ class SyncMemberDatabase
         private readonly string $sacevtLocale,
         private readonly LoggerInterface|null $logger = null,
     ) {
+        $this->prepare();
     }
 
     /**
@@ -81,7 +81,6 @@ class SyncMemberDatabase
         $stopWatchEvent = (new Stopwatch())->start(self::STOP_WATCH_EVENT);
 
         $this->resetSyncLog();
-        $this->prepare();
         $this->fetchFilesFromFtp();
         $this->syncContaoDatabase();
         $this->syncLog['duration'] = round($stopWatchEvent->stop()->getDuration() / 1000);
@@ -340,7 +339,7 @@ class SyncMemberDatabase
             }
 
             // Disable members that could not be found in the CSV files.
-            $this->disableNonMemberAccounts();
+            $this->disableAllNonMemberAccounts();
 
             $this->connection->commit();
             $this->connection->executeStatement('UNLOCK TABLES;');
@@ -444,11 +443,18 @@ class SyncMemberDatabase
     }
 
     /**
-     * Disable members that could not be found in the database dump.
+     * Disables all accounts in tl_member that are not present in the temporary table.
      *
-     * @throws Exception
+     * The method performs the following actions:
+     * - Calculates the total number of members.
+     * - Ensures the percentage of members to be disabled does not exceed a predetermined threshold.
+     * - Updates the relevant member records to disable them, sets their `isSacMember` attribute to false,
+     *   and disables the ability for them to log in.
+     * - Records the changes with timestamps and logs the disabled member details.
+     *
+     * Throws an exception if the disable threshold is exceeded to prevent unintended bulk disabling.
      */
-    protected function disableNonMemberAccounts(): void
+    protected function disableAllNonMemberAccounts(): void
     {
         $totalMembers = $this->connection->fetchOne('SELECT COUNT(*) FROM tl_member');
 
@@ -456,12 +462,15 @@ class SyncMemberDatabase
             return;
         }
 
-        $disabledMemberIds = $this->connection
-            ->fetchFirstColumn('SELECT id FROM tl_member WHERE sacMemberId NOT IN (SELECT sacMemberId FROM tl_member_sync)')
-        ;
+        $sql = sprintf(
+            'SELECT id FROM tl_member WHERE sacMemberId NOT IN (SELECT sacMemberId FROM %s)',
+            self::SYNC_TABLE_NAME,
+        );
+
+        $disabledMemberIds = $this->connection->fetchFirstColumn($sql);
 
         if (\count($disabledMemberIds) / $totalMembers * 100 > self::DISABLE_THRESHOLD_PERCENT) {
-            throw new \RuntimeException('Should disable more than 5% of the members. Aborting sync process.');
+            throw new \RuntimeException(sprintf('Should disable more than %d%% of the members, which could indicate an error. Aborting sync process.', self::DISABLE_THRESHOLD_PERCENT));
         }
 
         foreach ($disabledMemberIds as $memberId) {
@@ -481,7 +490,7 @@ class SyncMemberDatabase
 
                 if (false !== $rowDisabledMember) {
                     $msg = sprintf(
-                        'Disable SAC-Member "%s %s" SAC-User-ID: %s during the sync process. Could not find the user in the SAC main database from Bern.',
+                        'Disable SAC-Member "%s %s" SAC-User-ID: %s during the sync process. User not found in the CSV dump from SAC Zentralverband Bern.',
                         $rowDisabledMember['firstname'],
                         $rowDisabledMember['lastname'],
                         $rowDisabledMember['sacMemberId']
