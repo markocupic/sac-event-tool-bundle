@@ -136,7 +136,7 @@ class CalendarEventsMember
                 case 'delete':
                     $rowReg = $dc->getCurrentRecord();
 
-                    if ($this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $rowReg['eventId'])) {
+                    if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $rowReg['eventId'])) {
                         $bookingType = $this->connection->fetchOne(
                             'SELECT bookingType FROM tl_calendar_events_member WHERE id = ?',
                             [$dc->id],
