@@ -345,7 +345,7 @@ class CalendarEventsMember
             $blnAllow = true;
         }
 
-        if ($this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $row['eventId'])) {
+        if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $row['eventId'])) {
             if (BookingType::MANUALLY === $row['bookingType'] ?? null) {
                 $blnAllow = true;
             }
