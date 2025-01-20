@@ -30,7 +30,6 @@ use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\Validator;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
@@ -115,7 +114,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         }
 
         // Add messages to template
-        $this->addMessagesToTemplate();
+        $this->addMessagesToTemplate($request);
 
         // Load language
         $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
@@ -244,22 +243,22 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
     /**
      * Add messages from session to template.
      */
-    private function addMessagesToTemplate(): void
+    private function addMessagesToTemplate(Request $request): void
     {
         $messageAdapter = $this->framework->getAdapter(Message::class);
-        $systemAdapter = $this->framework->getAdapter(System::class);
+        $session = $request->getSession();
 
         if ($messageAdapter->hasInfo()) {
             $this->template->set('hasInfoMessage', true);
-            $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.info');
-            $this->template->set('infoMessage', $session[0]);
+            $message = $session->getFlashBag()->get('contao.FE.info');
+            $this->template->set('infoMessage', $message[0]);
         }
 
         if ($messageAdapter->hasError()) {
             $this->template->set('hasErrorMessage', true);
-            $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.error');
-            $this->template->set('errorMessage', $session[0]);
-            $this->template->set('errorMessages', $session);
+            $message = $session->getFlashBag()->get('contao.FE.error');
+            $this->template->set('errorMessage', $message[0]);
+            $this->template->set('errorMessages', $message);
         }
 
         $messageAdapter->reset();
