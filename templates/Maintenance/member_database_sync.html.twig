@@ -39,6 +39,10 @@
                                         <td>Inserts:</td>
                                         <td>[[ log.inserts ]]</td>
                                     </tr>
+                                    <tr v-for="(message, index) in log.log">
+                                        <td>#[[ index ]]</td>
+                                        <td>[[ message ]]</td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </div>

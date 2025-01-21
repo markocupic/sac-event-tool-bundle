@@ -21,9 +21,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\DataContainer\Util;
-use Markocupic\SacEventToolBundle\String\PhoneNumber;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -32,19 +30,17 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
- * Class SyncMemberDatabase.
- *
  * Handles the synchronization of member data by fetching, processing CSV files from an FTP server,
  * and integrating the data into a MySQL database. Provides functionalities such as preparing FTP
  * credentials, managing temporary files, and ensuring secure database operations.
  */
 class SyncMemberDatabase
 {
-    public const string FTP_DB_DUMP_TARGET_PATH = '%s/system/tmp/Adressen_0000%d.csv';
+    public const string FTP_DB_DUMP_TARGET_PATH = '%s/system/tmp/Adressen_%s.csv';
     public const string FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
     public const string FTP_DB_DUMP_FIELD_DELIMITER = '$';
     public const string STOP_WATCH_EVENT = 'sac_database_sync';
-    public const string SYNC_TABLE_NAME = 'tl_member_sync';
+    public const string TEMP_TABLE_NAME = 'tl_member_sync_temp';
     private const int DISABLE_THRESHOLD_PERCENT = 5;
 
     private string $ftp_hostname;
@@ -69,7 +65,8 @@ class SyncMemberDatabase
         private readonly array $sacevtMemberSyncCredentials,
         private readonly string $projectDir,
         private readonly string $sacevtLocale,
-        private readonly LoggerInterface|null $logger = null,
+        private readonly LoggerInterface|null $contaoGeneralLogger = null,
+        private readonly LoggerInterface|null $contaoErrorLogger = null,
     ) {
         $this->setFtpOptions();
     }
@@ -94,7 +91,8 @@ class SyncMemberDatabase
             $this->syncLog['duration'],
         );
 
-        $this->log(LogLevel::INFO, $log, __METHOD__, Log::MEMBER_DATABASE_SYNC_SUCCESS);
+        $this->contaoGeneralLogger?->info($log, ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DATABASE_SYNC_SUCCESS)]);
+        $this->syncLog['log'][] = $log;
     }
 
     public function getSyncLog(): array
@@ -107,7 +105,7 @@ class SyncMemberDatabase
         return (new Stopwatch())->start(self::STOP_WATCH_EVENT);
     }
 
-    protected function generateHashedRandomPassword(): string
+    protected function getRandomPasswordHash(): string
     {
         return $this->passwordHasherFactory
             ->getPasswordHasher(FrontendUser::class)
@@ -161,7 +159,8 @@ class SyncMemberDatabase
         }
 
         foreach ($this->getSectionIds() as $sectionId) {
-            $targetPath = sprintf(static::FTP_DB_DUMP_TARGET_PATH, $this->projectDir, $sectionId);
+            $sectionIdPadded = str_pad($sectionId, 8, '0', STR_PAD_LEFT);
+            $targetPath = sprintf(static::FTP_DB_DUMP_TARGET_PATH, $this->projectDir, $sectionIdPadded);
 
             // Delete old file
             if ($fs->exists($targetPath)) {
@@ -170,7 +169,8 @@ class SyncMemberDatabase
 
             if (!isset($fileMap[$sectionId])) {
                 $errMsg = sprintf('Could not find the CSV file "%s" at "%s".', basename($targetPath), $this->ftp_hostname);
-                $this->log(LogLevel::CRITICAL, $errMsg, __METHOD__, ContaoContext::ERROR);
+                $this->contaoErrorLogger?->error($errMsg);
+                $this->syncLog['log'][] = $errMsg;
 
                 throw new \Exception($errMsg);
             }
@@ -181,11 +181,12 @@ class SyncMemberDatabase
                 $fs->copy($objSplFile->getPathname(), $targetPath);
             } catch (FileNotFoundException $e) {
                 $errMsg = sprintf('Could not find the CSV file "%s" at "%s".', basename($targetPath), $this->ftp_hostname);
-                $this->log(LogLevel::CRITICAL, $errMsg, __METHOD__, ContaoContext::ERROR);
+                $this->contaoErrorLogger?->error($errMsg);
+                $this->syncLog['log'][] = $errMsg;
 
                 throw new \Exception($errMsg);
             } catch (\Exception $e) {
-                $this->log(LogLevel::CRITICAL, $e->getMessage(), __METHOD__, ContaoContext::ERROR);
+                $this->contaoErrorLogger?->error($e->getMessage());
 
                 throw $e;
             }
@@ -205,7 +206,9 @@ class SyncMemberDatabase
         $arrFiles = [];
 
         foreach ($this->getSectionIds() as $sectionId) {
-            $targetPath = sprintf(static::FTP_DB_DUMP_TARGET_PATH, $this->projectDir, $sectionId);
+            $sectionIdPadded = str_pad($sectionId, 8, '0', STR_PAD_LEFT);
+
+            $targetPath = sprintf(static::FTP_DB_DUMP_TARGET_PATH, $this->projectDir, $sectionIdPadded);
 
             if (!is_file($targetPath)) {
                 throw new \RuntimeException(sprintf('Could not find the CSV file "%s".', $targetPath));
@@ -217,7 +220,7 @@ class SyncMemberDatabase
                 throw new \RuntimeException(sprintf('Could not read the CSV file "%s".', $targetPath));
             }
 
-            if ($objSplFile->getSize() < 1000) {
+            if (!str_contains(file_get_contents($targetPath), self::FTP_DB_DUMP_END_OF_FILE_STRING) || $objSplFile->getSize() < 1000) {
                 throw new \RuntimeException(sprintf('The CSV file "%s" seems to be empty or incomplete.', $targetPath));
             }
 
@@ -254,12 +257,13 @@ class SyncMemberDatabase
      */
     protected function syncContaoDatabase(): void
     {
+        // Do not place between Connection::beginTransaction() and Connection::commit()/Connection::rollBack()
+        // See: https://www.woltlab.com/community/thread/292971-php-8-there-is-no-active-transaction/?postID=1872216#post1872216
         $this->createTempTable();
 
-        try {
-            $this->connection->executeStatement('LOCK TABLES tl_member WRITE, tl_sac_section WRITE;');
-            $this->connection->beginTransaction();
+        $this->connection->beginTransaction();
 
+        try {
             $arrFiles = $this->getCsvFilesFromTempDir();
 
             foreach ($arrFiles as $objSplFile) {
@@ -288,12 +292,19 @@ class SyncMemberDatabase
                 fclose($stream);
             }
 
-            $arrAllTemp = $this->connection->fetchAllAssociative('SELECT * FROM '.self::SYNC_TABLE_NAME);
+            $arrAllTemp = $this->connection->fetchAllAssociative('SELECT * FROM '.self::TEMP_TABLE_NAME);
 
             foreach ($arrAllTemp as $rowTemp) {
                 unset($rowTemp['id']);
 
                 $sacMemberId = $rowTemp['sacMemberId'];
+
+                // Map phone numbers
+                $rowTemp['mobile'] = !empty($rowTemp['phoneMobile']) ? $rowTemp['phoneMobile'] : $rowTemp['phoneMain'];
+                $rowTemp['phone'] = $rowTemp['phonePrivate'];
+                $rowTemp['fax'] = $rowTemp['phoneFax'];
+
+                unset($rowTemp['phoneMobile'], $rowTemp['phoneMain'], $rowTemp['phonePrivate'], $rowTemp['phoneFax']);
 
                 // Insert new member
                 if (false === $this->connection->fetchOne('SELECT id FROM tl_member WHERE sacMemberId = ?', [$sacMemberId], [Types::INTEGER])) {
@@ -302,7 +313,7 @@ class SyncMemberDatabase
                     $rowTemp['isSacMember'] = 1;
                     $rowTemp['login'] = 1;
                     $rowTemp['disable'] = 0;
-                    $rowTemp['password'] = $this->generateHashedRandomPassword();
+                    $rowTemp['password'] = $this->getRandomPasswordHash();
 
                     if ($this->connection->insert('tl_member', $rowTemp)) {
                         $log = sprintf(
@@ -312,7 +323,8 @@ class SyncMemberDatabase
                             $rowTemp['sacMemberId'],
                         );
 
-                        $this->log(LogLevel::INFO, $log, __METHOD__, Log::MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER);
+                        $this->contaoGeneralLogger?->info($log, ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER)]);
+                        $this->syncLog['log'][] = $log;
 
                         ++$this->syncLog['inserts'];
                     }
@@ -323,12 +335,9 @@ class SyncMemberDatabase
                     $rowTemp['isSacMember'] = 1;
 
                     // Update record if there was a change
-                    if ($this->connection->update('tl_member', $rowTemp, ['sacMemberId' => $sacMemberId])) {
-                        $set = [
-                            'tstamp' => time(),
-                        ];
-
-                        $this->connection->update('tl_member', $set, ['sacMemberId' => $sacMemberId]);
+                    if ($this->connection->update('tl_member', $rowTemp, ['sacMemberId' => $sacMemberId], ['sacMemberId' => Types::INTEGER])) {
+                        // update tstamp
+                        $this->connection->update('tl_member', ['tstamp' => time()], ['sacMemberId' => $sacMemberId], ['sacMemberId' => Types::INTEGER]);
 
                         $log = sprintf(
                             'Updated SAC-member "%s %s" with SAC-User-ID: %s in tl_member.',
@@ -337,61 +346,87 @@ class SyncMemberDatabase
                             $rowTemp['sacMemberId'],
                         );
 
-                        $this->log(LogLevel::INFO, $log, __METHOD__, Log::MEMBER_DATABASE_SYNC_UPDATE_NEW_MEMBER);
+                        $this->contaoGeneralLogger?->info($log);
+                        $this->syncLog['log'][] = $log;
 
                         ++$this->syncLog['updates'];
                     }
-
-                    // Add a random password if there is none.
-                    $this->connection->update(
-                        'tl_member',
-                        [
-                            'password' => $this->generateHashedRandomPassword(),
-                            'tstamp' => time(),
-                        ],
-                        [
-                            'password' => '',
-                            'sacMemberId' => $sacMemberId,
-                        ],
-                    );
                 }
             }
 
             // Disable members that could not be found in the CSV files.
             $this->disableAllNonMemberAccounts();
 
-            // Drop the temporary table.
-            $this->dropTempTable();
+            // Set password where is none.
+            $this->setPassword(20);
 
             $this->connection->commit();
-            $this->connection->executeStatement('UNLOCK TABLES;');
         } catch (\Exception $e) {
             // Transaction rollback
             $this->connection->rollBack();
-            $this->connection->executeStatement('UNLOCK TABLES;');
 
             $errMsg = 'Error during the database sync process. Starting transaction rollback now. Error message: '.$e->getMessage();
-            $this->log(LogLevel::CRITICAL, $errMsg, __METHOD__, Log::MEMBER_DATABASE_SYNC_TRANSACTION_ERROR);
+
+            $this->contaoErrorLogger?->error($errMsg, ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DATABASE_SYNC_TRANSACTION_ERROR)]);
+            $this->syncLog['log'][] = $errMsg;
 
             // Throw exception
             throw $e;
         }
+
+        // Drop the temporary table.
+        // Do not place between Connection::beginTransaction() and Connection::commit()/Connection::rollBack()
+        // See: https://www.woltlab.com/community/thread/292971-php-8-there-is-no-active-transaction/?postID=1872216#post1872216
+        $this->dropTempTable();
 
         $this->syncLog['processed'] = \count($arrAllTemp);
     }
 
     /**
      * Parses a line of data and maps it to a structured user array.
+     *
+     * @See: https://github.com/hitobito/hitobito_sac_cas/blob/6507d29ce25346bbc84b9820c162a1fb384f8460/app/domain/export/tabular/people/sac_mitglieder.rb#L23
+     * 0 - id,
+     * 1 - layer_navision_id_padded,
+     * 2 - last_name,
+     * 3 - first_name,
+     * 4 - adresszusatz,
+     * 5 - address,
+     * 6 - postfach,
+     * 7 - zip_code,
+     * 8 - town,
+     * 9 - country,
+     * 10 - birthday,
+     * 11 - phone_number_main,
+     * 12 - phone_number_privat,
+     * 13 - empty, # 1 empty col
+     * 14 - phone_number_mobil,
+     * 15 - phone_number_fax,
+     * 16 - email,
+     * 17 - gender,
+     * 18 - empty, # 1 empty col
+     * 19 - language,
+     * 20 - eintrittsjahr,
+     * 21 - begünstigt,
+     * 22 - ehrenmitglied,
+     * 23 - beitragskategorie,
+     * 24 - s_info_1,
+     * 25 - s_info_2,
+     * 26 - s_info_3,
+     * 27 - bemerkungen,
+     * 28 - saldo,
+     * 29 - empty, # 1 empty col
+     * 30 - anzahl_die_alpen,
+     * 31 - anzahl_sektionsbulletin
      */
     protected function parseLine(array $arrLine): array
     {
         $defaultCountry = 'CH';
-
         $rowUser = [];
         $rowUser['sacMemberId'] = (int) $arrLine[0]; // int
         $rowUser['username'] = (string) ($arrLine[0]); // string
-        // Remove leading zeros 00004253 -> 4253 and convert to string again
-        $rowUser['sectionId'] = [(string) (int) ($arrLine[1])]; // array => allow multi membership
+        // Remove leading zeros 00004253 -> 4253
+        $rowUser['sectionId'] = [ltrim((string) $arrLine[1], '0')]; // array => allow multi membership
         $rowUser['firstname'] = $arrLine[3]; // string
         $rowUser['lastname'] = $arrLine[2]; // string
         $rowUser['addressExtra'] = $arrLine[4]; // string
@@ -401,12 +436,16 @@ class SyncMemberDatabase
         $rowUser['city'] = $arrLine[8]; // string
         $rowUser['country'] = empty($arrLine[9]) ? $defaultCountry : strtoupper($arrLine[9]); // string
         $rowUser['dateOfBirth'] = (string) strtotime($arrLine[10]); // string!
-        $rowUser['phoneBusiness'] = PhoneNumber::beautify($arrLine[11]); // string
-        $rowUser['phone'] = PhoneNumber::beautify($arrLine[12]); // string
-        $rowUser['mobile'] = PhoneNumber::beautify($arrLine[14]); // string
-        $rowUser['fax'] = $arrLine[15]; // string
+        $rowUser['phoneMain'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $arrLine[11]); // string
+        $rowUser['phonePrivate'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $arrLine[12]); // string
+        $rowUser['phoneMobile'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $arrLine[14]); // string
+        $rowUser['phoneFax'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $arrLine[15]); // string
         $rowUser['email'] = $arrLine[16]; // string
-        $rowUser['gender'] = 'weiblich' === strtolower($arrLine[17]) ? 'female' : 'male'; // string
+        $rowUser['gender'] = match ($arrLine[17]) {
+            'Weiblich' => 'female',
+            'Männlich' => 'male',
+            default => 'other',
+        };
         $rowUser['profession'] = $arrLine[18]; // string
         $rowUser['language'] = 'd' === strtolower($arrLine[19]) ? $this->sacevtLocale : strtolower($arrLine[19]); // string
         $rowUser['entryYear'] = $arrLine[20]; // string
@@ -418,18 +457,16 @@ class SyncMemberDatabase
         $rowUser['debit'] = $arrLine[28]; // string
         $rowUser['memberStatus'] = $arrLine[29]; // string
 
-        $rowUser = array_map(
+        return array_map(
             static function ($value) {
                 if (empty($value) || is_numeric($value) || \is_array($value)) {
                     return $value;
                 }
 
-                return mb_convert_encoding(trim($value), 'UTF-8', 'ISO-8859-1');
+                return mb_convert_encoding(trim($value), 'UTF-8', 'UTF-8');
             },
             $rowUser
         );
-
-        return $rowUser;
     }
 
     protected function insertOrUpdateTempMember(array $arrData): void
@@ -440,7 +477,7 @@ class SyncMemberDatabase
 
         $existingMember = $this->connection
             ->fetchAssociative(
-                sprintf('SELECT id,sectionId FROM %s WHERE sacMemberId = ?', self::SYNC_TABLE_NAME),
+                sprintf('SELECT id,sectionId FROM %s WHERE sacMemberId = ?', self::TEMP_TABLE_NAME),
                 [$arrData['sacMemberId']],
                 [Types::INTEGER],
             )
@@ -449,16 +486,16 @@ class SyncMemberDatabase
         if (false === $existingMember) {
             // Insert new temp member
             $arrData['sectionId'] = serialize($this->formatSectionId($arrData['sectionId']));
-            $this->connection->insert(self::SYNC_TABLE_NAME, $arrData);
+            $this->connection->insert(self::TEMP_TABLE_NAME, $arrData);
         } else {
             // The user is a member of multiple sections and already exists in the temp table
             // Then we append the section id only.
-            $arrSectionIds = array_merge(unserialize($existingMember['sectionId']), $arrData['sectionId']);
+            $arrSectionIds = array_filter(array_unique(array_merge(unserialize($existingMember['sectionId']), $arrData['sectionId'])));
             $set = [
                 'sectionId' => serialize($this->formatSectionId($arrSectionIds)),
             ];
 
-            $this->connection->update(self::SYNC_TABLE_NAME, $set, ['id' => $existingMember['id']]);
+            $this->connection->update(self::TEMP_TABLE_NAME, $set, ['id' => $existingMember['id']], ['id' => Types::INTEGER]);
         }
     }
 
@@ -483,14 +520,16 @@ class SyncMemberDatabase
         }
 
         $sql = sprintf(
-            'SELECT id FROM tl_member WHERE sacMemberId NOT IN (SELECT sacMemberId FROM %s)',
-            self::SYNC_TABLE_NAME,
+            'SELECT id FROM tl_member WHERE disable = 0 AND sacMemberId NOT IN (SELECT sacMemberId FROM %s)',
+            self::TEMP_TABLE_NAME,
         );
 
         $disabledMemberIds = $this->connection->fetchFirstColumn($sql);
 
-        if (\count($disabledMemberIds) / $totalMembers * 100 > self::DISABLE_THRESHOLD_PERCENT) {
-            throw new \RuntimeException(sprintf('Should disable more than %d%% of the members, which could indicate an error. Aborting sync process.', self::DISABLE_THRESHOLD_PERCENT));
+        $percentDisabledAccounts = round(\count($disabledMemberIds) / $totalMembers * 100, 1);
+
+        if ($percentDisabledAccounts > self::DISABLE_THRESHOLD_PERCENT) {
+            throw new \RuntimeException(sprintf('Should disable %d%% of the members, which could indicate an error. Aborting sync process.', $percentDisabledAccounts));
         }
 
         foreach ($disabledMemberIds as $memberId) {
@@ -500,12 +539,12 @@ class SyncMemberDatabase
                 'login' => 0,
             ];
 
-            if (1 === $this->connection->update('tl_member', $set, ['id' => $memberId], [Types::INTEGER])) {
+            if ($this->connection->update('tl_member', $set, ['id' => $memberId], ['id' => Types::INTEGER])) {
                 $set = [
                     'tstamp' => time(),
                 ];
 
-                $this->connection->update('tl_member', $set, ['id' => $memberId], [Types::INTEGER]);
+                $this->connection->update('tl_member', $set, ['id' => $memberId], ['id' => Types::INTEGER]);
                 $rowDisabledMember = $this->connection->fetchAssociative('SELECT * FROM tl_member WHERE id = ?', [$memberId], [Types::INTEGER]);
 
                 if (false !== $rowDisabledMember) {
@@ -516,23 +555,13 @@ class SyncMemberDatabase
                         $rowDisabledMember['sacMemberId']
                     );
 
-                    $this->log(LogLevel::INFO, $log, __METHOD__, Log::MEMBER_DATABASE_SYNC_DISABLE_MEMBER);
+                    $this->contaoGeneralLogger?->info($log, ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DATABASE_SYNC_DISABLE_MEMBER)]);
+                    $this->syncLog['log'][] = $log;
                 }
 
                 ++$this->syncLog['disabled'];
             }
         }
-    }
-
-    protected function log(string $strLogLevel, string $strText, string $strMethod, string $strCategory): void
-    {
-        $this->syncLog['log'][] = $strText;
-
-        $this->logger?->log(
-            $strLogLevel,
-            $strText,
-            ['contao' => new ContaoContext($strMethod, $strCategory)]
-        );
     }
 
     protected function resetSyncLog(): void
@@ -576,8 +605,8 @@ class SyncMemberDatabase
     {
         $schema = $this->connection->createSchemaManager();
 
-        if ($schema->tablesExist(self::SYNC_TABLE_NAME)) {
-            $schema->dropTable(self::SYNC_TABLE_NAME);
+        if ($schema->tablesExist(self::TEMP_TABLE_NAME)) {
+            $schema->dropTable(self::TEMP_TABLE_NAME);
         }
     }
 
@@ -586,7 +615,9 @@ class SyncMemberDatabase
         // Drop temp table if exists
         $this->dropTempTable();
 
-        $table = new Table(self::SYNC_TABLE_NAME);
+        $table = new Table(self::TEMP_TABLE_NAME);
+
+        // Add columns to the table
         $table->addColumn('id', 'integer', ['autoincrement' => true, 'notnull' => true, 'unsigned' => true]);
         $table->addColumn('sacMemberId', 'integer', ['notnull' => true, 'unsigned' => true, 'default' => 0]);
         $table->addColumn('username', 'string', ['length' => 256, 'default' => '']);
@@ -600,10 +631,10 @@ class SyncMemberDatabase
         $table->addColumn('city', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('country', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('dateOfBirth', 'string', ['length' => 256, 'default' => '']);
-        $table->addColumn('phoneBusiness', 'string', ['length' => 256, 'default' => '']);
-        $table->addColumn('phone', 'string', ['length' => 256, 'default' => '']);
-        $table->addColumn('mobile', 'string', ['length' => 256, 'default' => '']);
-        $table->addColumn('fax', 'string', ['length' => 256, 'default' => '']);
+        $table->addColumn('phoneMain', 'string', ['length' => 256, 'default' => '']);
+        $table->addColumn('phonePrivate', 'string', ['length' => 256, 'default' => '']);
+        $table->addColumn('phoneMobile', 'string', ['length' => 256, 'default' => '']);
+        $table->addColumn('phoneFax', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('email', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('gender', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('profession', 'string', ['length' => 256, 'default' => '']);
@@ -617,11 +648,51 @@ class SyncMemberDatabase
         $table->addColumn('debit', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('memberStatus', 'string', ['length' => 256, 'default' => '']);
 
+        // Keys
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['username']);
         $table->addUniqueIndex(['sacMemberId']);
 
-        $schema = $this->connection->createSchemaManager();
-        $schema->createTable($table);
+        $this->connection
+            ->createSchemaManager()
+            ->createTable($table)
+        ;
+    }
+
+    /**
+     * Updates the password for members within the specified limit by generating a random hashed password.
+     *
+     * This method fetches member IDs from the `tl_member` table where the `password` field is empty.
+     * The IDs are then iterated over to set a new password and update the timestamp.
+     */
+    protected function setPassword(int $limit = 20): void
+    {
+        $arrIds = $this->connection->fetchFirstColumn(
+            'SELECT id FROM tl_member WHERE password = ? LIMIT ?',
+            [
+                '',
+                $limit,
+            ],
+            [
+                Types::STRING,
+                Types::INTEGER,
+            ],
+        );
+
+        foreach ($arrIds as $id) {
+            $this->connection->update(
+                'tl_member',
+                [
+                    'password' => $this->getRandomPasswordHash(),
+                    'tstamp' => time(),
+                ],
+                [
+                    'id' => $id,
+                ],
+                [
+                    'id' => Types::INTEGER,
+                ],
+            );
+        }
     }
 }
