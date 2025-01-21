@@ -75,7 +75,7 @@ class EventRegistrationListGeneratorDocx
 
         if (null === $objEventMember) {
             // Send error message if there are no members assigned to the event
-            $this->messageAdapter->addError('Bitte überprüfe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, deren Teilname bestätigt ist.');
+            $this->messageAdapter->addError('Bitte überprüfe die Teilnehmerliste. Es wurden keine Teilnehmer gefunden, deren Teilname bestätigt ist.');
             $this->controllerAdapter->redirect(System::getReferer());
         }
 
