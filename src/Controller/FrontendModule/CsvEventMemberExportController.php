@@ -118,7 +118,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         if ($objForm->validate()) {
             if ('form-event-member-export' === $request->request->get('FORM_SUBMIT')) {
                 $eventType = $request->request->get('event-type');
-                $arrFields = ['id', 'eventId', 'eventName', 'startDate', 'endDate', 'organizers', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'dateAdded'];
+                $arrFields = ['id', 'eventId', 'eventName', 'startDate', 'endDate', 'organizers', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'phoneBusiness', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'dateAdded'];
                 $startDate = strtotime($request->request->get('startDate'));
                 $endDate = strtotime($request->request->get('endDate'));
 

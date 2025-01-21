@@ -433,7 +433,7 @@ class CalendarEventsUtil
                 $frontendUser = System::getContainer()->get('security.helper');
 
                 if ($frontendUser instanceof FrontendUser && !$objUser->hideInFrontendListings) {
-                    $arrContact = ['phone', 'mobile', 'email'];
+                    $arrContact = ['phone', 'mobile', 'phoneBusiness', 'email'];
 
                     foreach ($arrContact as $field) {
                         if ('' !== $objUser->{$field}) {

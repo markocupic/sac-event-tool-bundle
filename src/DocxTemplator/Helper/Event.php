@@ -202,7 +202,9 @@ class Event
         $objPhpWord->replace('eventInstructorName', $this->prepareString($objBiller->name));
         $objPhpWord->replace('eventInstructorStreet', $this->prepareString($objBiller->street));
         $objPhpWord->replace('eventInstructorPostalCity', $this->prepareString($objBiller->postal.' '.$objBiller->city));
-        $objPhpWord->replace('eventInstructorPhone', $this->prepareString($objBiller->mobile ?: $objBiller->phone ?: '---'));
+        $strPhone = implode("\n", array_filter([$objBiller->mobile, $objBiller->phone, $objBiller->phoneBusiness]));
+        $strPhone = !empty($strPhone) ? $strPhone : '---';
+        $objPhpWord->replace('eventInstructorPhone', $this->prepareString($strPhone), ['multiline' => true]);
         $objPhpWord->replace('countParticipants', $this->prepareString($countParticipants + $countInstructors));
         $objPhpWord->replace('countMale', $this->prepareString($countMale));
         $objPhpWord->replace('countFemale', $this->prepareString($countFemale));

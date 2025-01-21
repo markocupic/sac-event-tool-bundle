@@ -142,7 +142,7 @@ class User
             return;
         }
 
-        $arrReadonlyFields = ['gender', 'firstname', 'lastname', 'name', 'email', 'phone', 'mobile', 'street', 'postal', 'city', 'dateOfBirth'];
+        $arrReadonlyFields = ['gender', 'firstname', 'lastname', 'name', 'email', 'phone', 'mobile', 'phoneBusiness', 'street', 'postal', 'city', 'dateOfBirth'];
 
         foreach ($arrReadonlyFields as $fieldName) {
             $GLOBALS['TL_DCA']['tl_user']['fields'][$fieldName]['eval']['readonly'] = true;

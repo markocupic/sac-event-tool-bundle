@@ -85,6 +85,7 @@ class SyncMemberWithUser
                         'gender' => (string) $arrMember['gender'],
                         'phone' => (string) $arrMember['phone'],
                         'mobile' => (string) $arrMember['mobile'],
+                        'phoneBusiness' => (string) $arrMember['phoneBusiness'],
                     ];
 
                     if ($this->connection->update('tl_user', $set, ['id' => $arrUser['id']])) {
@@ -134,6 +135,19 @@ class SyncMemberWithUser
         }
 
         $this->syncLog['duration'] = round($stopWatchEvent->stop()->getDuration() / 1000, 6);
+
+        $msg = sprintf(
+            'Successfully completed the merging process from tl_member to tl_user. Processed %d data records. Total updates: %d. Disabled %d user(s). Duration: %d s.',
+            $this->syncLog['processed'],
+            $this->syncLog['updates'],
+            $this->syncLog['disabled'],
+            $this->syncLog['duration'],
+        );
+
+        $this->contaoGeneralLogger?->info(
+            $msg,
+            ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS)]
+        );
     }
 
     public function getSyncLog(): array

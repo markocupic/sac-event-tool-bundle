@@ -118,7 +118,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		{sac_member_id_legend},sacMemberId;
 		{personal_legend},firstname,lastname,gender,dateOfBirth,sectionId,ahvNumber;
 		{address_legend:hide},street,postal,city;
-		{contact_legend},mobile,email;
+		{contact_legend},phone,mobile,phoneBusiness,email;
 		{education_legend},hasLeadClimbingEducation;
 		{emergency_phone_legend},emergencyPhone,emergencyPhoneName;
 		{stateOfParticipation_legend},hasParticipated;
@@ -234,7 +234,19 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'eval'      => ['mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
+        'phone'                      => [
+            'exclude'   => true,
+            'inputType' => 'text',
+            'eval'      => ['mandatory' => false, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
+            'sql'       => "varchar(64) NOT NULL default ''",
+        ],
         'mobile'                      => [
+            'exclude'   => true,
+            'inputType' => 'text',
+            'eval'      => ['mandatory' => false, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
+            'sql'       => "varchar(64) NOT NULL default ''",
+        ],
+        'phoneBusiness'                      => [
             'exclude'   => true,
             'inputType' => 'text',
             'eval'      => ['mandatory' => false, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],

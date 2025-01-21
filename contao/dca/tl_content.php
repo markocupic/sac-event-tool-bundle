@@ -46,7 +46,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_replacePrivateAdressWithRol
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'checkbox',
-	'options'   => ['email', 'phone', 'mobile', 'street', 'postal', 'city'],
+	'options'   => ['email', 'phone', 'mobile', 'phoneBusiness', 'street', 'postal', 'city'],
 	'eval'      => ['submitOnChange' => false, 'multiple' => true, 'tl_class' => 'clr'],
 	'sql'       => 'blob NULL',
 ];
@@ -74,7 +74,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_showFieldsToGuests'] = [
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'checkbox',
-	'options'   => ['email', 'phone', 'mobile', 'street', 'postal', 'city'],
+	'options'   => ['email', 'phone', 'mobile', 'phoneBusiness', 'street', 'postal', 'city'],
 	'eval'      => ['multiple' => true, 'tl_class' => 'clr'],
 	'sql'       => 'blob NULL',
 ];

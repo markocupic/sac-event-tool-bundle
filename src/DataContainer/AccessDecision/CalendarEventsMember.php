@@ -188,6 +188,7 @@ class CalendarEventsMember
                 'city',
                 'phone',
                 'mobile',
+                'phoneBusiness',
                 'dateOfBirth',
                 'email',
                 'ahvNumber',

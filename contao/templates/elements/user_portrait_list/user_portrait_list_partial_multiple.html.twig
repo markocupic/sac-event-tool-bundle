@@ -33,6 +33,7 @@
                     {% if city|default and 'city' in showFieldsToGuests %}{{ city }}<br>{% endif %}
                     {% if phone|default and 'phone' in showFieldsToGuests %}P: {{ phone }}<br>{% endif %}
                     {% if mobile|default and 'mobile' in showFieldsToGuests %}M: {{ mobile }}<br>{% endif %}
+                    {% if phoneBusiness|default and 'phoneBusiness' in showFieldsToGuests %}G: {{ phoneBusiness }}<br>{% endif %}
                     {% if email|default and 'email' in showFieldsToGuests %}{{ insert_tag('email_open::'~ email)|raw }}{{ email }}</a><br>{% endif %}
                 {% endif %}
             </small>

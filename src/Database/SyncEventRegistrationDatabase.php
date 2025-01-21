@@ -132,7 +132,9 @@ class SyncEventRegistrationDatabase extends AbstractController
                 'city' => $arrMember['city'],
                 'dateOfBirth' => $arrMember['dateOfBirth'],
                 'email' => $arrMember['email'],
+                'phone' => $arrMember['phone'],
                 'mobile' => $arrMember['mobile'],
+                'phoneBusiness' => $arrMember['phoneBusiness'],
             ];
 
             $intAffected = $this->connection->update(
