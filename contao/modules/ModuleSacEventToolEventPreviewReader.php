@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle;
 
 use Code4Nix\UriSigner\UriSigner;
+use Codefog\HasteBundle\UrlParser;
 use Contao\ArticleModel;
 use Contao\BackendTemplate;
 use Contao\Calendar;
@@ -86,16 +87,12 @@ class ModuleSacEventToolEventPreviewReader extends Events
         if (null === $objEvent) {
             return new Response('No valid event id/alias could be found in the url parameters.', Response::HTTP_BAD_REQUEST);
         }
-
-        /** @var UriSigner $uriSigner */
-        $uriSigner = System::getContainer()->get('code4nix_uri_signer.uri_signer');
-
-        if (!$uriSigner->checkRequest($request)) {
+        
+        if (!$this->getUriSigner()->check($this->getUrlParser()->removeQueryString(['file']))) {
             throw new AccessDeniedException('Denied access to this resource.');
         }
 
         $this->cal_calendar = [$objEvent->pid];
-        /* End Hack Marko Cupic */
 
         return parent::generate();
     }
@@ -486,5 +483,15 @@ class ModuleSacEventToolEventPreviewReader extends Events
         }
 
         return [$strDate, $strTime];
+    }
+
+    private function getUrlParser(): UrlParser
+    {
+        return System::getContainer()->get(UrlParser::class);
+    }
+
+    private function getUriSigner(): UriSigner
+    {
+        return System::getContainer()->get('code4nix_uri_signer.uri_signer');
     }
 }
