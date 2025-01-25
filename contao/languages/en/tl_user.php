@@ -62,9 +62,12 @@ $GLOBALS['TL_LANG']['tl_user']['section']['4252'] = 'SAC PILATUS NAPF';
 $GLOBALS['TL_LANG']['tl_user']['section']['4253'] = 'SAC PILATUS HOCHDORF';
 $GLOBALS['TL_LANG']['tl_user']['section']['4254'] = 'SAC PILATUS RIGI';
 
+$GLOBALS['TL_LANG']['tl_user']['rescissionCauseOptions']['accident'] = 'Unfall/Ereignis (Notfallkonzept)';
 $GLOBALS['TL_LANG']['tl_user']['rescissionCauseOptions']['deceased'] = 'Verstorben';
 $GLOBALS['TL_LANG']['tl_user']['rescissionCauseOptions']['recission'] = 'Rücktritt';
 $GLOBALS['TL_LANG']['tl_user']['rescissionCauseOptions']['leaving'] = 'Vereins-Austritt';
+$GLOBALS['TL_LANG']['tl_user']['rescissionCauseOptions']['pausing'] = 'Pausierung';
+$GLOBALS['TL_LANG']['tl_user']['rescissionCauseOptions']['another'] = 'Andere';
 
 $GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][1] = 'Tourenleiter/in SAC';
 $GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][2] = 'Bergführer/in IVBV';
