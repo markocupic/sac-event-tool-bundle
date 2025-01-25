@@ -146,10 +146,12 @@ class SyncEventRegistrationDatabase extends AbstractController
                         'postal' => $arrContaoMember['postal'],
                         'city' => $arrContaoMember['city'],
                         'dateOfBirth' => $arrContaoMember['dateOfBirth'],
-                    ];
+						'phone' => $arrContaoMember['phone'],
+						'phoneBusiness' => $arrContaoMember['phoneBusiness'],
+					];
 
-                    // Do not override contact data with empty values
-                    $arrContact = ['email', 'mobile', 'phone', 'phoneBusiness'];
+                    // Do not override these contact data fields with empty values
+                    $arrContact = ['email', 'mobile'];
 
                     foreach ($arrContact as $field) {
                         if (!empty($arrContaoMember[$field])) {
