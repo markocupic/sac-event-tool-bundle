@@ -69,7 +69,7 @@ class Configuration implements ConfigurationInterface
                                 ->booleanNode('reset_permissions_on_login')->defaultFalse()->end()
                                 ->arrayNode('rescission_cause')
                                     ->prototype('scalar')->end()
-                                    ->defaultValue(['deceased', 'recission', 'leaving'])
+                                    ->defaultValue(['accident', 'deceased', 'recission', 'leaving', 'pausing', 'another'])
                                 ->end()
                             ->end()
                         ->end()
