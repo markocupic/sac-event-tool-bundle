@@ -23,14 +23,21 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 
 #[Route('/_sync', name: self::class)]
 class SyncEventRegistrationDatabase extends AbstractController
 {
-    private const STOP_WATCH_EVENT = 'update_event_reg_data';
-    private int $affected = 0;
-    private array $affectedMembers = [];
-    private array $errors = [];
+    private const string STOP_WATCH_EVENT = 'update_event_reg_data';
+    private array $syncLog = [
+        'processed_registrations' => 0,
+        'processed_members' => 0,
+        'updates' => 0,
+        'log' => [],
+        'duration' => 0,
+        'with_error' => false,
+        'exceptions' => [],
+    ];
 
     public function __construct(
         private readonly ContaoFramework $framework,
@@ -44,35 +51,36 @@ class SyncEventRegistrationDatabase extends AbstractController
     {
         $this->framework->initialize();
 
-        $stopWatchEvent = (new Stopwatch())->start(self::STOP_WATCH_EVENT);
+        $stopWatchEvent = $this->stopWatchStart();
 
-        $arrIDS = $this->getContaoMemberIds();
+        $this->sync();
 
-        foreach ($arrIDS as $contaoMemberId) {
-            $this->sync($contaoMemberId);
-        }
-
-        $duration = round($stopWatchEvent->stop()->getDuration() / 1000).' s';
+        $duration = round($stopWatchEvent->stop()->getDuration() / 1000);
+        $this->syncLog['duration'] = $duration;
 
         if (null !== $this->contaoGeneralLogger) {
             $strText = sprintf(
-                'Successful update of the member data in the event registration table "tl_calendar_events_member": affected rows: %d, errors: %d, duration: %s.',
-                $this->affected,
-                \count($this->errors),
-                $duration,
+                'Successful update of the member data in the event registration table "tl_calendar_events_member": processed: %d, updates: %d, errors: %d, duration: %s.',
+                $this->syncLog['processed_registrations'],
+                $this->syncLog['updates'],
+                \count($this->syncLog['exceptions']),
+                $duration.' s',
             );
 
             $this->contaoGeneralLogger->info($strText);
         }
 
-        $json = [
-            'affected_members' => $this->affectedMembers,
-            'affected_registrations_count' => $this->affected,
-            'errors' => $this->errors,
-            'duration' => $duration,
-        ];
+        return $this->json($this->syncLog);
+    }
 
-        return $this->json($json);
+    public function getSyncLog(): array
+    {
+        return $this->syncLog;
+    }
+
+    private function stopWatchStart(): StopwatchEvent
+    {
+        return (new Stopwatch())->start(self::STOP_WATCH_EVENT);
     }
 
     private function getContaoMemberIds(): array
@@ -101,75 +109,89 @@ class SyncEventRegistrationDatabase extends AbstractController
         );
     }
 
-    private function sync(int $contaoMemberId): void
+    private function sync(): void
     {
-        $arrMember = $this->connection->fetchAssociative(
-            '
-					SELECT
-						id,gender,firstname,lastname,street,postal,city,dateOfBirth,email,mobile
-					FROM
-						tl_member
-					WHERE
-						id = ?
-    			',
-            [
-                $contaoMemberId,
-            ],
-            [
-                Types::INTEGER,
-            ],
-        );
+        $arrContaoFrontendMemberIds = $this->getContaoMemberIds();
+
+        $this->syncLog['processed_members'] = \count($arrContaoFrontendMemberIds);
+
+        $this->connection->beginTransaction();
 
         try {
-            $this->connection->beginTransaction();
+            foreach ($arrContaoFrontendMemberIds as $contaoMemberId) {
+                $arrContaoMember = $this->connection->fetchAssociative(
+                    'SELECT * FROM tl_member WHERE id = ?',
+                    [
+                        $contaoMemberId,
+                    ],
+                    [
+                        Types::INTEGER,
+                    ],
+                );
 
-            $set = [
-                'gender' => $arrMember['gender'],
-                'firstname' => $arrMember['firstname'],
-                'lastname' => $arrMember['lastname'],
-                'street' => $arrMember['street'],
-                'postal' => $arrMember['postal'],
-                'city' => $arrMember['city'],
-                'dateOfBirth' => $arrMember['dateOfBirth'],
-                'email' => $arrMember['email'],
-                'phone' => $arrMember['phone'],
-                'mobile' => $arrMember['mobile'],
-                'phoneBusiness' => $arrMember['phoneBusiness'],
-            ];
+                $arrRegAll = $this->connection->fetchAllAssociative(
+                    'SELECT * FROM tl_calendar_events_member WHERE contaoMemberId = ?',
+                    [$arrContaoMember['id']],
+                    [Types::INTEGER],
+                );
 
-            $intAffected = $this->connection->update(
-                'tl_calendar_events_member',
-                $set,
-                [
-                    'contaoMemberId' => $contaoMemberId,
-                ],
-                [
-                    'contaoMemberId' => Types::INTEGER,
-                ],
-            );
+                foreach ($arrRegAll as $arrReg) {
+                    ++$this->syncLog['processed_registrations'];
 
-            if (\is_int($intAffected) && $intAffected > 0) {
-                $this->affected += $intAffected;
+                    $set = [
+                        'gender' => $arrContaoMember['gender'],
+                        'firstname' => $arrContaoMember['firstname'],
+                        'lastname' => $arrContaoMember['lastname'],
+                        'street' => $arrContaoMember['street'],
+                        'postal' => $arrContaoMember['postal'],
+                        'city' => $arrContaoMember['city'],
+                        'dateOfBirth' => $arrContaoMember['dateOfBirth'],
+                    ];
 
-                $this->affectedMembers[] = [
-                    'id' => $arrMember['id'],
-                    'firstname' => $arrMember['firstname'],
-                    'lastname' => $arrMember['lastname'],
-                    'street' => $arrMember['street'],
-                    'city' => $arrMember['city'],
-                    'affected_rows' => $intAffected,
-                ];
+                    // Do not override contact data with empty values
+                    $arrContact = ['email', 'mobile', 'phone', 'phoneBusiness'];
+
+                    foreach ($arrContact as $field) {
+                        if (!empty($arrContaoMember[$field])) {
+                            $set[$field] = $arrContaoMember[$field];
+                        }
+                    }
+
+                    $intAffected = $this->connection->update(
+                        'tl_calendar_events_member',
+                        $set,
+                        [
+                            'id' => $arrReg['id'],
+                        ],
+                        [
+                            'id' => Types::INTEGER,
+                        ],
+                    );
+
+                    if (!empty($intAffected)) {
+                        ++$this->syncLog['updates'];
+
+                        $this->syncLog['log'][] = sprintf(
+                            'Update contact data for event registration ID %d with member %s %s.',
+                            $arrReg['id'],
+                            $arrContaoMember['firstname'],
+                            $arrContaoMember['lastname'],
+                        );
+                    }
+                }
             }
 
             $this->connection->commit();
         } catch (\Exception $e) {
             $this->connection->rollBack();
             $this->errors[] = [
-                'member_id' => $arrMember['id'],
+                'event_registration_id' => $arrReg['id'],
+                'member_id' => $arrContaoMember['id'],
                 'error_message' => $e->getMessage(),
             ];
-
-            $this->contaoErrorLogger->error(sprintf('There has been an error while trying to update event registrations from Contao member with ID %d. Error: %s', $arrMember['id'], $e->getMessage()));
+            $this->syncLog['with_error'] = true;
+            $this->syncLog['exceptions'][] = $e->getMessage();
+            $this->contaoErrorLogger->error(sprintf('There has been an error while trying to update contact data of event registration ID %d. Error: %s', $arrReg['id'], $e->getMessage()));
         }
     }
 }

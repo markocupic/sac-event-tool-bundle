@@ -15,6 +15,7 @@ declare(strict_types=1);
 use Contao\CoreBundle\Controller\BackendCsvImportController;
 use Contao\ListWizard;
 use Contao\TableWizard;
+use Markocupic\SacEventToolBundle\ContaoBackendMaintenance\EventRegistrationSync;
 use Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainBackendUser;
 use Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MemberDatabaseSync;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventRegistrationStateController;
@@ -118,6 +119,7 @@ $GLOBALS['TL_PURGE']['custom']['reset_backend_user_rights'] = [
 ];
 
 $GLOBALS['TL_MAINTENANCE'][] = MemberDatabaseSync::class;
+$GLOBALS['TL_MAINTENANCE'][] = EventRegistrationSync::class;
 
 /*
  * Contao backend permissions

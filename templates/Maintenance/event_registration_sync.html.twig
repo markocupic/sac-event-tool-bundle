@@ -1,0 +1,165 @@
+<div{{ attrs().addClass('maintenance_' ~ (is_active ? 'active' : 'inactive')) }}>
+    <h2 class="sub_headline sub_headline_index">Synchronisation Mitglieder -> Event Registrierungen</h2>
+
+    {% if is_running %}
+        <div class="inner">
+            <div id="eventRegistrationSyncApp">
+                <div class="widget">
+                    <div v-if="isRunning" class="tl_message">
+                        <p class="tl_info">
+                            Die Synchronisierung wurde gestartet [[ time ]] s.<br>
+                            Bitte beachten Sie, dass der Vorgang mehrere Minuten Zeit in Anspruch nehmen kann.<br>
+                            Bleiben Sie auf der Seite und schliessen Sie das Fenster erst, wenn Sie dazu aufgefordert werden.
+                        </p>
+                    </div>
+
+                    <div v-if="isResponseOk" class="tl_message">
+                        <p v-if="isError" class="tl_error">Die Synchronisierung konnte nicht durchgeführt werden.</p>
+                        <p v-if="!isError" class="tl_confirm">Die Synchronisierung konnte erfolgreich abgeschlossen werden. Sie können das Fenster jetzt schliessen.</p>
+                        <p></p>
+                        <div>
+                            <div class="row">
+                                <div class="col_1">Duration:</div>
+                                <div class="col_2">[[ log.duration ]] s</div>
+                            </div>
+                            <div class="row">
+                                <div class="col_1">Processed:</div>
+                                <div class="col_2">[[ log.processed_registrations ]]</div>
+                            </div>
+                            <div class="row">
+                                <div class="col_1">Updates:</div>
+                                <div class="col_2">[[ log.updates ]]</div>
+                            </div>
+                            <div class="row" v-for="(message, index) in log.exceptions">
+                                <div class="col_1">#[[ index ]]</div>
+                                <div class="col_2">
+                                    <div class="tl_message"><p class="tl_error">[[ message ]]</p></div>
+                                </div>
+                            </div>
+                            <div class="row" v-for="(message, index) in log.log">
+                                <div class="col_1">#[[ index ]]</div>
+                                <div class="col_2">
+                                    <div class="tl_message"><p class="tl_confirm">[[ message ]]</p></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="isError && !isResponseOk" class="tl_message">
+                        <p class="tl_error">Synchronisierung konnte nicht erfolgreich abgeschlossen werden. Bitte öffnen Sie das System-Log für weitere Details.</p>
+                    </div>
+                    <div>
+                        <br>
+                        <img src="{{ asset('icons/maintenance/member_database_sync/db_sync.svg', 'markocupic_sac_event_tool') }}" aria-hidden="true" alt="event registration sync" width="300">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            #eventRegistrationSyncApp .row {
+                display: flex;
+                flex-wrap: nowrap;
+                margin: 0.75rem 0;
+            }
+
+            #eventRegistrationSyncApp .col_1 {
+                width: 4.5rem
+            }
+
+            #eventRegistrationSyncApp .col_2 {
+                flex-grow: 4;
+            }
+        </style>
+
+        <script src="{{ asset('vue/dist/vue.global.prod.js', 'markocupic_sac_event_tool') }}"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                new EventRegistrationSyncMaintenance('#eventRegistrationSyncApp');
+            });
+
+            EventRegistrationSyncMaintenance = class {
+                constructor(appId) {
+                    const {createApp} = Vue
+
+                    let app = createApp({
+                        data() {
+                            return {
+                                timer: null,
+                                time: 0,
+                                isRunning: false,
+                                isError: false,
+                                isResponseOk: false,
+                                withError: false,
+                                countUpdateErrors: 0,
+                                log: null,
+                            };
+                        },
+                        mounted() {
+                            this.run();
+                        },
+                        methods: {
+                            run: async function run() {
+                                this.startTimer();
+                                this.isRunning = true;
+                                const url = window.location.href;
+
+                                try {
+                                    const response = await fetch(url, {
+                                        headers: {
+                                            "X-Requested-With": "XMLHttpRequest",
+                                        },
+                                    });
+
+                                    if (!response.ok) {
+                                        this.isRunning = false;
+                                        this.isError = true;
+                                        this.isResponseOk = false;
+                                        this.resetTimer();
+                                        throw new Error(`Response status: ${response.status}`);
+                                    }
+
+                                    this.log = await response.json();
+                                    this.isResponseOk = true;
+                                    this.isError = this.log.with_error;
+                                    this.isRunning = false;
+                                    this.stopTimer();
+                                } catch (error) {
+                                    this.resetTimer();
+                                }
+                            },
+                            startTimer: function startTimer() {
+                                this.resetTimer();
+
+                                this.timer = window.setInterval(() => {
+                                    this.time++;
+                                }, 1000);
+                            },
+                            resetTimer: function resetTimer() {
+                                clearInterval(this.timer);
+                                this.timer = null;
+                                this.timer = 0;
+                            },
+                            stopTimer: function resetTimer() {
+                                clearInterval(this.timer);
+                                this.timer = null;
+                            },
+                        }
+                    });
+                    app.config.compilerOptions.delimiters = ['[[ ', ' ]]'];
+                    app.mount(appId);
+                }
+            }
+        </script>
+    {% else %}
+        <form class="tl_form" method="get">
+            <div class="tl_formbody_edit">
+                <input type="hidden" name="do" value="maintenance">
+                <input type="hidden" name="act" value="eventRegistrationSync">
+                <input type="hidden" name="rt" value="{{ csrf_token }}">
+            </div>
+            <div class="tl_submit_container">
+                <button type="submit" class="tl_submit">Event-Registrierungs-Synchronisierung starten</button>
+            </div>
+        </form>
+    {% endif %}
+</div>
