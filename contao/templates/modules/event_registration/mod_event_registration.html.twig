@@ -1,3 +1,4 @@
+{% trans_default_domain 'contao_default' %}
 {% extends '@Contao/block_unsearchable' %}
 
 {% block content %}
@@ -43,17 +44,18 @@
         {% if eventFullyBooked|default is same as(true) %}
             <div class="alert alert-info" role="alert">
                 <i class="fa-solid fa-info-circle"></i>
-                <div>{{ 'ERR.evt_reg_bookingLimitReaches'|trans({}, 'contao_default') }}</div>
+                <div>{{ 'ERR.evt_reg_bookingLimitReaches'|trans }}</div>
             </div>
         {% endif %}
 
-        <h2 class="content-headline text-danger mt-5 mb-4">Für {{ ('MSC.'~eventModel.eventType~'_short')|trans({}, 'contao_default') }} <span class="text-black">"{{ eventModel.title }}"</span> anmelden</h2>
+        <h4 class="content-headline text-danger mt-5 mb-0">Anmelden für {{ ('MSC.'~eventModel.eventType~'_short')|trans }}:</h4>
+        <h2 class="content-headline mt-0 mb-4 text-black">{{ eventModel.title }}</h2>
 
         {% if eventModel.addIban %}
             <div class="alert alert-info" role="alert">
                 <i class="fa-solid fa-info-circle"></i>
                 <div>
-                    {{ 'FORM.evt_reg_ibanText'|trans({}, 'contao_default') }}
+                    {{ 'FORM.evt_reg_ibanText'|trans }}
                     <br>
                     <br>
                     IBAN:
@@ -61,7 +63,7 @@
                     {{ eventModel.iban }}
                     <br>
                     <br>
-                    {{ 'FORM.evt_reg_ibanBeneficiary'|trans({}, 'contao_default') }}:
+                    {{ 'FORM.evt_reg_ibanBeneficiary'|trans }}:
                     <br>
                     {{ eventModel.ibanBeneficiary|nl2br }}
                 </div>
@@ -69,114 +71,138 @@
         {% endif %}
 
         {# start form #}
-        <div class="hasteform_form-event-registration block">
-            <form action="{{ form.getAction() }}" method="{{ form.getHttpMethod() }}" enctype="{{ form.getEnctype() }}">
-                <div class="formbody bg-reg-form">
+        <div id="eventRegistrationForm" class="hasteform_form-event-registration block">
+            <div class="row gx-5">
+                <div class="col-12 col-lg-6">
+                    <form action="{{ form.getAction() }}" method="{{ form.getHttpMethod() }}" enctype="{{ form.getEnctype() }}">
+                        <div class="formbody">
+                            <div class="pe-lg-3">
+                                {% if form.hasFormField('FORM_SUBMIT') %}
+                                    {{ form.getWidget('FORM_SUBMIT').parse()|raw }}
+                                {% endif %}
 
-                    <div class="ps-3 pe-3">
-                        {% if form.hasFormField('FORM_SUBMIT') %}
-                            {{ form.getWidget('FORM_SUBMIT').parse()|raw }}
-                        {% endif %}
+                                {% if form.hasFormField('REQUEST_TOKEN') %}
+                                    {{ form.getWidget('REQUEST_TOKEN').parse()|raw }}
+                                {% endif %}
 
-                        {% if form.hasFormField('REQUEST_TOKEN') %}
-                            {{ form.getWidget('REQUEST_TOKEN').parse()|raw }}
-                        {% endif %}
+                                {% if form.hasFormField('carInfo') %}
+                                    <div class="mt-0 mb-2" data-reg-widget="carInfo">
+                                        {{ form.getWidget('carInfo').parse()|raw }}
+                                    </div>
+                                {% endif %}
 
-                        {% if form.hasFormField('carInfo') %}
-                            <div class="mt-0 mb-4 p-3" data-reg-widget="carInfo">
-                                {{ form.getWidget('carInfo').parse()|raw }}
-                            </div>
-                        {% endif %}
+                                {% if form.hasFormField('ticketInfo') %}
+                                    <div class="mt-0 mb-2" data-reg-widget="ticketInfo">
+                                        {{ form.getWidget('ticketInfo').parse()|raw }}
+                                    </div>
+                                {% endif %}
 
-                        {% if form.hasFormField('ticketInfo') %}
-                            <div class="mt-0 mb-4 p-3" data-reg-widget="ticketInfo">
-                                {{ form.getWidget('ticketInfo').parse()|raw }}
-                            </div>
-                        {% endif %}
-
-                        {% if form.hasFormField('mobile') %}
-                            <div class="mt-0 mb-4 p-3" data-reg-widget="mobile">
-                                {{ form.getWidget('mobile').parse()|raw }}
-                                <div data-ffield-explanation="mobile">
-                                    <div class="alert alert-success" role="alert">
-                                        <i class="fa-solid fa-check-circle"></i>
-                                        <div>
-                                            {{ 'FORM.evt_reg_ffield_expl_mobile'|trans({}, 'contao_default')|raw }}
+                                {% if form.hasFormField('mobile') %}
+                                    <div class="mt-0 mb-2" data-reg-widget="mobile">
+                                        {{ form.getWidget('mobile').parse()|raw }}
+                                        <div data-ffield-explanation="mobile">
+                                            <div class="alert alert-success" role="alert">
+                                                <i class="fa-solid fa-check-circle"></i>
+                                                <div>
+                                                    {{ 'FORM.evt_reg_ffield_expl_mobile'|trans|raw }}
+                                                </div>
+                                            </div>
                                         </div>
+                                    </div>
+                                {% endif %}
+
+                                {% if form.hasFormField('emergencyPhone') %}
+                                    <div class="mt-0 mb-2" data-reg-widget="emergencyPhone">
+                                        {{ form.getWidget('emergencyPhone').parse()|raw }}
+                                    </div>
+                                {% endif %}
+
+                                {% if form.hasFormField('emergencyPhoneName') %}
+                                    <div class="mt-0 mb-2" data-reg-widget="emergencyPhoneName">
+                                        {{ form.getWidget('emergencyPhoneName').parse()|raw }}
+                                    </div>
+                                {% endif %}
+
+                                {% if form.hasFormField('notes') %}
+                                    <div class="mt-0 mb-2" data-reg-widget="notes">
+                                        {{ form.getWidget('notes').parse()|raw }}
+                                        <div data-ffield-explanation="notes">
+                                            <div class="alert alert-success" role="alert">
+                                                <i class="fa-solid fa-check-circle"></i>
+                                                <div>
+                                                    {{ 'FORM.evt_reg_ffield_expl_notes'|trans|raw }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                {% if form.hasFormField('ahvNumber') %}
+                                    <div class="mt-0 mb-2" data-reg-widget="ahvNumber">
+                                        {{ form.getWidget('ahvNumber').parse()|raw }}
+                                        <div data-ffield-explanation="ahvNumber">
+                                            <div class="alert alert-success" role="alert">
+                                                <i class="fa-solid fa-check-circle"></i>
+                                                <div>
+                                                    {{ 'FORM.evt_reg_ffield_expl_ahvNumber'|trans|raw }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                {% if form.hasFormField('foodHabits') %}
+                                    <div class="mt-0 mb-3" data-reg-widget="foodHabits">
+                                        {{ form.getWidget('foodHabits').parse()|raw }}
+                                    </div>
+                                {% endif %}
+
+                                {% if form.hasFormField('agb') %}
+                                    <div class="mt-0 mb-3" data-reg-widget="agb">
+                                        {{ form.getWidget('agb').parse()|raw }}
+                                    </div>
+                                {% endif %}
+
+                                {% if form.hasFormField('hasAcceptedPrivacyRules') %}
+                                    <div class="mt-0 mb-3" data-reg-widget="hasAcceptedPrivacyRules">
+                                        {{ form.getWidget('hasAcceptedPrivacyRules').parse()|raw }}
+                                    </div>
+                                {% endif %}
+
+                                <div class="widget widget-submit">
+                                    <div class="d-grid">
+                                        <button type="submit" id="ctrl_submit" class="submit btn btn-primary" name="submit">{{ 'FORM.evt_reg_submit'|trans }}</button>
                                     </div>
                                 </div>
                             </div>
-                        {% endif %}
-
-                        {% if form.hasFormField('emergencyPhone') %}
-                            <div class="mt-0 mb-4 p-3" data-reg-widget="emergencyPhone">
-                                {{ form.getWidget('emergencyPhone').parse()|raw }}
-                            </div>
-                        {% endif %}
-
-                        {% if form.hasFormField('emergencyPhoneName') %}
-                            <div class="mt-0 mb-4 p-3" data-reg-widget="emergencyPhoneName">
-                                {{ form.getWidget('emergencyPhoneName').parse()|raw }}
-                            </div>
-                        {% endif %}
-
-                        {% if form.hasFormField('notes') %}
-                            <div class="mt-0 mb-4 p-3" data-reg-widget="notes">
-                                {{ form.getWidget('notes').parse()|raw }}
-                                <div data-ffield-explanation="notes">
-                                    <div class="alert alert-success" role="alert">
-                                        <i class="fa-solid fa-check-circle"></i>
-                                        <div>
-                                            {{ 'FORM.evt_reg_ffield_expl_notes'|trans({}, 'contao_default')|raw }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-
-                        {% if form.hasFormField('ahvNumber') %}
-                            <div class="mt-0 mb-4 p-3" data-reg-widget="ahvNumber">
-                                {{ form.getWidget('ahvNumber').parse()|raw }}
-                                <div data-ffield-explanation="ahvNumber">
-                                    <div class="alert alert-success" role="alert">
-                                        <i class="fa-solid fa-check-circle"></i>
-                                        <div>
-                                            {{ 'FORM.evt_reg_ffield_expl_ahvNumber'|trans({}, 'contao_default')|raw }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-
-                        {% if form.hasFormField('foodHabits') %}
-                            <div class="mt-0 mb-4 p-3" data-reg-widget="foodHabits">
-                                {{ form.getWidget('foodHabits').parse()|raw }}
-                            </div>
-                        {% endif %}
-
-                        {% if form.hasFormField('agb') %}
-                            <div class="mt-0 mb-0 ps-3 pe-3" data-reg-widget="agb">
-                                {{ form.getWidget('agb').parse()|raw }}
-                            </div>
-                        {% endif %}
-
-                        {% if form.hasFormField('hasAcceptedPrivacyRules') %}
-                            <div class="mt-0 mb-4 ps-3 pe-3" data-reg-widget="hasAcceptedPrivacyRules">
-                                {{ form.getWidget('hasAcceptedPrivacyRules').parse()|raw }}
-                            </div>
-                        {% endif %}
-
-                        {% if form.hasFormField('submit') %}
-                            <div class="mt-0 mb-0" data-reg-widget="submit">
-                                {{ form.getWidget('submit').parse()|raw }}
-                            </div>
-                        {% endif %}
-                    </div>
-
+                        </div>
+                    </form>
                 </div>
-            </form>
+                <div class="col-0 col-lg-6 col-right">
+                    {# contains the background image for large screens #}
+                </div>
+            </div>
         </div>
         {# end form #}
+        {% add to head %}
+            <style>
+                #eventRegistrationForm {
+                    overflow: hidden;
+                }
+
+                #eventRegistrationForm .col-right {
+                    background-image: url('./bundles/markocupicsaceventtool/images/registration_form/registration_form_bg_1.jpg');
+                    background-size: cover;
+                    background-repeat: no-repeat;
+                    background-position: center top;
+                    filter: grayscale(0);
+                }
+
+                #eventRegistrationForm select, #eventRegistrationForm input, #eventRegistrationForm textarea {
+                    background-color: #f8f9fa !important;
+                }
+            </style>
+        {% endadd %}
 
         <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
             document.addEventListener('DOMContentLoaded', (event) => {

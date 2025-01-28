@@ -175,7 +175,7 @@ $GLOBALS['TL_LANG']['FORM']['evt_reg_notes'] = 'Anmerkungen / Erfahrungen / Refe
 $GLOBALS['TL_LANG']['FORM']['evt_reg_foodHabits'] = 'Essgewohnheiten (Vegetarier/in, Laktoseintoleranz, etc.)';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_agb'] = 'Ich akzeptiere <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">das Kurs- und Tourenreglement.</a>*';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_hasAcceptedPrivacyRules'] = 'Ich habe die <a href="#" data-bs-toggle="modal" data-bs-target="#hasAcceptedPrivacyRulesModal">Hinweise zum Datenschutz und zu meinen Persönlichkeitsrechten</a> zur Kenntnis genommen und bin damit einverstanden.*';
-$GLOBALS['TL_LANG']['FORM']['evt_reg_submit'] = 'Für Event anmelden';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_submit'] = 'Definitv für Event anmelden';
 
 // Send tour rapport notification module
 $GLOBALS['TL_LANG']['MSC']['evt_strn_successfullySendNotification'] = 'Tourrapport und Vergütungsformular erfolgreich versandt an: "%s" CC: "%s".';

@@ -18,12 +18,15 @@ use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\PageModel;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Types;
 
 #[AsHook('replaceInsertTags', priority: 100)]
 class ReplaceInsertTagsListener
 {
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
     ) {
     }
 
@@ -72,6 +75,41 @@ class ReplaceInsertTagsListener
                     $strLocation = sprintf('%s%s', $objPage->getFrontendUrl(), $params);
                     $controllerAdapter->redirect($strLocation);
                 }
+            }
+        }
+
+        // {{count_frontend_user}} -> 86
+        // {{count_frontend_user::10}} -> 80 floor value
+        if (str_starts_with($strTag, 'count_frontend_users')) {
+            $floor = (int) ($elements[1] ?? 1);
+            $count = $this->connection->fetchOne('SELECT COUNT(id) FROM tl_member WHERE isSacMember = ?', [true], [Types::BOOLEAN]);
+            return (string) (floor($count/$floor) * $floor);
+        }
+
+        // {{count_by_event_type::tour}} -> 764
+        // {{count_by_event_type::tour::100}} -> 700 floor value
+        if (str_starts_with($strTag, 'count_by_event_type')) {
+            $elements = explode('::', $strTag);
+
+            if (\is_array($elements) && \count($elements) > 1) {
+                $eventType = $elements[1];
+                $floor = (int) ($elements[2] ?? 1);
+
+                // Get the current year
+                $currentYear = (int) date("Y");
+                $nextYear = $currentYear + 1;
+
+                // Create a timestamp for January 1st of the current year
+                $tstampStart = mktime(0, 0, 0, 1, 1, $currentYear);
+                $tstampEnd = mktime(0, 0, 0, 1, 1, $nextYear);
+
+                $count =  $this->connection->fetchOne(
+                    'SELECT COUNT(id) FROM tl_calendar_events WHERE eventType = ? AND published = ? AND startDate >= ? AND startDate < ?',
+                    [$eventType, true, $tstampStart, $tstampEnd],
+                    [Types::STRING, Types::BOOLEAN, Types::INTEGER, Types::INTEGER],
+                );
+
+                return (string) (floor($count/$floor) * $floor);
             }
         }
 
