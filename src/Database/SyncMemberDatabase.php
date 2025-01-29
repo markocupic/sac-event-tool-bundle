@@ -459,11 +459,11 @@ class SyncMemberDatabase
 
         return array_map(
             static function ($value) {
-                if (empty($value) || is_numeric($value) || \is_array($value)) {
+                if (empty($value) || is_numeric($value) || \is_array($value) || !is_string($value)) {
                     return $value;
                 }
 
-                return mb_convert_encoding(trim($value), 'UTF-8', 'UTF-8');
+                return mb_convert_encoding(trim($value), 'UTF-8', 'ISO-8859-1');
             },
             $rowUser
         );
