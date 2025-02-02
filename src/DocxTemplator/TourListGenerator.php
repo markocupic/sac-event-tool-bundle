@@ -56,8 +56,18 @@ class TourListGenerator extends AbstractController
         if (\count($arrIds)) {
             $arrIdsChecked = $this->connection->fetchFirstColumn(
                 'SELECT id FROM tl_calendar_events WHERE (eventType = ? OR eventType = ? OR eventType = ?) AND id IN('.implode(',', $arrIds).') AND published = ?',
-                [EventType::GENERAL_EVENT, EventType::TOUR, EventType::LAST_MINUTE_TOUR, true],
-                [Types::STRING, Types::STRING, Types::STRING, Types::BOOLEAN],
+                [
+                    EventType::GENERAL_EVENT,
+                    EventType::TOUR,
+                    EventType::LAST_MINUTE_TOUR,
+                    true,
+                ],
+                [
+                    Types::STRING,
+                    Types::STRING,
+                    Types::STRING,
+                    Types::BOOLEAN,
+                ],
             );
 
             $arrIds = array_intersect($arrIds, $arrIdsChecked);
@@ -190,7 +200,8 @@ class TourListGenerator extends AbstractController
             $templateProcessor->setValue('more_details_#'.$index_outer, implode(',    ', $arrMoreDetails), 1);
 
             // tour guide
-            $strMainInstructor = implode(', ', CalendarEventsUtil::getInstructorNamesAsArray($event));
+            $strMainInstructor = implode(', ', CalendarEventsUtil::getInstructorNamesAsArray($event, ['includeHidden' => false]));
+            $strMainInstructor = \strlen($strMainInstructor) ? $strMainInstructor : '---';
             $templateProcessor->setValue('tour_guide_#'.$index_outer, $this->prepareString(' '.$strMainInstructor.' '), 1);
 
             // public transport event
