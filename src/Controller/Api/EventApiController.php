@@ -120,11 +120,12 @@ class EventApiController extends AbstractController
                     if (null === $oData) {
                         $oData = new \stdClass();
 
-                        foreach ($arrFields as $field) {
-                            $v = $calendarEventsUtil->getEventData($objEvent, $field);
-                            $aField = explode('||', $field);
-                            $field = $aField[0];
-                            $oData->{$field} = $this->prepareValue($v);
+                        foreach ($arrFields as $key) {
+                            $value = $calendarEventsUtil->getEventData($objEvent, $key);
+                            // $key may contain a query string: eventImage?size=5
+                            $parts = explode('?', $key, 2);
+                            $key = $parts[0];
+                            $oData->{$key} = $this->prepareValue($value);
                         }
                     }
 

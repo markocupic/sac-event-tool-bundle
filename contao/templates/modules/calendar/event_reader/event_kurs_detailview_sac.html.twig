@@ -152,8 +152,9 @@
                     <!-- indexer::continue -->
                     <h5>Kursleitung</h5>
                     <div class="row mt-3 g-2">
-                        {% if not get_event_data(model, 'instructorContactBoxes') is empty %}
-                            {{ get_event_data(model, 'instructorContactBoxes')|raw }}
+                        {% set contact_boxes = get_event_data(model, 'instructorContactBoxes?includeHidden=false') %}
+                        {% if contact_boxes %}
+                            {{ contact_boxes|raw }}
                         {% else %}
                             <p>Leiter/in wurde gelöscht.</p>
                         {% endif %}
@@ -189,8 +190,8 @@
                         <p>{{ get_event_data(model, 'bookingEvent')|nl2br }}</p>
                     {% endif %}
 
-                    {% if get_event_data(model, 'generateMainInstructorContactDataFromDb') %}
-                        <p class="m-0">{{ get_event_data(model, 'mainInstructorContactDataFromDb')|raw }}</p>
+                    {% if get_event_data(model, 'generateMainInstructorContactDataFromDb?includeHidden=false') %}
+                        <p class="m-0">{{ get_event_data(model, 'mainInstructorContactDataFromDb?includeHidden=false')|raw }}</p>
                     {% endif %}
 
                     {# button bar #}

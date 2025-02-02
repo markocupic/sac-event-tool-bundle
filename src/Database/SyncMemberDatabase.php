@@ -421,6 +421,17 @@ class SyncMemberDatabase
      */
     protected function parseLine(array $arrLine): array
     {
+        $arrLine = array_map(
+            static function ($value) {
+                if (empty($value) || is_numeric($value) || \is_array($value) || !\is_string($value)) {
+                    return $value;
+                }
+
+                return mb_convert_encoding(trim($value), 'UTF-8', 'ISO-8859-1');
+            },
+            $arrLine
+        );
+
         $defaultCountry = 'CH';
         $rowUser = [];
         $rowUser['sacMemberId'] = (int) $arrLine[0]; // int
@@ -443,7 +454,8 @@ class SyncMemberDatabase
         $rowUser['email'] = $arrLine[16]; // string
         $rowUser['gender'] = match ($arrLine[17]) {
             'Weiblich' => 'female',
-            'Männlich' => 'male',
+            'Männlich' => 'male', // Be sure the string has already been converted from ISO-8859-1 to UTF-8
+            'Andere' => 'other',
             default => 'other',
         };
         $rowUser['profession'] = $arrLine[18]; // string
@@ -457,16 +469,7 @@ class SyncMemberDatabase
         $rowUser['debit'] = $arrLine[28]; // string
         $rowUser['memberStatus'] = $arrLine[29]; // string
 
-        return array_map(
-            static function ($value) {
-                if (empty($value) || is_numeric($value) || \is_array($value) || !is_string($value)) {
-                    return $value;
-                }
-
-                return mb_convert_encoding(trim($value), 'UTF-8', 'ISO-8859-1');
-            },
-            $rowUser
-        );
+        return $rowUser;
     }
 
     protected function insertOrUpdateTempMember(array $arrData): void

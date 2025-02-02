@@ -323,7 +323,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $arrData['courseTypeLevel1'] = null !== $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1) ? $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1)->name : '';
                     $arrData['date'] = $this->getEventPeriod($objEvent->current(), $dateFormat);
                     $arrData['month'] = $dateAdapter->parse('F', $objEvent->startDate);
-                    $arrData['instructors'] = implode(', ', $calendarEventsUtilAdapter->getInstructorNamesAsArray($objEvent->current(), false, true));
+                    $arrData['instructors'] = implode(', ', $calendarEventsUtilAdapter->getInstructorNamesAsArray($objEvent->current()));
                     $arrData['tourType'] = implode(', ', $arrTourType);
                     $arrData['difficulty'] = implode(', ', $calendarEventsUtilAdapter->getTourTechDifficultiesAsArray($objEvent->current()));
                     // Layout settings

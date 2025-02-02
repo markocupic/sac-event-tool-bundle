@@ -24,6 +24,7 @@ use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\ContentModel;
 use Contao\Controller;
+use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\CoreBundle\Util\SymlinkUtil;
 use Contao\Database;
 use Contao\Date;
@@ -56,6 +57,7 @@ use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Markocupic\SacEventToolBundle\Model\TourTypeModel;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CalendarEventsUtil
 {
@@ -71,10 +73,22 @@ class CalendarEventsUtil
         Controller::loadLanguageFile('default');
         $value = '';
 
-        // Add arguments separated by two pipes -> eventImage||5
-        $arrArgs = explode('||', $strProperty);
+        // Add arguments with a query string eventImage?size=5
+        $parts = explode('?', $strProperty, 2);
+        $key = $parts[0];
+        parse_str(html_entity_decode($parts[1] ?? ''), $options);
+        $options = array_map(
+            static function ($v) {
+                return match ($v) {
+                    'true' => true,
+                    'false' => false,
+                    default => $v,
+                };
+            },
+            $options
+        );
 
-        switch ($arrArgs[0]) {
+        switch ($key) {
             case 'model':
                 $value = $objEvent;
                 break;
@@ -232,7 +246,7 @@ class CalendarEventsUtil
                 break;
 
             case 'instructors':
-                $value = implode(', ', static::getInstructorNamesAsArray($objEvent));
+                $value = implode(', ', static::getInstructorNamesAsArray($objEvent, $options));
                 break;
 
             case 'journey':
@@ -240,7 +254,7 @@ class CalendarEventsUtil
                 break;
 
             case 'instructorsWithQualification':
-                $value = implode(', ', static::getInstructorNamesAsArray($objEvent, true));
+                $value = implode(', ', static::getInstructorNamesAsArray($objEvent, $options));
                 break;
 
             case 'courseTypeLevel1':
@@ -252,8 +266,8 @@ class CalendarEventsUtil
                 break;
 
             case 'eventImage':
-                if (isset($arrArgs[1])) {
-                    $pictureSize = $arrArgs[1];
+                if (!empty($options['size'])) {
+                    $pictureSize = $options['size'];
                     $src = static::getEventImagePath($objEvent);
                     $parser = System::getContainer()->get('contao.insert_tag.parser');
                     $value = $parser->replace(sprintf('{{picture::%s?size=%s}}', $src, $pictureSize));
@@ -272,17 +286,16 @@ class CalendarEventsUtil
                 $value = CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name;
                 break;
 
-            // inside vue.js templates: eventOrganizerLogos||60
+            // inside vue.js templates: eventOrganizerLogos?width=60
             // The first parameter defines the logo width
             case 'eventOrganizerLogos':
-                $intDefaultWidth = 60;
-                $width = $arrArgs[1] ?? $intDefaultWidth;
+                $width = !empty($options['width']) ? $options['width'] : '60';
                 $strInsertTag = '{{image::%s?width='.$width.'&alt=%s}}';
                 $value = static::getEventOrganizersLogoAsHtml($objEvent, $strInsertTag);
                 break;
 
             case 'eventOrganizerLogoPaths':
-                $allowDuplicate = isset($arrArgs[1]) && \in_array($arrArgs[1], [true, 'true', 1, '1'], true);
+                $allowDuplicate = !empty($options['allowDuplicate']) && 'true' === $options['allowDuplicate'];
                 $value = static::getEventOrganizerLogoPaths($objEvent, $allowDuplicate);
                 break;
 
@@ -291,11 +304,11 @@ class CalendarEventsUtil
                 break;
 
             case 'mainInstructorContactDataFromDb':
-                $value = static::generateMainInstructorContactDataFromDb($objEvent);
+                $value = static::generateMainInstructorContactDataFromDb($objEvent, $options);
                 break;
 
             case 'instructorContactBoxes':
-                $value = static::generateInstructorContactBoxes($objEvent);
+                $value = static::generateInstructorContactBoxes($objEvent, $options);
                 break;
 
             case 'arrTourProfile':
@@ -348,10 +361,10 @@ class CalendarEventsUtil
             default:
                 $arrEvent = $objEvent->row();
 
-                if (null !== $objTemplate && isset($objTemplate->{$arrArgs[0]})) {
-                    $value = $objTemplate->{$arrArgs[0]};
-                } elseif (isset($arrEvent[$arrArgs[0]])) {
-                    $value = $arrEvent[$arrArgs[0]];
+                if (null !== $objTemplate && isset($objTemplate->{$key})) {
+                    $value = $objTemplate->{$key};
+                } elseif (isset($arrEvent[$key])) {
+                    $value = $arrEvent[$key];
                 } else {
                     $value = '';
                 }
@@ -383,73 +396,75 @@ class CalendarEventsUtil
     }
 
     /**
-     * @throws \Exception
+     * @param array{includeDisabled?: bool, includeHidden?: bool} $options
      */
-    public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent): string
+    public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent, array $options): string
     {
-        $strHtml = '';
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            'includeDisabled' => false,
+            'includeHidden' => true,
+        ]);
+        $resolver->setAllowedValues('includeDisabled', [true, false]);
+        $resolver->setAllowedValues('includeHidden', [true, false]);
+        $options = $resolver->resolve($options);
+
         $objCalendar = $objEvent->getRelated('pid');
+
+        /** @var InsertTagParser $parser */
+        $insertTagParser = System::getContainer()->get('contao.insert_tag.parser');
+
+        /** @var Security $security */
+        $security = System::getContainer()->get('security.helper');
+
+        /** @var Avatar $avatarManager */
+        $avatarManager = System::getContainer()->get(Avatar::class);
+
         $userPortraitJumpTo = $objCalendar->userPortraitJumpTo;
 
-        $arrInstructors = static::getInstructorsAsArray($objEvent);
+        $arrInstructors = static::getInstructorsAsArray($objEvent, $options);
+        $arrItems = [];
 
         foreach ($arrInstructors as $userId) {
-            $strHtml .= '<div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4"><div class="">';
-
             $objUser = UserModel::findByPk($userId);
-            $avatarManager = System::getContainer()->get(Avatar::class);
 
             if (null !== $objUser) {
-                $parser = System::getContainer()->get('contao.insert_tag.parser');
-
-                // Use a figure and add the title tag, this way Contao will automatically generate the necessary JsonLD tags.
-                $figureTag = '{{figure::'.$avatarManager->getAvatarResourcePath($objUser).'?size=18&metadata[title]='.StringUtil::specialchars($objUser->name).'&enableLightbox=0&options[attr][class]=avatar-large&template=image}}';
-
-                $strHtml .= '<div class="image_container portrait">';
-                $strHtml .= sprintf('<a href="%s?username=%s" data-title="Leiter Portrait ansehen">', $parser->replace('{{link_url::'.$userPortraitJumpTo.'}}'), UserModel::findByPk($userId)->username);
-                $strHtml .= $parser->replace($figureTag);
-                $strHtml .= '</a></div>';
-                // End image
-
-                // Start instructor name
-                $strHtml .= '<div class="instructor-name">';
-                $strQuali = '';
-
-                if ('' !== static::getMainQualification($objUser)) {
-                    $strQuali .= ' ('.static::getMainQualification($objUser).')';
+                if ($objUser->hideUser) {
+                    continue;
                 }
 
-                if (!$objUser->hideInFrontendListings) {
-                    $parser = System::getContainer()->get('contao.insert_tag.parser');
-                    $strHtml .= sprintf('<a href="%s?username=%s" data-title="Leiter Portrait ansehen">', $parser->replace('{{link_url::'.$userPortraitJumpTo.'}}'), $objUser->username);
+                $arrInstructor = $objUser->row();
+
+                if ($objCalendar->userPortraitJumpTo) {
+                    $arrInstructor['href'] = $insertTagParser->replaceInline('{{link_url::'.$userPortraitJumpTo.'}}').'?username='.$objUser->username;
+                    $arrInstructor['has_link'] = true;
+                } else {
+                    $arrInstructor['href'] = '';
                 }
 
-                $strHtml .= sprintf('%s %s%s', $objUser->lastname, $objUser->firstname, $strQuali);
+                $arrInstructor['avatar_path'] = $avatarManager->getAvatarResourcePath($objUser);
+                $arrInstructor['main_qualification'] = !empty(static::getMainQualification($objUser)) ? static::getMainQualification($objUser) : '';
+                $arrInstructor['contact_options'] = [];
 
-                if (!$objUser->hideInFrontendListings) {
-                    $strHtml .= '</a>';
-                }
-
-                $frontendUser = System::getContainer()->get('security.helper');
-
-                if ($frontendUser instanceof FrontendUser && !$objUser->hideInFrontendListings) {
+                if ($security->getUser() instanceof FrontendUser) {
                     $arrContact = ['phone', 'mobile', 'phoneBusiness', 'email'];
 
                     foreach ($arrContact as $field) {
-                        if ('' !== $objUser->{$field}) {
-                            $strHtml .= sprintf('<div class="ce_user_portrait_%s">', $field);
-                            $strHtml .= sprintf('<small data-title="%s">%s</small>', $objUser->{$field}, $objUser->{$field});
-                            $strHtml .= '</div>';
+                        if ('' === $objUser->{$field}) {
+                            continue;
                         }
+
+                        $arrInstructor['contact_options'][$field] = $objUser->{$field};
                     }
                 }
-                $strHtml .= '</div>';
-                // End instructor name
+
+                $arrItems[] = $arrInstructor;
             }
-            $strHtml .= '</div></div>';
         }
 
-        return $strHtml;
+        $twig = System::getContainer()->get('twig');
+
+        return $twig->render('@MarkocupicSacEventTool/Calendar/instructor_contact_boxes.html.twig', ['instructors' => $arrItems]);
     }
 
     /**
@@ -568,9 +583,21 @@ class CalendarEventsUtil
         return $strName;
     }
 
-    public static function generateMainInstructorContactDataFromDb(CalendarEventsModel $objEvent): string
+    /**
+     * @param array{includeDisabled?: bool, includeHidden?: bool} $options
+     */
+    public static function generateMainInstructorContactDataFromDb(CalendarEventsModel $objEvent, array $options = []): string
     {
-        $arrInstructors = static::getInstructorsAsArray($objEvent);
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            'includeDisabled' => false,
+            'includeHidden' => true,
+        ]);
+        $resolver->setAllowedValues('includeDisabled', [true, false]);
+        $resolver->setAllowedValues('includeHidden', [true, false]);
+        $options = $resolver->resolve($options);
+
+        $arrInstructors = static::getInstructorsAsArray($objEvent, $options);
         $objUser = UserModel::findByPk($arrInstructors[0]);
 
         if (null !== $objUser) {
@@ -587,8 +614,20 @@ class CalendarEventsUtil
         return '';
     }
 
-    public static function getInstructorsAsArray(CalendarEventsModel $objEvent, bool $blnShowPublishedOnly = true): array
+    /**
+     * @param array{includeDisabled?: bool, includeHidden?: bool} $options
+     */
+    public static function getInstructorsAsArray(CalendarEventsModel $objEvent, array $options = []): array
     {
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            'includeDisabled' => false,
+            'includeHidden' => true,
+        ]);
+        $resolver->setAllowedValues('includeDisabled', [true, false]);
+        $resolver->setAllowedValues('includeHidden', [true, false]);
+        $options = $resolver->resolve($options);
+
         $arrInstructors = [];
 
         // Get all instructors from an event, list mainInstructor first
@@ -601,15 +640,19 @@ class CalendarEventsUtil
             $objUser = UserModel::findByPk($objInstructor->userId);
 
             if (null !== $objUser) {
-                if (true === $blnShowPublishedOnly && $objUser->disable) {
+                if (false === $options['includeDisabled'] && $objUser->disable) {
                     continue;
                 }
 
-                if (true === $blnShowPublishedOnly && ('' !== $objUser->stop && $objUser->stop < time())) {
+                if (false === $options['includeDisabled'] && ('' !== $objUser->stop && $objUser->stop < time())) {
                     continue;
                 }
 
-                if (true === $blnShowPublishedOnly && ('' !== $objUser->start && $objUser->start > time())) {
+                if (false === $options['includeDisabled'] && ('' !== $objUser->start && $objUser->start > time())) {
+                    continue;
+                }
+
+                if (false === $options['includeHidden'] && $objUser->hideUser) {
                     continue;
                 }
 
@@ -620,23 +663,39 @@ class CalendarEventsUtil
         return $arrInstructors;
     }
 
-    public static function getInstructorNamesAsArray(CalendarEventsModel $objEvent, bool $blnAddMainQualification = false, bool $blnShowPublishedOnly = true): array
+    /**
+     * @param array{includeDisabled?: bool, includeHidden?: bool, addMainQualification?: bool} $options
+     */
+    public static function getInstructorNamesAsArray(CalendarEventsModel $objEvent, array $options = []): array
     {
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            'includeDisabled' => false,
+            'includeHidden' => true,
+            'addMainQualification' => false,
+        ]);
+        $resolver->setAllowedValues('includeDisabled', [true, false]);
+        $resolver->setAllowedValues('includeHidden', [true, false]);
+        $resolver->setAllowedValues('addMainQualification', [true, false]);
+        $options = $resolver->resolve($options);
+
         $arrInstructors = [];
 
-        $arrUsers = static::getInstructorsAsArray($objEvent, $blnShowPublishedOnly);
+        $arrUsers = static::getInstructorsAsArray(
+            $objEvent,
+            [
+                'includeDisabled' => $options['includeDisabled'],
+                'includeHidden' => $options['includeHidden'],
+            ],
+        );
 
         foreach ($arrUsers as $userId) {
             $objUser = UserModel::findByPk($userId);
 
             if (null !== $objUser) {
-                if (true === $blnShowPublishedOnly && $objUser->disable) {
-                    continue;
-                }
-
                 $strName = trim($objUser->lastname.' '.$objUser->firstname);
 
-                if ($blnAddMainQualification && '' !== static::getMainQualification($objUser)) {
+                if (true === $options['addMainQualification'] && '' !== static::getMainQualification($objUser)) {
                     $arrInstructors[] = $strName.' ('.static::getMainQualification($objUser).')';
                 } else {
                     $arrInstructors[] = $strName;

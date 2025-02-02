@@ -70,8 +70,8 @@ class UserPortraitListController extends AbstractContentElementController
             $queryType = $model->userList_queryType;
 
             if (\count($arrSelectedRoles) > 0) {
-                $stmt = $this->connection->executeQuery(
-                    'SELECT * FROM tl_user WHERE disable = 0 AND (stop = "" OR stop > ?) AND hideInFrontendListings = 0 ORDER BY lastname, firstname',
+                $arrUsers = $this->connection->fetchAllAssociative(
+                    'SELECT * FROM tl_user WHERE disable = 0 AND (stop = "" OR stop > ?) AND hideUser = 0 ORDER BY lastname, firstname',
                     [
                         time(),
                     ],
@@ -81,7 +81,7 @@ class UserPortraitListController extends AbstractContentElementController
                 );
 
                 if ('OR' === $queryType) {
-                    while (false !== ($arrUser = $stmt->fetchAssociative())) {
+                    foreach ($arrUsers as $arrUser) {
                         $arrUserRole = $stringUtilAdapter->deserialize($arrUser['userRole'], true);
 
                         if (\count(array_intersect($arrUserRole, $arrSelectedRoles)) > 0) {
@@ -89,7 +89,7 @@ class UserPortraitListController extends AbstractContentElementController
                         }
                     }
                 } elseif ('AND' === $queryType) {
-                    while (false !== ($arrUser = $stmt->fetchAssociative())) {
+                    foreach ($arrUsers as $arrUser) {
                         $arrUserRole = $stringUtilAdapter->deserialize($arrUser['userRole'], true);
 
                         if (\count(array_intersect($arrUserRole, $arrSelectedRoles)) === \count($arrSelectedRoles)) {

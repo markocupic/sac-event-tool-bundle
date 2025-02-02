@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\Controller\ContentElement;
 use Contao\ContentModel;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
+use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\PageModel;
@@ -55,6 +56,10 @@ class UserPortraitController extends AbstractContentElementController
         // Do not display the profile of a disabled or deleted user.
         if (null === $user || $user->disable || ('' !== $user->start && $user->start > time()) || ('' !== $user->stop && $user->stop < time()) || ('' !== $user->start && $user->start > time())) {
             return new Response('', Response::HTTP_NO_CONTENT);
+        }
+
+        if ($user->hideUser) {
+            throw new PageNotFoundException();
         }
 
         $arrUser = $user->row();

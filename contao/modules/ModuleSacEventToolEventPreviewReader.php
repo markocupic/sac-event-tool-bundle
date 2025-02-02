@@ -87,7 +87,7 @@ class ModuleSacEventToolEventPreviewReader extends Events
         if (null === $objEvent) {
             return new Response('No valid event id/alias could be found in the url parameters.', Response::HTTP_BAD_REQUEST);
         }
-        
+
         if (!$this->getUriSigner()->check($this->getUrlParser()->removeQueryString(['file']))) {
             throw new AccessDeniedException('Denied access to this resource.');
         }

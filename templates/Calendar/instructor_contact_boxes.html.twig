@@ -1,0 +1,19 @@
+{% for instructor in instructors %}
+    <div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4">
+        <div class="image_container portrait">
+            {% set figure = insert_tag('figure::'~instructor.avatar_path~'?size=18&metadata[title]='~instructor.name~'&enableLightbox=0&options[attr][class]=avatar-large&template=image') %}
+            <a href="{{ instructor.href }}" data-title="Leiter Portrait ansehen">
+                {{ figure|raw }}
+            </a>
+        </div>
+        <div class="instructor-name">
+            <a href="{{ instructor.href }}" data-title="Leiter Portrait ansehen">{{ instructor.lastname }} {{ instructor.firstname }}{% if instructor.main_qualification %}, {{ instructor.main_qualification }}{% endif %}</a>
+        </div>
+        {% for key,value in instructor.contact_options %}
+            <div class="ce_user_portrait_{{ key }}">
+                <small data-title="{{ value }}">{{ value }}</small>
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
+

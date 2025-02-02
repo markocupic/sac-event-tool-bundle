@@ -149,6 +149,7 @@ class Event
 
         $countFemale = 0;
         $countMale = 0;
+        $countDivers = 0;
 
         // Count participants
         // Member list
@@ -158,18 +159,20 @@ class Event
             while ($objEventMember->next()) {
                 if ('female' === $objEventMember->gender) {
                     ++$countFemale;
-                } else {
+                } elseif ('male' === $objEventMember->gender) {
                     ++$countMale;
+                } else {
+                    ++$countDivers;
                 }
             }
             // Reset Contao model collection
             $objEventMember->reset();
         }
 
-        $countParticipants = $countFemale + $countMale;
+        $countParticipants = $countFemale + $countMale + $countDivers;
 
         // Count instructors
-        $arrInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent, false);
+        $arrInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent, ['includeDisabled' => true]);
         $countInstructors = \count($arrInstructors);
         $objUser = $userModel->findMultipleByIds($arrInstructors);
 
@@ -177,8 +180,10 @@ class Event
             while ($objUser->next()) {
                 if ('female' === $objUser->gender) {
                     ++$countFemale;
-                } else {
+                } elseif ('male' === $objUser->gender) {
                     ++$countMale;
+                } else {
+                    ++$countDivers;
                 }
             }
         }
@@ -208,6 +213,7 @@ class Event
         $objPhpWord->replace('countParticipants', $this->prepareString($countParticipants + $countInstructors));
         $objPhpWord->replace('countMale', $this->prepareString($countMale));
         $objPhpWord->replace('countFemale', $this->prepareString($countFemale));
+        $objPhpWord->replace('countDivers', $this->prepareString($countDivers));
 
         $objPhpWord->replace('weatherConditions', $this->prepareString($objEvent->tourWeatherConditions));
         $objPhpWord->replace('avalancheConditions', $this->prepareString($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->tourAvalancheConditions][0]));

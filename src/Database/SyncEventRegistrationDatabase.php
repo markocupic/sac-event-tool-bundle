@@ -146,9 +146,9 @@ class SyncEventRegistrationDatabase extends AbstractController
                         'postal' => $arrContaoMember['postal'],
                         'city' => $arrContaoMember['city'],
                         'dateOfBirth' => $arrContaoMember['dateOfBirth'],
-						'phone' => $arrContaoMember['phone'],
-						'phoneBusiness' => $arrContaoMember['phoneBusiness'],
-					];
+                        'phone' => $arrContaoMember['phone'],
+                        'phoneBusiness' => $arrContaoMember['phoneBusiness'],
+                    ];
 
                     // Do not override these contact data fields with empty values
                     $arrContact = ['email', 'mobile'];
@@ -186,11 +186,6 @@ class SyncEventRegistrationDatabase extends AbstractController
             $this->connection->commit();
         } catch (\Exception $e) {
             $this->connection->rollBack();
-            $this->errors[] = [
-                'event_registration_id' => $arrReg['id'],
-                'member_id' => $arrContaoMember['id'],
-                'error_message' => $e->getMessage(),
-            ];
             $this->syncLog['with_error'] = true;
             $this->syncLog['exceptions'][] = $e->getMessage();
             $this->contaoErrorLogger->error(sprintf('There has been an error while trying to update contact data of event registration ID %d. Error: %s', $arrReg['id'], $e->getMessage()));

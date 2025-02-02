@@ -48,7 +48,7 @@ class EventMember
         $i = 0;
 
         // TL
-        $arrInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent, false);
+        $arrInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent, ['includeDisabled' => true]);
 
         if (!empty($arrInstructors) && \is_array($arrInstructors)) {
             foreach ($arrInstructors as $userId) {
@@ -180,7 +180,7 @@ class EventMember
         }
 
         // Event instructors
-        $aInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent, false);
+        $aInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent, ['includeDisabled' => true]);
 
         $arrInstructors = array_map(
             function ($id) {

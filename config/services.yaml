@@ -9,6 +9,7 @@ services:
             $sacevtSectionName: '%sacevt.section_name%'
             $sacevtAvatarFemale: '%sacevt.avatar.female%'
             $sacevtAvatarMale: '%sacevt.avatar.male%'
+            $sacevtAvatarOther: '%sacevt.avatar.other%'
             $sacevtEventAdminEmail: '%sacevt.event_admin_email%'
             $sacevtEventAdminName: '%sacevt.event_admin_name%'
             $sacevtEventCourseLevels: '%sacevt.event.course.levels%'

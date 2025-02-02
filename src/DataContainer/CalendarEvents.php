@@ -326,7 +326,7 @@ class CalendarEvents
                                 $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
                                 break;
                             case 'instructor':
-                                $arrInstructors = $this->calendarEventsUtil->getInstructorNamesAsArray($objEvent->current(), false, true);
+                                $arrInstructors = $this->calendarEventsUtil->getInstructorNamesAsArray($objEvent->current());
                                 $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
                                 break;
                             case 'tourType':

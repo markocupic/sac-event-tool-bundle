@@ -190,8 +190,8 @@ class TourListGenerator extends AbstractController
             $templateProcessor->setValue('more_details_#'.$index_outer, implode(',    ', $arrMoreDetails), 1);
 
             // tour guide
-            $strMainInnstructor = implode(', ', CalendarEventsUtil::getInstructorNamesAsArray($event, false, true));
-            $templateProcessor->setValue('tour_guide_#'.$index_outer, $this->prepareString(' '.$strMainInnstructor.' '), 1);
+            $strMainInstructor = implode(', ', CalendarEventsUtil::getInstructorNamesAsArray($event));
+            $templateProcessor->setValue('tour_guide_#'.$index_outer, $this->prepareString(' '.$strMainInstructor.' '), 1);
 
             // public transport event
             $isPublicTransport = CalendarEventsUtil::isPublicTransportEvent($event);
