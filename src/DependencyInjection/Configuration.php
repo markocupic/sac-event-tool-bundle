@@ -56,6 +56,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('female')->defaultValue('vendor/markocupic/sac-event-tool-bundle/public/images/avatars/avatar-default-female.png')->end()
                         ->scalarNode('male')->defaultValue('vendor/markocupic/sac-event-tool-bundle/public/images/avatars/avatar-default-male.png')->end()
+                        ->scalarNode('other')->defaultValue('vendor/markocupic/sac-event-tool-bundle/public/images/avatars/avatar-default-other.png')->end()
                     ->end()
                 ->end()
                 // Backend and frontend users

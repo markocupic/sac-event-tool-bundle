@@ -30,6 +30,7 @@ class Avatar
         private readonly string $projectDir,
         private readonly string $sacevtAvatarFemale,
         private readonly string $sacevtAvatarMale,
+        private readonly string $sacevtAvatarOther,
     ) {
         $this->filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
     }
@@ -53,6 +54,10 @@ class Avatar
             return $blnAbsolute ? Path::makeAbsolute($this->sacevtAvatarFemale, $this->projectDir) : $this->sacevtAvatarFemale;
         }
 
-        return $blnAbsolute ? Path::makeAbsolute($this->sacevtAvatarMale, $this->projectDir) : $this->sacevtAvatarMale;
+        if (!empty($userModel) && 'male' === $userModel->gender) {
+            return $blnAbsolute ? Path::makeAbsolute($this->sacevtAvatarMale, $this->projectDir) : $this->sacevtAvatarMale;
+        }
+
+        return $blnAbsolute ? Path::makeAbsolute($this->sacevtAvatarOther, $this->projectDir) : $this->sacevtAvatarOther;
     }
 }
