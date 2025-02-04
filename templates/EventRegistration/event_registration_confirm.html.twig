@@ -33,6 +33,18 @@
         <td>{{ event_member_model.postal }} {{ event_member_model.city }}</td>
     </tr>
     <tr>
+        <td class="fw-bold">E-Mail-Adresse</td>
+        <td>{{ event_member_model.email }}</td>
+    </tr>
+    <tr>
+        <td class="fw-bold">Telefonnummer Festnetz</td>
+        <td>{{ event_member_model.phone }}</td>
+    </tr>
+    <tr>
+        <td class="fw-bold">Telefonnummer Mobile</td>
+        <td>{{ event_member_model.mobile }}</td>
+    </tr>
+    <tr>
         <td class="fw-bold">Registriert am</td>
         <td>{{ event_member_model.dateAdded|date("d.m.Y H:m") }}</td>
     </tr>
