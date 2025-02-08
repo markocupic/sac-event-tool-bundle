@@ -31,14 +31,15 @@ use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\SendTourRapportNotificationController;
+use Markocupic\SacEventToolBundle\DocxTemplator\DocumentType;
+use Markocupic\SacEventToolBundle\DocxTemplator\Exception\TourRapportGeneratorException;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
+use Markocupic\SacEventToolBundle\DocxTemplator\OutputType;
 use Markocupic\SacEventToolBundle\DocxTemplator\TourRapportGenerator;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
-use PhpOffice\PhpWord\Exception\CopyFileException;
-use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -70,16 +71,12 @@ readonly class CalendarEventsInstructorInvoice
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 90)]
     public function checkPermissions(DataContainer $dc): void
     {
-        $user = $this->security->getUser();
-
         $request = $this->requestStack->getCurrentRequest();
 
         $action = $request->query->get('action', '');
 
         $arrOperations = [
-            //'generateInvoiceDocx',
             'generateInvoicePdf',
-            //'generateTourRapportDocx',
             'generateTourRapportPdf',
             'sendRapport',
         ];
@@ -133,10 +130,6 @@ readonly class CalendarEventsInstructorInvoice
         }
     }
 
-    /**
-     * @throws CopyFileException
-     * @throws CreateTemporaryFileException
-     */
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 80)]
     public function routeActions(): void
     {
@@ -150,27 +143,23 @@ readonly class CalendarEventsInstructorInvoice
             $action = $request->query->get('action');
 
             if ($action) {
-                /** @var TourRapportGenerator $objTemplator */
-                $objTemplator = $this->tourRapportGenerator;
+                try {
+                    if ('generateInvoicePdf' === $request->query->get('action')) {
+                        throw new ResponseException($this->tourRapportGenerator->download(DocumentType::INVOICE, $objEventInvoice, OutputType::PDF, $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern));
+                    }
 
-                /** @todo We will remove this action in the longer term */
-                if ('generateInvoiceDocx' === $request->query->get('action')) {
-                    throw new \RuntimeException('Action no more allowed!');
-                    //throw new ResponseException($objTemplator->download('invoice', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern));
-                }
+                    if ('generateTourRapportPdf' === $request->query->get('action')) {
+                        throw new ResponseException($this->tourRapportGenerator->download(DocumentType::RAPPORT, $objEventInvoice, OutputType::PDF, $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern));
+                    }
+                } catch (ResponseException|TourRapportGeneratorException|\Exception $e) {
+                    $errMsg = match (true) {
+                        $e instanceof ResponseException => throw $e,
+                        $e instanceof TourRapportGeneratorException => $e->getTranslatableText(),
+                        default => throw $e,
+                    };
 
-                if ('generateInvoicePdf' === $request->query->get('action')) {
-                    throw new ResponseException($objTemplator->download('invoice', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern));
-                }
-
-                /** @todo We will remove this action in the longer term */
-                if ('generateTourRapportDocx' === $request->query->get('action')) {
-                    throw new \RuntimeException('Action no more allowed!');
-                    //throw new ResponseException($objTemplator->download('rapport', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern));
-                }
-
-                if ('generateTourRapportPdf' === $request->query->get('action')) {
-                    throw new ResponseException($objTemplator->download('rapport', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern));
+                    Message::addError($errMsg);
+                    Controller::redirect(System::getReferer());
                 }
             }
         }
@@ -187,7 +176,7 @@ readonly class CalendarEventsInstructorInvoice
 
             if (null !== $objEvent) {
                 if (!$objEvent->filledInEventReportForm) {
-                    Message::addError('Bevor ein Vergütungsformular erstellt werden kann, muss der Rapport vollständig ausgefüllt worden sein.', 'BE');
+                    Message::addError($this->translator->trans('ERR.evt_strn_eventRapportMustFilledOutCorrectly', [], 'contao_default'));
                     Controller::redirect(System::getReferer());
                 }
             }
@@ -209,7 +198,7 @@ readonly class CalendarEventsInstructorInvoice
 
             if (null !== $objEvent) {
                 if (!$objEvent->filledInEventReportForm) {
-                    Message::addError('Bevor der Tourrapport und das Vergütungsformular versandt werden können, sollte der Tourrapport vollständig ausgefüllt worden sein.', 'BE');
+                    Message::addError($this->translator->trans('ERR.evt_strn_eventRapportMustFilledOutCorrectly', [], 'contao_default'));
                     Controller::redirect(System::getReferer());
                 }
             }
@@ -243,10 +232,8 @@ readonly class CalendarEventsInstructorInvoice
 
         $user = $this->security->getUser();
 
-        // A common user should not be allowed to edit or delete another user's report
-        if ($this->security->isGranted('ROLE_ADMIN')) {
-            $blnAllow = true;
-        } elseif ((int) $row['userPid'] !== (int) $user->id) {
+        // A common user should not be allowed to edit or delete another user's rapport
+        if (!$this->security->isGranted('ROLE_ADMIN') && (int) $row['userPid'] !== (int) $user->id) {
             $blnAllow = false;
         }
 
@@ -323,6 +310,7 @@ readonly class CalendarEventsInstructorInvoice
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'fields.iban.load')]
     public function getIbanFromUser(mixed $value, DataContainer $dc): mixed
     {
+        // Override value from database
         $value = '';
 
         if (null !== ($objInvoice = CalendarEventsInstructorInvoiceModel::findByPk($dc->id))) {
@@ -333,15 +321,9 @@ readonly class CalendarEventsInstructorInvoice
 
                 if (!empty($value)) {
                     $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice']['fields']['iban']['eval']['readonly'] = true;
-
-                    Message::addInfo(
-                        sprintf(
-                            'Die IBAN Nummer für "%s" wurde aus der Benutzerdatenbank übernommen. Falls die IBAN nicht stimmt, muss diese zuerst unter "Profil" berichtigt werden!',
-                            $objUser->name
-                        )
-                    );
+                    Message::addInfo($this->translator->trans('MSC.evt_strn_ibanWasTakenFromUserDb', [$objUser->name], 'contao_default'));
                 } else {
-                    Message::addInfo('Leider wurde für deinen Namen keine IBAN gefunden. Bitte hinterlege deine IBAN in deinem Profil, damit diese in Zukunft automatisch beim Erstellen einer Abrechnung im Feld "IBAN" eingefügt werden kann.');
+                    Message::addInfo($this->translator->trans('ERR.evt_strn_ibanNotFound', [], 'contao_default'));
                 }
             }
         }
@@ -381,7 +363,7 @@ readonly class CalendarEventsInstructorInvoice
 
         $countParticipantsTotal = $countParticipants + $countInstructors;
 
-        if ($countParticipantsTotal < (int) $value) {
+        if ($countParticipantsTotal < $value) {
             throw new \Exception($this->translator->trans('ERR.invalidNumberOfPrivateArrivals', [$value, $countParticipantsTotal], 'contao_default'));
         }
 

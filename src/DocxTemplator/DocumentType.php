@@ -12,8 +12,10 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\DocxTemplator\Exception;
+namespace Markocupic\SacEventToolBundle\DocxTemplator;
 
-class EventHasNoMemberException extends \Exception
+enum DocumentType: string
 {
+    case RAPPORT = 'rapport';
+    case INVOICE = 'invoice';
 }

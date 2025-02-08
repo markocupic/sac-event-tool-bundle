@@ -190,8 +190,13 @@ $GLOBALS['TL_LANG']['ERR']['evt_strn_sendNotificationFailed'] = 'Die E-Mail konn
 $GLOBALS['TL_LANG']['ERR']['evt_strn_cloudconvConversionCreditUsedUp'] = 'Die E-Mail konnte nicht versandt werden, weil bei der DOCX zu PDF Konvertierung von "%s" ein Fehler aufgetreten ist. Die Anzahl der täglich erlaubten Konvertierungen wurde überschritten.';
 $GLOBALS['TL_LANG']['ERR']['evt_strn_cloudconvUnexpectedError'] = 'Die E-Mail konnte nicht versandt werden, weil bei der DOCX zu PDF Konvertierung von "%s" ein unerwarteter Fehler aufgetreten ist. Probieren Sie den selben Vorgang noch einmal durchzuführen. Kontaktieren Sie bitte den Administrator dieser Webseite, sollte der Fehler erneut auftreten.';
 $GLOBALS['TL_LANG']['ERR']['evt_strn_eventHasNoMember'] = 'Bitte überprüfe die Teilnehmerliste. Es wurden keine Teilnehmer gefunden, die am Event teilgenommen haben. Falls du den Event abgesagt hast, musst du dies unter Event Status beim Event selber vermerken.';
+$GLOBALS['TL_LANG']['ERR']['evt_strn_user_not_found'] = 'Der Begünstigte mit der User-ID %d konnte nicht gefunden werden.';
+$GLOBALS['TL_LANG']['ERR']['evt_strn_event_not_found'] = 'Der Event mit ID %d konnten nicht gefunden werden.';
+$GLOBALS['TL_LANG']['ERR']['evt_strn_eventRapportMustFilledOutCorrectly'] = 'Bevor ein Vergütungsformular erstellt werden kann, muss der Tour-Rapport vollständig ausgefüllt worden sein.';
 $GLOBALS['TL_LANG']['ERR']['evt_strn_eventRapportNotFilledOutCorrectly'] = 'Bitte füllen Sie den Tourrapport vollständig aus, bevor Sie das Vergütungsformular herunterladen.';
 $GLOBALS['TL_LANG']['MSC']['evt_strn_multiFormSubmitWarning'] = 'Sie haben diese Benachrichtigung bereits %dx versendet. Das letzte Mal am %s. Möchten Sie die Benachrichtigung wirklich ein weiteres Mal versenden?';
+$GLOBALS['TL_LANG']['ERR']['evt_strn_ibanNotFound'] = 'Bevor ein Vergütungsformular erstellt werden kann, muss der Tour-Rapport vollständig ausgefüllt worden sein.';
+$GLOBALS['TL_LANG']['MSC']['evt_strn_ibanWasTakenFromUserDb'] = 'Die IBAN Nummer für "%s" wurde aus der Benutzerdatenbank übernommen. Falls die IBAN nicht stimmt, muss diese zuerst unter "Profil" berichtigt werden!';
 
 // Booking states/Subscription states
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED] = 'Anmeldeanfrage unbeantwortet';

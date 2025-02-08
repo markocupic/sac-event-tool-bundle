@@ -32,8 +32,9 @@ use Contao\Model\Collection;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
-use Markocupic\SacEventToolBundle\DocxTemplator\Exception\EventHasNoMemberException;
-use Markocupic\SacEventToolBundle\DocxTemplator\Exception\EventRapportNotFilledOutCorrectlyException;
+use Markocupic\SacEventToolBundle\DocxTemplator\DocumentType;
+use Markocupic\SacEventToolBundle\DocxTemplator\Exception\TourRapportGeneratorException;
+use Markocupic\SacEventToolBundle\DocxTemplator\OutputType;
 use Markocupic\SacEventToolBundle\DocxTemplator\TourRapportGenerator;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
@@ -161,9 +162,9 @@ class SendTourRapportNotificationController extends AbstractBackendController
         try {
             $rapportFile = $this->tourRapportGenerator
                 ->generate(
-                    'rapport',
+                    DocumentType::RAPPORT,
                     $invoice,
-                    TourRapportGenerator::OUTPUT_TYPE_PDF,
+                    OutputType::PDF,
                     $this->sacevtEventTemplateTourRapport,
                     $this->sacevtEventTourRapportFileNamePattern,
                 )
@@ -172,17 +173,16 @@ class SendTourRapportNotificationController extends AbstractBackendController
             if (false === $rapportFile->getSize() || 5000 > $rapportFile->getSize()) {
                 throw new \Exception(sprintf('File conversion failed. File size of the converted file "%s" is too small. File size: %d bytes!', $rapportFile->getFilename(), $rapportFile->getSize()));
             }
-        } catch (EventHasNoMemberException|EventRapportNotFilledOutCorrectlyException|HttpClientException|\Exception $e) {
-            $message = match (\get_class($e)) {
-                EventHasNoMemberException::class => $this->translator->trans('ERR.evt_strn_eventHasNoMember', [], 'contao_default'),
-                EventRapportNotFilledOutCorrectlyException::class => $this->translator->trans('ERR.evt_strn_eventRapportNotFilledOutCorrectly', [], 'contao_default'),
-                HttpClientException::class => $this->translator->trans('ERR.evt_strn_cloudconvConversionCreditUsedUp', ['Tourrapport'], 'contao_default'),
+        } catch (TourRapportGeneratorException|HttpClientException|\Exception $e) {
+            $message = match (true) {
+                $e instanceof TourRapportGeneratorException => $e->getTranslatableText(),
+                $e instanceof HttpClientException => $this->translator->trans('ERR.evt_strn_cloudconvConversionCreditUsedUp', ['Tourrapport'], 'contao_default'),
                 default => $this->translator->trans('ERR.evt_strn_cloudconvUnexpectedError', ['Tourrapport'], 'contao_default'),
             };
 
             $this->message->addError($message);
 
-            if (!$e instanceof EventHasNoMemberException && !$e instanceof EventRapportNotFilledOutCorrectlyException) {
+            if (!$e instanceof TourRapportGeneratorException) {
                 $this->notifyAdminOnError($e, $rapport_id);
             }
 
@@ -194,9 +194,9 @@ class SendTourRapportNotificationController extends AbstractBackendController
         try {
             $invoiceFile = $this->tourRapportGenerator
                 ->generate(
-                    'invoice',
+                    DocumentType::INVOICE,
                     $invoice,
-                    TourRapportGenerator::OUTPUT_TYPE_PDF,
+                    OutputType::PDF,
                     $this->sacevtEventTemplateTourInvoice,
                     $this->sacevtEventTourInvoiceFileNamePattern,
                 )
@@ -205,17 +205,16 @@ class SendTourRapportNotificationController extends AbstractBackendController
             if (false === $invoiceFile->getSize() || 5000 > $invoiceFile->getSize()) {
                 throw new \Exception(sprintf('File conversion failed. File size of the converted file "%s" is too small. File size: %d bytes!', $invoiceFile->getFilename(), $invoiceFile->getSize()));
             }
-        } catch (EventHasNoMemberException|EventRapportNotFilledOutCorrectlyException|HttpClientException|\Exception $e) {
-            $message = match (\get_class($e)) {
-                EventHasNoMemberException::class => $this->translator->trans('ERR.evt_strn_eventHasNoMember', [], 'contao_default'),
-                EventRapportNotFilledOutCorrectlyException::class => $this->translator->trans('ERR.evt_strn_eventRapportNotFilledOutCorrectly', [], 'contao_default'),
-                HttpClientException::class => $this->translator->trans('ERR.evt_strn_cloudconvConversionCreditUsedUp', ['Tourrapport'], 'contao_default'),
+        } catch (TourRapportGeneratorException|HttpClientException|\Exception $e) {
+            $message = match (true) {
+                $e instanceof TourRapportGeneratorException => $e->getTranslatableText(),
+                $e instanceof HttpClientException => $this->translator->trans('ERR.evt_strn_cloudconvConversionCreditUsedUp', ['Tourrapport'], 'contao_default'),
                 default => $this->translator->trans('ERR.evt_strn_cloudconvUnexpectedError', ['Tourrapport'], 'contao_default'),
             };
 
             $this->message->addError($message);
 
-            if (!$e instanceof EventHasNoMemberException && !$e instanceof EventRapportNotFilledOutCorrectlyException) {
+            if (!$e instanceof TourRapportGeneratorException) {
                 $this->notifyAdminOnError($e, $rapport_id);
             }
 
@@ -258,9 +257,9 @@ class SendTourRapportNotificationController extends AbstractBackendController
     {
         return $this->tourRapportGenerator
             ->download(
-                'rapport',
+                DocumentType::RAPPORT,
                 $invoice,
-                TourRapportGenerator::OUTPUT_TYPE_PDF,
+                OutputType::PDF,
                 $this->sacevtEventTemplateTourRapport,
                 $this->sacevtEventTourRapportFileNamePattern,
             )
@@ -271,9 +270,9 @@ class SendTourRapportNotificationController extends AbstractBackendController
     {
         return $this->tourRapportGenerator
             ->download(
-                'invoice',
+                DocumentType::INVOICE,
                 $invoice,
-                TourRapportGenerator::OUTPUT_TYPE_PDF,
+                OutputType::PDF,
                 $this->sacevtEventTemplateTourInvoice,
                 $this->sacevtEventTourInvoiceFileNamePattern,
             )
