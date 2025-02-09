@@ -35,9 +35,9 @@ use Symfony\Component\Filesystem\Path;
 
 class TourListGenerator extends AbstractController
 {
-    private const TEMPLATE = 'vendor/markocupic/sac-event-tool-bundle/contao/templates/docx/tour_listing_booklet.docx';
-    private const TEASER_LENGTH = 220;
-    private const STORAGE_DIR = 'files/sektion/tmp/tourlist_booklet/tmp';
+    private const string TEMPLATE = 'vendor/markocupic/sac-event-tool-bundle/contao/templates/docx/tour_listing_booklet.docx';
+    private const int TEASER_LENGTH = 220;
+    private const string STORAGE_DIR = 'files/sektion/tmp/tourlist_booklet/tmp';
 
     public function __construct(
         private readonly Connection $connection,
@@ -48,7 +48,7 @@ class TourListGenerator extends AbstractController
         $this->framework->initialize();
     }
 
-    public function generate(array $arrIds, string $outputFormat = 'docx'): FilesModel
+    public function generate(array $arrIds, OutputType $outputType = OutputType::DOCX): FilesModel
     {
         $arrIds = array_filter(array_unique(array_map('intval', $arrIds)));
 
@@ -88,12 +88,12 @@ class TourListGenerator extends AbstractController
 
         $splFileObject = $templateProcessor->generate();
 
-        if ('pdf' === $outputFormat) {
+        if (OutputType::PDF === $outputType) {
             // Use the CloudConvert bundle to convert docx to pdf
             $splFileObject = $this->convertFile
                 ->file($splFileObject->getRealPath())
                 ->uncached(true)
-                ->convertTo('pdf')
+                ->convertTo($outputType->value)
             ;
         }
 
@@ -166,22 +166,22 @@ class TourListGenerator extends AbstractController
             $templateProcessor->setValue('event_id_#'.$index_outer, CalendarEventsUtil::getEventData($event, 'eventId'), 1);
 
             // title
-            $templateProcessor->setValue('title_#'.$index_outer, $this->prepareString((string) $event->title), 1);
+            $templateProcessor->setValue('title_#'.$index_outer, $this->prepareString($event->title), 1);
 
             // teaser
-            $templateProcessor->setValue('teaser_#'.$index_outer, $this->prepareString((string) StringUtil::substr($event->teaser, self::TEASER_LENGTH)), 1);
+            $templateProcessor->setValue('teaser_#'.$index_outer, $this->prepareString(StringUtil::substr($event->teaser, self::TEASER_LENGTH)), 1);
 
             // date span
             $strDateSpan = CalendarEventsUtil::getEventPeriod($event, 'D, d.m.Y', true, false, true);
-            $templateProcessor->setValue('date_span_#'.$index_outer, $this->prepareString((string) strip_tags($strDateSpan)), 1);
+            $templateProcessor->setValue('date_span_#'.$index_outer, $this->prepareString(strip_tags($strDateSpan)), 1);
 
             // tour type
             $strTourType = implode(', ', CalendarEventsUtil::getTourTypesAsArray($event));
-            $templateProcessor->setValue('tour_type_#'.$index_outer, $this->prepareString((string) strip_tags($strTourType)), 1);
+            $templateProcessor->setValue('tour_type_#'.$index_outer, $this->prepareString(strip_tags($strTourType)), 1);
 
             // tour tech difficulty
             $strTechDiff = implode(', ', CalendarEventsUtil::getTourTechDifficultiesAsArray($event));
-            $templateProcessor->setValue('tech_diff_#'.$index_outer, $this->prepareString((string) strip_tags($strTechDiff)), 1);
+            $templateProcessor->setValue('tech_diff_#'.$index_outer, $this->prepareString(strip_tags($strTechDiff)), 1);
 
             $arrMoreDetails = [];
 
@@ -192,7 +192,7 @@ class TourListGenerator extends AbstractController
                 $arrMoreDetails[] = 'Einsteiger-Tour';
             }
 
-            // More details: event with montainguide
+            // More details: event with mountainguide
             if (!empty($event->mountainguide)) {
                 $arrMoreDetails[] = $GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][$event->mountainguide];
             }

@@ -21,6 +21,7 @@ use Doctrine\DBAL\Connection;
 use Markocupic\ContaoFrontendUserNotification\Model\FrontendUserNotificationModel;
 use Markocupic\ContaoFrontendUserNotification\Notification\DefaultFrontendUserNotification;
 use Markocupic\SacEventToolBundle\Controller\PrintTourList\DownloadController;
+use Markocupic\SacEventToolBundle\DocxTemplator\OutputType;
 use Markocupic\SacEventToolBundle\DocxTemplator\TourListGenerator;
 use Markocupic\SacEventToolBundle\Messenger\Message\GenerateTourListBookletMessage;
 use Symfony\Component\HttpFoundation\UriSigner;
@@ -44,12 +45,12 @@ readonly class GenerateTourListBookletHandler
         $ids = $message->getIds();
         $user = $message->getUser();
         $filename = $message->getFilename();
-        $outputFormat = $message->getOutputFormat();
+        $outputType = $message->getOutputType();
         $memberModel = MemberModel::findByPk($user->id);
         $notificationType = 'personal-tour-list-ready-for-download';
         $endOfLifeTstamp = time() + 7 * 24 * 3600;
 
-        if ($filesModel = $this->generateBooklet($ids, $outputFormat)) {
+        if ($filesModel = $this->generateBooklet($ids, $outputType)) {
             try {
                 $this->connection->beginTransaction();
 
@@ -90,13 +91,13 @@ readonly class GenerateTourListBookletHandler
         return $this->revertInputEncoding($text);
     }
 
-    private function generateBooklet(array $arrIds, string $outputFormat): FilesModel|bool
+    private function generateBooklet(array $arrIds, OutputType $outputType): FilesModel|bool
     {
         try {
             // Get event ids from request
             $arrIds = array_map('intval', $arrIds);
 
-            return $this->tourListGenerator->generate($arrIds, $outputFormat);
+            return $this->tourListGenerator->generate($arrIds, $outputType);
         } catch (\Exception $e) {
             return false;
         }

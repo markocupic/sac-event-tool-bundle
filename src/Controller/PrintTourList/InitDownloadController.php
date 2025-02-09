@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\PrintTourList;
 
 use Contao\FrontendUser;
+use Markocupic\SacEventToolBundle\DocxTemplator\OutputType;
 use Markocupic\SacEventToolBundle\Messenger\Message\GenerateTourListBookletMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -45,10 +46,10 @@ class InitDownloadController extends AbstractController
 
         // Get event ids from request
         $ids = array_map('intval', explode(',', $request->query->get('ids', '')));
-        $outputFormat = 'pdf';
-        $filename = 'Mein persönliches Tourenprogramm.'.$outputFormat;
+        $outputType = OutputType::PDF;
+        $filename = 'Mein persönliches Tourenprogramm.'.$outputType->value;
 
-        $this->messageBus->dispatch(new GenerateTourListBookletMessage($ids, $outputFormat, $filename, $user));
+        $this->messageBus->dispatch(new GenerateTourListBookletMessage($ids, $outputType, $filename, $user));
 
         return $this->json(['success' => true]);
     }

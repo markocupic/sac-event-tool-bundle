@@ -16,12 +16,13 @@ namespace Markocupic\SacEventToolBundle\Messenger\Message;
 
 use Contao\CoreBundle\Messenger\Message\LowPriorityMessageInterface;
 use Contao\FrontendUser;
+use Markocupic\SacEventToolBundle\DocxTemplator\OutputType;
 
 readonly class GenerateTourListBookletMessage implements LowPriorityMessageInterface
 {
     public function __construct(
         private array $ids,
-        private string $outputFormat,
+        private OutputType $outputType,
         private string $filename,
         private FrontendUser $user,
     ) {
@@ -32,9 +33,9 @@ readonly class GenerateTourListBookletMessage implements LowPriorityMessageInter
         return $this->ids;
     }
 
-    public function getOutputFormat(): string
+    public function getOutputType(): OutputType
     {
-        return $this->outputFormat;
+        return $this->outputType;
     }
 
     public function getFilename(): string
