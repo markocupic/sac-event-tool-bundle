@@ -57,7 +57,7 @@ class EventRegistrationListGeneratorDocx
         $this->framework->initialize();
     }
 
-    public function generate(CalendarEventsModel $objEvent, string $outputType = 'docx'): BinaryFileResponse
+    public function generate(CalendarEventsModel $objEvent, OutputType $outputType = OutputType::DOCX): BinaryFileResponse
     {
         $objEventMember = $this->calendarEventsMemberModelAdapter->findBy(
             [
@@ -93,27 +93,20 @@ class EventRegistrationListGeneratorDocx
         // Member list
         $this->eventMemberHelper->setEventMemberData($objPhpWord, $objEvent, $objEventMember);
 
-        if ('pdf' === $outputType) {
-            // Generate Docx file from template;
-            $objSplFileDocx = $objPhpWord->generate();
+        $objSplFileDocx = $objPhpWord->generate();
 
+        if (OutputType::PDF === $outputType) {
             // Generate pdf
             $objSplFilePdf = $this->convertFile
                 ->file($objSplFileDocx->getRealPath())
                 ->uncached(true)
-                ->convertTo('pdf')
+                ->convertTo($outputType->value)
             ;
 
             return $this->binaryFileDownload->sendFileToBrowser($objSplFilePdf->getRealPath(), '', true, true);
         }
 
-        if ('docx' === $outputType) {
-            // Generate Docx file from template;
-            $objSplFileDocx = $objPhpWord->generate();
-
-            return $this->binaryFileDownload->sendFileToBrowser($objSplFileDocx->getRealPath(), '', true, true);
-        }
-
-        throw new \LogicException('No output type defined. Please define the output type either "docx" or "pdf".');
+        // OutputType::DOCX === $outputType
+        return $this->binaryFileDownload->sendFileToBrowser($objSplFileDocx->getRealPath(), '', true, true);
     }
 }

@@ -44,6 +44,7 @@ use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmail
 use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventRegistrationStateController;
 use Markocupic\SacEventToolBundle\Csv\EventRegistrationListGeneratorCsv;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventRegistrationListGeneratorDocx;
+use Markocupic\SacEventToolBundle\DocxTemplator\OutputType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\NotificationType\SubscriptionStateChangeNotificationType;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
@@ -59,7 +60,7 @@ use Terminal42\NotificationCenterBundle\NotificationCenter;
 
 class CalendarEventsMember
 {
-    public const TABLE = 'tl_calendar_events_member';
+    public const string TABLE = 'tl_calendar_events_member';
 
     // Adapters
     private Adapter $calendarEvents;
@@ -174,7 +175,7 @@ class CalendarEventsMember
 
         match ($action) {
             // Download the registration list as a docx file
-            'downloadEventRegistrationListDocx' => throw new ResponseException($this->registrationListGeneratorDocx->generate($objEvent, 'docx')),
+            'downloadEventRegistrationListDocx' => throw new ResponseException($this->registrationListGeneratorDocx->generate($objEvent, OutputType::DOCX)),
             // Download the registration list as a csv file
             'downloadEventRegistrationListCsv' => throw new ResponseException($this->registrationListGeneratorCsv->generate($objEvent)),
         };
