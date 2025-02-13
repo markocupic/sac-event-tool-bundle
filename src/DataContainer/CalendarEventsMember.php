@@ -277,12 +277,13 @@ class CalendarEventsMember
                 }
 
                 if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $varValue && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && $this->calendarEventsUtil->areBookingDatesOccupied($objEvent, $objMember)) {
-                    $this->message->addError('Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".');
+                    $msg = $this->translator->trans('MSC.participantHasBeenNotifiedCannotBeRegisteredBecauseHeHasBeenConfirmedAtAnotherEvent', [], 'contao_default');
+                    $this->message->addError($msg);
                     $varValue = $objEventMemberModel->stateOfSubscription;
                 } elseif ($this->validator->isEmail($objEventMemberModel->email)) {
-                    $notificationId = $this->connection->fetchOne('SELECT id FROM tl_nc_notification WHERE type = :type', ['type' => SubscriptionStateChangeNotificationType::NAME], ['type' => Types::STRING]);
+                    $notificationIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_nc_notification WHERE type = :type', ['type' => SubscriptionStateChangeNotificationType::NAME], ['type' => Types::STRING]);
 
-                    if ($notificationId) {
+                    if (!empty($notificationIds)) {
                         $arrTokens = [
                             'participant_state_of_subscription' => html_entity_decode((string) $GLOBALS['TL_LANG']['MSC'][$varValue]),
                             'event_name' => html_entity_decode($objEvent->title),
@@ -292,7 +293,20 @@ class CalendarEventsMember
                             'event_link_detail' => $this->events->generateEventUrl($objEvent, true),
                         ];
 
-                        $this->notificationCenter->sendNotification($notificationId, $arrTokens, $this->sacevtLocale);
+                        $messageCount = 0;
+
+                        foreach ($notificationIds as $notificationId) {
+                            $receiptCollection = $this->notificationCenter->sendNotification($notificationId, $arrTokens, $this->sacevtLocale);
+
+                            if ($receiptCollection->count()) {
+                                $messageCount += $receiptCollection->count();
+                            }
+                        }
+
+                        if ($messageCount > 0) {
+                            $msg = $this->translator->trans('MSC.participantHasBeenNotifiedAboutTheRegistrationStatusChange', [$objEventMemberModel->firstname, $objEventMemberModel->lastname], 'contao_default');
+                            $this->message->addInfo($msg);
+                        }
                     }
                 }
             }

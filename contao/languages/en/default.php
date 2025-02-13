@@ -47,6 +47,9 @@ $GLOBALS['TL_LANG']['MSC']['level'] = 'Stufe';
 // tl_calendar_events_member
 $GLOBALS['TL_LANG']['ERR']['accessDenied'] = 'Zutritt verweigert.';
 $GLOBALS['TL_LANG']['MSC']['messageSuccessfullySent'] = 'Die Nachricht wurde erfolgreich versandt.';
+$GLOBALS['TL_LANG']['MSC']['participantCannotBeRegisteredBecauseHeHasBeenConfirmedAtAnotherEvent'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".';
+$GLOBALS['TL_LANG']['MSC']['participantHasBeenNotifiedCannotBeRegisteredBecauseHeHasBeenConfirmedAtAnotherEvent'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".';
+$GLOBALS['TL_LANG']['MSC']['participantHasBeenNotifiedAboutTheRegistrationStatusChange'] = 'Der Teilnehmer %s %s wurde via E-Mail über die Änderung des Anmeldestatus benachrichtigt.';
 
 // tl_calendar_events_instructor_invoice
 $GLOBALS['TL_LANG']['ERR']['actionNotSupported'] = 'Diese Aktion wird nicht unterstützt.';
