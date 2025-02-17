@@ -138,7 +138,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
 
                 if ('user-role-export' === $request->request->get('export-type')) {
                     $strTable = 'tl_user';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'phoneBusiness', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'leiterQualifikation', 'lastLogin', 'userRole'];
+                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'leiterQualifikation', 'lastLogin', 'userRole'];
                     $strGroupFieldName = 'userRole';
                     $result = $this->connection->executeQuery(
                         'SELECT * FROM tl_user WHERE disable = 0 AND (start = "" OR start < ?) AND (stop = "" OR stop > ?) ORDER BY lastname, firstname',
@@ -157,7 +157,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
 
                 if ('user-group-export' === $request->request->get('export-type')) {
                     $strTable = 'tl_user';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'phoneBusiness', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'lastLogin', 'groups'];
+                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
                     $result = $this->connection->executeQuery(
                         'SELECT * FROM tl_user WHERE disable = 0 AND (start = "" OR start < ?) AND (stop = "" OR stop > ?) ORDER BY lastname, firstname',
@@ -176,7 +176,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
 
                 if ('member-group-export' === $request->request->get('export-type')) {
                     $strTable = 'tl_member';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'phoneBusiness', 'email', 'isSacMember', 'disable', 'sacMemberId', 'login', 'lastLogin', 'groups'];
+                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'sacMemberId', 'login', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
                     $result = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember = ? ORDER BY lastname, firstname', [1], [Types::INTEGER]);
 

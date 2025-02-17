@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 						// Autofill form inputs
 						acceptAutocomplete.addEventListener('click', () => {
-							const fields = ['gender', 'name', 'username', 'firstname', 'lastname', 'street', 'postal', 'city', 'phone', 'mobile', 'phoneBusiness', 'email', 'dateOfBirth', 'foodHabits', 'emergencyPhone', 'emergencyPhoneName', 'sectionId'];
+							const fields = ['gender', 'name', 'username', 'firstname', 'lastname', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'dateOfBirth', 'foodHabits', 'emergencyPhone', 'emergencyPhoneName', 'sectionId'];
 							for (const fieldname of fields) {
 
 								const currField = document.getElementById('ctrl_' + fieldname);

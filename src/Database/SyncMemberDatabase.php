@@ -21,6 +21,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\DataContainer\Util;
+use Markocupic\SacEventToolBundle\String\PhoneNumber;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -60,6 +61,7 @@ class SyncMemberDatabase
     public function __construct(
         private readonly Connection $connection,
         private readonly PasswordHasherFactory $passwordHasherFactory,
+        private readonly PhoneNumber $phoneNumber,
         private readonly Util $util,
         #[\SensitiveParameter]
         private readonly array $sacevtMemberSyncCredentials,
@@ -299,13 +301,6 @@ class SyncMemberDatabase
 
                 $sacMemberId = $rowTemp['sacMemberId'];
 
-                // Map phone numbers
-                $rowTemp['mobile'] = !empty($rowTemp['phoneMobile']) ? $rowTemp['phoneMobile'] : $rowTemp['phoneMain'];
-                $rowTemp['phone'] = $rowTemp['phonePrivate'];
-                $rowTemp['fax'] = $rowTemp['phoneFax'];
-
-                unset($rowTemp['phoneMobile'], $rowTemp['phoneMain'], $rowTemp['phonePrivate'], $rowTemp['phoneFax']);
-
                 // Insert new member
                 if (false === $this->connection->fetchOne('SELECT id FROM tl_member WHERE sacMemberId = ?', [$sacMemberId], [Types::INTEGER])) {
                     $rowTemp['dateAdded'] = time();
@@ -386,38 +381,39 @@ class SyncMemberDatabase
      * Parses a line of data and maps it to a structured user array.
      *
      * @See: https://github.com/hitobito/hitobito_sac_cas/blob/6507d29ce25346bbc84b9820c162a1fb384f8460/app/domain/export/tabular/people/sac_mitglieder.rb#L23
-     * 0 - id,
-     * 1 - layer_navision_id_padded,
-     * 2 - last_name,
-     * 3 - first_name,
-     * 4 - adresszusatz,
-     * 5 - address,
-     * 6 - postfach,
-     * 7 - zip_code,
-     * 8 - town,
-     * 9 - country,
-     * 10 - birthday,
-     * 11 - phone_number_main,
-     * 12 - phone_number_privat,
-     * 13 - empty, # 1 empty col
-     * 14 - phone_number_mobil,
-     * 15 - phone_number_fax,
-     * 16 - email,
-     * 17 - gender,
-     * 18 - empty, # 1 empty col
-     * 19 - language,
-     * 20 - eintrittsjahr,
-     * 21 - begünstigt,
-     * 22 - ehrenmitglied,
-     * 23 - beitragskategorie,
-     * 24 - s_info_1,
-     * 25 - s_info_2,
-     * 26 - s_info_3,
-     * 27 - bemerkungen,
-     * 28 - saldo,
-     * 29 - empty, # 1 empty col
-     * 30 - anzahl_die_alpen,
-     * 31 - anzahl_sektionsbulletin
+     *
+     * :id,
+     * :layer_navision_id_padded,
+     * :last_name,
+     * :first_name,
+     * :adresszusatz,
+     * :address,
+     * :postfach,
+     * :zip_code,
+     * :town,
+     * :country,
+     * :birthday,
+     * :empty,
+     * :phone_number_landline,
+     * :empty,
+     * :phone_number_mobile,
+     * :empty,
+     * :email,
+     * :gender,
+     * :empty,
+     * :language,
+     * :eintrittsjahr,
+     * :begünstigt,
+     * :ehrenmitglied,
+     * :beitragskategorie,
+     * :s_info_1,
+     * :s_info_2,
+     * :s_info_3,
+     * :bemerkungen,
+     * :saldo,
+     * :empty,
+     * :anzahl_die_alpen,
+     * :anzahl_sektionsbulletin
      */
     protected function parseLine(array $arrLine): array
     {
@@ -447,10 +443,8 @@ class SyncMemberDatabase
         $rowUser['city'] = $arrLine[8]; // string
         $rowUser['country'] = empty($arrLine[9]) ? $defaultCountry : strtoupper($arrLine[9]); // string
         $rowUser['dateOfBirth'] = (string) strtotime($arrLine[10]); // string!
-        $rowUser['phoneMain'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $arrLine[11]); // string
-        $rowUser['phonePrivate'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $arrLine[12]); // string
-        $rowUser['phoneMobile'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $arrLine[14]); // string
-        $rowUser['phoneFax'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $arrLine[15]); // string
+        $rowUser['phone'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $arrLine[12]); // string
+        $rowUser['mobile'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $arrLine[14]); // string
         $rowUser['email'] = $arrLine[16]; // string
         $rowUser['gender'] = match ($arrLine[17]) {
             'Weiblich' => 'female',
@@ -489,6 +483,9 @@ class SyncMemberDatabase
         if (false === $existingMember) {
             // Insert new temp member
             $arrData['sectionId'] = serialize($this->formatSectionId($arrData['sectionId']));
+            $arrData['phone'] = $this->phoneNumber->beautify($arrData['phone']);
+            $arrData['mobile'] = $this->phoneNumber->beautify($arrData['mobile']);
+
             $this->connection->insert(self::TEMP_TABLE_NAME, $arrData);
         } else {
             // The user is a member of multiple sections and already exists in the temp table
@@ -634,10 +631,8 @@ class SyncMemberDatabase
         $table->addColumn('city', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('country', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('dateOfBirth', 'string', ['length' => 256, 'default' => '']);
-        $table->addColumn('phoneMain', 'string', ['length' => 256, 'default' => '']);
-        $table->addColumn('phonePrivate', 'string', ['length' => 256, 'default' => '']);
-        $table->addColumn('phoneMobile', 'string', ['length' => 256, 'default' => '']);
-        $table->addColumn('phoneFax', 'string', ['length' => 256, 'default' => '']);
+        $table->addColumn('phone', 'string', ['length' => 256, 'default' => '']);
+        $table->addColumn('mobile', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('email', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('gender', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('profession', 'string', ['length' => 256, 'default' => '']);

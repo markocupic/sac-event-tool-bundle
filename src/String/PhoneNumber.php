@@ -16,7 +16,7 @@ namespace Markocupic\SacEventToolBundle\String;
 
 class PhoneNumber
 {
-    public static function beautify(string $strNumber = ''): string
+    public function beautify(string $strNumber = ''): string
     {
         // Remove whitespaces
         $strNumber = preg_replace('/\s+/', '', $strNumber);

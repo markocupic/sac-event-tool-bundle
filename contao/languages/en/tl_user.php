@@ -36,7 +36,6 @@ $GLOBALS['TL_LANG']['tl_user']['state'] = ['Kanton', ''];
 $GLOBALS['TL_LANG']['tl_user']['country'] = ['Land', ''];
 $GLOBALS['TL_LANG']['tl_user']['phone'] = ['Telefonnummer Festnetz', 'Bitte geben Sie Ihre Festnetznummer ein.'];
 $GLOBALS['TL_LANG']['tl_user']['mobile'] = ['Telefonnummer Mobile', 'Bitte geben Sie die Mobilnummer ein.'];
-$GLOBALS['TL_LANG']['tl_user']['phoneBusiness'] = ['Telefonnummer Geschäft', 'Bitte geben Sie Ihre Geschäftsnummer ein.'];
 $GLOBALS['TL_LANG']['tl_user']['website'] = ['Webseite', ''];
 $GLOBALS['TL_LANG']['tl_user']['instructor_legend'] = 'Leiter-Einstellungen';
 $GLOBALS['TL_LANG']['tl_user']['leiterQualifikation'] = ['Leiter Qualifikation', ''];

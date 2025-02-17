@@ -449,7 +449,7 @@ class CalendarEventsUtil
                 $arrInstructor['contact_options'] = [];
 
                 if ($security->getUser() instanceof FrontendUser) {
-                    $arrContact = ['phone', 'mobile', 'phoneBusiness', 'email'];
+                    $arrContact = ['phone', 'mobile', 'email'];
 
                     foreach ($arrContact as $field) {
                         if ('' === $objUser->{$field}) {

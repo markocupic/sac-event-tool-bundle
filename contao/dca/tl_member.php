@@ -26,10 +26,9 @@ PaletteManipulator::create()
     ->addLegend('emergency_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
     ->addLegend('avatar_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
     ->addLegend('education_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
-    ->addField(['phoneBusiness'], 'mobile', PaletteManipulator::POSITION_AFTER)
     ->addField(['avatar'], 'avatar_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['foodHabits'], 'food_legend', PaletteManipulator::POSITION_AFTER)
-    ->addField(['isSacMember', 'sacMemberId', 'ahvNumber', 'uuid', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'phoneBusiness', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'], 'section_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['isSacMember', 'sacMemberId', 'ahvNumber', 'uuid', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'], 'section_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['emergencyPhone', 'emergencyPhoneName'], 'emergency_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['hasLeadClimbingEducation'], 'education_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_member');
@@ -131,14 +130,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['streetExtra'] = [
     'inputType' => 'text',
     'eval'      => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
     'sql'       => "varchar(255) NOT NULL default ''",
-];
-
-$GLOBALS['TL_DCA']['tl_member']['fields']['phoneBusiness'] = [
-    'exclude'   => true,
-    'search'    => true,
-    'inputType' => 'text',
-    'eval'      => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
-    'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['entryYear'] = [
@@ -257,7 +248,6 @@ if ($user instanceof BackendUser && !$user->admin) {
         $GLOBALS['TL_DCA']['tl_member']['fields']['membershipType']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['phone']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['mobile']['eval']['readonly'] = 'readonly';
-        $GLOBALS['TL_DCA']['tl_member']['fields']['phoneBusiness']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['email']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['dateOfBirth']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['username']['eval']['readonly'] = 'readonly';

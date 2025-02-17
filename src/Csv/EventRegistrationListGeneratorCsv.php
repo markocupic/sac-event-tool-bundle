@@ -52,7 +52,6 @@ class EventRegistrationListGeneratorCsv
         'city',
         'phone',
         'mobile',
-        'phoneBusiness',
         'email',
         'emergencyPhone',
         'emergencyPhoneName',

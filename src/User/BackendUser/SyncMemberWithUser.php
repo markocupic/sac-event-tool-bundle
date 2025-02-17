@@ -85,7 +85,6 @@ class SyncMemberWithUser
                         'gender' => (string) $arrMember['gender'],
                         'phone' => (string) $arrMember['phone'],
                         'mobile' => (string) $arrMember['mobile'],
-                        'phoneBusiness' => (string) $arrMember['phoneBusiness'],
                     ];
 
                     if ($this->connection->update('tl_user', $set, ['id' => $arrUser['id']])) {

@@ -112,7 +112,6 @@ final class NotifyMemberOnEventRegistration
                 'participant_has_lead_climbing_education' => $this->memberModel->hasLeadClimbingEducation,
                 'participant_phone' => $this->arrData['phone'],
                 'participant_mobile' => $this->arrData['mobile'],
-                'participant_phoneBusiness' => $this->arrData['phoneBusiness'],
                 'participant_name' => html_entity_decode($this->memberModel->firstname.' '.$this->memberModel->lastname),
                 'participant_notes' => html_entity_decode((string) ($this->arrData['notes'] ?? '')),
                 'participant_postal' => $this->memberModel->postal,

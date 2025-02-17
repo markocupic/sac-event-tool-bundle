@@ -38,7 +38,7 @@ PaletteManipulator::create()
 	->addLegend('event_tool_legend', 'emergency_phone_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('rescission_legend', 'event_tool_legend', PaletteManipulator::POSITION_BEFORE)
 	->addField('iban', 'bank_account_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['sacMemberId', 'username', 'email', 'name', 'firstname', 'lastname', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'phoneBusiness', 'website', 'uuid'], 'name_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['sacMemberId', 'username', 'email', 'name', 'firstname', 'lastname', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website', 'uuid'], 'name_legend', PaletteManipulator::POSITION_APPEND)
 	->addField('userRole', 'role_legend', PaletteManipulator::POSITION_APPEND)
 	->addField('leiterQualifikation', 'instructor_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['emergencyPhone', 'emergencyPhoneName'], 'emergency_phone_legend', PaletteManipulator::POSITION_APPEND)
@@ -65,7 +65,7 @@ PaletteManipulator::create()
 	->addLegend('event_tool_legend', 'instructor_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('rescission_legend', 'event_tool_legend', PaletteManipulator::POSITION_BEFORE)
 	->addField('iban', 'bank_account_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['sacMemberId', 'username', 'email', 'name', 'firstname', 'lastname', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'phoneBusiness', 'website', 'uuid'], 'name_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['sacMemberId', 'username', 'email', 'name', 'firstname', 'lastname', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website', 'uuid'], 'name_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['hideUser', 'userRole'], 'role_legend', PaletteManipulator::POSITION_APPEND)
 	->addField('leiterQualifikation', 'instructor_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['avatar', 'emergencyPhone', 'emergencyPhoneName', 'hobbies', 'introducing'], 'frontend_legend', PaletteManipulator::POSITION_APPEND)
@@ -91,7 +91,7 @@ PaletteManipulator::create()
 	->addLegend('event_tool_legend', 'instructor_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('rescission_legend', 'event_tool_legend', PaletteManipulator::POSITION_BEFORE)
 	->addField('iban', 'bank_account_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['sacMemberId', 'username', 'email', 'name', 'firstname', 'lastname', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'phoneBusiness', 'website', 'uuid'], 'name_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['sacMemberId', 'username', 'email', 'name', 'firstname', 'lastname', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website', 'uuid'], 'name_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['hideUser', 'userRole'], 'role_legend', PaletteManipulator::POSITION_APPEND)
 	->addField('leiterQualifikation', 'instructor_legend', PaletteManipulator::POSITION_APPEND)
 	->addField('admin', 'admin_legend', PaletteManipulator::POSITION_APPEND)
@@ -115,7 +115,7 @@ PaletteManipulator::create()
 	->addLegend('emergency_phone_legend', 'bank_account_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_tool_legend', 'emergency_phone_legend', PaletteManipulator::POSITION_BEFORE)
 	//->addLegend('rescission_legend', 'event_tool_legend', PaletteManipulator::POSITION_BEFORE)
-	->addField(['firstname', 'lastname', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'phoneBusiness', 'website'], 'name_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['firstname', 'lastname', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'], 'name_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['emergencyPhone', 'emergencyPhoneName'], 'emergency_phone_legend', PaletteManipulator::POSITION_APPEND)
 	->addField('iban', 'bank_account_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['avatar', 'hobbies', 'introducing'], 'frontend_legend', PaletteManipulator::POSITION_APPEND)
@@ -277,14 +277,6 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['country'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['phone'] = [
-	'exclude'   => true,
-	'search'    => true,
-	'inputType' => 'text',
-	'eval'      => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'clr'],
-	'sql'       => "varchar(64) NOT NULL default ''",
-];
-
-$GLOBALS['TL_DCA']['tl_user']['fields']['phoneBusiness'] = [
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',

@@ -76,7 +76,7 @@ class EventMember
                     $transportInfo = '';
 
                     // Phone
-                    $strPhone = implode("\n", array_filter([$objUserModel->mobile, $objUserModel->phone, $objUserModel->phoneBusiness]));
+                    $strPhone = implode("\n", array_filter([$objUserModel->mobile, $objUserModel->phone]));
                     $strPhone = !empty($strPhone) ? $strPhone : '----';
 
                     ++$i;
@@ -153,7 +153,7 @@ class EventMember
                 }
 
                 // Phone
-                $strPhone = implode("\n", array_filter([$objEventMember->mobile, $objEventMember->phone, $objEventMember->phoneBusiness]));
+                $strPhone = implode("\n", array_filter([$objEventMember->mobile, $objEventMember->phone]));
                 $strPhone = !empty($strPhone) ? $strPhone : '----';
 
                 // Clone row

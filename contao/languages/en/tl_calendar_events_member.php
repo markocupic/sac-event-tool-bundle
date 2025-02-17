@@ -60,7 +60,6 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['postal'] = ['Postleitzahl', 'G
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['city'] = ['Ort', 'Geben Sie hier den Ort ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['phone'] = ['Telefonnummer Festnetz', 'Bitte geben Sie Ihre Festnetznummer ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['mobile'] = ['Telefonnummer Mobile', 'Bitte geben Sie die Mobilnummer ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['phoneBusiness'] = ['Telefonnummer Geschäft', 'Bitte geben Sie Ihre Geschäftsnummer ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['hasLeadClimbingEducation'] = ['Seilschaftsführer', 'Geben Sie an, ob das Mitglied die Seilschaftsführer-Ausbildung besitzt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['dateOfLeadClimbingEducation'] = ['Datum der Seilschaftsführer-Ausbildung', 'Geben Sie an, wann das Mitglied die Seilschaftsführer-Ausbildung absolviert hat.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['emergencyPhoneName'] = ['Name und Bezug der Ihnen anvertrauten Kontaktperson für Notfälle', 'Geben Sie die den Namen und den Bezug einer Ihnen vertrauten Person an, welche in einem Notfall kontaktiert werden kann.'];

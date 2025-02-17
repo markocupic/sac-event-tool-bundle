@@ -335,7 +335,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $objForm->addContaoHiddenFields();
 
         // Get form presets from tl_member.
-        $arrFields = ['phone', 'mobile', 'phoneBusiness', 'emergencyPhone', 'emergencyPhoneName', 'foodHabits', 'ahvNumber'];
+        $arrFields = ['phone', 'mobile', 'emergencyPhone', 'emergencyPhoneName', 'foodHabits', 'ahvNumber'];
 
         foreach ($arrFields as $field) {
             if ($objForm->hasFormField($field)) {

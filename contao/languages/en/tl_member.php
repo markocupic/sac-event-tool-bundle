@@ -41,7 +41,6 @@ $GLOBALS['TL_LANG']['tl_member']['sectionId'] = ['Sektion', ''];
 $GLOBALS['TL_LANG']['tl_member']['addressExtra'] = ['Adresszusatz', ''];
 $GLOBALS['TL_LANG']['tl_member']['phone'] = ['Telefonnummer Festnetz', 'Bitte geben Sie Ihre Festnetznummer ein.'];
 $GLOBALS['TL_LANG']['tl_member']['mobile'] = ['Telefonnummer Mobile', 'Bitte geben Sie die Mobilnummer ein.'];
-$GLOBALS['TL_LANG']['tl_member']['phoneBusiness'] = ['Telefonnummer Geschäft', 'Bitte geben Sie Ihre Geschäftsnummer ein.'];
 $GLOBALS['TL_LANG']['tl_member']['profession'] = ['Beruf', ''];
 $GLOBALS['TL_LANG']['tl_member']['entryYear'] = ['Eintrittsjahr', ''];
 $GLOBALS['TL_LANG']['tl_member']['membershipType'] = ['Mitglieder Typ', ''];
