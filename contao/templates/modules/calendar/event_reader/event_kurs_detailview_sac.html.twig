@@ -211,13 +211,13 @@
                                 {# Display the download iCal button for the current event #}
                                 <div class="d-inline me-2 mt-3 mb-3">
                                     <a href="{{ path('sac_event_tool_download_event_ical', {'eventId': get_event_data(model, 'id')}) }}" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary text-nowrap">
-                                        <i class="fa-light fa-calendar-plus"></i>&nbsp;iCal
+                                        <i class="fa-regular fa-calendar-plus"></i>&nbsp;iCal
                                     </a>
                                 </div>
                                 {# Display the download details as PDF button for the current event #}
                                 <div class="d-inline me-2 mt-3 mb-3">
                                     <a href="{{ path('sac_event_tool_download_print_workshop_details_as_pdf', {'eventId': get_event_data(model, 'id')}) }}" title="Details drucken" class="btn btn-block btn-outline-primary text-nowrap">
-                                        <i class="fa-light fa-print"></i>&nbsp;Detailinfos
+                                        <i class="fa-regular fa-print"></i>&nbsp;Detailinfos
                                     </a>
                                 </div>
                             </nav>
