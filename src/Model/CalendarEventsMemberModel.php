@@ -141,7 +141,7 @@ class CalendarEventsMemberModel extends Model
                     ;
 
                     if ($objJoinedEvents->numRows) {
-                        // If member had the role of a participant
+                        // If member has the role "participant"
                         $objEventModel = CalendarEventsModel::findByPk($objEvents->id);
                         $arr = $objEventModel->row();
                         $arr['dateSpan'] = $objEvents->startDate !== $objEvents->endDate ? Date::parse('d.m.', $objEvents->startDate).' - '.Date::parse('d.m.Y', $objEvents->endDate) : Date::parse('d.m.Y', $objEvents->startDate);
@@ -154,7 +154,7 @@ class CalendarEventsMemberModel extends Model
                         $arr['unregisterUrl'] = Frontend::addToUrl('do=unregisterUserFromEvent&amp;registrationId='.$objJoinedEvents->id);
                         $arrEvents[] = $arr;
                     } else {
-                        // If member had the role of an instructor
+                        // If member has the role "instructor"
                         if ($blnInstructorRole && $blnHasEventsAsInstructor) {
                             $objEventModel = CalendarEventsModel::findByPk($objEvents->id);
                             $arr = $objEventModel->row();
