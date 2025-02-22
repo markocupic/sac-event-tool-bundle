@@ -254,7 +254,7 @@ class ClearFrontendUserData
             }
 
             // Past events
-            $arrEvents = $calendarEventsMemberModelAdapter->findPastEventsByMemberId($objMember->id);
+            $arrEvents = $calendarEventsMemberModelAdapter->findPastEventsByMemberId($objMember->id, [], false, false);
 
             foreach ($arrEvents as $arrEvent) {
                 $objEventsMember = $calendarEventsMemberModelAdapter->findByPk($arrEvent['registrationId']);
