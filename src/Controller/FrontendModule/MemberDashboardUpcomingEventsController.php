@@ -20,7 +20,6 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Twig\FragmentTemplate;
-use Contao\Environment;
 use Contao\Events;
 use Contao\FrontendUser;
 use Contao\Input;
@@ -129,7 +128,6 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
         $eventsAdapter = $this->framework->getAdapter(Events::class);
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
 
         $objEventRegistration = $calendarEventsMemberModelAdapter->findByPk($registrationId);
         $errorMsg = null;
@@ -215,7 +213,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                     'instructor_email' => $objInstructor->email,
                     'participant_name' => $objEventRegistration->firstname.' '.$objEventRegistration->lastname,
                     'participant_email' => $objEventRegistration->email,
-                    'event_link_detail' => $environmentAdapter->get('url').'/'.$eventsAdapter->generateEventUrl($objEvent),
+                    'event_link_detail' => $eventsAdapter->generateEventUrl($objEvent, true),
                     'sac_member_id' => !empty($objEventRegistration->sacMemberId) ? $objEventRegistration->sacMemberId : 'keine',
                 ];
 
