@@ -15,16 +15,17 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Model;
 
 use Contao\CalendarEventsModel;
-use Contao\Date;
 use Contao\Events;
 use Contao\Frontend;
 use Contao\MemberModel;
 use Contao\Model;
 use Contao\System;
 use Contao\UserModel;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
+use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 
 class CalendarEventsMemberModel extends Model
 {
@@ -154,12 +155,26 @@ class CalendarEventsMemberModel extends Model
         $arrEventIDS = array_filter(array_unique($arrEventIDS));
 
         if (\count($arrEventIDS)) {
-            $queryStartDate = null !== $intStartDateMin ? sprintf('startDate >= %s AND ', $intStartDateMin) : '';
-            $queryEndDate = null !== $intStartDateMax ? sprintf('startDate <= %s AND ', $intStartDateMax) : '';
+            $qb = $database->createQueryBuilder();
+            $qb->select('*')
+                ->from('tl_calendar_events', 't')
+                ->where('t.id IN (:ids)')
+                ->setParameter('ids', array_map('intval', $arrEventIDS), ArrayParameterType::INTEGER)
+            ;
 
-            $events = $database->fetchAllAssociative('SELECT * FROM tl_calendar_events WHERE '.$queryStartDate.$queryEndDate.'id IN('.implode(',', $arrEventIDS).') ORDER BY startDate DESC');
+            if (null !== $intStartDateMin) {
+                $qb->andWhere('t.startDate >= :startDateMin')
+                    ->setParameter('startDateMin', $intStartDateMin, Types::INTEGER)
+                ;
+            }
 
-            foreach ($events as $arrEvent) {
+            if (null !== $intStartDateMax) {
+                $qb->andWhere('t.startDate <= :startDateMax')
+                    ->setParameter('startDateMax', $intStartDateMax, Types::INTEGER)
+                ;
+            }
+
+            foreach ($qb->fetchAllAssociative() as $arrEvent) {
                 // Filter by event type
                 if (!empty($arrEventTypeFilter)) {
                     if (!\in_array($arrEvent['eventType'], $arrEventTypeFilter, true)) {
@@ -168,7 +183,7 @@ class CalendarEventsMemberModel extends Model
                 }
 
                 $arrEventReg = $database->fetchAssociative(
-                    'SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId = ?',
+                    'SELECT * FROM tl_calendar_events_member WHERE sacMemberId = ? AND eventId = ?',
                     [
                         $objMember->sacMemberId,
                         $arrEvent['id'],
@@ -179,33 +194,27 @@ class CalendarEventsMemberModel extends Model
                     ]
                 );
 
+                $objEventModel = CalendarEventsModel::findByPk($arrEvent['id']);
+                $row = $objEventModel->row();
+                $row['dateSpan'] = CalendarEventsUtil::getEventPeriod($objEventModel, 'd.m.Y');
+                $row['objEvent'] = $objEventModel;
+                $row['eventModel'] = $objEventModel;
+                $row['eventUrl'] = Events::generateEventUrl($objEventModel);
+
                 if (false !== $arrEventReg) {
                     // If member has the role "participant"
-                    $objEventModel = CalendarEventsModel::findByPk($arrEvent['id']);
-                    $row = $objEventModel->row();
-                    $row['dateSpan'] = $arrEvent['startDate'] !== $arrEvent['endDate'] ? Date::parse('d.m.', $arrEvent['startDate']).' - '.Date::parse('d.m.Y', $arrEvent['endDate']) : Date::parse('d.m.Y', $arrEvent['startDate']);
+                    $row['eventRegistrationModel'] = self::findByPk($arrEventReg['id']);
                     $row['registrationId'] = $arrEventReg['id'];
                     $row['role'] = 'member';
-                    $row['objEvent'] = $objEventModel;
-                    $row['eventModel'] = $objEventModel;
-                    $row['eventRegistrationModel'] = self::findByPk($arrEventReg['id']);
-                    $row['eventUrl'] = Events::generateEventUrl($objEventModel);
                     $row['unregisterUrl'] = Frontend::addToUrl('do=unregisterUserFromEvent&amp;registrationId='.$arrEventReg['id']);
-                    $arrEvents[] = $row;
                 } else {
                     // If member has the role "instructor"
                     if ($blnInstructorRole && $blnHasEventsAsInstructor) {
-                        $objEventModel = CalendarEventsModel::findByPk($arrEvent['id']);
-                        $row = $objEventModel->row();
-                        $row['dateSpan'] = $arrEvent['startDate'] !== $arrEvent['endDate'] ? Date::parse('d.m.', $arrEvent['startDate']).' - '.Date::parse('d.m.Y', $arrEvent['endDate']) : Date::parse('d.m.Y', $arrEvent['startDate']);
                         $row['registrationId'] = null;
                         $row['role'] = 'instructor';
-                        $row['objEvent'] = $objEventModel;
-                        $row['eventModel'] = $objEventModel;
-                        $row['eventUrl'] = Events::generateEventUrl($objEventModel);
-                        $arrEvents[] = $row;
                     }
                 }
+                $arrEvents[] = $row;
             }
         }
 
