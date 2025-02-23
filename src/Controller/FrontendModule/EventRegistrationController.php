@@ -390,7 +390,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
                 $objEventRegistration = new CalendarEventsMemberModel();
                 unset($arrData['id']);
-                $arrData = array_filter($arrData);
                 $objEventRegistration->setRow($arrData);
                 $objEventRegistration->save();
 

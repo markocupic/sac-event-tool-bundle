@@ -66,6 +66,7 @@ class EventRegistrationNotificationType implements NotificationTypeInterface
                 'event_name',
                 'event_state',
                 'event_type',
+                'event_type_translated',
                 'event_*',
                 'instructor_email',
                 'instructor_name',
