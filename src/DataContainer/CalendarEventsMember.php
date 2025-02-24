@@ -318,31 +318,41 @@ class CalendarEventsMember
     #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.hasParticipated.save', priority: 100)]
     public function saveCallbackHasParticipated(string $varValue, DataContainer $dc): string
     {
-        if ($dc->id) {
-            $registration = $this->calendarEventsMember->findByPk($dc->id);
-
-            if (null !== $registration) {
-                $event = $this->calendarEvents->findByPk($registration->eventId);
-
-                if (null !== $event) {
-                    $sacMemberId = $registration->sacMemberId ?? '0';
-
-                    if ($varValue) {
-                        $log = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "unconfirmed" to "confirmed".';
-                        $context = Log::EVENT_PARTICIPATION_CONFIRM;
-                    } else {
-                        $log = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "confirmed" to "unconfirmed".';
-                        $context = Log::EVENT_PARTICIPATION_UNCONFIRM;
-                    }
-
-                    // System log
-                    $this->contaoGeneralLogger?->info(
-                        sprintf($log, $registration->firstname, $registration->lastname, $sacMemberId, $event->title, $event->id),
-                        ['contao' => new ContaoContext(__METHOD__, $context)],
-                    );
-                }
-            }
+        if (!$dc->id) {
+            return $varValue;
         }
+
+        $registration = $this->calendarEventsMember->findByPk($dc->id);
+
+        if (null === $registration) {
+            return $varValue;
+        }
+
+        $event = $this->calendarEvents->findByPk($registration->eventId);
+
+        if (null === $event) {
+            return $varValue;
+        }
+
+        if ((bool) $varValue === (bool) $registration->hasParticipated) {
+            return $varValue;
+        }
+
+        if ($varValue) {
+            $log = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "unconfirmed" to "confirmed".';
+            $context = Log::EVENT_PARTICIPATION_CONFIRM;
+        } else {
+            $log = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "confirmed" to "unconfirmed".';
+            $context = Log::EVENT_PARTICIPATION_UNCONFIRM;
+        }
+
+        $sacMemberId = $registration->sacMemberId ?? '0';
+
+        // System log
+        $this->contaoGeneralLogger?->info(
+            sprintf($log, $registration->firstname, $registration->lastname, $sacMemberId, $event->title, $event->id),
+            ['contao' => new ContaoContext(__METHOD__, $context)],
+        );
 
         return $varValue;
     }
