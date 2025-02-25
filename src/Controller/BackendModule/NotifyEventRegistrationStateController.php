@@ -27,6 +27,7 @@ use Contao\Email;
 use Contao\Events;
 use Contao\MemberModel;
 use Contao\Message;
+use Contao\StringUtil;
 use Contao\Validator;
 use Contao\Versions;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
@@ -34,26 +35,14 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 class NotifyEventRegistrationStateController
 {
     // query key assigned to the controller
-    public const PARAM_KEY = 'notify_event_registration_state';
-
-    // Actions
-    public const ACCEPT_WITH_EMAIL_ACTION = 'accept_with_email';
-    public const ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION = 'add_to_waitinglist_with_email';
-    public const CANCEL_WITH_EMAIL_ACTION = 'cancel_with_email';
-    public const REFUSE_WITH_EMAIL_ACTION = 'refuse_with_email';
-
-    public const ACTIONS = [
-        self::ACCEPT_WITH_EMAIL_ACTION,
-        self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION,
-        self::CANCEL_WITH_EMAIL_ACTION,
-        self::REFUSE_WITH_EMAIL_ACTION,
-    ];
+    public const string PARAM_KEY = 'notify_event_registration_state';
 
     private CalendarEventsMemberModel|null $registration;
     private CalendarEventsModel|null $event;
@@ -62,19 +51,21 @@ class NotifyEventRegistrationStateController
     private array|null $configuration;
 
     // Adapters
+    private Adapter $events;
+    private Adapter $stringUtil;
     private Adapter $calendarEvents;
-    private Adapter $calendarEventsUtil;
     private Adapter $calendarEventsMember;
+    private Adapter $calendarEventsUtil;
     private Adapter $config;
     private Adapter $controller;
-    private Adapter $events;
     private Adapter $member;
     private Adapter $message;
     private Adapter $validator;
 
     public function __construct(
-        private readonly Environment $twig,
+        private readonly UriSigner $uriSigner,
         private readonly ContaoFramework $framework,
+        private readonly Environment $twig,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
@@ -86,9 +77,10 @@ class NotifyEventRegistrationStateController
         private readonly string $sacevtEventAdminEmail,
         private readonly string $sacevtEventAdminName,
     ) {
+        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->config = $this->framework->getAdapter(Config::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->events = $this->framework->getAdapter(Events::class);
@@ -124,6 +116,11 @@ class NotifyEventRegistrationStateController
 
         $id = $request->query->get('id');
 
+        if (!$this->uriSigner->checkRequest($request)) {
+            $this->message->addInfo('Zugriff verweigert.');
+            $this->controller->redirect($this->getErrorUri());
+        }
+
         $this->registration = $this->calendarEventsMember->findByPk($id);
 
         if (null === $this->registration) {
@@ -146,7 +143,7 @@ class NotifyEventRegistrationStateController
 
         $this->action = $request->query->get('action', null);
 
-        if (empty($this->action) || !\in_array($this->action, self::ACTIONS, true) || null === ($this->configuration = $this->getActionConfig($this->action))) {
+        if (empty($this->action) || !\in_array($this->action, EventSubscriptionState::ALL, true) || null === ($this->configuration = $this->getActionConfig($this->action))) {
             $this->message->addInfo(sprintf('Ungültiger Query-Parameter "action" => "%s".', $this->action));
             $this->controller->redirect($this->getErrorUri());
         }
@@ -155,29 +152,29 @@ class NotifyEventRegistrationStateController
     private function getActionConfig(string $action): array|null
     {
         $configs = [
-            self::ACCEPT_WITH_EMAIL_ACTION => [
-                'formId' => strtolower(self::ACCEPT_WITH_EMAIL_ACTION).'_form',
+            EventSubscriptionState::SUBSCRIPTION_ACCEPTED => [
+                'formId' => strtolower(EventSubscriptionState::SUBSCRIPTION_ACCEPTED).'_form',
                 'headline' => 'Anmeldeanfrage bestätigen',
                 'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_ACCEPTED,
                 'backendMessage' => 'Die Anmeldeanfrage wurde erfolgreich bestätigt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'templatePath' => $this->sacevtEventRegistrationConfigEmailAcceptTemplPath,
             ],
-            self::CANCEL_WITH_EMAIL_ACTION => [
-                'formId' => strtolower(self::CANCEL_WITH_EMAIL_ACTION).'_form',
+            EventSubscriptionState::USER_HAS_UNSUBSCRIBED => [
+                'formId' => strtolower(EventSubscriptionState::USER_HAS_UNSUBSCRIBED).'_form',
                 'headline' => 'Anmeldeanfrage stornieren',
                 'stateOfSubscription' => EventSubscriptionState::USER_HAS_UNSUBSCRIBED,
                 'backendMessage' => 'Die Anmeldeanfrage wurde storniert und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'templatePath' => $this->sacevtEventRegistrationConfigEmailCancelTemplPath,
             ],
-            self::REFUSE_WITH_EMAIL_ACTION => [
-                'formId' => strtolower(self::REFUSE_WITH_EMAIL_ACTION).'_form',
+            EventSubscriptionState::SUBSCRIPTION_REFUSED => [
+                'formId' => strtolower(EventSubscriptionState::SUBSCRIPTION_REFUSED).'_form',
                 'headline' => 'Anmeldeanfrage ablehnen',
                 'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_REFUSED,
                 'backendMessage' => 'Die Anmeldeanfrage wurde abgelehnt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'templatePath' => $this->sacevtEventRegistrationConfigEmailRefuseTemplPath,
             ],
-            self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION => [
-                'formId' => strtolower(self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION).'_form',
+            EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST => [
+                'formId' => strtolower(EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST).'_form',
                 'headline' => 'Anmeldestatus auf "Warteliste" ändern',
                 'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST,
                 'backendMessage' => 'Der Status dieser Registrierung wurde erfolgreich auf "Warteliste" gesetzt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
@@ -220,7 +217,7 @@ class NotifyEventRegistrationStateController
         if (!$request->isMethod('post')) {
             $arrEmailTextTokens = $this->getTokenArray();
 
-            if (self::ACCEPT_WITH_EMAIL_ACTION === $this->action && $this->event->customizeEventRegistrationConfirmationEmailText && !empty($this->event->customEventRegistrationConfirmationEmailText)) {
+            if (EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST === $this->action && $this->event->customizeEventRegistrationConfirmationEmailText && !empty($this->event->customEventRegistrationConfirmationEmailText)) {
                 // Only for accept_with_email!!!
                 // Replace tags for custom notification set in the events settings (tags can be used case-insensitive!)
                 $emailBodyText = $this->event->customEventRegistrationConfirmationEmailText;
@@ -268,17 +265,17 @@ class NotifyEventRegistrationStateController
         }
 
         $email = new Email();
-        $email->fromName = html_entity_decode(html_entity_decode($this->sacevtEventAdminName));
+        $email->fromName = $this->stringUtil->revertInputEncoding($this->sacevtEventAdminName);
         $email->from = $this->sacevtEventAdminEmail;
         $email->replyTo($this->user->email);
-        $email->subject = html_entity_decode((string) $form->getWidget('subject')->value);
-        $email->text = html_entity_decode(strip_tags((string) $form->getWidget('text')->value));
+        $email->subject = $this->stringUtil->revertInputEncoding($form->getWidget('subject')->value);
+        $email->text = $this->stringUtil->revertInputEncoding(strip_tags((string) $form->getWidget('text')->value));
 
         // Check if event participant has already been booked on another event at the same time.
         $objMember = $this->member->findOneBySacMemberId($this->registration->sacMemberId);
 
         if (
-            self::ACCEPT_WITH_EMAIL_ACTION === $this->action &&
+            EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $this->action &&
             null !== $objMember &&
             !$this->registration->allowMultiSignUp &&
             $this->calendarEventsUtil->areBookingDatesOccupied($this->event, $objMember)
@@ -289,7 +286,7 @@ class NotifyEventRegistrationStateController
                 'Wenn Sie die Anmeldeanfrage trotzdem bestätigen möchten, so wählen Sie die Option "Mehrfachbuchung zulassen" aus.'
             );
         } elseif (
-            self::ACCEPT_WITH_EMAIL_ACTION === $this->action
+            EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $this->action
             && !$this->calendarEventsMember->canAcceptSubscription($this->registration, $this->event)
         ) {
             $this->message->addError(

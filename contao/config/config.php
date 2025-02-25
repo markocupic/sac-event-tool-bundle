@@ -129,7 +129,6 @@ $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
 
 /*
  * Legacy Contao frontend modules
- * Contao 5 ready fe modules are registered in controller-frontend-module.yml
  */
 $GLOBALS['FE_MOD']['sac_event_tool_frontend_modules'] = [
     'eventToolCalendarEventPreviewReader' => ModuleSacEventToolEventPreviewReader::class,

@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Code4Nix\UriSigner\UriSigner;
 use Codefog\HasteBundle\UrlParser;
 use Contao\BackendTemplate;
 use Contao\CalendarEventsModel;
@@ -26,6 +25,7 @@ use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\DataContainer;
 use Contao\Events;
 use Contao\MemberModel;
@@ -41,7 +41,6 @@ use League\Csv\InvalidArgument;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmailController;
-use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventRegistrationStateController;
 use Markocupic\SacEventToolBundle\Csv\EventRegistrationListGeneratorCsv;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventRegistrationListGeneratorDocx;
 use Markocupic\SacEventToolBundle\DocxTemplator\OutputType;
@@ -54,6 +53,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Terminal42\NotificationCenterBundle\NotificationCenter;
@@ -74,6 +75,7 @@ class CalendarEventsMember
     private Adapter $validator;
 
     public function __construct(
+        private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly Connection $connection,
         private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
         private readonly ContaoFramework $framework,
@@ -114,6 +116,28 @@ class CalendarEventsMember
 
         if ('calendar' === $request->query->get('do') && '' !== $request->query->get('ref')) {
             $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('js/backend_member_autocomplete.js', 'markocupic_sac_event_tool');
+        }
+    }
+
+    /**
+     * This will redirect the user to the NotifyEventRegistrationStateController
+     * if a change subscription state button has been clicked.
+     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onsubmit', priority: -999999)]
+    public function handleChangeSubscriptionStateButtonClicks(DataContainer $dc): void
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ('edit' !== $request->query->get('act')) {
+            return;
+        }
+
+        if ($request->request->has('changeSubscriptionStateWithEmail')) {
+            $strQuery = sprintf('key=notify_event_registration_state&action=%s', $request->request->get('changeSubscriptionStateWithEmail'));
+            $url = $this->urlParser->addQueryString($strQuery);
+
+            // Redirect the user to the NotifyEventRegistrationStateController.
+            $this->controller->redirect($this->uriSigner->sign($url));
         }
     }
 
@@ -260,54 +284,64 @@ class CalendarEventsMember
     {
         $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
 
-        if (null !== $objEventMemberModel) {
-            // Retrieve the event id
-            $eventId = !empty($objEventMemberModel->eventId) ? $objEventMemberModel->eventId : $dc->currentPid;
-            $objEvent = $this->calendarEvents->findByPk($eventId);
+        if (null === $objEventMemberModel) {
+            return $varValue;
+        }
 
-            if (null !== $objEvent && $objEventMemberModel->stateOfSubscription !== $varValue) {
-                // Check if member has already booked at the same time
-                $objMember = $this->member->findOneBySacMemberId($objEventMemberModel->sacMemberId);
+        // Retrieve the event id
+        $eventId = !empty($objEventMemberModel->eventId) ? $objEventMemberModel->eventId : $dc->currentPid;
+        $objEvent = $this->calendarEvents->findByPk($eventId);
 
-                // Do not allow the maximum number of participants to be exceeded.
-                if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $varValue) {
-                    if (!$this->calendarEventsMember->canAcceptSubscription($objEventMemberModel, $objEvent)) {
-                        $varValue = EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST;
+        if (null === $objEvent) {
+            return $varValue;
+        }
+
+        if ($objEventMemberModel->stateOfSubscription === $varValue) {
+            return $varValue;
+        }
+
+        // Check if member has already booked at the same time
+        $objMember = $this->member->findOneBySacMemberId($objEventMemberModel->sacMemberId);
+
+        // Do not allow the maximum number of participants to be exceeded.
+        if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $varValue) {
+            if (!$this->calendarEventsMember->canAcceptSubscription($objEventMemberModel, $objEvent)) {
+                $varValue = EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST;
+                $msg = $this->translator->trans('MSC.participantHasBeenAddedToTheWaitingList', [$objEventMemberModel->firstname, $objEventMemberModel->lastname], 'contao_default');
+                $this->message->addInfo($msg);
+            }
+        }
+
+        if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $varValue && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && $this->calendarEventsUtil->areBookingDatesOccupied($objEvent, $objMember)) {
+            $msg = $this->translator->trans('MSC.participantHasBeenNotifiedCannotBeRegisteredBecauseHeHasBeenConfirmedAtAnotherEvent', [], 'contao_default');
+            $this->message->addError($msg);
+            $varValue = $objEventMemberModel->stateOfSubscription;
+        } elseif ($this->validator->isEmail($objEventMemberModel->email)) {
+            $notificationIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_nc_notification WHERE type = ?', [SubscriptionStateChangeNotificationType::NAME], [Types::STRING]);
+
+            if (!empty($notificationIds)) {
+                $arrTokens = [
+                    'participant_state_of_subscription' => $this->stringUtil->revertInputEncoding((string) $GLOBALS['TL_LANG']['MSC'][$varValue]),
+                    'event_name' => $this->stringUtil->revertInputEncoding($objEvent->title),
+                    'participant_uuid' => $objEventMemberModel->uuid,
+                    'participant_name' => $this->stringUtil->revertInputEncoding($objEventMemberModel->firstname.' '.$objEventMemberModel->lastname),
+                    'participant_email' => $objEventMemberModel->email,
+                    'event_link_detail' => $this->contentUrlGenerator->generate($objEvent, [], UrlGeneratorInterface::ABSOLUTE_URL),
+                ];
+
+                $messageCount = 0;
+
+                foreach ($notificationIds as $notificationId) {
+                    $receiptCollection = $this->notificationCenter->sendNotification($notificationId, $arrTokens, $this->sacevtLocale);
+
+                    if ($receiptCollection->count()) {
+                        $messageCount += $receiptCollection->count();
                     }
                 }
 
-                if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $varValue && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && $this->calendarEventsUtil->areBookingDatesOccupied($objEvent, $objMember)) {
-                    $msg = $this->translator->trans('MSC.participantHasBeenNotifiedCannotBeRegisteredBecauseHeHasBeenConfirmedAtAnotherEvent', [], 'contao_default');
-                    $this->message->addError($msg);
-                    $varValue = $objEventMemberModel->stateOfSubscription;
-                } elseif ($this->validator->isEmail($objEventMemberModel->email)) {
-                    $notificationIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_nc_notification WHERE type = :type', ['type' => SubscriptionStateChangeNotificationType::NAME], ['type' => Types::STRING]);
-
-                    if (!empty($notificationIds)) {
-                        $arrTokens = [
-                            'participant_state_of_subscription' => html_entity_decode((string) $GLOBALS['TL_LANG']['MSC'][$varValue]),
-                            'event_name' => html_entity_decode($objEvent->title),
-                            'participant_uuid' => $objEventMemberModel->uuid,
-                            'participant_name' => html_entity_decode($objEventMemberModel->firstname.' '.$objEventMemberModel->lastname),
-                            'participant_email' => $objEventMemberModel->email,
-                            'event_link_detail' => $this->events->generateEventUrl($objEvent, true),
-                        ];
-
-                        $messageCount = 0;
-
-                        foreach ($notificationIds as $notificationId) {
-                            $receiptCollection = $this->notificationCenter->sendNotification($notificationId, $arrTokens, $this->sacevtLocale);
-
-                            if ($receiptCollection->count()) {
-                                $messageCount += $receiptCollection->count();
-                            }
-                        }
-
-                        if ($messageCount > 0) {
-                            $msg = $this->translator->trans('MSC.participantHasBeenNotifiedAboutTheRegistrationStatusChange', [$objEventMemberModel->firstname, $objEventMemberModel->lastname], 'contao_default');
-                            $this->message->addInfo($msg);
-                        }
-                    }
+                if ($messageCount > 0) {
+                    $msg = $this->translator->trans('MSC.participantHasBeenNotifiedAboutTheRegistrationStatusChange', [$objEventMemberModel->firstname, $objEventMemberModel->lastname], 'contao_default');
+                    $this->message->addInfo($msg);
                 }
             }
         }
@@ -449,44 +483,38 @@ class CalendarEventsMember
     {
         $registration = $this->calendarEventsMember->findByPk($dc->id);
 
-        if (null !== $registration) {
-            $event = $this->calendarEvents->findByPk($registration->eventId);
-
-            if (null !== $event) {
-                if ($registration->tstamp && !$this->validator->isEmail($registration->email)) {
-                    $this->message->addInfo($this->translator->trans('tl_calendar_events_member.notificationDueToMissingEmailDisabled', [], 'contao_default'));
-                }
-
-                if ($registration->hasParticipated) {
-                    $this->message->addInfo('Dieser Teilnehmer/diese Teilnehmerin hat am Anlass teilgenommen. Es können deshalb keine Benachrichtigungen versandt werden.');
-                }
-
-                if (!$registration->hasParticipated && $this->validator->isEmail($registration->email)) {
-                    if ($this->validator->isEmail($registration->email)) {
-                        $template = new BackendTemplate('be_calendar_events_registration_dashboard');
-                        $template->registration = $registration;
-                        $template->state_of_subscription = $registration->stateOfSubscription;
-
-                        $uri = $this->urlParser->addQueryString('key='.NotifyEventRegistrationStateController::PARAM_KEY);
-
-                        $hrefs = [];
-
-                        foreach (NotifyEventRegistrationStateController::ACTIONS as $action) {
-                            $hrefs[$action] = $this->urlParser->addQueryString('action='.$action, $uri);
-                        }
-
-                        $template->button_hrefs = $hrefs;
-                        $template->event = $event->row();
-                        $template->show_email_buttons = true;
-                        $template->event_is_fully_booked = $this->calendarEventsUtil->eventIsFullyBooked($event);
-
-                        return $template->parse();
-                    }
-                }
-            }
+        if (null === $registration) {
+            return '';
         }
 
-        return '';
+        $event = $this->calendarEvents->findByPk($registration->eventId);
+
+        if (null === $event) {
+            return '';
+        }
+
+        if ($registration->tstamp && !$this->validator->isEmail($registration->email)) {
+            $this->message->addInfo($this->translator->trans('tl_calendar_events_member.notificationDueToMissingEmailDisabled', [], 'contao_default'));
+        }
+
+        if ($registration->hasParticipated) {
+            $this->message->addInfo('Dieser Teilnehmer/diese Teilnehmerin hat am Anlass teilgenommen. Es können deshalb keine Benachrichtigungen versandt werden.');
+
+            return '';
+        }
+
+        if (!$this->validator->isEmail($registration->email)) {
+            return '';
+        }
+
+        $template = new BackendTemplate('be_calendar_events_registration_dashboard');
+        $template->registration = $registration;
+        $template->state_of_subscription = $registration->stateOfSubscription;
+        $template->event = $event->row();
+        $template->show_email_buttons = true;
+        $template->event_is_fully_booked = $this->calendarEventsUtil->eventIsFullyBooked($event);
+
+        return $template->parse();
     }
 
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.global_operations.backToEventSettings.button', priority: 100)]
@@ -510,14 +538,6 @@ class CalendarEventsMember
     public function generateSendEmailButton(string|null $href, string $label, string $title, string $class, string $attributes, string $table): string
     {
         $request = $this->requestStack->getCurrentRequest();
-
-        $url = System::getContainer()->get('code4nix_uri_signer.uri_signer')->sign(
-            System::getContainer()->get('router')->generate(EventParticipantEmailController::class, [
-                'event_id' => $request->query->get('id'),
-                'rt' => $request->query->get('rt'),
-                'sid' => uniqid(),
-            ])
-        );
 
         $url = System::getContainer()->get('router')->generate(EventParticipantEmailController::class);
         $url = $this->urlParser->addQueryString('eventId='.$request->query->get('id'), $url);

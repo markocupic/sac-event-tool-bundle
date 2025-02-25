@@ -26,6 +26,7 @@ use Contao\Email;
 use Contao\Environment;
 use Contao\Events;
 use Contao\Message;
+use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
@@ -43,6 +44,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment as Twig;
@@ -69,36 +71,37 @@ class EventParticipantEmailController extends AbstractBackendController
     private string|null $sid = null;
 
     // Adapters
+    private Adapter $stringUtil;
     private Adapter $calendarEvents;
-    private Adapter $calendarEventsUtil;
     private Adapter $calendarEventsMember;
+    private Adapter $calendarEventsUtil;
     private Adapter $controller;
     private Adapter $environment;
     private Adapter $events;
     private Adapter $message;
-    private Adapter $system;
     private Adapter $userModel;
     private Adapter $validator;
 
     public function __construct(
+        private readonly UriSigner $uriSigner,
+        private readonly Connection $connection,
         private readonly ContaoFramework $framework,
+        private readonly EventRegistrationUtil $eventRegistrationUtil,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
-        private readonly EventRegistrationUtil $eventRegistrationUtil,
-        private readonly Connection $connection,
         private readonly TranslatorInterface $translator,
         private readonly Twig $twig,
         private readonly string $sacevtEventAdminEmail,
         private readonly string $sacevtEventAdminName,
     ) {
+        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->environment = $this->framework->getAdapter(Environment::class);
         $this->events = $this->framework->getAdapter(Events::class);
         $this->message = $this->framework->getAdapter(Message::class);
-        $this->system = $this->framework->getAdapter(System::class);
         $this->userModel = $this->framework->getAdapter(UserModel::class);
         $this->validator = $this->framework->getAdapter(Validator::class);
     }
@@ -113,9 +116,7 @@ class EventParticipantEmailController extends AbstractBackendController
 
         $blnAllow = true;
 
-        $uriSigner = $this->system->getContainer()->get('code4nix_uri_signer.uri_signer');
-
-        if (!$uriSigner->check($this->requestStack->getCurrentRequest()->getRequestUri())) {
+        if (!$this->uriSigner->check($this->requestStack->getCurrentRequest()->getRequestUri())) {
             $blnAllow = false;
         }
 
@@ -301,11 +302,11 @@ class EventParticipantEmailController extends AbstractBackendController
         $arrEmailRecipients = array_unique($arrEmailRecipients);
 
         $objEmail = new Email();
-        $objEmail->fromName = html_entity_decode($this->sacevtEventAdminName);
+        $objEmail->fromName = $this->stringUtil->revertInputEncoding($this->sacevtEventAdminName);
         $objEmail->from = $this->sacevtEventAdminEmail;
         $objEmail->replyTo($this->user->email);
-        $objEmail->subject = html_entity_decode((string) $request->request->get('subject'));
-        $objEmail->text = html_entity_decode((string) $request->request->get('text'));
+        $objEmail->subject = $this->stringUtil->revertInputEncoding((string) $request->request->get('subject'));
+        $objEmail->text = $this->stringUtil->revertInputEncoding((string) $request->request->get('text'));
 
         // Send a copy of the message to the logged-in user
         $user = $this->security->getUser();

@@ -50,6 +50,7 @@ $GLOBALS['TL_LANG']['MSC']['messageSuccessfullySent'] = 'Die Nachricht wurde erf
 $GLOBALS['TL_LANG']['MSC']['participantCannotBeRegisteredBecauseHeHasBeenConfirmedAtAnotherEvent'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".';
 $GLOBALS['TL_LANG']['MSC']['participantHasBeenNotifiedCannotBeRegisteredBecauseHeHasBeenConfirmedAtAnotherEvent'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".';
 $GLOBALS['TL_LANG']['MSC']['participantHasBeenNotifiedAboutTheRegistrationStatusChange'] = 'Der Teilnehmer %s %s wurde via E-Mail über die Änderung des Anmeldestatus benachrichtigt.';
+$GLOBALS['TL_LANG']['MSC']['participantHasBeenAddedToTheWaitingList'] = 'Der Teilnehmer %s %s wurde auf die Warteliste gesetzt.';
 
 // tl_calendar_events_instructor_invoice
 $GLOBALS['TL_LANG']['ERR']['actionNotSupported'] = 'Diese Aktion wird nicht unterstützt.';
