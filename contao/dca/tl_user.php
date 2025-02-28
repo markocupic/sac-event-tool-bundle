@@ -191,7 +191,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['sacMemberId'] = [
 	'sorting'   => true,
 	'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
 	'inputType' => 'text',
-	'eval'      => ['doNotCopy' => true, 'rgxp' => 'sacMemberIdIsUniqueAndValid', 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
+	'eval'      => ['doNotCopy' => true, 'rgxp' => 'sacMemberIdIsUniqueOrZero', 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
 	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 

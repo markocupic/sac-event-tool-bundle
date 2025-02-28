@@ -21,14 +21,16 @@ use Contao\MemberModel;
 use Contao\Widget;
 use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsHook('addCustomRegexp', priority: 100)]
 readonly class AddCustomRegexpListener
 {
     public function __construct(
+        private TranslatorInterface $translator,
         private ContaoFramework $framework,
-        private RequestStack $requestStack,
         private EventDurationInfo $eventDurationInfo,
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -54,9 +56,7 @@ readonly class AddCustomRegexpListener
             $countDates = \count($post['eventDates']);
 
             if ($arrDurationInfo['dateRows'] !== $countDates) {
-                $objWidget->addError($GLOBALS['TL_LANG']['ERR']['invalidEventDurationInfo']);
-
-                return false;
+                $objWidget->addError($this->translator->trans('ERR.invalidEventDurationInfo', [], 'contao_default'));
             }
 
             return true;
@@ -67,34 +67,54 @@ readonly class AddCustomRegexpListener
         $databaseAdapter = $this->framework->getAdapter(Database::class);
 
         // Check for a valid/existent sacMemberId
-        if ('sacMemberId' === $strRegexp) {
-            if ('' !== trim($varValue)) {
+        if ('sacMemberIdOrEmptyString' === $strRegexp) {
+            if ('' === $varValue) {
+                return true;
+            }
+
+            if (preg_match('/^[1-9]\d{5,}$/', $varValue)) {
                 $objMemberModel = $memberModelAdapter->findOneBySacMemberId(trim($varValue));
 
                 if (null === $objMemberModel) {
-                    $objWidget->addError('Field '.$objWidget->label.' should be a valid sac member id.');
+                    $objWidget->addError($this->translator->trans('ERR.memberWithSACMemberIdNotFound', [$varValue], 'contao_default'));
+
+                    return true;
                 }
+            } else {
+                $objWidget->addError($this->translator->trans('ERR.SACMemberIdShouldBeNumberOrEmptyString', [], 'contao_default'));
+
+                return true;
             }
 
             return true;
         }
 
         // Check for a valid/existent sacMemberId
-        if ('sacMemberIdIsUniqueAndValid' === $strRegexp) {
-            if (!is_numeric($varValue)) {
-                $objWidget->addError('Sac member id must be a number >= 0');
-            } elseif ('' !== trim($varValue) && $varValue > 0) {
-                $objMemberModel = $memberModelAdapter->findOneBySacMemberId(trim($varValue));
+        if ('sacMemberIdIsUniqueOrZero' === $strRegexp) {
+            if (0 === $varValue || '0' === $varValue) {
+                return true;
+            }
+
+            if (preg_match('/^[1-9]\d{5,}$/', $varValue)) {
+                $objMemberModel = $memberModelAdapter->findOneBySacMemberId($varValue);
 
                 if (null === $objMemberModel) {
-                    $objWidget->addError('Field '.$objWidget->label.' should be a valid sac member id.');
+                    $objWidget->addError($this->translator->trans('ERR.memberWithSACMemberIdNotFound', [$varValue], 'contao_default'));
+
+                    return true;
                 }
 
                 $objUser = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_user WHERE sacMemberId = ?')->execute($varValue);
 
                 if ($objUser->numRows > 1) {
-                    $objWidget->addError('SAC member id '.$varValue.' is already in use.');
+                    $objWidget->addError($this->translator->trans('ERR.userWithThisSACMemberIdAlreadyExists', [$varValue], 'contao_default'));
+
+                    return true;
                 }
+            } else {
+                $objWidget->addError($this->translator->trans('ERR.SACMemberIdShouldBeNumberOrZero', [], 'contao_default'));
+
+                return true;
             }
 
             return true;

@@ -1315,46 +1315,48 @@ class CalendarEvents
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.instructor.save', priority: 100)]
     public function setMainInstructor(string|null $varValue, DataContainer $dc): string|null
     {
-        if ($dc->id > 0) {
-            $arrInstructors = $this->stringUtil->deserialize($varValue, true);
-
-            // Use a child table to store instructors
-            // Delete instructor
-            $this->connection->delete('tl_calendar_events_instructor', ['pid' => $dc->id]);
-
-            $i = 0;
-
-            foreach ($arrInstructors as $arrInstructor) {
-                // Rebuild instructor table
-                $set = [
-                    'pid' => $dc->id,
-                    'userId' => $arrInstructor['instructorId'],
-                    'tstamp' => time(),
-                    'isMainInstructor' => $i < 1 ? 1 : 0,
-                ];
-
-                $this->connection->insert('tl_calendar_events_instructor', $set);
-
-                ++$i;
-            }
-            // End child insert
-
-            if (\count($arrInstructors) > 0) {
-                $intInstructor = $arrInstructors[0]['instructorId'];
-
-                if (null !== $this->userModel->findByPk($intInstructor)) {
-                    $set = ['mainInstructor' => $intInstructor];
-
-                    $this->connection->update('tl_calendar_events', $set, ['id' => $dc->id]);
-
-                    return $varValue;
-                }
-            }
-
-            $set = ['mainInstructor' => 0];
-
-            $this->connection->update('tl_calendar_events', $set, ['id' => $dc->id]);
+        if (!$dc->id) {
+            return $varValue;
         }
+
+        $arrInstructors = $this->stringUtil->deserialize($varValue, true);
+
+        // Use a child table to store instructors
+        // Delete instructor
+        $this->connection->delete('tl_calendar_events_instructor', ['pid' => $dc->id]);
+
+        $i = 0;
+
+        foreach ($arrInstructors as $arrInstructor) {
+            // Rebuild instructor table
+            $set = [
+                'pid' => $dc->id,
+                'userId' => $arrInstructor['instructorId'],
+                'tstamp' => time(),
+                'isMainInstructor' => $i < 1 ? 1 : 0,
+            ];
+
+            $this->connection->insert('tl_calendar_events_instructor', $set);
+
+            ++$i;
+        }
+        // End child insert
+
+        if (\count($arrInstructors) > 0) {
+            $intInstructor = $arrInstructors[0]['instructorId'];
+
+            if (null !== $this->userModel->findByPk($intInstructor)) {
+                $set = ['mainInstructor' => $intInstructor];
+
+                $this->connection->update('tl_calendar_events', $set, ['id' => $dc->id]);
+
+                return $varValue;
+            }
+        }
+
+        $set = ['mainInstructor' => 0];
+
+        $this->connection->update('tl_calendar_events', $set, ['id' => $dc->id]);
 
         return $varValue;
     }

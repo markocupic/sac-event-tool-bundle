@@ -27,7 +27,6 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\DataContainer;
-use Contao\Events;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\StringUtil;
@@ -44,14 +43,17 @@ use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmail
 use Markocupic\SacEventToolBundle\Csv\EventRegistrationListGeneratorCsv;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventRegistrationListGeneratorDocx;
 use Markocupic\SacEventToolBundle\DocxTemplator\OutputType;
+use Markocupic\SacEventToolBundle\Event\DataContainer\ContaoPostUpdateEvent;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\NotificationType\SubscriptionStateChangeNotificationType;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -59,6 +61,9 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Terminal42\NotificationCenterBundle\NotificationCenter;
 
+/**
+ * Represents the Calendar Events Member handling component with various data manipulation functionalities.
+ */
 class CalendarEventsMember
 {
     public const string TABLE = 'tl_calendar_events_member';
@@ -68,7 +73,6 @@ class CalendarEventsMember
     private Adapter $calendarEventsUtil;
     private Adapter $calendarEventsMember;
     private Adapter $controller;
-    private Adapter $events;
     private Adapter $member;
     private Adapter $message;
     private Adapter $stringUtil;
@@ -99,7 +103,6 @@ class CalendarEventsMember
         $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
-        $this->events = $this->framework->getAdapter(Events::class);
         $this->member = $this->framework->getAdapter(MemberModel::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
@@ -158,7 +161,7 @@ class CalendarEventsMember
         }
 
         // Do only show email buttons in the global operation's section if there are registrations
-        $regId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$eventId]);
+        $regId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$eventId], [Types::INTEGER]);
 
         if (!$regId) {
             unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail']);
@@ -219,7 +222,7 @@ class CalendarEventsMember
         $ids = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar_events_member AS em WHERE em.sacMemberId > ? AND em.tstamp > ? AND NOT EXISTS (SELECT * FROM tl_member AS m WHERE em.sacMemberId = m.sacMemberId)', [0, 0]);
 
         if (!empty($ids)) {
-            $rowsAffected = $this->connection->executeStatement('DELETE FROM tl_calendar_events_member WHERE id IN('.implode(',', $ids).')', []);
+            $rowsAffected = $this->connection->executeStatement('DELETE FROM tl_calendar_events_member WHERE id IN('.implode(',', $ids).')');
 
             if ($rowsAffected) {
                 $reload = true;
@@ -279,180 +282,236 @@ class CalendarEventsMember
         return array_values($arrEventSubscriptionStates);
     }
 
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.stateOfSubscription.save', priority: 100)]
-    public function saveCallbackStateOfSubscription($varValue, DataContainer $dc): mixed
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onbeforesubmit', priority: 100)]
+    public function checkStateOfSubscriptionChange($updatedFields, DataContainer $dc): mixed
     {
-        $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
+        $objReg = $this->calendarEventsMember->findByPk($dc->id);
 
-        if (null === $objEventMemberModel) {
-            return $varValue;
+        if (null === $objReg) {
+            return $updatedFields;
         }
 
-        // Retrieve the event id
-        $eventId = !empty($objEventMemberModel->eventId) ? $objEventMemberModel->eventId : $dc->currentPid;
-        $objEvent = $this->calendarEvents->findByPk($eventId);
+        // Temporary apply changes on the registration model
+        $objReg->mergeRow($updatedFields);
+
+        $objEvent = $this->calendarEvents->findByPk($objReg->eventId);
 
         if (null === $objEvent) {
-            return $varValue;
+            throw new \Exception(sprintf('The event ID %d that is associated with the registration does not exist.', $objReg->eventId));
         }
-
-        if ($objEventMemberModel->stateOfSubscription === $varValue) {
-            return $varValue;
-        }
-
-        // Check if member has already booked at the same time
-        $objMember = $this->member->findOneBySacMemberId($objEventMemberModel->sacMemberId);
 
         // Do not allow the maximum number of participants to be exceeded.
-        if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $varValue) {
-            if (!$this->calendarEventsMember->canAcceptSubscription($objEventMemberModel, $objEvent)) {
-                $varValue = EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST;
-                $msg = $this->translator->trans('MSC.participantHasBeenAddedToTheWaitingList', [$objEventMemberModel->firstname, $objEventMemberModel->lastname], 'contao_default');
+        if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $objReg->stateOfSubscription) {
+            if (!$this->calendarEventsMember->canAcceptSubscription($objReg, $objEvent)) {
+                $updatedFields['stateOfSubscription'] = EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST;
+
+                // Show a message in the backend
+                $msg = $this->translator->trans('MSC.participantHasBeenAddedToTheWaitingList', [$objReg->firstname, $objReg->lastname], 'contao_default');
+                $this->message->addInfo($msg);
+
+                return $updatedFields;
+            }
+
+            // Check if member has already booked at the same time
+            $objMember = $this->member->findOneBySacMemberId($objReg->sacMemberId);
+
+            if (null !== $objMember && !$objReg->allowMultiSignUp && $this->calendarEventsUtil->areBookingDatesOccupied($objEvent, $objMember)) {
+                $updatedFields['stateOfSubscription'] = EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST;
+
+                // Show messages in the backend
+                $msg = $this->translator->trans('MSC.participantHasBeenNotifiedCannotBeRegisteredBecauseHeHasBeenConfirmedAtAnotherEvent', [], 'contao_default');
+                $this->message->addError($msg);
+                $msg = $this->translator->trans('MSC.participantHasBeenAddedToTheWaitingList', [$objReg->firstname, $objReg->lastname], 'contao_default');
                 $this->message->addInfo($msg);
             }
         }
 
-        if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $varValue && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && $this->calendarEventsUtil->areBookingDatesOccupied($objEvent, $objMember)) {
-            $msg = $this->translator->trans('MSC.participantHasBeenNotifiedCannotBeRegisteredBecauseHeHasBeenConfirmedAtAnotherEvent', [], 'contao_default');
-            $this->message->addError($msg);
-            $varValue = $objEventMemberModel->stateOfSubscription;
-        } elseif ($this->validator->isEmail($objEventMemberModel->email)) {
-            $notificationIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_nc_notification WHERE type = ?', [SubscriptionStateChangeNotificationType::NAME], [Types::STRING]);
-
-            if (!empty($notificationIds)) {
-                $arrTokens = [
-                    'participant_state_of_subscription' => $this->stringUtil->revertInputEncoding((string) $GLOBALS['TL_LANG']['MSC'][$varValue]),
-                    'event_name' => $this->stringUtil->revertInputEncoding($objEvent->title),
-                    'participant_uuid' => $objEventMemberModel->uuid,
-                    'participant_name' => $this->stringUtil->revertInputEncoding($objEventMemberModel->firstname.' '.$objEventMemberModel->lastname),
-                    'participant_email' => $objEventMemberModel->email,
-                    'event_link_detail' => $this->contentUrlGenerator->generate($objEvent, [], UrlGeneratorInterface::ABSOLUTE_URL),
-                ];
-
-                $messageCount = 0;
-
-                foreach ($notificationIds as $notificationId) {
-                    $receiptCollection = $this->notificationCenter->sendNotification($notificationId, $arrTokens, $this->sacevtLocale);
-
-                    if ($receiptCollection->count()) {
-                        $messageCount += $receiptCollection->count();
-                    }
-                }
-
-                if ($messageCount > 0) {
-                    $msg = $this->translator->trans('MSC.participantHasBeenNotifiedAboutTheRegistrationStatusChange', [$objEventMemberModel->firstname, $objEventMemberModel->lastname], 'contao_default');
-                    $this->message->addInfo($msg);
-                }
-            }
-        }
-
-        return $varValue;
-    }
-
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.hasParticipated.save', priority: 100)]
-    public function saveCallbackHasParticipated(string $varValue, DataContainer $dc): string
-    {
-        if (!$dc->id) {
-            return $varValue;
-        }
-
-        $registration = $this->calendarEventsMember->findByPk($dc->id);
-
-        if (null === $registration) {
-            return $varValue;
-        }
-
-        $event = $this->calendarEvents->findByPk($registration->eventId);
-
-        if (null === $event) {
-            return $varValue;
-        }
-
-        if ((bool) $varValue === (bool) $registration->hasParticipated) {
-            return $varValue;
-        }
-
-        if ($varValue) {
-            $log = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "unconfirmed" to "confirmed".';
-            $context = Log::EVENT_PARTICIPATION_CONFIRM;
-        } else {
-            $log = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "confirmed" to "unconfirmed".';
-            $context = Log::EVENT_PARTICIPATION_UNCONFIRM;
-        }
-
-        $sacMemberId = $registration->sacMemberId ?? '0';
-
-        // System log
-        $this->contaoGeneralLogger?->info(
-            sprintf($log, $registration->firstname, $registration->lastname, $sacMemberId, $event->title, $event->id),
-            ['contao' => new ContaoContext(__METHOD__, $context)],
-        );
-
-        return $varValue;
+        return $updatedFields;
     }
 
     /**
-     * Add more data to the registration, when a backend user manually adds a new registration.
+     * Notify the member if the event subscription state was changed manually.
+     */
+    #[AsEventListener]
+    public function notifyMemberOnParticipationStateUpdate(ContaoPostUpdateEvent $event): void
+    {
+        $arrDiff = $event->getDiffData();
+
+        if ('tl_calendar_events_member' !== $event->getTableName()) {
+            return;
+        }
+
+        if (!isset($arrDiff['stateOfSubscription'])) {
+            return;
+        }
+
+        $arrReg = $event->getPostUpdateRecord();
+
+        $objEvent = $this->calendarEvents->findByPk($arrReg['eventId']);
+
+        if (null === $objEvent) {
+            throw new \Exception(sprintf('The event ID %d that is associated with the registration does not exist.', $arrReg['id']));
+        }
+
+        if (!$this->validator->isEmail($arrReg['email'])) {
+            throw new \Exception(sprintf('Can not send the notification because the email address "%s" is not valid.', $arrReg['email']));
+        }
+
+        $notificationIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_nc_notification WHERE type = ?', [SubscriptionStateChangeNotificationType::NAME], [Types::STRING]);
+
+        if (empty($notificationIds)) {
+            return;
+        }
+
+        $arrTokens = [
+            'participant_state_of_subscription' => $this->stringUtil->revertInputEncoding((string) $GLOBALS['TL_LANG']['MSC'][$arrReg['stateOfSubscription']]),
+            'event_name' => $this->stringUtil->revertInputEncoding($objEvent->title),
+            'participant_uuid' => $arrReg['uuid'],
+            'participant_name' => $this->stringUtil->revertInputEncoding($arrReg['firstname'].' '.$arrReg['lastname']),
+            'participant_email' => $arrReg['email'],
+            'event_link_detail' => $this->contentUrlGenerator->generate($objEvent, [], UrlGeneratorInterface::ABSOLUTE_URL),
+        ];
+
+        $messageCount = 0;
+
+        foreach ($notificationIds as $notificationId) {
+            $receiptCollection = $this->notificationCenter->sendNotification($notificationId, $arrTokens, $this->sacevtLocale);
+
+            if ($receiptCollection->count()) {
+                $messageCount += $receiptCollection->count();
+            }
+        }
+
+        if ($messageCount) {
+            $msg = $this->translator->trans('MSC.participantHasBeenNotifiedAboutTheRegistrationStatusChange', [$arrReg['firstname'], $arrReg['lastname']], 'contao_default');
+            $this->message->addInfo($msg);
+        }
+    }
+
+    #[AsEventListener]
+    public function writeParticipationStateChangeToContaoSystemLog(ContaoPostUpdateEvent $event): void
+    {
+        $arrDiff = $event->getDiffData();
+
+        if ('tl_calendar_events_member' !== $event->getTableName()) {
+            return;
+        }
+
+        if (!isset($arrDiff['hasParticipated'])) {
+            return;
+        }
+
+        $objReg = $this->calendarEventsMember->findByPk($event->getRecordId());
+
+        if (null === $objReg) {
+            throw new \Exception(sprintf('Registration with ID %d not found.', $event->getRecordId()));
+        }
+
+        $objEvent = $this->calendarEvents->findByPk($objReg->eventId);
+
+        if (null === $objEvent) {
+            throw new \Exception(sprintf('The event ID %d that is associated with the registration does not exist.', $objReg->id));
+        }
+
+        if (true === (bool) $arrDiff['hasParticipated']) {
+            $logText = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "unconfirmed" to "confirmed".';
+            $context = Log::EVENT_PARTICIPATION_CONFIRM;
+        } else {
+            $logText = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "confirmed" to "unconfirmed".';
+            $context = Log::EVENT_PARTICIPATION_UNCONFIRM;
+        }
+
+        $sacMemberId = $objReg->sacMemberId ?? '0';
+
+        $this->contaoGeneralLogger?->info(
+            sprintf($logText, $objReg->firstname, $objReg->lastname, $sacMemberId, $objEvent->title, $objEvent->id),
+            ['contao' => new ContaoContext(__METHOD__, $context)],
+        );
+    }
+
+    /**
+     * Add the event id, uuid and the date added timestamp to the record,
+     * if a backend user manually adds a new registration.
      *
      * @throws Exception
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'config.oncreate', priority: 100)]
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.oncopy', priority: 100)]
     public function oncreateCallback(string $strTable, int $insertId, array $arrFields, DataContainer $dc): void
     {
         if (!$dc->id) {
             return;
         }
 
-        if (empty($arrFields['dateAdded'])) {
-            $set = ['dateAdded' => time()];
-            $this->connection->update('tl_calendar_events_member', $set, ['id' => $insertId]);
-        }
+        $set = [
+            'uuid' => Uuid::uuid4()->toString(),
+            'eventId' => $this->requestStack->getCurrentRequest()->query->get('id'),
+            'dateAdded' => time(),
+        ];
+
+        $this->connection->update('tl_calendar_events_member', $set, ['id' => $insertId]);
     }
 
     /**
-     * Add more data to the registration, when user adds a new registration manually.
+     * Add more data to the registration,
+     * if the user manually adds a new registration.
      *
      * @throws Exception
      */
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onsubmit', priority: 100)]
-    public function onsubmitCallback(DataContainer $dc): void
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onbeforesubmit', priority: 100)]
+    public function onBeforeSubmitCallback(array $arrData, DataContainer $dc): array
     {
         if (!$dc->activeRecord) {
-            return;
+            return $arrData;
         }
 
-        $arrReg = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events_member WHERE id = ?', [$dc->id]);
-
         $set = [
-            'dateAdded' => empty($arrReg['dateAdded']) ? time() : $arrReg['dateAdded'],
-            'tstamp' => time(),
             'contaoMemberId' => 0,
         ];
 
-        // Set the Contao member id
-        if (!empty($arrReg['sacMemberId'])) {
-            $id = $this->connection->fetchOne('SELECT id FROM tl_member WHERE sacMemberId = ?', [$arrReg['sacMemberId']]);
+        // $arrData will only contain values that have been changed.
+        $arrReg = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events_member WHERE id = ?', [$dc->activeRecord->id]);
 
-            if ($id) {
-                $set['contaoMemberId'] = $id;
-                $dc->activeRecord->contaoMemberId = $id;
-            }
+        $sacMemberId = $arrData['sacMemberId'] ?? $arrReg['sacMemberId'];
+
+        // Set the Contao member id, if it has one.
+        $id = 0;
+
+        if (!empty($sacMemberId)) {
+            $id = $this->connection->fetchOne(
+                'SELECT id FROM tl_member WHERE sacMemberId = ?',
+                [
+                    (int) $sacMemberId,
+                ],
+                [
+                    Types::INTEGER,
+                ],
+            );
         }
 
+        $set['contaoMemberId'] = (int) $id;
+        $dc->activeRecord->contaoMemberId = (int) $id;
+
         // Add correct event id and event title
-        $arrEvent = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events WHERE id = ?', [$arrReg['eventId']]);
+        $arrEvent = $this->connection->fetchAssociative(
+            'SELECT * FROM tl_calendar_events WHERE id = ?',
+            [
+                $dc->activeRecord->eventId,
+            ],
+            [
+                Types::INTEGER,
+            ],
+        );
 
         if ($arrEvent) {
             // Set correct event title and eventId
             $set['eventName'] = $arrEvent['title'];
+            $arrData['eventName'] = $arrEvent['title'];
             $dc->activeRecord->eventName = $arrEvent['title'];
-
-            $set['eventId'] = $arrEvent['id'];
-            $dc->activeRecord->eventId = $arrEvent['id'];
         }
 
         $this->connection->update('tl_calendar_events_member', $set, ['id' => $dc->id]);
+
+        return $arrData;
     }
 
     /**
@@ -471,8 +530,8 @@ class CalendarEventsMember
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.label.label', priority: 100)]
     public function addIcon(array $row, string $label, DataContainer $dc, array $args): array
     {
-        $registrationModel = $this->calendarEventsMember->findByPk($row['id']);
-        $icon = $this->eventRegistrationUtil->getSubscriptionStateIcon($registrationModel);
+        $objReg = $this->calendarEventsMember->findByPk($row['id']);
+        $icon = $this->eventRegistrationUtil->getSubscriptionStateIcon($objReg);
         $args[0] = sprintf('<div>%s</div>', $icon);
 
         return $args;
@@ -481,38 +540,38 @@ class CalendarEventsMember
     #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.dashboard.input_field', priority: 100)]
     public function parseNotificationButtonDashboard(DataContainer $dc): string
     {
-        $registration = $this->calendarEventsMember->findByPk($dc->id);
+        $objReg = $this->calendarEventsMember->findByPk($dc->id);
 
-        if (null === $registration) {
+        if (null === $objReg) {
             return '';
         }
 
-        $event = $this->calendarEvents->findByPk($registration->eventId);
+        $objEvent = $this->calendarEvents->findByPk($objReg->eventId);
 
-        if (null === $event) {
+        if (null === $objEvent) {
             return '';
         }
 
-        if ($registration->tstamp && !$this->validator->isEmail($registration->email)) {
+        if ($objReg->tstamp && !$this->validator->isEmail($objReg->email)) {
             $this->message->addInfo($this->translator->trans('tl_calendar_events_member.notificationDueToMissingEmailDisabled', [], 'contao_default'));
         }
 
-        if ($registration->hasParticipated) {
+        if ($objReg->hasParticipated) {
             $this->message->addInfo('Dieser Teilnehmer/diese Teilnehmerin hat am Anlass teilgenommen. Es können deshalb keine Benachrichtigungen versandt werden.');
 
             return '';
         }
 
-        if (!$this->validator->isEmail($registration->email)) {
+        if (!$this->validator->isEmail($objReg->email)) {
             return '';
         }
 
         $template = new BackendTemplate('be_calendar_events_registration_dashboard');
-        $template->registration = $registration;
-        $template->state_of_subscription = $registration->stateOfSubscription;
-        $template->event = $event->row();
+        $template->registration = $objReg;
+        $template->state_of_subscription = $objReg->stateOfSubscription;
+        $template->event = $objEvent->row();
         $template->show_email_buttons = true;
-        $template->event_is_fully_booked = $this->calendarEventsUtil->eventIsFullyBooked($event);
+        $template->event_is_fully_booked = $this->calendarEventsUtil->eventIsFullyBooked($objEvent);
 
         return $template->parse();
     }

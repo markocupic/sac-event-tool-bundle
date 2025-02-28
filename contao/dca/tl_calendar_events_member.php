@@ -139,7 +139,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		'uuid'                        => [
 			'exclude'   => true,
 			'inputType' => 'text',
-			'default'   => Uuid::uuid4()->toString(),
 			'eval'      => ['unique' => true, 'doNotCopy' => true],
 			'sql'       => "char(36) NOT NULL default ''",
 		],
@@ -153,7 +152,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		'eventId'                     => [
 			'exclude'    => true,
 			'foreignKey' => 'tl_calendar_events.title',
-			'default'    => Input::get('id'),
 			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 			'eval'       => ['doNotShow' => true, 'readonly' => true],
@@ -256,7 +254,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		'sacMemberId'                 => [
 			'exclude'   => true,
 			'inputType' => 'text',
-			'eval'      => ['doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'],
+			'eval'      => ['doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberIdOrEmptyString', 'maxlength' => 6, 'tl_class' => 'clr'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'notes'                       => [
