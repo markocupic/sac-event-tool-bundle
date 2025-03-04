@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\BackendHomeScreen;
 
-use Code4Nix\UriSigner\UriSigner;
 use Codefog\HasteBundle\UrlParser;
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
@@ -32,6 +31,7 @@ use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment as Twig;
 use Twig\Error\LoaderError;
@@ -46,15 +46,15 @@ class DashboardController
 
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
-        private readonly ContaoFramework $framework,
         private readonly Connection $connection,
-        private readonly RequestStack $requestStack,
-        private readonly Twig $twig,
-        private readonly Security $security,
         private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
-        private readonly UrlParser $urlParser,
-        private readonly UriSigner $uriSigner,
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
         private readonly RouterInterface $router,
+        private readonly Security $security,
+        private readonly Twig $twig,
+        private readonly UriSigner $uriSigner,
+        private readonly UrlParser $urlParser,
     ) {
         // Adapters
         $this->calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
