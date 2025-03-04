@@ -24,11 +24,11 @@ use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 
-class EventMember
+readonly class EventMember
 {
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly string $projectDir,
+        private CalendarEventsUtil $calendarEventsUtil,
+        private ContaoFramework $framework,
     ) {
         $this->framework->initialize();
     }
@@ -42,15 +42,13 @@ class EventMember
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
         /** @var $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
-        /** @var CalendarEventsUtil $calendarEventsUtilAdapter */
-        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
 
         $i = 0;
 
         // TL
-        $arrInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent, ['includeDisabled' => true]);
+        $arrInstructors = $this->calendarEventsUtil->getInstructorsAsArray($objEvent, ['includeDisabled' => true]);
 
-        if (!empty($arrInstructors) && \is_array($arrInstructors)) {
+        if (!empty($arrInstructors)) {
             foreach ($arrInstructors as $userId) {
                 $objUserModel = $userModelAdapter->findByPk($userId);
                 $strMemberInSection = '';
@@ -69,7 +67,7 @@ class EventMember
                             $isMember = false;
                         }
 
-                        $strMemberInSection = '('.CalendarEventsUtil::getSectionMembershipAsString($objMember).')';
+                        $strMemberInSection = '('.$this->calendarEventsUtil->getSectionMembershipAsString($objMember).')';
                     }
 
                     // Keep this var empty
@@ -135,7 +133,7 @@ class EventMember
                         if ($objMemberModel->isSacMember && !$objMemberModel->disable) {
                             $strIsActiveMember = ' ';
                         }
-                        $strMemberInSection = '('.CalendarEventsUtil::getSectionMembershipAsString($objMemberModel).')';
+                        $strMemberInSection = '('.$this->calendarEventsUtil->getSectionMembershipAsString($objMemberModel).')';
                     }
                 }
 
@@ -180,23 +178,23 @@ class EventMember
         }
 
         // Event instructors
-        $aInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent, ['includeDisabled' => true]);
+        $aInstructors = $this->calendarEventsUtil->getInstructorsAsArray($objEvent, ['includeDisabled' => true]);
 
         $arrInstructors = array_map(
-            function ($id) {
+            function ($id): string|null {
                 $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
                 $objUser = $userModelAdapter->findByPk($id);
 
-                if (null !== $objUser) {
-                    return $objUser->name;
-                }
+                return $objUser?->name;
             },
             $aInstructors
         );
+
+        $arrInstructors = array_filter($arrInstructors);
         $objPhpWord->replace('eventInstructors', $this->prepareString(implode(', ', $arrInstructors)));
 
-        // Event Id
+        // Event ID
         $objPhpWord->replace('eventId', $objEvent->id);
     }
 
@@ -217,6 +215,6 @@ class EventMember
             return '';
         }
 
-        return htmlspecialchars(html_entity_decode((string) $string));
+        return htmlspecialchars(html_entity_decode($string));
     }
 }

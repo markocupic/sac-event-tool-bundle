@@ -55,7 +55,6 @@ class NotifyEventRegistrationStateController
     private Adapter $stringUtil;
     private Adapter $calendarEvents;
     private Adapter $calendarEventsMember;
-    private Adapter $calendarEventsUtil;
     private Adapter $config;
     private Adapter $controller;
     private Adapter $member;
@@ -63,12 +62,13 @@ class NotifyEventRegistrationStateController
     private Adapter $validator;
 
     public function __construct(
-        private readonly UriSigner $uriSigner,
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
         private readonly Environment $twig,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
+        private readonly UriSigner $uriSigner,
         private readonly UrlParser $urlParser,
         private readonly string $sacevtEventRegistrationConfigEmailAcceptTemplPath,
         private readonly string $sacevtEventRegistrationConfigEmailCancelTemplPath,
@@ -80,7 +80,6 @@ class NotifyEventRegistrationStateController
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->config = $this->framework->getAdapter(Config::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->events = $this->framework->getAdapter(Events::class);

@@ -33,15 +33,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EventICal
 {
-    private Adapter $calendarEventsUtil;
     private Adapter $events;
     private Adapter $stringUtil;
 
     public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
         private readonly InsertTagParser $insertTagParser,
     ) {
-        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->events = $this->framework->getAdapter(Events::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }

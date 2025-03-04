@@ -40,6 +40,7 @@ class TourListGenerator extends AbstractController
     private const string STORAGE_DIR = 'files/sektion/tmp/tourlist_booklet/tmp';
 
     public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly ConvertFile $convertFile,
@@ -163,7 +164,7 @@ class TourListGenerator extends AbstractController
             $templateProcessor->setValue('id_#'.$index_outer, $this->prepareString((string) $event->id), 1);
 
             // event id
-            $templateProcessor->setValue('event_id_#'.$index_outer, CalendarEventsUtil::getEventData($event, 'eventId'), 1);
+            $templateProcessor->setValue('event_id_#'.$index_outer, $this->calendarEventsUtil->getEventData($event, 'eventId'), 1);
 
             // title
             $templateProcessor->setValue('title_#'.$index_outer, $this->prepareString($event->title), 1);
@@ -172,15 +173,15 @@ class TourListGenerator extends AbstractController
             $templateProcessor->setValue('teaser_#'.$index_outer, $this->prepareString(StringUtil::substr($event->teaser, self::TEASER_LENGTH)), 1);
 
             // date span
-            $strDateSpan = CalendarEventsUtil::getEventPeriod($event, 'D, d.m.Y', true, false, true);
+            $strDateSpan = $this->calendarEventsUtil->getEventPeriod($event, 'D, d.m.Y', true, false, true);
             $templateProcessor->setValue('date_span_#'.$index_outer, $this->prepareString(strip_tags($strDateSpan)), 1);
 
             // tour type
-            $strTourType = implode(', ', CalendarEventsUtil::getTourTypesAsArray($event));
+            $strTourType = implode(', ', $this->calendarEventsUtil->getTourTypesAsArray($event));
             $templateProcessor->setValue('tour_type_#'.$index_outer, $this->prepareString(strip_tags($strTourType)), 1);
 
             // tour tech difficulty
-            $strTechDiff = implode(', ', CalendarEventsUtil::getTourTechDifficultiesAsArray($event));
+            $strTechDiff = implode(', ', $this->calendarEventsUtil->getTourTechDifficultiesAsArray($event));
             $templateProcessor->setValue('tech_diff_#'.$index_outer, $this->prepareString(strip_tags($strTechDiff)), 1);
 
             $arrMoreDetails = [];
@@ -200,12 +201,12 @@ class TourListGenerator extends AbstractController
             $templateProcessor->setValue('more_details_#'.$index_outer, implode(',    ', $arrMoreDetails), 1);
 
             // tour guide
-            $strMainInstructor = implode(', ', CalendarEventsUtil::getInstructorNamesAsArray($event, ['includeHidden' => false]));
+            $strMainInstructor = implode(', ', $this->calendarEventsUtil->getInstructorNamesAsArray($event, ['includeHidden' => false]));
             $strMainInstructor = \strlen($strMainInstructor) ? $strMainInstructor : '---';
             $templateProcessor->setValue('tour_guide_#'.$index_outer, $this->prepareString(' '.$strMainInstructor.' '), 1);
 
             // public transport event
-            $isPublicTransport = CalendarEventsUtil::isPublicTransportEvent($event);
+            $isPublicTransport = $this->calendarEventsUtil->isPublicTransportEvent($event);
 
             if ($isPublicTransport) {
                 $path = Path::join($this->projectDir, 'vendor/markocupic/sac-event-tool-bundle/public/icons/tour_booklet/oev-tour-badge.png');
@@ -215,7 +216,7 @@ class TourListGenerator extends AbstractController
             }
 
             // organizer icons
-            $arrOrgLogoPaths = CalendarEventsUtil::getEventOrganizerLogoPaths($event);
+            $arrOrgLogoPaths = $this->calendarEventsUtil->getEventOrganizerLogoPaths($event);
 
             for ($i = 0; $i < 5; ++$i) {
                 if (isset($arrOrgLogoPaths[$i])) {

@@ -66,7 +66,6 @@ class CalendarEvents
 {
     // Adapters
     private Adapter $arrayUtil;
-    private Adapter $calendarEventsUtil;
     private Adapter $calendarEventsJourneyModel;
     private Adapter $calendarEventsModel;
     private Adapter $calendarModel;
@@ -82,7 +81,7 @@ class CalendarEvents
     private Adapter $userModel;
 
     public function __construct(
-        private readonly TranslatorInterface $translator,
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly CourseLevels $courseLevels,
@@ -91,11 +90,11 @@ class CalendarEvents
         private readonly PasswordHasherFactoryInterface $passwordHasherFactory,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
+        private readonly TranslatorInterface $translator,
         private readonly string $sacevtEventRegistrationConfigEmailAcceptCustomTemplPath,
     ) {
         // Adapters
         $this->arrayUtil = $this->framework->getAdapter(ArrayUtil::class);
-        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsJourneyModel = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarModel = $this->framework->getAdapter(CalendarModel::class);

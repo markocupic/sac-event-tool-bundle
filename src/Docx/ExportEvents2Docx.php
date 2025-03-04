@@ -46,9 +46,10 @@ class ExportEvents2Docx
     private array|null $arrDatarecord;
 
     public function __construct(
-        private readonly CourseLevels $courseLevels,
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly BinaryFileDownload $binaryFileDownload,
         private readonly ContaoFramework $framework,
+        private readonly CourseLevels $courseLevels,
         private readonly string $projectDir,
     ) {
         $this->framework->initialize(true);
@@ -242,7 +243,7 @@ class ExportEvents2Docx
             }
 
             if ('instructor' === $field) {
-                $arrInstructors = CalendarEventsUtil::getInstructorsAsArray($objEvent);
+                $arrInstructors = $this->calendarEventsUtil->getInstructorsAsArray($objEvent);
                 $arrValue = array_map(
                     static fn ($v) => UserModel::findByPk($v)->name,
                     $arrInstructors
@@ -279,7 +280,7 @@ class ExportEvents2Docx
             // Kusdatendaten in der Form d.m.Y, d.m.Y, ...
             if ('eventDates' === $field) {
                 $objEvent = CalendarEventsModel::findByPk($this->arrDatarecord['id']);
-                $arr = CalendarEventsUtil::getEventTimestamps($objEvent);
+                $arr = $this->calendarEventsUtil->getEventTimestamps($objEvent);
                 $arr = array_map(
                     static fn ($tstamp) => Date::parse('d.m.Y', $tstamp),
                     $arr

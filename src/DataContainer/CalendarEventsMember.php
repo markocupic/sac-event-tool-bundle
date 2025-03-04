@@ -70,7 +70,6 @@ class CalendarEventsMember
 
     // Adapters
     private Adapter $calendarEvents;
-    private Adapter $calendarEventsUtil;
     private Adapter $calendarEventsMember;
     private Adapter $controller;
     private Adapter $member;
@@ -79,6 +78,7 @@ class CalendarEventsMember
     private Adapter $validator;
 
     public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly Connection $connection,
         private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
@@ -100,7 +100,6 @@ class CalendarEventsMember
     ) {
         // Adapters
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->member = $this->framework->getAdapter(MemberModel::class);

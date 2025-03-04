@@ -17,7 +17,6 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Knp\Menu\MenuItem;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
@@ -30,14 +29,14 @@ use Symfony\Component\Routing\RouterInterface;
  * Generates the small button bar on the bottom of the event form.
  */
 #[AsHook('generateEventDashboard', priority: 100)]
-class GenerateEventDashboardListener
+readonly class GenerateEventDashboardListener
 {
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly Security $security,
-        private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
-        private readonly RequestStack $requestStack,
-        private readonly RouterInterface $router,
+        private CalendarEventsUtil $calendarEventsUtil,
+        private Security $security,
+        private ContaoCsrfTokenManager $contaoCsrfTokenManager,
+        private RequestStack $requestStack,
+        private RouterInterface $router,
     ) {
     }
 
@@ -46,7 +45,6 @@ class GenerateEventDashboardListener
      */
     public function __invoke(MenuItem $menu, CalendarEventsModel $objEvent): void
     {
-        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
         $request = $this->requestStack->getCurrentRequest();
         $eventId = $objEvent->id;
         $calendarId = $objEvent->getRelated('pid')->id;
@@ -85,7 +83,7 @@ class GenerateEventDashboardListener
         ;
 
         // "Go to event-preview" button
-        if (($href = $calendarEventsUtilAdapter->generateEventPreviewUrl($objEvent)) !== '') {
+        if (($href = $this->calendarEventsUtil->generateEventPreviewUrl($objEvent)) !== '') {
             $menu->addChild('Vorschau', ['uri' => $href])
                 ->setLinkAttribute('role', 'button')
                 ->setLinkAttribute('class', 'tl_submit')

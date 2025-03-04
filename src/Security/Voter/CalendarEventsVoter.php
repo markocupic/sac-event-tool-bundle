@@ -28,14 +28,14 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class CalendarEventsVoter extends Voter
 {
-    public const CAN_DELETE_EVENT = 'sacevt_can_delete_event';
-    public const CAN_WRITE_EVENT = 'sacevt_can_write_event';
-    public const CAN_CUT_EVENT = 'sacevt_can_cut_event';
-    public const CAN_UPGRADE_EVENT_RELEASE_LEVEL = 'sacevt_can_upgrade_event_release_level';
-    public const CAN_DOWNGRADE_EVENT_RELEASE_LEVEL = 'sacevt_can_downgrade_event_release_level';
-    public const CAN_ADMINISTER_EVENT_REGISTRATIONS = 'sacevt_can_administer_event_registrations';
+    public const string CAN_DELETE_EVENT = 'sacevt_can_delete_event';
+    public const string CAN_WRITE_EVENT = 'sacevt_can_write_event';
+    public const string CAN_CUT_EVENT = 'sacevt_can_cut_event';
+    public const string CAN_UPGRADE_EVENT_RELEASE_LEVEL = 'sacevt_can_upgrade_event_release_level';
+    public const string CAN_DOWNGRADE_EVENT_RELEASE_LEVEL = 'sacevt_can_downgrade_event_release_level';
+    public const string CAN_ADMINISTER_EVENT_REGISTRATIONS = 'sacevt_can_administer_event_registrations';
 
-    private const EVENT_PERMISSIONS_ALL = [
+    private const array EVENT_PERMISSIONS_ALL = [
         self::CAN_DELETE_EVENT,
         self::CAN_WRITE_EVENT,
         self::CAN_CUT_EVENT,
@@ -46,7 +46,6 @@ class CalendarEventsVoter extends Voter
 
     // Adapters
     private Adapter $calendarEvent;
-    private Adapter $calendarEventsUtil;
     private Adapter $eventReleaseLevelPolicy;
     private Adapter $stringUtil;
 
@@ -54,6 +53,7 @@ class CalendarEventsVoter extends Voter
     private BackendUser|null $user = null;
 
     public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
         private readonly Security $security,
         #[Autowire('%sacevt.event_registration.config.reg_start_time_offset%')]
@@ -61,7 +61,6 @@ class CalendarEventsVoter extends Voter
     ) {
         // Adapters
         $this->calendarEvent = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->eventReleaseLevelPolicy = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }

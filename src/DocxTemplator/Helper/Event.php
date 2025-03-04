@@ -38,6 +38,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class Event
 {
     public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
         private readonly TranslatorInterface $translator,
         private readonly Connection $connection,
@@ -57,9 +58,6 @@ class Event
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        /** @var CalendarEventsUtil $calendarEventsUtilAdapter */
-        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
-
         // Event data
         $objPhpWord->replace('eventTitle', $this->prepareString($objEvent->title));
         $controllerAdapter->loadLanguageFile('tl_calendar_events');
@@ -72,7 +70,7 @@ class Event
 
         // Generate event duration string
         $arrEventDates = [];
-        $eventTimestamps = $calendarEventsUtilAdapter->getEventTimestamps($objEvent);
+        $eventTimestamps = $this->calendarEventsUtil->getEventTimestamps($objEvent);
 
         foreach ($eventTimestamps as $i => $v) {
             if (\count($eventTimestamps) - 1 === $i) {
@@ -85,7 +83,7 @@ class Event
         $strEventDuration = implode(', ', $arrEventDates);
 
         // Get tour profile
-        $arrTourProfile = $calendarEventsUtilAdapter->getTourProfileAsArray($objEvent);
+        $arrTourProfile = $this->calendarEventsUtil->getTourProfileAsArray($objEvent);
         $strTourProfile = implode("\r\n", $arrTourProfile);
         $strTourProfile = str_replace('Tag: ', 'Tag:'."\r\n", $strTourProfile);
 
@@ -114,7 +112,7 @@ class Event
 
         $objPhpWord->replace('eventDates', $this->prepareString($strEventDuration));
         $objPhpWord->replace('eventMeetingpoint', $this->prepareString($objEvent->meetingPoint));
-        $objPhpWord->replace('eventTechDifficulties', $this->prepareString(implode(', ', $calendarEventsUtilAdapter->getTourTechDifficultiesAsArray($objEvent, false, false))));
+        $objPhpWord->replace('eventTechDifficulties', $this->prepareString(implode(', ', $this->calendarEventsUtil->getTourTechDifficultiesAsArray($objEvent, false, false))));
         $objPhpWord->replace('eventEquipment', $this->prepareString($objEvent->equipment), ['multiline' => true]);
         $objPhpWord->replace('eventTourProfile', $this->prepareString($strTourProfile), ['multiline' => true]);
         $objPhpWord->replace('emergencyConcept', $this->prepareString($strEmergencyConcept), ['multiline' => true]);
@@ -132,9 +130,6 @@ class Event
 
         /** @var System $systemAdapter */
         $systemAdapter = $this->framework->getAdapter(System::class);
-
-        /** @var CalendarEventsUtil $calendarEventsUtilAdapter */
-        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
 
         /** @var CalendarEventsJourneyModel $calendarEventsJourneyModel */
         $calendarEventsJourneyModel = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
@@ -172,7 +167,7 @@ class Event
         $countParticipants = $countFemale + $countMale + $countDivers;
 
         // Count instructors
-        $arrInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent, ['includeDisabled' => true]);
+        $arrInstructors = $this->calendarEventsUtil->getInstructorsAsArray($objEvent, ['includeDisabled' => true]);
         $countInstructors = \count($arrInstructors);
         $objUser = $userModel->findMultipleByIds($arrInstructors);
 

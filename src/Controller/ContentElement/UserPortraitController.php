@@ -32,6 +32,7 @@ class UserPortraitController extends AbstractContentElementController
     public const TYPE = 'user_portrait';
 
     public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
     ) {
     }
@@ -43,14 +44,11 @@ class UserPortraitController extends AbstractContentElementController
 
     protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {
-        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
-
         $user = null;
 
         if ($request->query->has('username')) {
             $username = $request->query->get('username');
-            $user = $userModelAdapter->findByUsername($username);
+            $user = $this->framework->getAdapter(UserModel::class)->findByUsername($username);
         }
 
         // Do not display the profile of a disabled or deleted user.
@@ -63,7 +61,7 @@ class UserPortraitController extends AbstractContentElementController
         }
 
         $arrUser = $user->row();
-        $arrUser['mainQualification'] = $calendarEventsUtilAdapter->getMainQualification($user);
+        $arrUser['mainQualification'] = $this->calendarEventsUtil->getMainQualification($user);
         $template->set('user', $arrUser);
         $template->set('userModel', $user);
 

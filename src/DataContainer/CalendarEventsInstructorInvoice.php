@@ -21,7 +21,6 @@ use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\ResponseException;
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
 use Contao\Image;
 use Contao\Message;
@@ -50,14 +49,14 @@ readonly class CalendarEventsInstructorInvoice
      * Import the back end user object.
      */
     public function __construct(
-        private ContaoFramework $framework,
-        private RequestStack $requestStack,
+        private CalendarEventsUtil $calendarEventsUtil,
         private Connection $connection,
-        private TranslatorInterface $translator,
-        private Security $security,
         private ContaoCsrfTokenManager $contaoCsrfTokenManager,
-        private TourRapportGenerator $tourRapportGenerator,
         private EventMember $eventMember,
+        private RequestStack $requestStack,
+        private Security $security,
+        private TourRapportGenerator $tourRapportGenerator,
+        private TranslatorInterface $translator,
         private string $sacevtEventTemplateTourInvoice,
         private string $sacevtEventTemplateTourRapport,
         private string $sacevtEventTourInvoiceFileNamePattern,
@@ -355,10 +354,8 @@ readonly class CalendarEventsInstructorInvoice
 
         $countParticipants = $objEventMember->count();
 
-        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
-
         // Count instructors
-        $arrInstructors = $calendarEventsUtilAdapter->getInstructorsAsArray($objEvent);
+        $arrInstructors = $this->calendarEventsUtil->getInstructorsAsArray($objEvent);
         $countInstructors = \count($arrInstructors);
 
         $countParticipantsTotal = $countParticipants + $countInstructors;

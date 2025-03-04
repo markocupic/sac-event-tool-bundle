@@ -44,7 +44,6 @@ class CalendarEvents
 {
     // Adapters
     private Adapter $backend;
-    private Adapter $calendarEventsUtil;
     private Adapter $calendarEventsModel;
     private Adapter $controller;
     private Adapter $image;
@@ -53,18 +52,18 @@ class CalendarEvents
     private Adapter $system;
 
     public function __construct(
-        private readonly TranslatorInterface $translator,
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly EventReleaseLevelUtil $eventReleaseLevelUtil,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
+        private readonly TranslatorInterface $translator,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
         // Adapters
         $this->backend = $this->framework->getAdapter(Backend::class);
-        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->image = $this->framework->getAdapter(Image::class);

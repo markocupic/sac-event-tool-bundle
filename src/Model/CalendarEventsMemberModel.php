@@ -196,7 +196,7 @@ class CalendarEventsMemberModel extends Model
 
                 $objEventModel = CalendarEventsModel::findByPk($arrEvent['id']);
                 $row = $objEventModel->row();
-                $row['dateSpan'] = CalendarEventsUtil::getEventPeriod($objEventModel, 'd.m.Y');
+                $row['dateSpan'] = System::getContainer()->get(CalendarEventsUtil::class)->getEventPeriod($objEventModel, 'd.m.Y');
                 $row['objEvent'] = $objEventModel;
                 $row['eventModel'] = $objEventModel;
                 $row['eventUrl'] = Events::generateEventUrl($objEventModel);

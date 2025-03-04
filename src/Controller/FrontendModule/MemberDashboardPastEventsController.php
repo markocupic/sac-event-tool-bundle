@@ -55,9 +55,10 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
     private FragmentTemplate|null $template;
 
     public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
-        private readonly Security $security,
         private readonly ConvertFile $convertFile,
+        private readonly Security $security,
         private readonly string $projectDir,
         private readonly string $sacevtTempDir,
         private readonly string $sacevtEventTemplateCourseConfirmation,
@@ -157,7 +158,6 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
         $dateAdapter = $this->framework->getAdapter(Date::class);
-        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
 
         if (null !== $this->objUser) {
             $objRegistration = $calendarEventsMemberModelAdapter->findByPk($inputAdapter->get('id'));
@@ -183,7 +183,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 
                                 return $dateAdapter->parse('d.m.Y', $tstmp);
                             },
-                            $calendarEventsUtilAdapter->getEventTimestamps($objEvent)
+                            $this->calendarEventsUtil->getEventTimestamps($objEvent)
                         );
 
                         // Course id

@@ -15,12 +15,19 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Twig\Extension;
 
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class TwigQrCodeManager extends AbstractExtension
 {
+    public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
+        private readonly ContaoFramework $framework,
+    ) {
+    }
+
     public function getFunctions(): array
     {
         return [
@@ -40,11 +47,11 @@ class TwigQrCodeManager extends AbstractExtension
     public function getEventQrCode(CalendarEventsModel|int $varEvent): string
     {
         if (\is_int($varEvent)) {
-            $event = CalendarEventsModel::findByPk($varEvent);
+            $event = $this->framework->getAdapter(CalendarEventsModel::class)->findByPk($varEvent);
         } else {
             $event = $varEvent;
         }
 
-        return CalendarEventsUtil::getEventQrCode($event) ?? '';
+        return $this->calendarEventsUtil->getEventQrCode($event) ?? '';
     }
 }

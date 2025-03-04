@@ -15,12 +15,9 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Tests\ContaoManager;
 
 use Code4Nix\UriSigner\Code4NixUriSigner;
-use Contao\CalendarBundle\ContaoCalendarBundle;
-use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\DelegatingParser;
 use Contao\TestCase\ContaoTestCase;
-use Markocupic\ContaoFrontendUserNotification\MarkocupicContaoFrontendUserNotification;
 use Markocupic\RssFeedGeneratorBundle\MarkocupicRssFeedGeneratorBundle;
 use Markocupic\SacEventToolBundle\ContaoManager\Plugin;
 use Markocupic\SacEventToolBundle\MarkocupicSacEventToolBundle;
@@ -41,8 +38,8 @@ class PluginTest extends ContaoTestCase
 
         $this->assertCount(3, $bundles);
 
-		$this->assertInstanceOf(BundleConfig::class, $bundles[0]);
-		$this->assertSame(Code4NixUriSigner::class, $bundles[0]->getName());
+        $this->assertInstanceOf(BundleConfig::class, $bundles[0]);
+        $this->assertSame(Code4NixUriSigner::class, $bundles[0]->getName());
 
         $this->assertInstanceOf(BundleConfig::class, $bundles[1]);
         $this->assertSame(MarkocupicRssFeedGeneratorBundle::class, $bundles[1]->getName());

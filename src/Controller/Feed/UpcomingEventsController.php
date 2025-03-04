@@ -38,12 +38,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class UpcomingEventsController extends AbstractController
 {
     private readonly Adapter $calendarEventsModel;
-    private readonly Adapter $calendarEventsUtil;
     private readonly Adapter $events;
     private readonly Adapter $environment;
     private readonly Adapter $stringUtil;
 
     public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
         private readonly FeedFactory $feedFactory,
         private readonly Connection $connection,
@@ -51,7 +51,6 @@ class UpcomingEventsController extends AbstractController
         private readonly string $projectDir,
     ) {
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->events = $this->framework->getAdapter(Events::class);
         $this->environment = $this->framework->getAdapter(Environment::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);

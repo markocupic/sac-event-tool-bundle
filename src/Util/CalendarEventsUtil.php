@@ -24,10 +24,10 @@ use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\ContentModel;
 use Contao\Controller;
-use Contao\CoreBundle\InsertTag\InsertTagParser;
+use Contao\CoreBundle\Framework\Adapter;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\CoreBundle\Util\SymlinkUtil;
-use Contao\Date;
-use Contao\Events;
 use Contao\FilesModel;
 use Contao\Folder;
 use Contao\FrontendUser;
@@ -37,10 +37,8 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\Template;
 use Contao\UserModel;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
-use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
@@ -54,22 +52,32 @@ use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Markocupic\SacEventToolBundle\Model\TourTypeModel;
-use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CalendarEventsUtil
+#[Autoconfigure(public: true)]
+readonly class CalendarEventsUtil
 {
+    public function __construct(
+        private ContaoFramework $framework,
+    ) {
+    }
+
     /**
      * @param Template|null $objTemplate
-     *
-     * @throws \Exception
      */
-    public static function getEventData(CalendarEventsModel $objEvent, string $strProperty, Template|null $objTemplate = null): mixed
+    public function getEventData(CalendarEventsModel $objEvent, string $strProperty, Template|null $objTemplate = null): mixed
     {
+        $this->framework->initialize();
+
         // Load language files
-        Controller::loadLanguageFile('tl_calendar_events');
-        Controller::loadLanguageFile('default');
+        $this->getAdapter(System::class)->loadLanguageFile('tl_calendar_events');
+        $this->getAdapter(System::class)->loadLanguageFile('default');
+
         $value = '';
 
         // Add arguments with a query string eventImage?size=5
@@ -99,17 +107,24 @@ class CalendarEventsUtil
                 break;
 
             case 'eventId':
-                $value = sprintf('%s-%s', Date::parse('Y', $objEvent->startDate), $objEvent->id);
+                $value = sprintf('%s-%s', date('Y', (int) $objEvent->startDate), $objEvent->id);
                 break;
 
             case 'eventTitle':
-                $parser = System::getContainer()->get('contao.insert_tag.parser');
-                $value = $parser->replace(sprintf('{{event_title::%s}}', $objEvent->id));
+                $value = StringUtil::revertInputEncoding($objEvent->title);
                 break;
 
             case 'eventUrl':
-                $parser = System::getContainer()->get('contao.insert_tag.parser');
-                $value = $parser->replace(sprintf('{{event_url::%s}}', $objEvent->id));
+                $blnAbsolute = false;
+
+                $value = $this->getContainer()
+                    ->get('contao.routing.content_url_generator')
+                    ->generate(
+                        $objEvent,
+                        [],
+                        $blnAbsolute ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH,
+                    )
+                ;
                 break;
 
             case 'tourTypesIds':
@@ -117,92 +132,92 @@ class CalendarEventsUtil
                 break;
 
             case 'tourTypesShortcuts':
-                $value = implode(' ', static::getTourTypesAsArray($objEvent, 'shortcut', true));
+                $value = implode(' ', $this->getTourTypesAsArray($objEvent, 'shortcut', true));
                 break;
 
             case 'tourTypesTitles':
-                $value = implode('<br>', static::getTourTypesAsArray($objEvent, 'title'));
+                $value = implode('<br>', $this->getTourTypesAsArray($objEvent, 'title'));
                 break;
 
             case 'startDateDay':
-                $value = Date::parse('d', $objEvent->startDate);
+                $value = date('d', (int) $objEvent->startDate);
                 break;
 
             case 'startDateMonth':
-                $value = Date::parse('M', $objEvent->startDate);
+                $value = date('M', (int) $objEvent->startDate);
                 break;
 
             case 'startDateYear':
-                $value = Date::parse('y', $objEvent->startDate);
+                $value = date('y', (int) $objEvent->startDate);
                 break;
 
             case 'endDateDay':
-                $value = Date::parse('d', $objEvent->endDate);
+                $value = date('d', (int) $objEvent->endDate);
                 break;
 
             case 'endDateMonth':
-                $value = Date::parse('M', $objEvent->endDate);
+                $value = date('M', (int) $objEvent->endDate);
                 break;
 
             case 'endDateYear':
-                $value = Date::parse('y', $objEvent->endDate);
+                $value = date('y', (int) $objEvent->endDate);
                 break;
 
             case 'eventPeriodSmTooltip':
             case 'eventPeriodSm':
-                $value = static::getEventPeriod($objEvent, 'd.m.Y', false);
+                $value = $this->getEventPeriod($objEvent, 'd.m.Y', false);
                 break;
 
             case 'eventPeriodLgInline':
-                $value = static::getEventPeriod($objEvent, 'D, d.m.Y', false, true, true);
+                $value = $this->getEventPeriod($objEvent, 'D, d.m.Y', false, true, true);
                 break;
 
             case 'eventPeriodLgTooltip':
             case 'eventPeriodLg':
-                $value = static::getEventPeriod($objEvent, 'D, d.m.Y', false);
+                $value = $this->getEventPeriod($objEvent, 'D, d.m.Y', false);
                 break;
 
             case 'eventDuration':
-                $value = static::getEventDuration($objEvent);
+                $value = $this->getEventDuration($objEvent);
                 break;
 
             case 'registrationStartDateWithOffsetFormatted':
-                $regStartTime = $objEvent->registrationStartDate + System::getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
-                $value = Date::parse(Config::get('dateFormat'), $regStartTime);
+                $regStartTime = $objEvent->registrationStartDate + $this->getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
+                $value = date($this->getAdapter(Config::class)->get('dateFormat'), (int) $regStartTime);
                 break;
 
             case 'registrationStartTimeWithOffsetFormatted':
-                $regStartTime = $objEvent->registrationStartDate + System::getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
-                $value = Date::parse(Config::get('datimFormat'), $regStartTime);
+                $regStartTime = $objEvent->registrationStartDate + $this->getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
+                $value = date($this->getAdapter(Config::class)->get('datimFormat'), (int) $regStartTime);
                 break;
 
             case 'registrationEndDateFormatted':
                 // If registration end time! is set to default --> 23:59 then only show registration end date!
-                $endDate = Date::parse(Config::get('dateFormat'), $objEvent->registrationEndDate);
+                $endDate = date($this->getAdapter(Config::class)->get('dateFormat'), (int) $objEvent->registrationEndDate);
 
                 if (abs($objEvent->registrationEndDate - strtotime($endDate)) === (24 * 3600) - 60) {
-                    $formatedEndDate = Date::parse(Config::get('dateFormat'), $objEvent->registrationEndDate);
+                    $formatedEndDate = date($this->getAdapter(Config::class)->get('dateFormat'), (int) $objEvent->registrationEndDate);
                 } else {
-                    $formatedEndDate = Date::parse(Config::get('datimFormat'), $objEvent->registrationEndDate);
+                    $formatedEndDate = date($this->getAdapter(Config::class)->get('datimFormat'), (int) $objEvent->registrationEndDate);
                 }
                 $value = $formatedEndDate;
                 break;
 
             case 'eventState':
-                $value = static::getEventState($objEvent);
+                $value = $this->getEventState($objEvent);
                 break;
 
             case 'eventStateIcon':
-                $value = static::getEventStateIcon($objEvent);
+                $value = $this->getEventStateIcon($objEvent);
                 break;
 
             case 'eventStateLabel':
-                $value = '' !== $GLOBALS['TL_LANG']['MSC']['calendar_events'][static::getEventState($objEvent)] ? $GLOBALS['TL_LANG']['MSC']['calendar_events'][static::getEventState($objEvent)] : static::getEventState($objEvent);
+                $value = '' !== $GLOBALS['TL_LANG']['MSC']['calendar_events'][$this->getEventState($objEvent)] ? $GLOBALS['TL_LANG']['MSC']['calendar_events'][$this->getEventState($objEvent)] : $this->getEventState($objEvent);
 
                 if (EventState::STATE_RESCHEDULED === $objEvent->eventState) {
-                    $dateFormat = Config::get('dateFormat');
+                    $dateFormat = $this->getAdapter(Config::class)->get('dateFormat');
                     $newDate = $objEvent->rescheduledEventDate ? date($dateFormat, (int) $objEvent->rescheduledEventDate) : 'unbest';
-                    $value = sprintf($GLOBALS['TL_LANG']['MSC']['calendar_events'][static::getEventState($objEvent)], $newDate);
+                    $value = sprintf($GLOBALS['TL_LANG']['MSC']['calendar_events'][$this->getEventState($objEvent)], $newDate);
                 }
                 break;
 
@@ -223,11 +238,11 @@ class CalendarEventsUtil
                 break;
 
             case 'bookingCounter':
-                $value = static::getBookingCounter($objEvent);
+                $value = $this->getBookingCounter($objEvent);
                 break;
 
             case 'bookingCounterAsText':
-                $value = static::getBookingCounter($objEvent, true);
+                $value = $this->getBookingCounter($objEvent, true);
                 break;
 
             case 'minMembers':
@@ -235,24 +250,25 @@ class CalendarEventsUtil
                 break;
 
             case 'tourTechDifficultiesAsArray':
-                $value = static::getTourTechDifficultiesAsArray($objEvent, false, false);
+                $value = $this->getTourTechDifficultiesAsArray($objEvent, false, false);
                 break;
 
             case 'tourTechDifficultiesAsArrayWithExplanation':
-                $value = static::getTourTechDifficultiesAsArray($objEvent, false, true);
+                $value = $this->getTourTechDifficultiesAsArray($objEvent, false, true);
                 break;
 
             case 'tourTechDifficulties':
-                $value = implode(' ', static::getTourTechDifficultiesAsArray($objEvent, true, false));
+                $value = implode(' ', $this->getTourTechDifficultiesAsArray($objEvent, true, false));
                 break;
 
             case 'instructorsWithQualification':
             case 'instructors':
-                $value = implode(', ', static::getInstructorNamesAsArray($objEvent, $options));
+                $value = implode(', ', $this->getInstructorNamesAsArray($objEvent, $options));
                 break;
 
             case 'journey':
-                $value = null !== CalendarEventsJourneyModel::findByPk($objEvent->journey) ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : '';
+                $adapter = $this->getAdapter(CalendarEventsJourneyModel::class);
+                $value = null !== $adapter->findByPk($objEvent->journey) ? $adapter->findByPk($objEvent->journey)->title : '';
                 break;
 
             case 'courseTypeLevel1':
@@ -260,28 +276,30 @@ class CalendarEventsUtil
                 break;
 
             case 'eventImagePath':
-                $value = static::getEventImagePath($objEvent);
+                $value = $this->getEventImagePath($objEvent);
                 break;
 
             case 'eventImage':
                 if (!empty($options['size'])) {
                     $pictureSize = $options['size'];
-                    $src = static::getEventImagePath($objEvent);
-                    $parser = System::getContainer()->get('contao.insert_tag.parser');
+                    $src = $this->getEventImagePath($objEvent);
+                    $parser = $this->getContainer()->get('contao.insert_tag.parser');
                     $value = $parser->replace(sprintf('{{picture::%s?size=%s}}', $src, $pictureSize));
                 }
                 break;
 
             case 'courseLevelName':
-                $value = System::getContainer()->get(CourseLevels::class)->get($objEvent->courseLevel);
+                $value = $this->getContainer()->get(CourseLevels::class)->get($objEvent->courseLevel);
                 break;
 
             case 'courseTypeLevel0Name':
-                $value = CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name;
+                $adapter = $this->getAdapter(CourseMainTypeModel::class);
+                $value = $adapter->findByPk($objEvent->courseTypeLevel0)?->name ?? '';
                 break;
 
             case 'courseTypeLevel1Name':
-                $value = CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name;
+                $adapter = $this->getAdapter(CourseSubTypeModel::class);
+                $value = $adapter->findByPk($objEvent->courseTypeLevel1)?->name ?? '';
                 break;
 
             // inside vue.js templates: eventOrganizerLogos?width=60
@@ -289,28 +307,28 @@ class CalendarEventsUtil
             case 'eventOrganizerLogos':
                 $width = !empty($options['width']) ? $options['width'] : '60';
                 $strInsertTag = '{{image::%s?width='.$width.'&alt=%s}}';
-                $value = static::getEventOrganizersLogoAsHtml($objEvent, $strInsertTag);
+                $value = $this->getEventOrganizersLogoAsHtml($objEvent, $strInsertTag);
                 break;
 
             case 'eventOrganizerLogoPaths':
                 $allowDuplicate = !empty($options['allowDuplicate']) && 'true' === $options['allowDuplicate'];
-                $value = static::getEventOrganizerLogoPaths($objEvent, $allowDuplicate);
+                $value = $this->getEventOrganizerLogoPaths($objEvent, $allowDuplicate);
                 break;
 
             case 'eventOrganizers':
-                $value = implode('<br>', static::getEventOrganizersAsArray($objEvent));
+                $value = implode('<br>', $this->getEventOrganizersAsArray($objEvent));
                 break;
 
             case 'mainInstructorContactDataFromDb':
-                $value = static::generateMainInstructorContactDataFromDb($objEvent, $options);
+                $value = $this->generateMainInstructorContactDataFromDb($objEvent, $options);
                 break;
 
             case 'instructorContactBoxes':
-                $value = static::generateInstructorContactBoxes($objEvent, $options);
+                $value = $this->generateInstructorContactBoxes($objEvent, $options);
                 break;
 
             case 'arrTourProfile':
-                $value = static::getTourProfileAsArray($objEvent);
+                $value = $this->getTourProfileAsArray($objEvent);
                 break;
 
             case 'geoLink':
@@ -318,31 +336,31 @@ class CalendarEventsUtil
                 break;
 
             case 'hasCoords':
-                $value = !empty(static::getCoordsCH1903AsArray($objEvent));
+                $value = !empty($this->getCoordsCH1903AsArray($objEvent));
                 break;
 
             case 'coordsCH1903':
-                $value = static::getCoordsCH1903AsArray($objEvent);
+                $value = $this->getCoordsCH1903AsArray($objEvent);
                 break;
 
             case 'geoLinkUrl':
-                $value = static::getGeoLinkUrl($objEvent);
+                $value = $this->getGeoLinkUrl($objEvent);
                 break;
 
             case 'linkSacRoutePortal':
-                $value = static::getSacRoutePortalLink($objEvent);
+                $value = $this->getSacRoutePortalLink($objEvent);
                 break;
 
             case 'isPublicTransportEvent':
-                $value = static::isPublicTransportEvent($objEvent);
+                $value = $this->isPublicTransportEvent($objEvent);
                 break;
 
             case 'getPublicTransportBadge':
-                $value = static::getPublicTransportBadge();
+                $value = $this->getPublicTransportBadge();
                 break;
 
             case 'isFavoredEvent':
-                $value = static::isFavoredEvent($objEvent);
+                $value = $this->isFavoredEvent($objEvent);
                 break;
 
             case 'gallery':
@@ -353,7 +371,7 @@ class CalendarEventsUtil
                 $rowEvent['fullsize'] = true;
                 $rowEvent['customTpl'] = 'content_element/gallery/col_4_with_caption';
 
-                $value = static::getGallery($rowEvent);
+                $value = $this->getGallery($rowEvent);
                 break;
 
             default:
@@ -371,12 +389,13 @@ class CalendarEventsUtil
         return $value;
     }
 
-    public static function isPublicTransportEvent(CalendarEventsModel $objEvent): bool
+    public function isPublicTransportEvent(CalendarEventsModel $objEvent): bool
     {
+        $this->framework->initialize();
+
         $isPublicTransport = false;
 
-        /** @var Connection $database */
-        $database = System::getContainer()->get('database_connection');
+        $database = $this->getContainer()->get('database_connection');
 
         $idPublicTransportJourney = $database->fetchOne(
             'SELECT id from tl_calendar_events_journey WHERE alias = ?',
@@ -400,8 +419,10 @@ class CalendarEventsUtil
     /**
      * @param array{includeDisabled?: bool, includeHidden?: bool} $options
      */
-    public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent, array $options): string
+    public function generateInstructorContactBoxes(CalendarEventsModel $objEvent, array $options): string
     {
+        $this->framework->initialize();
+
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
             'includeDisabled' => false,
@@ -413,69 +434,59 @@ class CalendarEventsUtil
 
         $objCalendar = $objEvent->getRelated('pid');
 
-        /** @var InsertTagParser $parser */
-        $insertTagParser = System::getContainer()->get('contao.insert_tag.parser');
+        $avatarManager = $this->getContainer()->get(Avatar::class);
 
-        /** @var Security $security */
-        $security = System::getContainer()->get('security.helper');
+        $objPage = $this->getAdapter(PageModel::class)->findByPk($objCalendar->userPortraitJumpTo);
 
-        /** @var Avatar $avatarManager */
-        $avatarManager = System::getContainer()->get(Avatar::class);
+        if (null === $objPage) {
+            throw new \Exception('Page model not found.');
+        }
 
-        $userPortraitJumpTo = $objCalendar->userPortraitJumpTo;
-
-        $arrInstructors = static::getInstructorsAsArray($objEvent, $options);
+        $arrInstructors = $this->getInstructorsAsArray($objEvent, $options);
         $arrItems = [];
 
         foreach ($arrInstructors as $userId) {
-            $objUser = UserModel::findByPk($userId);
+            $objUser = $this->getAdapter(UserModel::class)->findByPk($userId);
 
-            if (null !== $objUser) {
-                if ($objUser->hideUser) {
-                    continue;
-                }
+            $contentUrlGenerator = $this->getContainer()->get('contao.routing.content_url_generator');
 
-                $arrInstructor = $objUser->row();
-
-                if ($objCalendar->userPortraitJumpTo) {
-                    $arrInstructor['href'] = $insertTagParser->replaceInline('{{link_url::'.$userPortraitJumpTo.'}}').'?username='.$objUser->username;
-                    $arrInstructor['has_link'] = true;
-                } else {
-                    $arrInstructor['href'] = '';
-                }
-
-                $arrInstructor['avatar_path'] = $avatarManager->getAvatarResourcePath($objUser);
-                $arrInstructor['main_qualification'] = !empty(static::getMainQualification($objUser)) ? static::getMainQualification($objUser) : '';
-                $arrInstructor['contact_options'] = [];
-
-                if ($security->getUser() instanceof FrontendUser) {
-                    $arrContact = ['phone', 'mobile', 'email'];
-
-                    foreach ($arrContact as $field) {
-                        if ('' === $objUser->{$field}) {
-                            continue;
-                        }
-
-                        $arrInstructor['contact_options'][$field] = $objUser->{$field};
-                    }
-                }
-
-                $arrItems[] = $arrInstructor;
+            if (null === $objUser || $objUser->hideUser) {
+                continue;
             }
+
+            $arrInstructor = $objUser->row();
+            $arrInstructor['href'] = $contentUrlGenerator->generate($objPage).'?username='.$objUser->username;
+            $arrInstructor['has_link'] = true;
+
+            $arrInstructor['avatar_path'] = $avatarManager->getAvatarResourcePath($objUser);
+            $arrInstructor['main_qualification'] = !empty($this->getMainQualification($objUser)) ? $this->getMainQualification($objUser) : '';
+            $arrInstructor['contact_options'] = [];
+
+            if ($this->getContainer()->get('security.helper')->getUser() instanceof FrontendUser) {
+                $arrContact = ['phone', 'mobile', 'email'];
+
+                foreach ($arrContact as $field) {
+                    if ('' === $objUser->{$field}) {
+                        continue;
+                    }
+
+                    $arrInstructor['contact_options'][$field] = $objUser->{$field};
+                }
+            }
+
+            $arrItems[] = $arrInstructor;
         }
 
-        $twig = System::getContainer()->get('twig');
+        $twig = $this->getContainer()->get('twig');
 
         return $twig->render('@MarkocupicSacEventTool/Calendar/instructor_contact_boxes.html.twig', ['instructors' => $arrItems]);
     }
 
-    /**
-     * @throws \Exception
-     */
-    public static function getEventState(CalendarEventsModel $objEvent): string
+    public function getEventState(CalendarEventsModel $objEvent): string
     {
-        /** @var Connection $database */
-        $database = System::getContainer()->get('database_connection');
+        $this->framework->initialize();
+
+        $database = $this->getContainer()->get('database_connection');
 
         $registrationCount = $database->fetchOne(
             'SELECT COUNT(id) FROM tl_calendar_events_member WHERE eventId = ? AND stateOfSubscription = ?',
@@ -505,7 +516,7 @@ class CalendarEventsUtil
         }
 
         // Event is over or booking is no more possible
-        if ($objEvent->startDate <= time() || ($objEvent->setRegistrationPeriod && $objEvent->registrationEndDate < time())) {
+        if ($objEvent->startDate <= time() || $objEvent->endDate <= time() || ($objEvent->setRegistrationPeriod && $objEvent->registrationEndDate < time())) {
             return 'event_status_2';
         }
 
@@ -514,41 +525,43 @@ class CalendarEventsUtil
             return 'event_status_8';
         }
 
-        // Booking not possible yet
-        $regStartTime = $objEvent->registrationStartDate + System::getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
-
-        if ($objEvent->setRegistrationPeriod && $regStartTime > time()) {
-            return 'event_status_5';
-        }
-
         // If online registration is disabled in the event settings
         if ($objEvent->disableOnlineRegistration) {
             return 'event_status_7';
         }
 
+        // Booking not possible yet
+        $regStartTime = $objEvent->registrationStartDate + $this->getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
+
+        if ($objEvent->setRegistrationPeriod && $regStartTime > time()) {
+            return 'event_status_5';
+        }
+
         return 'event_status_1';
     }
 
-    /**
-     * @throws \Exception
-     */
-    public static function getEventStateIcon(CalendarEventsModel $objEvent): string
+    public function getEventStateIcon(CalendarEventsModel $objEvent): string
     {
-        $strState = static::getEventState($objEvent);
+        $this->framework->initialize();
+
+        $strState = $this->getEventState($objEvent);
         $strLabel = $GLOBALS['TL_LANG']['MSC']['calendar_events'][$strState] ?? $strState;
 
+        /** @var Packages $packages */
+        $packages = $this->getContainer()->get('assets.packages');
+
         return sprintf(
-            '<img src="%s/icons/event_states/%s.svg" title="%s">',
-            Bundle::ASSET_DIR,
-            $strState,
+            '<img src="%s" title="%s">',
+            $packages->getUrl("icons/event_states/$strState.svg", 'markocupic_sac_event_tool'),
             $strLabel,
         );
     }
 
-    public static function eventIsFullyBooked(CalendarEventsModel $objEvent): bool
+    public function eventIsFullyBooked(CalendarEventsModel $objEvent): bool
     {
-        /** @var Connection $database */
-        $database = System::getContainer()->get('database_connection');
+        $this->framework->initialize();
+
+        $database = $this->getContainer()->get('database_connection');
 
         $registrationCount = $database->fetchOne(
             'SELECT COUNT(id) FROM tl_calendar_events_member WHERE eventId = ? AND stateOfSubscription = ?',
@@ -569,10 +582,11 @@ class CalendarEventsUtil
         return false;
     }
 
-    public static function getMainInstructor(CalendarEventsModel $objEvent): UserModel|null
+    public function getMainInstructor(CalendarEventsModel $objEvent): UserModel|null
     {
-        /** @var Connection $database */
-        $database = System::getContainer()->get('database_connection');
+        $this->framework->initialize();
+
+        $database = $this->getContainer()->get('database_connection');
 
         $id = $database->fetchOne(
             'SELECT userId FROM tl_calendar_events_instructor WHERE pid = ? AND isMainInstructor = ?',
@@ -582,7 +596,7 @@ class CalendarEventsUtil
             ],
             [
                 Types::INTEGER,
-                Types::STRING,
+                Types::INTEGER,
             ]
         );
 
@@ -590,32 +604,29 @@ class CalendarEventsUtil
             return null;
         }
 
-        return UserModel::findByPk($id);
+        return $this->getAdapter(UserModel::class)?->findByPk($id);
     }
 
-    public static function getMainInstructorName(CalendarEventsModel $objEvent): string
+    public function getMainInstructorName(CalendarEventsModel $objEvent): string
     {
-        $strName = '';
+        $this->framework->initialize();
 
-        $objUser = self::getMainInstructor($objEvent);
+        $objUser = $this->getMainInstructor($objEvent);
 
         if (null === $objUser) {
-            return $strName;
+            return '';
         }
 
-        $arrName = [];
-        $arrName[] = $objUser->lastname;
-        $arrName[] = $objUser->firstname;
-        $arrName = array_filter($arrName);
-
-        return implode(' ', $arrName);
+        return implode(' ', array_filter([$objUser->lastname, $objUser->firstname]));
     }
 
     /**
      * @param array{includeDisabled?: bool, includeHidden?: bool} $options
      */
-    public static function generateMainInstructorContactDataFromDb(CalendarEventsModel $objEvent, array $options = []): string
+    public function generateMainInstructorContactDataFromDb(CalendarEventsModel $objEvent, array $options = []): string
     {
+        $this->framework->initialize();
+
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
             'includeDisabled' => false,
@@ -625,8 +636,8 @@ class CalendarEventsUtil
         $resolver->setAllowedValues('includeHidden', [true, false]);
         $options = $resolver->resolve($options);
 
-        $arrInstructors = static::getInstructorsAsArray($objEvent, $options);
-        $objUser = UserModel::findByPk($arrInstructors[0]);
+        $arrInstructors = $this->getInstructorsAsArray($objEvent, $options);
+        $objUser = $this->getAdapter(UserModel::class)->findByPk($arrInstructors[0]);
 
         if (null === $objUser) {
             return '';
@@ -645,8 +656,10 @@ class CalendarEventsUtil
     /**
      * @param array{includeDisabled?: bool, includeHidden?: bool} $options
      */
-    public static function getInstructorsAsArray(CalendarEventsModel $objEvent, array $options = []): array
+    public function getInstructorsAsArray(CalendarEventsModel $objEvent, array $options = []): array
     {
+        $this->framework->initialize();
+
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
             'includeDisabled' => false,
@@ -658,12 +671,11 @@ class CalendarEventsUtil
 
         $arrInstructors = [];
 
-        /** @var Connection $database */
-        $database = System::getContainer()->get('database_connection');
+        $database = $this->getContainer()->get('database_connection');
 
         // Get all instructors from a specific event, list the mainInstructor first
-        $arrInstructorsAll = $database->fetchAllAssociative(
-            'SELECT * FROM tl_calendar_events_instructor WHERE pid = ? ORDER BY isMainInstructor DESC',
+        $userIds = $database->fetchFirstColumn(
+            'SELECT userId FROM tl_calendar_events_instructor WHERE pid = ? ORDER BY isMainInstructor DESC',
             [
                 $objEvent->id,
             ],
@@ -672,8 +684,10 @@ class CalendarEventsUtil
             ],
         );
 
-        foreach ($arrInstructorsAll as $arrInstructor) {
-            $objUser = UserModel::findByPk($arrInstructor['userId']);
+        $userAdapter = $this->getAdapter(UserModel::class);
+
+        foreach ($userIds as $userId) {
+            $objUser = $userAdapter->findByPk($userId);
 
             if (null === $objUser) {
                 continue;
@@ -704,8 +718,10 @@ class CalendarEventsUtil
     /**
      * @param array{includeDisabled?: bool, includeHidden?: bool, addMainQualification?: bool} $options
      */
-    public static function getInstructorNamesAsArray(CalendarEventsModel $objEvent, array $options = []): array
+    public function getInstructorNamesAsArray(CalendarEventsModel $objEvent, array $options = []): array
     {
+        $this->framework->initialize();
+
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
             'includeDisabled' => false,
@@ -719,7 +735,7 @@ class CalendarEventsUtil
 
         $arrInstructors = [];
 
-        $arrUsers = static::getInstructorsAsArray(
+        $arrUsers = $this->getInstructorsAsArray(
             $objEvent,
             [
                 'includeDisabled' => $options['includeDisabled'],
@@ -728,7 +744,7 @@ class CalendarEventsUtil
         );
 
         foreach ($arrUsers as $userId) {
-            $objUser = UserModel::findByPk($userId);
+            $objUser = $this->getAdapter(UserModel::class)->findByPk($userId);
 
             if (null === $objUser) {
                 continue;
@@ -736,8 +752,8 @@ class CalendarEventsUtil
 
             $strName = trim($objUser->lastname.' '.$objUser->firstname);
 
-            if (true === $options['addMainQualification'] && '' !== static::getMainQualification($objUser)) {
-                $arrInstructors[] = $strName.' ('.static::getMainQualification($objUser).')';
+            if (true === $options['addMainQualification'] && '' !== $this->getMainQualification($objUser)) {
+                $arrInstructors[] = $strName.' ('.$this->getMainQualification($objUser).')';
             } else {
                 $arrInstructors[] = $strName;
             }
@@ -746,22 +762,26 @@ class CalendarEventsUtil
         return $arrInstructors;
     }
 
-    public static function getMainQualification(UserModel $objUser): string
+    public function getMainQualification(UserModel $objUser): string
     {
+        $this->framework->initialize();
+
         $strQuali = '';
 
         $arrQuali = StringUtil::deserialize($objUser->leiterQualifikation, true);
 
         if (!empty($arrQuali[0])) {
-            Controller::loadLanguageFile('tl_user');
+            $this->getAdapter(System::class)->loadLanguageFile('tl_user');
             $strQuali = $GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][(int) $arrQuali[0]] ?? 'undefined';
         }
 
         return $strQuali;
     }
 
-    public static function getGallery(array $arrData): string
+    public function getGallery(array $arrData): string
     {
+        $this->framework->initialize();
+
         $arrData['type'] = 'gallery';
         $arrData['tstamp'] = 0;
 
@@ -772,42 +792,40 @@ class CalendarEventsUtil
         $objModel = new ContentModel();
         $objModel->setRow($arrData);
 
-        return Controller::getContentElement($objModel);
+        return $this->getAdapter(Controller::class)->getContentElement($objModel);
     }
 
-    public static function getEventImagePath(CalendarEventsModel $objEvent): string
+    public function getEventImagePath(CalendarEventsModel $objEvent): string
     {
-        $projectDir = System::getContainer()->getParameter('kernel.project_dir');
-        System::getContainer()->get('contao.framework')->initialize();
+        $this->framework->initialize();
 
-        $fallback = System::getContainer()->getParameter('sacevt.event.course.fallback_image');
+        $fallbackImage = $this->getContainer()->getParameter('sacevt.event.course.fallback_image');
 
         if (empty($objEvent->singleSRC)) {
-            return $fallback;
+            return $fallbackImage;
         }
 
-        $objFile = FilesModel::findByUuid($objEvent->singleSRC);
+        $objFile = $this->getAdapter(FilesModel::class)->findByUuid($objEvent->singleSRC);
 
         if (null === $objFile) {
-            return $fallback;
+            return $fallbackImage;
         }
 
-        $path = Path::join($projectDir, $objFile->path);
+        $path = Path::join($this->getProjectDir(), $objFile->path);
 
         if (!is_file($path)) {
-            return $fallback;
+            return $fallbackImage;
         }
 
         return $objFile->path;
     }
 
-    /**
-     * @throws \Exception
-     */
-    public static function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = '', bool $blnAppendEventDuration = true, bool $blnTooltip = true, bool $blnInline = false): string
+    public function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = '', bool $blnAppendEventDuration = true, bool $blnTooltip = true, bool $blnInline = false): string
     {
+        $this->framework->initialize();
+
         if (empty($dateFormat)) {
-            $dateFormat = Config::get('dateFormat');
+            $dateFormat = $this->getAdapter(Config::class)->get('dateFormat');
         }
 
         $dateFormatShortened = $dateFormat;
@@ -816,45 +834,53 @@ class CalendarEventsUtil
             $dateFormatShortened = 'd.m.';
         }
 
-        $eventDuration = \count(self::getEventTimestamps($objEvent));
+        $eventDuration = \count($this->getEventTimestamps($objEvent));
 
         // Typecast is required here, this although PhpCodeSniffer claims the opposite.
         // Calendar::calculateSpan() returns "double" not "integer"
-        $span = (int) Calendar::calculateSpan(self::getStartDate($objEvent), self::getEndDate($objEvent)) + 1;
+        $span = (int) Calendar::calculateSpan($this->getStartTstamp($objEvent), $this->getEndTstamp($objEvent)) + 1;
 
         if (1 === $eventDuration) {
-            return Date::parse($dateFormat, self::getStartDate($objEvent)).($blnAppendEventDuration ? ' ('.self::getEventDuration($objEvent).')' : '');
+            $strEventDuration = $blnAppendEventDuration ? ' ('.$this->getEventDuration($objEvent).')' : '';
+
+            return date($dateFormat, $this->getStartTstamp($objEvent)).$strEventDuration;
         }
 
         if ($span === $eventDuration) {
-            // von bis
-            return Date::parse($dateFormatShortened, self::getStartDate($objEvent)).' - '.Date::parse($dateFormat, self::getEndDate($objEvent)).($blnAppendEventDuration ? ' ('.self::getEventDuration($objEvent).')' : '');
+            $strEventDuration = $blnAppendEventDuration ? ' ('.$this->getEventDuration($objEvent).')' : '';
+
+            return date($dateFormatShortened, $this->getStartTstamp($objEvent)).' - '.date($dateFormat, $this->getEndTstamp($objEvent)).$strEventDuration;
         }
 
         $arrDates = [];
-        $dates = self::getEventTimestamps($objEvent);
+        $dates = $this->getEventTimestamps($objEvent);
 
         foreach ($dates as $date) {
-            $arrDates[] = Date::parse($dateFormat, $date);
+            $arrDates[] = date($dateFormat, (int) $date);
         }
 
         if ($blnTooltip) {
-            return Date::parse($dateFormat, self::getStartDate($objEvent)).($blnAppendEventDuration ? ' ('.self::getEventDuration($objEvent).')' : '').(!$blnInline ? '<br>' : ' ').'<a tabindex="0" class="more-date-infos" data-bs-toggle="tooltip" data-placement="bottom" data-title="Eventdaten: '.implode(', ', $arrDates).'">und weitere</a>';
+            $strEventDuration = $blnAppendEventDuration ? ' ('.$this->getEventDuration($objEvent).')' : '';
+            $strTooltip = '<a tabindex="0" class="more-date-infos" data-bs-toggle="tooltip" data-placement="bottom" data-title="Eventdaten: '.implode(', ', $arrDates).'">und weitere</a>';
+
+            return date($dateFormat, $this->getStartTstamp($objEvent)).$strEventDuration.(!$blnInline ? '<br>' : ' ').$strTooltip;
         }
 
         $dateString = '';
 
-        foreach (self::getEventTimestamps($objEvent) as $tstamp) {
-            $dateString .= sprintf('<time datetime="%s">%s</time>', Date::parse('Y-m-d', $tstamp), Date::parse('D, d.m.Y', $tstamp));
+        foreach ($this->getEventTimestamps($objEvent) as $tstamp) {
+            $dateString .= sprintf('<time datetime="%s">%s</time>', date('Y-m-d', (int) $tstamp), date('D, d.m.Y', (int) $tstamp));
         }
-        $dateString .= $blnAppendEventDuration ? sprintf('<time>(%s)</time>', self::getEventDuration($objEvent)) : '';
+        $dateString .= $blnAppendEventDuration ? sprintf('<time>(%s)</time>', $this->getEventDuration($objEvent)) : '';
 
         return $dateString;
     }
 
-    public static function getBookingPeriod(int $id, string $dateFormatStart = '', string $dateFormatEnd = ''): string
+    public function getBookingPeriod(int $id, string $dateFormatStart = '', string $dateFormatEnd = ''): string
     {
-        $objEvent = CalendarEventsModel::findByPk($id);
+        $this->framework->initialize();
+
+        $objEvent = $this->getAdapter(CalendarEventsModel::class)->findByPk($id);
 
         if (null === $objEvent) {
             return '';
@@ -865,20 +891,22 @@ class CalendarEventsUtil
         }
 
         if ('' === $dateFormatStart) {
-            $dateFormatStart = Config::get('dateFormat');
+            $dateFormatStart = $this->getAdapter(Config::class)->get('dateFormat');
         }
 
         if ('' === $dateFormatEnd) {
-            $dateFormatEnd = Config::get('dateFormat');
+            $dateFormatEnd = $this->getAdapter(Config::class)->get('dateFormat');
         }
 
-        $regStartTime = $objEvent->registrationStartDate + System::getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
+        $regStartTime = $objEvent->registrationStartDate + $this->getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
 
-        return Date::parse($dateFormatStart, $regStartTime).' - '.Date::parse($dateFormatEnd, $objEvent->registrationEndDate);
+        return date($dateFormatStart, (int) $regStartTime).' - '.date($dateFormatEnd, (int) $objEvent->registrationEndDate);
     }
 
-    public static function getEventTimestamps(CalendarEventsModel $objEvent): array
+    public function getEventTimestamps(CalendarEventsModel $objEvent): array
     {
+        $this->framework->initialize();
+
         $arrRepeats = [];
 
         $arrDates = StringUtil::deserialize($objEvent->eventDates, true);
@@ -890,8 +918,10 @@ class CalendarEventsUtil
         return $arrRepeats;
     }
 
-    public static function getStartDate(CalendarEventsModel $objEvent): int
+    public function getStartTstamp(CalendarEventsModel $objEvent): int
     {
+        $this->framework->initialize();
+
         $arrDates = StringUtil::deserialize($objEvent->eventDates);
 
         if (!\is_array($arrDates) || empty($arrDates)) {
@@ -901,8 +931,10 @@ class CalendarEventsUtil
         return (int) $arrDates[0]['new_repeat'];
     }
 
-    public static function getEndDate(CalendarEventsModel $objEvent): int
+    public function getEndTstamp(CalendarEventsModel $objEvent): int
     {
+        $this->framework->initialize();
+
         $arrDates = StringUtil::deserialize($objEvent->eventDates);
 
         if (!\is_array($arrDates) || empty($arrDates)) {
@@ -912,11 +944,10 @@ class CalendarEventsUtil
         return (int) $arrDates[\count($arrDates) - 1]['new_repeat'];
     }
 
-    /**
-     * @throws \Exception
-     */
-    public static function getEventDuration(CalendarEventsModel $objEvent): string
+    public function getEventDuration(CalendarEventsModel $objEvent): string
     {
+        $this->framework->initialize();
+
         $arrDates = StringUtil::deserialize($objEvent->eventDates);
 
         if ('' !== $objEvent->durationInfo) {
@@ -930,13 +961,15 @@ class CalendarEventsUtil
         return '';
     }
 
-    public static function getPublicTransportBadge(): string
+    public function getPublicTransportBadge(): string
     {
         return '<span class="badge badge-sm badge-pill bg-success" data-bs-toggle="tooltip" data-placement="top" data-title="Anreise mit ÖV">ÖV</span>';
     }
 
-    public static function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, bool $tooltip = false, bool $explanation = false): array
+    public function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, bool $tooltip = false, bool $explanation = false): array
     {
+        $this->framework->initialize();
+
         $arrReturn = [];
 
         $arrValues = StringUtil::deserialize($objEvent->tourTechDifficulty, true);
@@ -950,14 +983,14 @@ class CalendarEventsUtil
             $strDiffTitle = '';
 
             if (\strlen($difficulty['tourTechDifficultyMin']) && \strlen($difficulty['tourTechDifficultyMax'])) {
-                $objDiff = TourDifficultyModel::findByPk((int) $difficulty['tourTechDifficultyMin']);
+                $objDiff = $this->getAdapter(TourDifficultyModel::class)->findByPk((int) $difficulty['tourTechDifficultyMin']);
 
                 if (null !== $objDiff) {
                     $strDiff = $objDiff->shortcut;
                     $strDiffTitle = $objDiff->title;
                 }
 
-                $objDiff = TourDifficultyModel::findByPk((int) $difficulty['tourTechDifficultyMax']);
+                $objDiff = $this->getAdapter(TourDifficultyModel::class)->findByPk((int) $difficulty['tourTechDifficultyMax']);
 
                 if (null !== $objDiff) {
                     $max = $objDiff->shortcut;
@@ -965,7 +998,7 @@ class CalendarEventsUtil
                     $strDiffTitle .= ' - '.$objDiff->title;
                 }
             } elseif (\strlen($difficulty['tourTechDifficultyMin'])) {
-                $objDiff = TourDifficultyModel::findByPk((int) $difficulty['tourTechDifficultyMin']);
+                $objDiff = $this->getAdapter(TourDifficultyModel::class)->findByPk((int) $difficulty['tourTechDifficultyMin']);
 
                 if (null !== $objDiff) {
                     $strDiff = $objDiff->shortcut;
@@ -990,44 +1023,47 @@ class CalendarEventsUtil
         return $arrReturn;
     }
 
-    public static function getTourTypesAsArray(CalendarEventsModel $objEvent, string $field = 'shortcut', bool $tooltip = false): array
+    public function getTourTypesAsArray(CalendarEventsModel $objEvent, string $field = 'shortcut', bool $tooltip = false): array
     {
-        $arrReturn = [];
+        $this->framework->initialize();
+
+        $arrTourTypes = [];
 
         $arrValues = StringUtil::deserialize($objEvent->tourType, true);
 
         if (empty($arrValues)) {
-            return $arrReturn;
+            return $arrTourTypes;
         }
 
         foreach ($arrValues as $id) {
-            $objModel = TourTypeModel::findByPk($id);
+            $objTourType = $this->getAdapter(TourTypeModel::class)->findByPk($id);
 
-            if (null === $objModel) {
+            if (null === $objTourType) {
                 continue;
             }
 
             if ($tooltip) {
                 $html = '<span class="badge badge-sm badge-pill bg-secondary" data-bs-toggle="tooltip" data-placement="top" data-title="Typ: %s">%s</span>';
-                $arrReturn[] = sprintf($html, $objModel->{'title'}, $objModel->{$field});
+                $arrTourTypes[] = sprintf($html, $objTourType->title, $objTourType->{$field});
             } else {
-                $arrReturn[] = $objModel->{$field};
+                $arrTourTypes[] = $objTourType->{$field};
             }
         }
 
-        return $arrReturn;
+        return $arrTourTypes;
     }
 
-    public static function getBookingCounter(CalendarEventsModel $objEvent, bool $withoutTooltip = false): string
+    public function getBookingCounter(CalendarEventsModel $objEvent, bool $withoutTooltip = false): string
     {
+        $this->framework->initialize();
+
         $strBadge = '<span class="badge badge-sm badge-pill bg-%s" data-bs-toggle="tooltip" data-placement="top" data-title="%s">%s</span>';
 
         if ($withoutTooltip) {
             $strBadge = '%2$s (%3$s)'; // only text as output, e.g. 'noch 1 freie Plätze (5/6)`
         }
 
-        /** @var Connection $database */
-        $database = System::getContainer()->get('database_connection');
+        $database = $this->getContainer()->get('database_connection');
 
         $registrationCount = $database->fetchOne(
             'SELECT COUNT(id) FROM tl_calendar_events_member WHERE eventId = ? && stateOfSubscription = ?',
@@ -1052,7 +1088,7 @@ class CalendarEventsUtil
                 return sprintf($strBadge, 'dark', 'ausgebucht', $registrationCount.'/'.$objEvent->maxMembers);
             }
 
-            // Free places
+            // Free places available
             return sprintf($strBadge, 'dark', sprintf('noch %s freie Plätze', $objEvent->maxMembers - $registrationCount), $registrationCount.'/'.$objEvent->maxMembers);
         }
 
@@ -1060,8 +1096,10 @@ class CalendarEventsUtil
         return sprintf($strBadge, 'dark', $registrationCount.' bestätigte Plätze', $registrationCount.'/?');
     }
 
-    public static function getEventStateOfSubscriptionBadgesString(CalendarEventsModel $objEvent): string
+    public function getEventStateOfSubscriptionBadgesString(CalendarEventsModel $objEvent): string
     {
+        $this->framework->initialize();
+
         $strRegistrationsBadges = '';
         $intNotConfirmed = 0;
         $intAccepted = 0;
@@ -1069,7 +1107,7 @@ class CalendarEventsUtil
         $intWaitlisted = 0;
         $intUnsubscribedUser = 0;
 
-        $eventsMemberModel = CalendarEventsMemberModel::findByEventId($objEvent->id);
+        $eventsMemberModel = $this->getAdapter(CalendarEventsMemberModel::class)->findByEventId($objEvent->id);
 
         if (null !== $eventsMemberModel) {
             while ($eventsMemberModel->next()) {
@@ -1095,14 +1133,14 @@ class CalendarEventsUtil
             }
 
             // Generate the href
-            $router = System::getContainer()->get('router');
+            $router = $this->getContainer()->get('router');
 
             $href = $router->generate('contao_backend', [
                 'do' => 'calendar',
                 'table' => 'tl_calendar_events_member',
                 'id' => $objEvent->id,
-                'rt' => System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(),
-                'ref' => System::getContainer()->get('request_stack')->getCurrentRequest()->attributes->get('_contao_referer_id'),
+                'rt' => $this->getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(),
+                'ref' => $this->getContainer()->get('request_stack')->getCurrentRequest()->attributes->get('_contao_referer_id'),
             ]);
 
             if ($intNotConfirmed > 0) {
@@ -1129,8 +1167,10 @@ class CalendarEventsUtil
         return $strRegistrationsBadges;
     }
 
-    public static function getEventOrganizersAsArray(CalendarEventsModel $objEvent, string $field = 'title'): array
+    public function getEventOrganizersAsArray(CalendarEventsModel $objEvent, string $field = 'title'): array
     {
+        $this->framework->initialize();
+
         $arrReturn = [];
 
         $arrValues = StringUtil::deserialize($objEvent->organizers, true);
@@ -1140,7 +1180,7 @@ class CalendarEventsUtil
         }
 
         foreach ($arrValues as $id) {
-            $objModel = EventOrganizerModel::findByPk($id);
+            $objModel = $this->getAdapter(EventOrganizerModel::class)->findByPk($id);
 
             if (null === $objModel) {
                 continue;
@@ -1155,8 +1195,10 @@ class CalendarEventsUtil
     /**
      * Test if the member has already made another booking at the same time.
      */
-    public static function areBookingDatesOccupied(CalendarEventsModel $objEvent, MemberModel $objMember): bool
+    public function areBookingDatesOccupied(CalendarEventsModel $objEvent, MemberModel $objMember): bool
     {
+        $this->framework->initialize();
+
         $arrEventDates = [];
         $arrEventRepeats = StringUtil::deserialize($objEvent->eventDates, true);
 
@@ -1168,11 +1210,9 @@ class CalendarEventsUtil
             }
         }
 
-        /** @var Connection $database */
-        $database = System::getContainer()->get('database_connection');
+        $database = $this->getContainer()->get('database_connection');
 
-        // Get all future events of the member
-
+        // Get all upcoming events of the member
         $arrRegistrations = $database->fetchAllAssociative(
             'SELECT * FROM tl_calendar_events_member WHERE eventId != ? AND contaoMemberId = ? AND stateOfSubscription = ? AND hasParticipated = ?',
             [
@@ -1190,7 +1230,7 @@ class CalendarEventsUtil
         );
 
         foreach ($arrRegistrations as $arrRegistration) {
-            $objEvent = CalendarEventsModel::findByPk($arrRegistration['eventId']);
+            $objEvent = $this->getAdapter(CalendarEventsModel::class)->findByPk($arrRegistration['eventId']);
 
             if (null === $objEvent) {
                 continue;
@@ -1217,13 +1257,15 @@ class CalendarEventsUtil
         return false;
     }
 
-    public static function generateEventPreviewUrl(CalendarEventsModel $objEvent): string
+    public function generateEventPreviewUrl(CalendarEventsModel $objEvent): string
     {
+        $this->framework->initialize();
+
         /** @var UriSigner $uriSigner */
-        $uriSigner = System::getContainer()->get('code4nix_uri_signer.uri_signer');
+        $uriSigner = $this->getContainer()->get('code4nix_uri_signer.uri_signer');
 
         /** @var UrlParser $urlParser */
-        $urlParser = System::getContainer()->get(UrlParser::class);
+        $urlParser = $this->getContainer()->get(UrlParser::class);
 
         $eventPreviewUrl = '';
 
@@ -1231,13 +1273,13 @@ class CalendarEventsUtil
             return $eventPreviewUrl;
         }
 
-        $objEventType = EventTypeModel::findOneBy('alias', $objEvent->eventType);
+        $objEventType = $this->getAdapter(EventTypeModel::class)->findOneBy('alias', $objEvent->eventType);
 
         if (null === $objEventType || !$objEventType->previewPage) {
             return $eventPreviewUrl;
         }
 
-        $objPage = PageModel::findByPk($objEventType->previewPage);
+        $objPage = $this->getAdapter(PageModel::class)->findByPk($objEventType->previewPage);
 
         if (!$objPage instanceof PageModel) {
             return $eventPreviewUrl;
@@ -1251,8 +1293,10 @@ class CalendarEventsUtil
         return $uriSigner->sign($eventPreviewUrl, 86400);
     }
 
-    public static function getTourProfileAsArray(CalendarEventsModel $objEvent): array
+    public function getTourProfileAsArray(CalendarEventsModel $objEvent): array
     {
+        $this->framework->initialize();
+
         $arrProfile = [];
 
         if (empty($objEvent->tourProfile) || !\is_array(StringUtil::deserialize($objEvent->tourProfile))) {
@@ -1308,15 +1352,17 @@ class CalendarEventsUtil
         return $arrProfile;
     }
 
-    public static function getEventOrganizersLogoAsHtml(CalendarEventsModel $objEvent, string $strInsertTag = '{{image::%s&alt=%s}}', bool $allowDuplicate = false): array
+    public function getEventOrganizersLogoAsHtml(CalendarEventsModel $objEvent, string $strInsertTag = '{{image::%s&alt=%s}}', bool $allowDuplicate = false): array
     {
+        $this->framework->initialize();
+
         $arrHtml = [];
         $arrUuids = [];
 
         $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
 
         foreach ($arrOrganizers as $orgId) {
-            $objOrganizer = EventOrganizerModel::findByPk($orgId);
+            $objOrganizer = $this->getAdapter(EventOrganizerModel::class)->findByPk($orgId);
 
             if (null === $objOrganizer) {
                 continue;
@@ -1333,7 +1379,7 @@ class CalendarEventsUtil
             $strInsertTag = str_replace('alt=%s', 'alt='.$objOrganizer->title, $strInsertTag);
 
             $arrUuids[] = $objOrganizer->singleSRC;
-            $parser = System::getContainer()->get('contao.insert_tag.parser');
+            $parser = $this->getContainer()->get('contao.insert_tag.parser');
 
             $strLogo = $parser->replace(sprintf($strInsertTag, StringUtil::binToUuid($objOrganizer->singleSRC)));
 
@@ -1345,15 +1391,16 @@ class CalendarEventsUtil
         return $arrHtml;
     }
 
-    public static function getEventOrganizerLogoPaths(CalendarEventsModel $objEvent, bool $allowDuplicate = false): array
+    public function getEventOrganizerLogoPaths(CalendarEventsModel $objEvent, bool $allowDuplicate = false): array
     {
-        $projectDir = System::getContainer()->getParameter('kernel.project_dir');
+        $this->framework->initialize();
+
         $arrPaths = [];
 
         $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
 
         foreach ($arrOrganizers as $orgId) {
-            $objOrganizer = EventOrganizerModel::findByPk($orgId);
+            $objOrganizer = $this->getAdapter(EventOrganizerModel::class)->findByPk($orgId);
 
             if (null === $objOrganizer) {
                 continue;
@@ -1363,9 +1410,9 @@ class CalendarEventsUtil
                 continue;
             }
 
-            $objFiles = FilesModel::findByUuid($objOrganizer->singleSRC);
+            $objFiles = $this->getAdapter(FilesModel::class)->findByUuid($objOrganizer->singleSRC);
 
-            $path = Path::join($projectDir, $objFiles->path);
+            $path = Path::join($this->getProjectDir(), $objFiles->path);
 
             if (null === $objFiles || !is_file($path)) {
                 continue;
@@ -1377,18 +1424,19 @@ class CalendarEventsUtil
         return $allowDuplicate ? $arrPaths : array_unique($arrPaths);
     }
 
-    public static function getEventQrCode(CalendarEventsModel $objEvent, array $arrOptions = [], bool $blnAbsoluteUrl = true, bool $blnCache = true): string|null
+    public function getEventQrCode(CalendarEventsModel $objEvent, array $arrOptions = [], bool $blnAbsoluteUrl = true, bool $blnCache = true): string|null
     {
+        $this->framework->initialize();
+
         // Generate QR code folder
         $objFolder = new Folder('system/qrcodes');
 
         // Symlink
-        $projectDir = System::getContainer()->getParameter('kernel.project_dir');
-        $webDir = Path::join($projectDir, 'public');
-        $relWebDir = Path::makeRelative($webDir, $projectDir); // public
+        $webDir = Path::join($this->getProjectDir(), 'public');
+        $relWebDir = Path::makeRelative($webDir, $this->getProjectDir()); // public
 
         // Symlink (target: 'system/qrcodes', link: 'public/system/qrcodes')
-        SymlinkUtil::symlink($objFolder->path, Path::join($relWebDir, $objFolder->path), $projectDir);
+        SymlinkUtil::symlink($objFolder->path, Path::join($relWebDir, $objFolder->path), $this->getProjectDir());
 
         // Generate path
         $filepath = sprintf($objFolder->path.'/'.'eventQRcode_%s.png', $objEvent->id);
@@ -1409,7 +1457,10 @@ class CalendarEventsUtil
         $options = new QROptions(array_merge($opt, $arrOptions));
 
         // Get event reader url
-        $url = Events::generateEventUrl($objEvent, $blnAbsoluteUrl);
+        /** @var ContentUrlGenerator $contentUrlGenerator */
+        $contentUrlGenerator = $this->getContainer()->get('contao.routing.content_url_generator');
+
+        $url = $contentUrlGenerator->generate($objEvent, [], $blnAbsoluteUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH);
 
         // Generate QR and return the image path
         if ((new QRCode($options))->render($url, $filepath)) {
@@ -1419,9 +1470,11 @@ class CalendarEventsUtil
         return null;
     }
 
-    public static function getSectionMembershipAsString(MemberModel $objMember): string
+    public function getSectionMembershipAsString(MemberModel $objMember): string
     {
-        Controller::loadLanguageFile('tl_member');
+        $this->framework->initialize();
+
+        $this->getAdapter(System::class)->loadLanguageFile('tl_member');
         $arrSections = [];
         $sections = StringUtil::deserialize($objMember->sectionId, true);
 
@@ -1432,7 +1485,7 @@ class CalendarEventsUtil
         return implode(', ', $arrSections);
     }
 
-    public static function getCoordsCH1903AsArray(CalendarEventsModel $objEvent): array
+    public function getCoordsCH1903AsArray(CalendarEventsModel $objEvent): array
     {
         // coordsCH1903 (format "2600000, 1200000" (CH1903+) or "600000, 200000" (CH1903))
         if (!empty($objEvent->coordsCH1903)) {
@@ -1450,12 +1503,14 @@ class CalendarEventsUtil
         return [];
     }
 
-    public static function getGeoLinkUrl(CalendarEventsModel $objEvent): string|null
+    public function getGeoLinkUrl(CalendarEventsModel $objEvent): string|null
     {
-        $arrCoord = self::getCoordsCH1903AsArray($objEvent);
+        $this->framework->initialize();
+
+        $arrCoord = $this->getCoordsCH1903AsArray($objEvent);
 
         if (!empty($arrCoord)) {
-            $strGeoLink = System::getContainer()->getParameter('sacevt.event.geo_link');
+            $strGeoLink = $this->getContainer()->getParameter('sacevt.event.geo_link');
 
             return sprintf($strGeoLink, $arrCoord[0], $arrCoord[1]);
         }
@@ -1463,8 +1518,10 @@ class CalendarEventsUtil
         return null;
     }
 
-    public static function getSacRoutePortalLink(CalendarEventsModel $objEvent): string|null
+    public function getSacRoutePortalLink(CalendarEventsModel $objEvent): string|null
     {
+        $this->framework->initialize();
+
         if (empty($objEvent->linkSacRoutePortal)) {
             return null;
         }
@@ -1477,26 +1534,28 @@ class CalendarEventsUtil
         }
 
         // Only links from the SAC route portal are allowed
-        if (!str_starts_with($strPortalLink, System::getContainer()->getParameter('sacevt.event.sac_route_portal_base_link'))) {
+        if (!str_starts_with($strPortalLink, $this->getContainer()->getParameter('sacevt.event.sac_route_portal_base_link'))) {
             return null;
         }
 
         // Check if the SAC route portal base link is not entered
-        if ($strPortalLink === System::getContainer()->getParameter('sacevt.event.sac_route_portal_base_link')) {
+        if ($strPortalLink === $this->getContainer()->getParameter('sacevt.event.sac_route_portal_base_link')) {
             return null;
         }
 
         return $strPortalLink;
     }
 
-    public static function getEventReleaseLevelAsString(CalendarEventsModel $objEvent): string|null
+    public function getEventReleaseLevelAsString(CalendarEventsModel $objEvent): string|null
     {
+        $this->framework->initialize();
+
         if (empty($objEvent->id) || empty($objEvent->eventReleaseLevel)) {
             return null;
         }
 
         $strLevel = null;
-        $eventReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+        $eventReleaseLevelModel = $this->getAdapter(EventReleaseLevelPolicyModel::class)->findByPk($objEvent->eventReleaseLevel);
 
         if (null !== $eventReleaseLevelModel) {
             $strLevel = sprintf(
@@ -1512,30 +1571,43 @@ class CalendarEventsUtil
         return $strLevel;
     }
 
-    public static function isFavoredEvent(CalendarEventsModel $objEvent): bool
+    public function isFavoredEvent(CalendarEventsModel $objEvent): bool
     {
-        /** @var Security $security */
-        $security = System::getContainer()->get('security.helper');
+        $this->framework->initialize();
 
-        $frontendUser = $security->getUser();
+        $user = $this->getContainer()->get('security.helper')->getUser();
 
-        if (!$frontendUser instanceof FrontendUser) {
+        if (!$user instanceof FrontendUser) {
             return false;
         }
 
-        /** @var Connection $database */
-        $database = System::getContainer()->get('database_connection');
+        $database = $this->getContainer()->get('database_connection');
 
         return false !== $database->fetchOne(
             'SELECT id FROM tl_favored_events WHERE eventId = ? AND memberId = ?',
             [
                 $objEvent->id,
-                $frontendUser->id,
+                $user->id,
             ],
             [
                 Types::INTEGER,
                 Types::INTEGER,
             ],
         );
+    }
+
+    private function getProjectDir(): string
+    {
+        return $this->getContainer()->getParameter('kernel.project_dir');
+    }
+
+    private function getContainer(): ContainerInterface
+    {
+        return $this->getAdapter(System::class)->getContainer();
+    }
+
+    private function getAdapter(string $class): Adapter
+    {
+        return $this->framework->getAdapter($class);
     }
 }

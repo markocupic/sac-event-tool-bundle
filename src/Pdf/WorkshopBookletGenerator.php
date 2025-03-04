@@ -44,6 +44,7 @@ class WorkshopBookletGenerator
     private bool $printSingleEvent = false;
 
     public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly CourseLevels $courseLevels,
         private readonly BinaryFileDownload $binaryFileDownload,
         private readonly Connection $connection,
@@ -242,7 +243,7 @@ class WorkshopBookletGenerator
         $strDates = '';
 
         if (null !== $objEvent) {
-            $arr = CalendarEventsUtil::getEventTimestamps($objEvent);
+            $arr = $this->calendarEventsUtil->getEventTimestamps($objEvent);
 
             if (!empty($arr)) {
                 $arrValue = [];
@@ -327,13 +328,14 @@ class WorkshopBookletGenerator
         $objPartial->location = $this->nl2br($objEvent->location);
 
         // Instructors
-        $arrInstructors = CalendarEventsUtil::getInstructorsAsArray($objEvent);
+        $arrInstructors = $this->calendarEventsUtil->getInstructorsAsArray($objEvent);
+        $calendarEventsUtil = $this->calendarEventsUtil;
         $arrItems = array_map(
-            static function ($userId) {
+            static function ($userId) use ($calendarEventsUtil) {
                 $objUser = UserModel::findByPk($userId);
 
                 if (null !== $objUser) {
-                    $strQuali = '' !== CalendarEventsUtil::getMainQualification($objUser) ? ' ('.CalendarEventsUtil::getMainQualification($objUser).')' : '';
+                    $strQuali = '' !== $calendarEventsUtil->getMainQualification($objUser) ? ' ('.$calendarEventsUtil->getMainQualification($objUser).')' : '';
 
                     return $objUser->name.$strQuali;
                 }

@@ -11,6 +11,6 @@ php vendor\bin\ecs check vendor/markocupic/sac-event-tool-bundle/src --fix --con
 php vendor\bin\ecs check vendor/markocupic/sac-event-tool-bundle/contao --fix --config vendor/markocupic/sac-event-tool-bundle/tools/ecs/config.php
 php vendor\bin\ecs check vendor/markocupic/sac-event-tool-bundle/config --fix --config vendor/markocupic/sac-event-tool-bundle/tools/ecs/config.php
 php vendor\bin\ecs check vendor/markocupic/sac-event-tool-bundle/templates --fix --config vendor/markocupic/sac-event-tool-bundle/tools/ecs/config.php
-::php vendor\bin\ecs check vendor/markocupic/sac-event-tool-bundle/tests --fix --config vendor/markocupic/sac-event-tool-bundle/tools/ecs/config.php
+php vendor\bin\ecs check vendor/markocupic/sac-event-tool-bundle/tests --fix --config vendor/markocupic/sac-event-tool-bundle/tools/ecs/config.php
 
 

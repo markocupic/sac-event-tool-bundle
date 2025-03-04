@@ -33,11 +33,12 @@ use Twig\Environment as Twig;
  * Generates the event member dashboard.
  */
 #[AsHook('parseBackendTemplate', priority: 100)]
-class ParseBackendTemplateListener
+readonly class ParseBackendTemplateListener
 {
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly Twig $twig,
+        private CalendarEventsUtil $calendarEventsUtil,
+        private ContaoFramework $framework,
+        private Twig $twig,
     ) {
     }
 
@@ -50,8 +51,6 @@ class ParseBackendTemplateListener
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-
-        $calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         if ('be_main' === $strTemplate) {
@@ -73,8 +72,8 @@ class ParseBackendTemplateListener
                         $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
                         $arrEvent = $objEvent->row();
-                        $arrEvent['time_span'] = $calendarEventsUtilAdapter->getEventPeriod($objEvent);
-                        $arrEvent['instructors'] = $calendarEventsUtilAdapter->getInstructorNamesAsArray($objEvent);
+                        $arrEvent['time_span'] = $this->calendarEventsUtil->getEventPeriod($objEvent);
+                        $arrEvent['instructors'] = $this->calendarEventsUtil->getInstructorNamesAsArray($objEvent);
 
                         $arrRegistration = [];
                         $arrRegistration['states'] = array_diff(EventSubscriptionState::ALL, [EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED]);

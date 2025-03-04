@@ -42,11 +42,12 @@ final readonly class ChangeEventReleaseLevelListener
     private Adapter $eventReleaseLevelPolicyModelAdapter;
 
     public function __construct(
+        private CalendarEventsUtil $calendarEventsUtil,
         private ContaoFramework $framework,
-        private ScopeMatcher $scopeMatcher,
-        private Security $security,
         private Environment $twig,
         private RouterInterface $router,
+        private ScopeMatcher $scopeMatcher,
+        private Security $security,
     ) {
         $this->framework->initialize();
         $this->configAdapter = $this->framework->getAdapter(Config::class);
@@ -116,7 +117,7 @@ final readonly class ChangeEventReleaseLevelListener
 
         $arrEvent = array_map(static fn ($val) => StringUtil::revertInputEncoding((string) $val), $objEvent->row());
 
-        $objInstructor = CalendarEventsUtil::getMainInstructor($objEvent);
+        $objInstructor = $this->calendarEventsUtil->getMainInstructor($objEvent);
 
         if (null === $objInstructor) {
             throw new \RuntimeException(sprintf('Could not find a main instructor for event with ID %d.', $objEvent->id));

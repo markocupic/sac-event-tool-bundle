@@ -37,9 +37,10 @@ class EventApiController extends AbstractController
     public const CACHE_MAX_AGE = 60;
 
     public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
+        private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly Security $security,
-        private readonly Connection $connection,
     ) {
     }
 
@@ -55,7 +56,6 @@ class EventApiController extends AbstractController
     {
         $this->framework->initialize();
 
-        $calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
 
         // Get query filter params from request
@@ -121,7 +121,7 @@ class EventApiController extends AbstractController
                         $oData = new \stdClass();
 
                         foreach ($arrFields as $key) {
-                            $value = $calendarEventsUtil->getEventData($objEvent, $key);
+                            $value = $this->calendarEventsUtil->getEventData($objEvent, $key);
                             // $key may contain a query string: eventImage?size=5
                             $parts = explode('?', $key, 2);
                             $key = $parts[0];
@@ -164,7 +164,6 @@ class EventApiController extends AbstractController
         $this->framework->initialize();
 
         $calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
-        $calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
 
         $eventId = (int) $request->request->get('id');
         $arrFields = '' !== $request->get('fields') ? explode(',', $request->get('fields')) : [];
@@ -188,7 +187,7 @@ class EventApiController extends AbstractController
                     }
                 }
 
-                $arrEvent[$k] = $this->prepareValue($calendarEventsUtil->getEventData($objEvent, $k));
+                $arrEvent[$k] = $this->prepareValue($this->calendarEventsUtil->getEventData($objEvent, $k));
             }
             $arrJSON['arrEventData'] = $arrEvent;
         }

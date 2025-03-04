@@ -62,9 +62,9 @@ use Twig\Environment as Twig;
 #[Route('/contao/event_participant_email', name: EventParticipantEmailController::class, defaults: ['_scope' => 'backend', '_token_check' => true])]
 class EventParticipantEmailController extends AbstractBackendController
 {
-    public const SESSION_BAG_KEY = 'sacevt_event_participant_email';
-    public const MAX_FILE_SIZE = 4000000;
-    public const ALLOWED_EXTENSIONS = ['csv', 'bmp', 'png', 'svg', 'jpg', 'jpeg', 'tiff', 'doc', 'docx', 'pdf', 'xls', 'xlsx', 'txt', 'zip', 'rtf'];
+    public const string SESSION_BAG_KEY = 'sacevt_event_participant_email';
+    public const int MAX_FILE_SIZE = 4000000;
+    public const array ALLOWED_EXTENSIONS = ['csv', 'bmp', 'png', 'svg', 'jpg', 'jpeg', 'tiff', 'doc', 'docx', 'pdf', 'xls', 'xlsx', 'txt', 'zip', 'rtf'];
 
     private CalendarEventsModel|null $event = null;
     private BackendUser|null $user = null;
@@ -74,7 +74,6 @@ class EventParticipantEmailController extends AbstractBackendController
     private Adapter $stringUtil;
     private Adapter $calendarEvents;
     private Adapter $calendarEventsMember;
-    private Adapter $calendarEventsUtil;
     private Adapter $controller;
     private Adapter $environment;
     private Adapter $events;
@@ -83,7 +82,7 @@ class EventParticipantEmailController extends AbstractBackendController
     private Adapter $validator;
 
     public function __construct(
-        private readonly UriSigner $uriSigner,
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly EventRegistrationUtil $eventRegistrationUtil,
@@ -91,13 +90,13 @@ class EventParticipantEmailController extends AbstractBackendController
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
         private readonly Twig $twig,
+        private readonly UriSigner $uriSigner,
         private readonly string $sacevtEventAdminEmail,
         private readonly string $sacevtEventAdminName,
     ) {
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->environment = $this->framework->getAdapter(Environment::class);
         $this->events = $this->framework->getAdapter(Events::class);

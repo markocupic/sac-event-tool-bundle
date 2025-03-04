@@ -23,13 +23,12 @@ use Twig\TwigFunction;
 
 class TwigEventDataManager extends AbstractExtension
 {
-    private Adapter $calendarEventsUtil;
     private Adapter $calendarEventsModel;
 
     public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
     ) {
-        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
     }
 

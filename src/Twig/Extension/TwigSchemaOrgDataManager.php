@@ -26,15 +26,14 @@ use Twig\TwigFunction;
 
 class TwigSchemaOrgDataManager extends AbstractExtension
 {
-    private Adapter $calendarEventsUtil;
     private Adapter $events;
 
     public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
         private readonly RequestStack $requestStack,
         private readonly string $sacevtSectionName,
     ) {
-        $this->calendarEventsUtil = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->events = $this->framework->getAdapter(Events::class);
     }
 

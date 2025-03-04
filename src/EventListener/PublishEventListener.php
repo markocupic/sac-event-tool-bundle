@@ -41,6 +41,7 @@ final readonly class PublishEventListener
     private Adapter $configAdapter;
 
     public function __construct(
+        private CalendarEventsUtil $calendarEventsUtil,
         private ContaoFramework $framework,
         private ScopeMatcher $scopeMatcher,
         private Security $security,
@@ -103,7 +104,7 @@ final readonly class PublishEventListener
 
         $arrEvent = array_map(static fn ($val) => StringUtil::revertInputEncoding((string) $val), $objEvent->row());
 
-        $objInstructor = CalendarEventsUtil::getMainInstructor($objEvent);
+        $objInstructor = $this->calendarEventsUtil->getMainInstructor($objEvent);
 
         if (null === $objInstructor) {
             throw new \RuntimeException(sprintf('Could not find a main instructor for event with ID %d.', $objEvent->id));

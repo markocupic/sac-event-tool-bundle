@@ -35,9 +35,6 @@ class Avatar
         $this->filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
     }
 
-    /**
-     * @todo Provide an avatar if gender === 'other'
-     */
     public function getAvatarResourcePath(MemberModel|UserModel|null $userModel, $blnAbsolute = false): string
     {
         if (!empty($userModel->avatar)) {

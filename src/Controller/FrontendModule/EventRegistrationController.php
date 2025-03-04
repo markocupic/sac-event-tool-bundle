@@ -69,7 +69,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
     public const CHECKOUT_STEP_CONFIRM = 'confirm';
     public const CHECKOUT_STEP_REGISTRATION_INTERRUPTED = 'registration_interrupted';
 
-    private Adapter $calendarEventsUtilAdapter;
     private Adapter $calendarEventsJourneyModelAdapter;
     private Adapter $calendarEventsMemberModelAdapter;
     private Adapter $calendarEventsModelAdapter;
@@ -88,13 +87,14 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private UserModel|null $mainInstructorModel = null;
 
     public function __construct(
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly CarSeatInfo $carSeatInfo,
-        private readonly TicketInfo $ticketInfo,
         private readonly ContaoFramework $framework,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly RequestStack $requestStack,
         private readonly ScopeMatcher $scopeMatcher,
         private readonly Security $security,
+        private readonly TicketInfo $ticketInfo,
         private readonly TranslatorInterface $translator,
         private readonly TwigEnvironment $twig,
         #[Autowire('%sacevt.event_registration.config.reg_start_time_offset%')]
@@ -102,7 +102,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
         private readonly UrlParser $urlParser,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
-        $this->calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->calendarEventsJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
         $this->calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
@@ -193,7 +192,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $template->set('form', $this->generateForm($request));
 
                 // Check if event is already fully booked.
-                if ($this->calendarEventsUtilAdapter->eventIsFullyBooked($this->eventModel)) {
+                if ($this->calendarEventsUtil->eventIsFullyBooked($this->eventModel)) {
                     $template->set('eventFullyBooked', true);
                 }
 
@@ -266,7 +265,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         } elseif (!$this->eventModel->setRegistrationPeriod && $this->eventModel->startDate - 60 * 60 * 24 < time()) {
             // If no registration time has been set, it should only be possible to register online up to 24 h before the event start date.
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_registrationPossible24HoursBeforeEventStart', [], 'contao_default'));
-        } elseif ($this->memberModel && true === $this->calendarEventsUtilAdapter->areBookingDatesOccupied($this->eventModel, $this->memberModel)) {
+        } elseif ($this->memberModel && true === $this->calendarEventsUtil->areBookingDatesOccupied($this->eventModel, $this->memberModel)) {
             // Check if the person registering has already booked other events at the event time.
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventDateOverlapError', [], 'contao_default'));
         } elseif (null === $this->mainInstructorModel) {
@@ -366,7 +365,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $arrData['dateAdded'] = time();
                 $arrData['tstamp'] = time();
                 $arrData['uuid'] = Uuid::uuid4()->toString();
-                $arrData['stateOfSubscription'] = $this->calendarEventsUtilAdapter->eventIsFullyBooked($this->eventModel) ? EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST : EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED;
+                $arrData['stateOfSubscription'] = $this->calendarEventsUtil->eventIsFullyBooked($this->eventModel) ? EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST : EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED;
                 $arrData['bookingType'] = BookingType::ONLINE_FORM;
                 $arrData['sectionId'] = $this->memberModel->sectionId;
 
@@ -504,9 +503,9 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     private function isMultiDayEvent(): bool
     {
-        $durationInDays = \count($this->calendarEventsUtilAdapter->getEventTimestamps($this->eventModel));
-        $startDate = $this->calendarEventsUtilAdapter->getStartDate($this->eventModel);
-        $endDate = $this->calendarEventsUtilAdapter->getEndDate($this->eventModel);
+        $durationInDays = \count($this->calendarEventsUtil->getEventTimestamps($this->eventModel));
+        $startDate = $this->calendarEventsUtil->getStartTstamp($this->eventModel);
+        $endDate = $this->calendarEventsUtil->getEndTstamp($this->eventModel);
 
         if ($durationInDays > 1 && $startDate + ($durationInDays - 1) * 86400 === $endDate) {
             return true;

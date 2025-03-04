@@ -35,7 +35,6 @@ final class NotifyMemberOnEventRegistration
 {
     public const int PRIORITY = 10000;
 
-    private Adapter $calendarEventsUtilAdapter;
     private Adapter $eventsAdapter;
     private Adapter $userModelAdapter;
 
@@ -46,13 +45,13 @@ final class NotifyMemberOnEventRegistration
     private ModuleModel|null $moduleModel = null;
 
     public function __construct(
-        private readonly TranslatorInterface $translator,
+        private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
         private readonly NotificationCenter $notificationCenter,
+        private readonly TranslatorInterface $translator,
         private readonly string $sacevtLocale,
         private readonly LoggerInterface|null $contaoErrorLogger,
     ) {
-        $this->calendarEventsUtilAdapter = $this->framework->getAdapter(CalendarEventsUtil::class);
         $this->eventsAdapter = $this->framework->getAdapter(Events::class);
         $this->userModelAdapter = $this->framework->getAdapter(UserModel::class);
     }
@@ -160,7 +159,7 @@ final class NotifyMemberOnEventRegistration
 
     private function getSectionMembership(): string
     {
-        return $this->calendarEventsUtilAdapter->getSectionMembershipAsString($this->memberModel);
+        return $this->calendarEventsUtil->getSectionMembershipAsString($this->memberModel);
     }
 
     private function getSubscriptionState(): string
