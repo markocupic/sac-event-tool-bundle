@@ -136,7 +136,11 @@ class CalendarEventsMember
 
         if ($request->request->has('changeSubscriptionStateWithEmail')) {
             $strQuery = sprintf('key=notify_event_registration_state&action=%s', $request->request->get('changeSubscriptionStateWithEmail'));
+
             $url = $this->urlParser->addQueryString($strQuery);
+
+            // Remove the old hash before append the new one to the uri.
+            $url = $this->urlParser->removeQueryString(['_hash'], $url);
 
             // Redirect the user to the NotifyEventRegistrationStateController.
             $this->controller->redirect($this->uriSigner->sign($url));

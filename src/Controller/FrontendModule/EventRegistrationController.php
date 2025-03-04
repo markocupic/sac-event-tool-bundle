@@ -235,6 +235,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
     {
         if (null === $this->eventModel) {
             // Check if event entity exists.
+            //throw new EventRegistrationException('Could not find the event.', EventRegistrationException::LEVEL_ERROR',ERR.evt_reg_eventNotFound', [$this->inputAdapter->get('auto_item',null)], 'contao_default');
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventNotFound', [$this->inputAdapter->get('auto_item') ?? 'NULL'], 'contao_default'));
         } elseif (!$this->eventModel->published) {
             // Check if event is published.

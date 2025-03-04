@@ -137,7 +137,7 @@ class NotifyEventRegistrationStateController
         $this->user = $this->security->getUser();
 
         if (!$this->user instanceof BackendUser) {
-            throw new \Exception('Access denied! User has to be a logged in Contao backend user.');
+            throw new \Exception('Access denied! User has to be a logged in as a Contao backend user.');
         }
 
         $this->action = $request->query->get('action', null);
