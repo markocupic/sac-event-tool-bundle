@@ -174,6 +174,8 @@ class CalendarEventsMemberModel extends Model
                 ;
             }
 
+            $qb->orderBy('t.startDate', 'DESC');
+
             foreach ($qb->fetchAllAssociative() as $arrEvent) {
                 // Filter by event type
                 if (!empty($arrEventTypeFilter)) {

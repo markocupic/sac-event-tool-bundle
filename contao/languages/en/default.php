@@ -148,7 +148,7 @@ $GLOBALS['TL_LANG']['MSC']['bhs_dashb_noUpcomingEventsDetected'] = 'In nächster
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_noPastEventsDetected'] = 'Es wurden keine Events gefunden, bei denen Sie in letzter Zeit eine Leitungsfunktion ausgeübt haben.';
 
 // Event registration frontend module
-$GLOBALS['TL_LANG']['ERR']['evt_reg_eventNotFound'] = 'Event mit ID: %s nicht gefunden.';
+$GLOBALS['TL_LANG']['ERR']['evt_reg_unknownError'] = 'Es ist ein unerwarteter Fehler aufgetreten. Bitte benachrichtige den Administrator dieser Webseite, sollte der Fehler erneut auftreten.';
 $GLOBALS['TL_LANG']['ERR']['evt_reg_eventNotPublishedYet'] = 'Der Event "%s" ist nicht veröffentlicht und eine Online-Anmeldung ist (noch) nicht möglich.';
 $GLOBALS['TL_LANG']['ERR']['evt_reg_eventReleaseLevelPolicyDoesNotAllowRegistrations'] = 'Die Veröffentlichungsstufe für Event "%s" erlaubt Online-Anmeldungen nicht.';
 $GLOBALS['TL_LANG']['ERR']['evt_reg_onlineRegDisabled'] = 'Der/Die Leiter/in hat die Online-Anmeldung zu diesem Event deaktiviert. Bitte beachte die Tourenausschreibung.';

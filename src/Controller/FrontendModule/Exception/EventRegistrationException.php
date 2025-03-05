@@ -17,7 +17,7 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule\Exception;
 class EventRegistrationException extends \RuntimeException
 {
     public const string LEVEL_INFO = 'info';
-    public const string LEVEL_ERROR = 'err';
+    public const string LEVEL_ERROR = 'error';
 
     public function __construct(
         private readonly string $reason,
