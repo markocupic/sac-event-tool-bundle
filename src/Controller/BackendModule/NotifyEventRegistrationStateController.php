@@ -216,7 +216,7 @@ class NotifyEventRegistrationStateController
         if (!$request->isMethod('post')) {
             $arrEmailTextTokens = $this->getTokenArray();
 
-            if (EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST === $this->action && $this->event->customizeEventRegistrationConfirmationEmailText && !empty($this->event->customEventRegistrationConfirmationEmailText)) {
+            if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $this->action && $this->event->customizeEventRegistrationConfirmationEmailText && !empty($this->event->customEventRegistrationConfirmationEmailText)) {
                 // Only for accept_with_email!!!
                 // Replace tags for custom notification set in the events settings (tags can be used case-insensitive!)
                 $emailBodyText = $this->event->customEventRegistrationConfirmationEmailText;
