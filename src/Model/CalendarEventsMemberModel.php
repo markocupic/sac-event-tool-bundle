@@ -15,17 +15,19 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Model;
 
 use Contao\CalendarEventsModel;
-use Contao\Events;
 use Contao\Frontend;
 use Contao\MemberModel;
 use Contao\Model;
+use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CalendarEventsMemberModel extends Model
 {
@@ -87,15 +89,29 @@ class CalendarEventsMemberModel extends Model
             ]
         );
 
-        if (false === $id) {
-            return null;
-        }
-
-        return static::findByPk($id);
+        return false === $id ? null : static::findByPk($id);
     }
 
-    public static function findEventsByMemberId(int $memberId, array $arrEventTypeFilter = [], int|null $intStartDateMin = null, int|null $intStartDateMax = null, bool $blnInstructorRole = false, bool $blnShowEventsWithParticipationOnly = false): array
+    public static function findEventsByMemberId(int $memberId, array $options): array
     {
+        $options = (new OptionsResolver())
+            ->setDefaults([
+                'eventTypeFilter' => [],
+                'startTstamp' => null,
+                'endTstamp' => null,
+                'blnInstructorRole' => false,
+                'blnShowEventsWithParticipationOnly' => false,
+                'sorting' => 'DESC',
+            ])
+            ->addAllowedValues('eventTypeFilter', static fn (array $values = []) => empty(array_diff($values, EventType::ALL)))
+            ->addAllowedValues('sorting', ['ASC', 'DESC'])
+            ->addAllowedTypes('startTstamp', ['null', 'int'])
+            ->addAllowedTypes('endTstamp', ['null', 'int'])
+            ->addAllowedTypes('blnInstructorRole', ['bool'])
+            ->addAllowedTypes('blnShowEventsWithParticipationOnly', ['bool'])
+            ->resolve($options)
+        ;
+
         $arrEvents = [];
         $objMember = MemberModel::findByPk($memberId);
         $blnHasEventsAsInstructor = false;
@@ -107,8 +123,8 @@ class CalendarEventsMemberModel extends Model
         /** @var Connection $database */
         $database = System::getContainer()->get('database_connection');
 
-        if ($blnShowEventsWithParticipationOnly) {
-            $arrEventIDS = $database->fetchFirstColumn(
+        if ($options['blnShowEventsWithParticipationOnly']) {
+            $eventIDS = $database->fetchFirstColumn(
                 'SELECT eventId FROM tl_calendar_events_member WHERE sacMemberId = ? AND hasParticipated = ?',
                 [
                     $objMember->sacMemberId,
@@ -120,7 +136,7 @@ class CalendarEventsMemberModel extends Model
                 ]
             );
         } else {
-            $arrEventIDS = $database->fetchFirstColumn(
+            $eventIDS = $database->fetchFirstColumn(
                 'SELECT eventId FROM tl_calendar_events_member WHERE sacMemberId = ?',
                 [
                     $objMember->sacMemberId,
@@ -131,7 +147,7 @@ class CalendarEventsMemberModel extends Model
             );
         }
 
-        if ($blnInstructorRole) {
+        if (true === $options['blnInstructorRole']) {
             $objUser = UserModel::findOneBySacMemberId($objMember->sacMemberId);
 
             if (null !== $objUser) {
@@ -147,44 +163,43 @@ class CalendarEventsMemberModel extends Model
 
                 if (\count($arrEventIDSAsInstructor)) {
                     $blnHasEventsAsInstructor = true;
-                    $arrEventIDS = array_merge($arrEventIDS, $arrEventIDSAsInstructor);
+                    $eventIDS = array_merge($eventIDS, $arrEventIDSAsInstructor);
                 }
             }
         }
 
-        $arrEventIDS = array_filter(array_unique($arrEventIDS));
+        $eventIDS = array_filter(array_unique($eventIDS));
 
-        if (\count($arrEventIDS)) {
+        if (!empty($eventIDS)) {
             $qb = $database->createQueryBuilder();
             $qb->select('*')
                 ->from('tl_calendar_events', 't')
                 ->where('t.id IN (:ids)')
-                ->setParameter('ids', array_map('intval', $arrEventIDS), ArrayParameterType::INTEGER)
+                ->setParameter('ids', array_map('intval', $eventIDS), ArrayParameterType::INTEGER)
             ;
 
-            if (null !== $intStartDateMin) {
-                $qb->andWhere('t.startDate >= :startDateMin')
-                    ->setParameter('startDateMin', $intStartDateMin, Types::INTEGER)
+            if (null !== $options['startTstamp']) {
+                $qb->andWhere('t.startDate >= :startTstamp')
+                    ->setParameter('startTstamp', $options['startTstamp'], Types::INTEGER)
                 ;
             }
 
-            if (null !== $intStartDateMax) {
-                $qb->andWhere('t.startDate <= :startDateMax')
-                    ->setParameter('startDateMax', $intStartDateMax, Types::INTEGER)
+            if (null !== $options['endTstamp']) {
+                $qb->andWhere('t.startDate <= :endTstamp')
+                    ->setParameter('endTstamp', $options['endTstamp'], Types::INTEGER)
                 ;
             }
 
-            $qb->orderBy('t.startDate', 'DESC');
+            if (!empty($options['eventTypeFilter'])) {
+                $qb->andWhere($qb->expr()->in('t.eventType', ':eventTypeFilter'))
+                    ->setParameter('eventTypeFilter', $options['eventTypeFilter'], ArrayParameterType::STRING)
+                ;
+            }
+
+            $qb->orderBy('t.startDate', $options['sorting']);
 
             foreach ($qb->fetchAllAssociative() as $arrEvent) {
-                // Filter by event type
-                if (!empty($arrEventTypeFilter)) {
-                    if (!\in_array($arrEvent['eventType'], $arrEventTypeFilter, true)) {
-                        continue;
-                    }
-                }
-
-                $arrEventReg = $database->fetchAssociative(
+                $rowReg = $database->fetchAssociative(
                     'SELECT * FROM tl_calendar_events_member WHERE sacMemberId = ? AND eventId = ?',
                     [
                         $objMember->sacMemberId,
@@ -196,41 +211,58 @@ class CalendarEventsMemberModel extends Model
                     ]
                 );
 
-                $objEventModel = CalendarEventsModel::findByPk($arrEvent['id']);
-                $row = $objEventModel->row();
-                $row['dateSpan'] = System::getContainer()->get(CalendarEventsUtil::class)->getEventPeriod($objEventModel, 'd.m.Y');
-                $row['objEvent'] = $objEventModel;
-                $row['eventModel'] = $objEventModel;
-                $row['eventUrl'] = Events::generateEventUrl($objEventModel);
+                $objEvent = CalendarEventsModel::findByPk($arrEvent['id']);
+                $rowEvent = $objEvent->row();
+                $rowEvent['dateSpan'] = System::getContainer()->get(CalendarEventsUtil::class)->getEventPeriod($objEvent, 'd.m.Y');
+                $rowEvent['objEvent'] = $objEvent;
+                $rowEvent['eventModel'] = $objEvent;
+                $rowEvent['eventUrl'] = System::getContainer()->get('contao.routing.content_url_generator')->generate($objEvent);
 
-                if (false !== $arrEventReg) {
+                if (false !== $rowReg) {
                     // If member has the role "participant"
-                    $row['eventRegistrationModel'] = self::findByPk($arrEventReg['id']);
-                    $row['registrationId'] = $arrEventReg['id'];
-                    $row['role'] = 'member';
-                    $row['unregisterUrl'] = Frontend::addToUrl('do=unregisterUserFromEvent&amp;registrationId='.$arrEventReg['id']);
+                    $rowEvent['eventRegistrationModel'] = self::findByPk($rowReg['id']);
+                    $rowEvent['registrationId'] = $rowReg['id'];
+                    $rowEvent['role'] = 'member';
+                    $rowEvent['unregisterUrl'] = Frontend::addToUrl(StringUtil::ampersand('do=unregisterUserFromEvent&registrationId='.$rowReg['id']));
                 } else {
                     // If member has the role "instructor"
-                    if ($blnInstructorRole && $blnHasEventsAsInstructor) {
-                        $row['registrationId'] = null;
-                        $row['role'] = 'instructor';
+                    if (true === $options['blnInstructorRole'] && $blnHasEventsAsInstructor) {
+                        $rowEvent['registrationId'] = null;
+                        $rowEvent['role'] = 'instructor';
                     }
                 }
-                $arrEvents[] = $row;
+                $arrEvents[] = $rowEvent;
             }
         }
 
         return $arrEvents;
     }
 
-    public static function findUpcomingEventsByMemberId(int $memberId, array $arrEventTypeFilter = [], bool $blnInstructorRole = false): array
+    public static function findUpcomingEventsByMemberId(int $memberId, array $eventTypeFilter = [], bool $blnInstructorRole = false, $sorting = 'ASC'): array
     {
-        return static::findEventsByMemberId($memberId, $arrEventTypeFilter, time(), null, $blnInstructorRole);
+        $options = [
+            'eventTypeFilter' => $eventTypeFilter,
+            'startTstamp' => time(),
+            'endTstamp' => null,
+            'blnInstructorRole' => $blnInstructorRole,
+            'sorting' => $sorting,
+        ];
+
+        return static::findEventsByMemberId($memberId, $options);
     }
 
-    public static function findPastEventsByMemberId(int $memberId, array $arrEventTypeFilter = [], bool $blnInstructorRole = false, bool $blnShowEventsWithParticipationOnly = true): array
+    public static function findPastEventsByMemberId(int $memberId, array $eventTypeFilter = [], bool $blnInstructorRole = false, bool $blnShowEventsWithParticipationOnly = true, $sorting = 'DESC'): array
     {
-        return static::findEventsByMemberId($memberId, $arrEventTypeFilter, null, time(), $blnInstructorRole, $blnShowEventsWithParticipationOnly);
+        $options = [
+            'eventTypeFilter' => $eventTypeFilter,
+            'startTstamp' => null,
+            'endTstamp' => time(),
+            'blnInstructorRole' => $blnInstructorRole,
+            'blnShowEventsWithParticipationOnly' => $blnShowEventsWithParticipationOnly,
+            'sorting' => $sorting,
+        ];
+
+        return static::findEventsByMemberId($memberId, $options);
     }
 
     public static function canAcceptSubscription(self $objMember, CalendarEventsModel $objEvent): bool
