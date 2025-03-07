@@ -89,4 +89,5 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['bankTransfer'] = 'Bank-/Postü
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['twint'] = 'TWINT';
 
 // Messages
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['notificationDueToMissingEmailDisabled'] = 'Benachrichtigungen wegen fehlender E-Mail-Adresse nicht möglich.';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['notificationDueToMissingEmailDisabled'] = 'Achtung! Eine Benachrichtigung des Teilnehmers bei Änderung des Buchungsstatus ist wegen fehlender E-Mail-Adresse nicht möglich.';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['bookingStateHasBeenChangedButParticipantWasNotNotifiedDueToMissingEmail'] = 'Der Buchungsstatus wurde auf "%s" geändert, jedoch konnte der Teilnehmer wegen fehlender E-Mail-Adresse nicht darüber benachrichtigt werden.';

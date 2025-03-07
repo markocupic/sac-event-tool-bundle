@@ -26,6 +26,7 @@ use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Routing\ContentUrlGenerator;
+use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\DataContainer;
 use Contao\MemberModel;
 use Contao\Message;
@@ -90,6 +91,7 @@ class CalendarEventsMember
         private readonly Packages $packages,
         private readonly RequestStack $requestStack,
         private readonly RouterInterface $router,
+        private readonly ScopeMatcher $scopeMatcher,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
         private readonly UriSigner $uriSigner,
@@ -357,7 +359,13 @@ class CalendarEventsMember
         }
 
         if (!$this->validator->isEmail($arrReg['email'])) {
-            throw new \Exception(sprintf('Can not send the notification because the email address "%s" is not valid.', $arrReg['email']));
+            if ($this->scopeMatcher->isBackendRequest($this->requestStack->getCurrentRequest())) {
+                $stateOfSubscription = $this->translator->trans('MSC.'.$arrReg['stateOfSubscription'], [], 'contao_default');
+                $message = $this->translator->trans('tl_calendar_events_member.bookingStateHasBeenChangedButParticipantWasNotNotifiedDueToMissingEmail', [$stateOfSubscription], 'contao_default');
+                $this->message->addInfo($message);
+            }
+
+            return;
         }
 
         $notificationIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_nc_notification WHERE type = ?', [SubscriptionStateChangeNotificationType::NAME], [Types::STRING]);
