@@ -44,6 +44,8 @@ class ContaoUpdateEventDispatcher
 
     /**
      * Dispatch the Contao-Pre-Update-Event.
+     * We use a very low priority to ensure
+     * that the callbacks are triggered as late as possible.
      *
      * @param array $updatedFields the modifications to be applied to the record
      */
@@ -70,12 +72,18 @@ class ContaoUpdateEventDispatcher
 
     /**
      * Dispatch the Contao-Post-Update-Event.
+     * We use a very low priority to ensure
+     * that the callbacks are triggered as late as possible.
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: -99999)]
     #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onsubmit', priority: -99999)]
     public function dispatchPostUpdateEvent(DataContainer $dc): void
     {
-        $this->validatePreUpdateState($dc);
+        if (!$this->validatePreUpdateState($dc)) {
+            // Stop here if the config.onbeforesubmit callback has not been triggered
+            // because of an empty form submit.
+            return;
+        }
 
         $postUpdateRecord = $this->fetchRecord($this->tableName, $this->recordId);
         $diffData = array_diff_assoc($postUpdateRecord, $this->preUpdateRecord);
@@ -102,13 +110,16 @@ class ContaoUpdateEventDispatcher
     }
 
     /**
-     * Validates that the pre-update state is consistent and valid.
+     * Validates that the config.onbeforesubmit callback has been triggered
+     * and the pre-update state is consistent and valid.
      */
-    protected function validatePreUpdateState(DataContainer $dc): void
+    protected function validatePreUpdateState(DataContainer $dc): bool
     {
         if ($this->tableName !== $dc->table || $this->recordId !== (int) $dc->id || 0 === $this->recordId) {
-            throw new \LogicException('Invalid pre-update state. Ensure preUpdate() is called before postUpdate().');
+            return false;
         }
+
+        return true;
     }
 
     /**
