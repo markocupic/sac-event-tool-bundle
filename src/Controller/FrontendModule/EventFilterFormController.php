@@ -56,48 +56,53 @@ class EventFilterFormController extends AbstractFrontendModuleController
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        // Do not allow an invalid "year" param.
-        if ($request->query->has('year')) {
-            $validYears = implode('|', range(2016, (int) date('Y') + 1));
+        $arrAll = array_filter($request->query->all());
+        $url = $request->getUri();
+        $isValid = false;
+        $countUrlFixes = 0;
 
-            // Check if year number is valid.
-            if (!preg_match('/^('.$validYears.')$/', $request->query->get('year'))) {
-                $url = $this->urlParser->removeQueryString(['year']);
+        while (!$isValid) {
+            if (isset($arrAll['year']) && \strlen($arrAll['year'])) {
+                $validYears = implode('|', range(2017, (int) date('Y') + 1));
 
-                // Reload the page with the fixed url
-                $controllerAdapter->redirect($url);
+                if (!preg_match('/^('.$validYears.')$/', $arrAll['year'])) {
+                    unset($arrAll['year']);
+                    $url = $this->urlParser->removeQueryString(['year'], $url);
+                    ++$countUrlFixes;
+
+                    continue;
+                }
             }
 
-            // We assume that the "year" param is valid.
-            // Add a correct "dateStart" param if there is none.
-            if (!$this->isDateValid($request->query->get('dateStart', ''))) {
-                $year = $request->query->get('year');
-                $date = $year.'-01-01';
-                $url = $this->urlParser->removeQueryString(['dateStart']);
-                $url = $this->urlParser->addQueryString('dateStart='.$date, $url);
+            if (isset($arrAll['dateStart']) && \strlen($arrAll['dateStart'])) {
+                if (!$this->isDateValid($arrAll['dateStart'])) {
+                    unset($arrAll['dateStart']);
+                    $url = $this->urlParser->removeQueryString(['dateStart'], $url);
+                    ++$countUrlFixes;
 
-                // Reload the page with the fixed url
-                $controllerAdapter->redirect($url);
+                    continue;
+                }
+
+                $arrAll['year'] = date('Y', strtotime($arrAll['dateStart']));
             }
+
+            if (isset($arrAll['year']) && \strlen($arrAll['year'])) {
+                $arrAll['dateStop'] = $arrAll['year'].'-12-31';
+            } else {
+                $arrAll['dateStop'] = date('Y').'-12-31';
+            }
+
+            if ($request->query->get('dateStop') !== $arrAll['dateStop']) {
+                $url = $this->urlParser->removeQueryString(['dateStop'], $url);
+                $url = $this->urlParser->addQueryString('dateStop='.$arrAll['dateStop'], $url);
+                ++$countUrlFixes;
+            }
+
+            $isValid = true;
         }
 
-        // Clean the url query from an invalid param "dateStart".
-        if ($request->query->has('dateStart')) {
-            if (!$this->isDateValid($request->query->get('dateStart'), self::DATE_FORMAT)) {
-                $url = $this->urlParser->removeQueryString(['dateStart']);
-
-                // Reload the page with the fixed url
-                $controllerAdapter->redirect($url);
-            }
-
-            if ($request->query->get('year') !== date('Y', strtotime($request->query->get('dateStart')))) {
-                $yearNumber = date('Y', strtotime($request->query->get('dateStart')));
-                $url = $this->urlParser->removeQueryString(['year']);
-                $url = $this->urlParser->addQueryString('year='.$yearNumber, $url);
-
-                // Reload the page with the fixed url
-                $controllerAdapter->redirect($url);
-            }
+        if ($countUrlFixes) {
+            $controllerAdapter->redirect($url);
         }
 
         $arrAllowedFields = $stringUtilAdapter->deserialize($model->eventFilterBoardFields, true);

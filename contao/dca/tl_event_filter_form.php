@@ -31,7 +31,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
         ],
         'dateStart'            => [
             'inputType' => 'text',
-            'eval'      => ['placeholder' => 'yyyy-mm-dd', 'maxlength' => 12],
+            'eval'      => ['rgxp' => 'date', 'maxlength' => 10],
             'sql'       => "varchar(10) NOT NULL default ''",
         ],
         'tourType'             => [

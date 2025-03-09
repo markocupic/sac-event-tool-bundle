@@ -58,8 +58,9 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             let options = {
-                'locale': '{{ sacevt_locale }}',
-                'dateFormat': '{{ date_format }}',
+                'datePicker': {
+                    'minYear': 2017,
+                }
             }
 
             EventListFilter.initialize(options);

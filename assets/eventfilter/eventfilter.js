@@ -16,8 +16,7 @@ const EventListFilter = {
 
     /**
      * Initialize filter board
-     * @param eventList
-     * @param options
+     * @param opt
      */
     initialize: function (opt) {
         if (typeof window.jQuery === 'undefined') {
@@ -79,41 +78,37 @@ const EventListFilter = {
             window.location.href = location.href.replace(location.search, '');
         });
 
-        //Set Datepicker
-        const datePickerOpt = {
-            dateFormat: self.options.dateFormat, "locale": self.options.locale,
-        }
+        // Initialize date picker
+        const datePicker = document.getElementById('ctrl_dateStart');
+        datePicker.setAttribute('min', opt.datePicker.minYear + '-01-01');
+        datePicker.setAttribute('max', (new Date()).getFullYear() + 1 + '-12-31');
 
-        const today = new Date();
-        const mm = today.getMonth() + 1;
-        const dd = today.getDate();
-        const YYYY = today.getFullYear();
-
-
-        const minYYYY = 2016;
-        const maxYYYY = today.getFullYear() + 1
-
-        datePickerOpt.minDate = minYYYY + '-01-01';
-        datePickerOpt.maxDate = maxYYYY + '-12-31';
-
-        // Set datepickers start and end date
+        // Set the date pickers start and end date
         if (self.getUrlParam('year') > 0) {
-            datePickerOpt.defaultDate = self.getUrlParam('year') + '-01-01';
+            datePicker.value = self.getUrlParam('year') + '-01-01';
 
-            if (self.getUrlParam('dateStart') != '') {
-                datePickerOpt.defaultDate = self.getUrlParam('dateStart');
+            if (self.getUrlParam('dateStart') !== '') {
+                datePicker.value = self.getUrlParam('dateStart');
             }
         }
 
-        // Instantiate the flatpicker calendar plugin
-        const calendar = flatpickr("#ctrl_dateStart", datePickerOpt);
+        // Reset date picker if the user changes the year number.
+        const yearInput = document.getElementById('ctrl_year');
+        yearInput.addEventListener('change', (e) => {
+            datePicker.value = '';
+        });
 
-        // Update the calendar if the year dropdown has been changed
-        document.getElementById('year').addEventListener('change', (e) => {
+        // Update the year input field if the user changes the date picker.
+        datePicker.addEventListener('change', (e) => {
             if (!e.target.value) {
-                calendar.clear();
+                yearInput.value = '';
             } else {
-                calendar.setDate(e.target.value + '-01-01');
+                const date = new Date(e.target.value);
+                if (date) {
+                    yearInput.value = date.getFullYear().toString();
+                } else {
+                    yearInput.value = '';
+                }
             }
         });
 
