@@ -31,8 +31,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AsFrontendModule(EventFilterFormController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_event_filter_form')]
 class EventFilterFormController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'event_filter_form';
-    public const DATE_FORMAT = 'Y-m-d';
+    public const string TYPE = 'event_filter_form';
+    public const string DATE_FORMAT = 'Y-m-d';
 
     public function __construct(
         private readonly ContaoFramework $framework,
@@ -56,28 +56,47 @@ class EventFilterFormController extends AbstractFrontendModuleController
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        // Clean the url query from an invalid param "dateStart" and reload the page
-        if ($request->query->has('dateStart')) {
-            if (!$this->validateDate($request->query->get('dateStart'), self::DATE_FORMAT)) {
-                $url = $this->urlParser->removeQueryString(['dateStart']);
+        // Do not allow an invalid "year" param.
+        if ($request->query->has('year')) {
+            $validYears = implode('|', range(2016, (int) date('Y') + 1));
+
+            // Check if year number is valid.
+            if (!preg_match('/^('.$validYears.')$/', $request->query->get('year'))) {
+                $url = $this->urlParser->removeQueryString(['year']);
+
                 // Reload the page with the fixed url
                 $controllerAdapter->redirect($url);
             }
 
-            if ($request->query->get('year') > 0) {
-                if ($request->query->get('year') !== date('Y', strtotime($request->query->get('dateStart')))) {
-                    $url = $this->urlParser->removeQueryString(['dateStart']);
-                    // Reload the page with the fixed url
-                    $controllerAdapter->redirect($url);
-                }
+            // We assume that the "year" param is valid.
+            // Add a correct "dateStart" param if there is none.
+            if (!$this->isDateValid($request->query->get('dateStart', ''))) {
+                $year = $request->query->get('year');
+                $date = $year.'-01-01';
+                $url = $this->urlParser->removeQueryString(['dateStart']);
+                $url = $this->urlParser->addQueryString('dateStart='.$date, $url);
+
+                // Reload the page with the fixed url
+                $controllerAdapter->redirect($url);
+            }
+        }
+
+        // Clean the url query from an invalid param "dateStart".
+        if ($request->query->has('dateStart')) {
+            if (!$this->isDateValid($request->query->get('dateStart'), self::DATE_FORMAT)) {
+                $url = $this->urlParser->removeQueryString(['dateStart']);
+
+                // Reload the page with the fixed url
+                $controllerAdapter->redirect($url);
             }
 
-            if (!$request->query->has('year')) {
-                if (date('Y') !== date('Y', strtotime($request->query->get('dateStart')))) {
-                    $url = $this->urlParser->removeQueryString(['dateStart']);
-                    // Reload the page with the fixed url
-                    $controllerAdapter->redirect($url);
-                }
+            if ($request->query->get('year') !== date('Y', strtotime($request->query->get('dateStart')))) {
+                $yearNumber = date('Y', strtotime($request->query->get('dateStart')));
+                $url = $this->urlParser->removeQueryString(['year']);
+                $url = $this->urlParser->addQueryString('year='.$yearNumber, $url);
+
+                // Reload the page with the fixed url
+                $controllerAdapter->redirect($url);
             }
         }
 
@@ -140,34 +159,35 @@ class EventFilterFormController extends AbstractFrontendModuleController
         ]);
 
         // Set form field value from $_GET
-        if (!empty($arrAllowedFields) && \is_array($arrAllowedFields)) {
+        if (!empty($arrAllowedFields)) {
             foreach ($arrAllowedFields as $k) {
                 if ($request->query->has($k)) {
-                    if ($objForm->hasFormField($k)) {
-                        $objWidget = $objForm->getWidget($k);
-                        $arrMultiSelects = ['organizers', 'tourType', 'courseType'];
-                        // Multi selects
-                        if (\in_array($k, $arrMultiSelects, true)) {
-                            // As of Symfony 6, non-scalar values are no longer supported
-                            // we must use $request->query->all()[$k]
-                            $value = $request->query->all()[$k] ?? [];
+                    if (!$objForm->hasFormField($k)) {
+                        continue;
+                    }
+                    $objWidget = $objForm->getWidget($k);
+                    $arrMultiSelects = ['organizers', 'tourType', 'courseType'];
+                    // Multi selects
+                    if (\in_array($k, $arrMultiSelects, true)) {
+                        // As of Symfony 6, non-scalar values are no longer supported
+                        // we must use $request->query->all()[$k]
+                        $value = $request->query->all()[$k] ?? [];
 
-                            // e.g the organizers GET param can be transmitted like this:
-                            // organizers=5 or organizers[]=5&organizers[]=6 or organizers=5,6
-                            if (\is_scalar($value)) {
-                                $value = [$value];
-                            } elseif (\is_array($value)) {
-                                // Do nothing if the value is an array
-                            } elseif (\is_string($value) && !empty($value) && str_contains($value, ',')) {
-                                $value = explode(',', $value);
-                            } else {
-                                $value = $stringUtilAdapter->deserialize($value, true);
-                            }
-
-                            $objWidget->value = !empty($value) ? $value : '';
+                        // e.g the organizers GET param can be transmitted like this:
+                        // organizers=5 or organizers[]=5&organizers[]=6 or organizers=5,6
+                        if (\is_scalar($value)) {
+                            $value = [$value];
+                        } elseif (\is_array($value)) {
+                            // Do nothing if the value is an array
+                        } elseif (\is_string($value) && !empty($value) && str_contains($value, ',')) {
+                            $value = explode(',', $value);
                         } else {
-                            $objWidget->value = $request->query->all()[$k];
+                            $value = $stringUtilAdapter->deserialize($value, true);
                         }
+
+                        $objWidget->value = !empty($value) ? $value : '';
+                    } else {
+                        $objWidget->value = $request->query->all()[$k];
                     }
                 }
             }
@@ -188,7 +208,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
         return $objForm;
     }
 
-    protected function validateDate(string $date, string $format = 'Y-m-d')
+    protected function isDateValid(string $date, string $format = 'Y-m-d'): bool
     {
         $objDate = \DateTime::createFromFormat($format, $date);
 

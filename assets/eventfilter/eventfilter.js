@@ -89,26 +89,33 @@ const EventListFilter = {
         const dd = today.getDate();
         const YYYY = today.getFullYear();
 
+
+        const minYYYY = 2016;
+        const maxYYYY = today.getFullYear() + 1
+
+        datePickerOpt.minDate = minYYYY + '-01-01';
+        datePickerOpt.maxDate = maxYYYY + '-12-31';
+
         // Set datepickers start and end date
         if (self.getUrlParam('year') > 0) {
-            datePickerOpt.minDate = self.getUrlParam('year') + '-01-01';
-            datePickerOpt.maxDate = self.getUrlParam('year') + '-12-31';
-            datePickerOpt.defaultDate = '';
+            datePickerOpt.defaultDate = self.getUrlParam('year') + '-01-01';
 
             if (self.getUrlParam('dateStart') != '') {
                 datePickerOpt.defaultDate = self.getUrlParam('dateStart');
             }
-        } else {
-            const today = new Date();
-            const mm = today.getMonth() + 1;
-            const dd = today.getDate();
-            let YYYY = today.getFullYear();
-            datePickerOpt.minDate = YYYY + '-' + mm + '-' + dd;
-            YYYY = YYYY + 2;
-            datePickerOpt.maxDate = YYYY + '-' + mm + '-' + dd;
         }
 
-        flatpickr("#ctrl_dateStart", datePickerOpt);
+        // Instantiate the flatpicker calendar plugin
+        const calendar = flatpickr("#ctrl_dateStart", datePickerOpt);
+
+        // Update the calendar if the year dropdown has been changed
+        document.getElementById('year').addEventListener('change', (e) => {
+            if (!e.target.value) {
+                calendar.clear();
+            } else {
+                calendar.setDate(e.target.value + '-01-01');
+            }
+        });
 
     }, /**
      * @param strParam
