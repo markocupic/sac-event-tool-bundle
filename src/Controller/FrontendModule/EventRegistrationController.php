@@ -281,7 +281,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
             throw new EventRegistrationException('The registration deadline for this event has expired.', EventRegistrationException::LEVEL_INFO, 'ERR.evt_reg_registrationDeadlineExpired', [$strEndDate, $strEndTime]);
         }
 
-        if ($eventModel->setRegistrationPeriod && $eventModel->startDate > strtotime('-1 day')) {
+        if (!$eventModel->setRegistrationPeriod && strtotime('+1 day') > $eventModel->startDate) {
             throw new EventRegistrationException('If no registration time has been set, online registration is only possible up to 24 h before the event start date.', EventRegistrationException::LEVEL_INFO, 'ERR.evt_reg_registrationPossible24HoursBeforeEventStart', []);
         }
 
