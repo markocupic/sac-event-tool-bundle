@@ -11,7 +11,13 @@
         </div>
         {% for key,value in instructor.contact_options %}
             <div class="ce_user_portrait_{{ key }}">
-                <small data-title="{{ value }}">{{ value }}</small>
+                {% if 'phone' == key or 'mobile' == key %}
+                    <small><a href="tel:{{ value }}">{{ value }}</a></small>
+                {% elseif 'email' == key %}
+                    <small><a href="mailto:{{ value }}">{{ value }}</a></small>
+                {% else %}
+                    <small data-title="{{ value }}">{{ value }}</small>
+                {% endif %}
             </div>
         {% endfor %}
     </div>
