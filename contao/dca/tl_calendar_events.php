@@ -845,7 +845,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['linkSacRoutePortal'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
-	'eval'      => ['tl_class' => 'm12 clr'],
+	'eval'      => ['maxlength' => 128, 'tl_class' => 'm12 clr'],
 	'sql'       => 'text NULL',
 ];
 
