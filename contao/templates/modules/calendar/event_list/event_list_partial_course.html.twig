@@ -113,7 +113,9 @@
             'calendarIds': {{ apiParam.calendarIds }}, // json_encoded array [1, 2]
             'courseId': '{{ apiParam.courseId }}',
             'courseType': {{ apiParam.courseType }}, // json_encoded array [1, 2]
+            'getUpcoming': '{{ apiParam.getUpcoming }}',
             'dateStart': '{{ apiParam.dateStart }}',
+            'dateEnd': '{{ apiParam.dateEnd }}',
             'eventId': '{{ apiParam.eventId }}',
             'eventType': {{ apiParam.eventType|raw }}, // json_encoded array ["tour", "generalEvent"]
             'favoredEvent': '{{ apiParam.favoredEvent }}',
@@ -124,7 +126,6 @@
             'textSearch': '{{ apiParam.textSearch }}',
             'tourType': {{ apiParam.tourType }}, // json_encoded array [1, 2]
             'username': '{{ apiParam.username }}',
-            'year': '{{ apiParam.year }}',
         },
         'fields': [
             'id',

@@ -455,7 +455,7 @@ readonly class CalendarEventsUtil
             }
 
             $arrInstructor = $objUser->row();
-            $arrInstructor['href'] = $contentUrlGenerator->generate($objPage).'?username='.$objUser->username;
+            $arrInstructor['href'] = $contentUrlGenerator->generate($objPage).'?getUpcoming=1&username='.$objUser->username;
             $arrInstructor['has_link'] = true;
 
             $arrInstructor['avatar_path'] = $avatarManager->getAvatarResourcePath($objUser);

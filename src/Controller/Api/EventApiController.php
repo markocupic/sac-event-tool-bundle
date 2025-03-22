@@ -34,7 +34,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class EventApiController extends AbstractController
 {
-    public const CACHE_MAX_AGE = 60;
+    public const int CACHE_MAX_AGE = 60;
 
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
@@ -210,12 +210,12 @@ class EventApiController extends AbstractController
             // Integers
             'offset' => empty($request->get('offset')) ? 0 : (int) $request->get('offset'),
             'limit' => empty($request->get('limit')) ? 0 : (int) $request->get('limit'),
-            'year' => (int) $request->get('year'),
             // Strings
             'courseId' => $request->get('courseId'),
             'eventId' => $request->get('eventId'),
+            'getUpcoming' => $request->get('getUpcoming') ? '1' : '',
             'dateStart' => $request->get('dateStart'),
-            'dateStop' => $request->get('dateStop'),
+            'dateEnd' => $request->get('dateEnd'),
             'textSearch' => $request->get('textSearch'),
             'username' => $request->get('username'),
             'suitableForBeginners' => $request->get('suitableForBeginners') ? '1' : '',
@@ -409,7 +409,7 @@ class EventApiController extends AbstractController
 
             // Show event if its organizer is in the search param
             foreach ($params['organizers'] as $orgId) {
-                if (!\in_array($orgId, $arrIgnoredOrganizer, false)) {
+                if (!\in_array($orgId, array_map('intval', $arrIgnoredOrganizer), true)) {
                     $arrOrExpr[] = $qb->expr()->like('t.organizers', $qb->expr()->literal('%:"'.$orgId.'";%'));
                 }
             }
@@ -462,46 +462,23 @@ class EventApiController extends AbstractController
             $blnIgnoreDate = true;
         }
 
-        $tstampStart = false;
-        $tstampStop = false;
-
         if (!$blnIgnoreDate) {
-            // The "dateStart" param has a higher priority then the "year" param.
-            if (!empty($params['dateStart']) && (false !== ($tstampStart = strtotime($params['dateStart'])))) {
-                // event filter: date start filter
-                $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
-                $qb->setParameter('tstampStart', $tstampStart, Types::INTEGER);
-            } elseif ((int) $params['year'] > 2000) {
-                // event filter: year filter
-                // The "year" param has a lower priority then the "dateStart" param
-                // but if a dateStop param exists, it will be overridden.
-                $year = (int) $params['year'];
-                $tstampStart = strtotime($year.'-01-01');
-                $tstampStop = (int) strtotime($year + 1 .'-01-01');
-                $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
-                $qb->andWhere($qb->expr()->lte('t.endDate', ':tstampStop'));
-                $qb->setParameter('tstampStart', $tstampStart, Types::INTEGER);
-                $qb->setParameter('tstampStop', $tstampStop, Types::INTEGER);
-            }
-
-            if (!$tstampStart) {
-                // event filter: upcoming events
+            if ('1' === $params['getUpcoming'] || (empty($params['dateStart']) && empty($params['dateEnd'] && '0' !== $params['getUpcoming']))) {
                 $tstampStart = strtotime(date('Y-m-d', time()));
-                $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
+                $qb->andWhere($qb->expr()->gte('t.startDate', ':tstampStart'));
                 $qb->setParameter('tstampStart', $tstampStart, Types::INTEGER);
-            }
+            } else {
+                if (!empty($params['dateStart']) && (false !== ($tstampStart = strtotime($params['dateStart'])))) {
+                    // event filter: date start filter
+                    $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
+                    $qb->setParameter('tstampStart', $tstampStart, Types::INTEGER);
+                }
 
-            if (!$tstampStop) {
-                if (!empty($params['dateStop']) && (false !== ($tstampStop = strtotime($params['dateStop'])))) {
+                if (!empty($params['dateEnd']) && (false !== ($tstampStop = strtotime($params['dateEnd'])))) {
                     // event filter: date start filter
                     $qb->andWhere($qb->expr()->lte('t.endDate', ':tstampStop'));
                     $qb->setParameter('tstampStop', $tstampStop, Types::INTEGER);
                 }
-
-                // event filter: upcoming events
-                $tstampStop = strtotime(date('Y', $tstampStart) + 1 .'-01-01');
-                $qb->andWhere($qb->expr()->lte('t.endDate', ':tstampStop'));
-                $qb->setParameter('tstampStop', $tstampStop, Types::INTEGER);
             }
         }
 

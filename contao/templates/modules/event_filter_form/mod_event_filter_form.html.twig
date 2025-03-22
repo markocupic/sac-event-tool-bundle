@@ -4,6 +4,9 @@
 
     <div class="filter-board {{ form.getFormId() }} block" id="{{ form.getFormId() }}">
         <form action="{{ form.getAction() }}" enctype="{{ form.getEnctype() }}" method="{{ form.getHttpMethod() }}">
+            <input type="hidden" id="ctrl_getUpcoming" name="getUpcoming" value="1">
+            <input type="hidden" id="ctrl_dateEnd" name="dateEnd" value="">
+
             {# start formbody #}
             <div class="formbody">
                 {# start row #}
