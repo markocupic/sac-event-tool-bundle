@@ -221,167 +221,190 @@ class EventFilterFormController extends AbstractFrontendModuleController
     }
 
     /**
-     * Sanitizes the given request URL by validating and adjusting query parameters.
+     * Sanitizes the given URL by adding, removing, or modifying query parameters based on specific conditions.
      *
-     * The method ensures that parameters conform to expected rules, such as:
-     * - Adding a default 'getUpcoming=1' parameter if relevant parameters are missing.
-     * - Restricting the 'getUpcoming' parameter to the value '1' only.
-     * - Disallowing 'dateStart', 'dateEnd', and 'year' parameters when 'getUpcoming=1'.
-     * - Validating the 'year' parameter as a valid year number.
-     * - Validating 'dateStart' and 'dateEnd' parameters to ensure they follow the YYYY-MM-DD format.
-     * - Adjusting 'dateStart' and 'dateEnd' parameters to match the provided 'year' parameter, if required.
-     * - Ensuring 'dateStart' does not come after 'dateEnd'.
-     * - Aligning 'dateStart' and 'dateEnd' parameters to be within the same year.
-     * - Automatically appending a missing 'dateEnd' or 'dateStart' parameter and adjusting 'year' accordingly.
+     * This method performs several validation and sanitization tasks:
+     * - Adds a default `getUpcoming` parameter if certain conditions are met.
+     * - Ensures the `getUpcoming` parameter always has a valid value.
+     * - Removes incompatible parameters when `getUpcoming` is set to `1`.
+     * - Validates the `year` parameter and removes it if it does not fall within the valid range.
+     * - Ensures `dateStart` and `dateEnd` parameters are in the valid date format (YYYY-MM-DD).
+     * - Updates `dateStart` and `dateEnd` if their year values do not match the `year` parameter.
+     * - Prevents `dateStart` from being later than `dateEnd` by adjusting the `dateEnd` parameter if necessary.
+     * - Ensures `dateStart` and `dateEnd` have consistent year values, adjusting parameters as needed.
+     * - Prevents `dateStart` or `dateEnd` from existing independently by automatically adding the missing parameter with a valid default value.
+     * - Sorts query parameters for consistent ordering.
      *
-     * The resulting URL parameters are sorted and sanitized. Fixes are tracked via a counter.
-     *
-     * @param Request $request the incoming HTTP request containing URL query parameters
-     *
-     * @return string the sanitized and sorted URL with adjusted query parameters
+     * This function modifies the URL to meet the application's expected parameter structure
+     * and tracks the number of modifications applied.
      */
     protected function sanitizeUrl(Request $request): string
     {
         $url = $request->getUri();
         $arrAll = $request->query->all();
+        $valid = false;
 
-        // Apply default parameter
-        if (!isset($arrAll['getUpcoming']) && !isset($arrAll['year']) && !isset($arrAll['dateStart']) && !isset($arrAll['dateEnd'])) {
-            $arrAll['getUpcoming'] = '1';
-            $url = $this->urlParser->addQueryString('getUpcoming=1', $url);
+        while (!$valid) {
+            // Apply default parameter
+            if (!isset($arrAll['getUpcoming']) && !isset($arrAll['year']) && !isset($arrAll['dateStart']) && !isset($arrAll['dateEnd'])) {
+                $arrAll['getUpcoming'] = '1';
+                $url = $this->urlParser->addQueryString('getUpcoming=1', $url);
 
-            ++$this->urlFixCount;
-        }
+                ++$this->urlFixCount;
+                continue;
+            }
 
-        // The only valid value for the getUpcoming param is '1'
-        if (isset($arrAll['getUpcoming']) && '1' !== $arrAll['getUpcoming']) {
-            unset($arrAll['getUpcoming']);
-            $url = $this->urlParser->removeQueryString(['getUpcoming'], $url);
+            // The only valid value for the getUpcoming param is '1'
+            if (isset($arrAll['getUpcoming']) && '1' !== $arrAll['getUpcoming']) {
+                unset($arrAll['getUpcoming']);
+                $url = $this->urlParser->removeQueryString(['getUpcoming'], $url);
 
-            ++$this->urlFixCount;
-        }
+                ++$this->urlFixCount;
+                continue;
+            }
 
-        // Do not allow 'dateStart', 'dateEnd' or 'year' if 'getUpcoming' === '1'
-        if (isset($arrAll['getUpcoming']) && '1' === $arrAll['getUpcoming']) {
-            foreach (['dateStart', 'dateEnd', 'year'] as $param) {
-                if (isset($arrAll[$param])) {
-                    unset($arrAll[$param]);
-                    $url = $this->urlParser->removeQueryString([$param], $url);
+            // Do not allow 'dateStart', 'dateEnd' or 'year' if 'getUpcoming' === '1'
+            if (isset($arrAll['getUpcoming']) && '1' === $arrAll['getUpcoming']) {
+                $fix = 0;
 
-                    ++$this->urlFixCount;
+                foreach (['dateStart', 'dateEnd', 'year'] as $param) {
+                    if (isset($arrAll[$param])) {
+                        ++$fix;
+                        unset($arrAll[$param]);
+                        $url = $this->urlParser->removeQueryString([$param], $url);
+
+                        ++$this->urlFixCount;
+                    }
+                }
+
+                if ($fix) {
+                    continue;
                 }
             }
-        }
 
-        // Validate the year param
-        if (isset($arrAll['year']) && !$this->isYearWithinValidRange($arrAll['year'])) {
-            unset($arrAll['year']);
-            $url = $this->urlParser->removeQueryString(['year'], $url);
+            // Validate the year param
+            if (isset($arrAll['year']) && !$this->isYearWithinValidRange($arrAll['year'])) {
+                unset($arrAll['year']);
+                $url = $this->urlParser->removeQueryString(['year'], $url);
 
-            ++$this->urlFixCount;
-        }
+                ++$this->urlFixCount;
+                continue;
+            }
 
-        // Validate if the dateStart param  is in format YYYY-MM-DD
-        if (isset($arrAll['dateStart']) && !$this->isDateValid($arrAll['dateStart'])) {
-            unset($arrAll['dateStart']);
-            $url = $this->urlParser->removeQueryString(['dateStart'], $url);
-
-            ++$this->urlFixCount;
-        }
-
-        // Validate if the dateEnd param is in format YYYY-MM-DD
-        if (isset($arrAll['dateEnd']) && !$this->isDateValid($arrAll['dateEnd'])) {
-            unset($arrAll['dateEnd']);
-            $url = $this->urlParser->removeQueryString(['dateEnd'], $url);
-
-            ++$this->urlFixCount;
-        }
-
-        // Replace the first 4 digits (year) in dateStart with the year param
-        // if the year number in dateStart does not match the year.
-        if (!empty($arrAll['year']) && !empty($arrAll['dateStart'])) {
-            $newDate = $arrAll['year'].substr($arrAll['dateStart'], 4);
-
-            if ($arrAll['dateStart'] !== $newDate) {
-                $arrAll['dateStart'] = $newDate;
+            // Validate if the dateStart param  is in format YYYY-MM-DD
+            if (isset($arrAll['dateStart']) && !$this->isDateValid($arrAll['dateStart'])) {
+                unset($arrAll['dateStart']);
                 $url = $this->urlParser->removeQueryString(['dateStart'], $url);
-                $url = $this->urlParser->addQueryString('dateStart='.$arrAll['dateStart'], $url);
 
                 ++$this->urlFixCount;
+                continue;
             }
-        }
 
-        // Replace the first 4 digits (year) in dateEnd with the year param
-        // if the year number in dateEnd does not match the year.
-        if (!empty($arrAll['year']) && !empty($arrAll['dateEnd'])) {
-            $newDate = $arrAll['year'].substr($arrAll['dateEnd'], 4);
-
-            if ($arrAll['dateEnd'] !== $newDate) {
-                $arrAll['dateEnd'] = $newDate;
+            // Validate if the dateEnd param is in format YYYY-MM-DD
+            if (isset($arrAll['dateEnd']) && !$this->isDateValid($arrAll['dateEnd'])) {
+                unset($arrAll['dateEnd']);
                 $url = $this->urlParser->removeQueryString(['dateEnd'], $url);
-                $url = $this->urlParser->addQueryString('dateEnd='.$arrAll['dateEnd'], $url);
 
                 ++$this->urlFixCount;
+                continue;
             }
-        }
 
-        // dateStart should not follow dateEnd
-        if (!empty($arrAll['dateStart']) && !empty($arrAll['dateEnd'])) {
-            $timeStart = strtotime($arrAll['dateStart']);
-            $timeEnd = strtotime($arrAll['dateEnd']);
+            // Replace the first 4 digits (year) in dateStart with the year param
+            // if the year number in dateStart does not match the year.
+            if (!empty($arrAll['year']) && !empty($arrAll['dateStart'])) {
+                $newDate = $arrAll['year'].substr($arrAll['dateStart'], 4);
 
-            if ($timeStart && $timeEnd && $timeStart > $timeEnd) {
-                $arrAll['dateEnd'] = date('Y', $timeEnd).'-12-31';
-                $url = $this->urlParser->removeQueryString(['dateEnd'], $url);
-                $url = $this->urlParser->addQueryString('dateEnd='.$arrAll['dateEnd'], $url);
+                if ($arrAll['dateStart'] !== $newDate) {
+                    $arrAll['dateStart'] = $newDate;
+                    $url = $this->urlParser->removeQueryString(['dateStart'], $url);
+                    $url = $this->urlParser->addQueryString('dateStart='.$arrAll['dateStart'], $url);
 
-                ++$this->urlFixCount;
+                    ++$this->urlFixCount;
+                    continue;
+                }
             }
-        }
 
-        // The end date must be in the same year as the start date.
-        if (isset($arrAll['dateEnd'], $arrAll['dateStart'])) {
-            $yearEnd = substr($arrAll['dateEnd'], 0, 4);
-            $yearStart = substr($arrAll['dateStart'], 0, 4);
+            // Replace the first 4 digits (year) in dateEnd with the year param
+            // if the year number in dateEnd does not match the year.
+            if (!empty($arrAll['year']) && !empty($arrAll['dateEnd'])) {
+                $newDate = $arrAll['year'].substr($arrAll['dateEnd'], 4);
 
-            if ($yearStart !== $yearEnd) {
-                $arrAll['dateEnd'] = $yearStart.'-12-31';
+                if ($arrAll['dateEnd'] !== $newDate) {
+                    $arrAll['dateEnd'] = $newDate;
+                    $url = $this->urlParser->removeQueryString(['dateEnd'], $url);
+                    $url = $this->urlParser->addQueryString('dateEnd='.$arrAll['dateEnd'], $url);
+
+                    ++$this->urlFixCount;
+                    continue;
+                }
+            }
+
+            // dateStart should not follow dateEnd
+            if (!empty($arrAll['dateStart']) && !empty($arrAll['dateEnd'])) {
+                $timeStart = strtotime($arrAll['dateStart']);
+                $timeEnd = strtotime($arrAll['dateEnd']);
+
+                if ($timeStart && $timeEnd && $timeStart > $timeEnd) {
+                    $arrAll['dateEnd'] = date('Y', $timeStart).'-12-31';
+                    $url = $this->urlParser->removeQueryString(['dateEnd', 'year'], $url);
+                    $url = $this->urlParser->addQueryString('dateEnd='.$arrAll['dateEnd'], $url);
+                    $url = $this->urlParser->addQueryString('year='.date('Y', $timeStart), $url);
+
+                    ++$this->urlFixCount;
+                    continue;
+                }
+            }
+
+            // The end date must have the same year number as the start date.
+            if (isset($arrAll['dateEnd'], $arrAll['dateStart'])) {
+                $yearEnd = substr($arrAll['dateEnd'], 0, 4);
+                $yearStart = substr($arrAll['dateStart'], 0, 4);
+
+                if ($yearStart !== $yearEnd) {
+                    $arrAll['dateEnd'] = $yearStart.'-12-31';
+                    $url = $this->urlParser->removeQueryString(['dateEnd', 'year'], $url);
+                    $url = $this->urlParser->addQueryString('dateEnd='.$arrAll['dateEnd'], $url);
+                    $url = $this->urlParser->addQueryString('year='.$yearStart, $url);
+
+                    ++$this->urlFixCount;
+                    continue;
+                }
+            }
+
+            // dateStart without dateEnd is not allowed
+            if (isset($arrAll['dateStart']) && !isset($arrAll['dateEnd'])) {
+                $arrAll['dateEnd'] = substr($arrAll['dateStart'], 0, 4).'-12-31';
+                $arrAll['year'] = substr($arrAll['dateStart'], 0, 4);
                 $url = $this->urlParser->removeQueryString(['dateEnd', 'year'], $url);
                 $url = $this->urlParser->addQueryString('dateEnd='.$arrAll['dateEnd'], $url);
-                $url = $this->urlParser->addQueryString('year='.$yearStart, $url);
+                $url = $this->urlParser->addQueryString('year='.$arrAll['year'], $url);
 
                 ++$this->urlFixCount;
+                continue;
             }
-        }
 
-        // dateStart without dateEnd is not allowed
-        if (isset($arrAll['dateStart']) && !isset($arrAll['dateEnd'])) {
-            $arrAll['dateEnd'] = substr($arrAll['dateStart'], 0, 4).'-12-31';
-            $arrAll['year'] = substr($arrAll['dateStart'], 0, 4);
-            $url = $this->urlParser->removeQueryString(['dateEnd', 'year'], $url);
-            $url = $this->urlParser->addQueryString('dateEnd='.$arrAll['dateEnd'], $url);
-            $url = $this->urlParser->addQueryString('year='.$arrAll['year'], $url);
+            // dateEnd without dateStart is not allowed
+            if (isset($arrAll['dateEnd']) && !isset($arrAll['dateStart'])) {
+                $arrAll['dateStart'] = substr($arrAll['dateEnd'], 0, 4).'-01-01';
+                $arrAll['year'] = substr($arrAll['dateEnd'], 0, 4);
+                $url = $this->urlParser->removeQueryString(['dateStart', 'year'], $url);
+                $url = $this->urlParser->addQueryString('dateStart='.$arrAll['dateStart'], $url);
+                $url = $this->urlParser->addQueryString('year='.$arrAll['year'], $url);
 
-            ++$this->urlFixCount;
-        }
+                ++$this->urlFixCount;
+                continue;
+            }
 
-        // dateEnd without dateStart is not allowed
-        if (isset($arrAll['dateEnd']) && !isset($arrAll['dateStart'])) {
-            $arrAll['dateStart'] = substr($arrAll['dateEnd'], 0, 4).'-01-01';
-            $arrAll['year'] = substr($arrAll['dateEnd'], 0, 4);
-            $url = $this->urlParser->removeQueryString(['dateStart', 'year'], $url);
-            $url = $this->urlParser->addQueryString('dateStart='.$arrAll['dateStart'], $url);
-            $url = $this->urlParser->addQueryString('year='.$arrAll['year'], $url);
+            $sortedUrl = $this->sortUrlParams($url);
 
-            ++$this->urlFixCount;
-        }
+            if (urldecode($sortedUrl) !== urldecode($url)) {
+                $url = $sortedUrl;
 
-        $sortedUrl = $this->sortUrlParams($url);
+                ++$this->urlFixCount;
+                continue;
+            }
 
-        if (urldecode($sortedUrl) !== urldecode($url)) {
-            $url = $sortedUrl;
-
-            ++$this->urlFixCount;
+            $valid = true;
         }
 
         return $url;
