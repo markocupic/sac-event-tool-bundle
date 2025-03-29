@@ -1,19 +1,15 @@
-{% set class = class|default('')|trim ~ ' block' %}
+{% extends "@Contao/content_element/_base.html.twig" %}
 
-<div class="{{ class }}" {{ cssID }}>
-    {% block headline %}
-        {% if headline|default %}
-            <{{ hl }} class="content-headline">{{ headline }}</{{ hl }}>
-        {% endif %}
-    {% endblock %}
-
+{% block content %}
     <!-- indexer::stop -->
     {{ insert_tag('link::back')|raw }}
     <!-- indexer::continue -->
 
     <div class="row">
         <div class="image_container portrait col-sm-4 col-lg-3">
+            <!-- indexer::stop -->
             {{ insert_tag('picture::'~getAvatarResourcePath(userModel)~'?size=18')|raw }}
+            <!-- indexer::continue -->
         </div>
 
         <div class="col-sm-8 col-lg-9">
@@ -23,15 +19,18 @@
             </div>
 
             {% if not has_logged_in_frontend_user() %}
+                <!-- indexer::stop -->
                 <br>
                 <div class="alert d-block alert-info" role="alert">
                     Bitte melde dich mit deinem Mitgliederkonto an, um die Kontaktdaten und mehr von <strong>{{ user.name }} </strong> zu sehen.
                 </div>
                 <br>
+                <!-- indexer::continue -->
             {% endif %}
 
             {# Show personal data to logged users only #}
             {% if has_logged_in_frontend_user() %}
+                <!-- indexer::stop -->
                 <div class="ce_user_portrait_street">
                     {{ user.street }}
                 </div>
@@ -71,10 +70,9 @@
                         {{ user.introducing|nl2br }}
                     </div>
                 {% endif %}
+                <!-- indexer::continue -->
             {% endif %}
-            {# End show personal data to logged users only #}
-
+            {# End show personal data to logged in users only #}
         </div>
     </div>
-
-</div>
+{% endblock %}

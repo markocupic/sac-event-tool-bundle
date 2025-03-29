@@ -1,6 +1,7 @@
 <div class="row">
     <div class="col-5 col-sm-5 col-md-5 col-xl-6">
         {% if addImage|default %}
+            <!-- indexer::stop -->
             {% if jumpTo|default %}
                 <a href="{{ insert_tag('link_url::' ~ jumpTo) }}?username={{ username }}" title="{{ lastname ~ ' ' ~ firstname|trim }}">
             {% endif %}
@@ -10,11 +11,12 @@
             {% if jumpTo|default %}
                 </a>
             {% endif %}
+            <!-- indexer::continue -->
         {% endif %}
-
     </div>
     <div class="col-7 col-sm-7 col-md-7 col-xl-6 ">
         <strong>{{ lastname ~ ' ' ~ firstname|trim }}</strong>
+        <!-- indexer::stop -->
         <small>
             <br>
             {% if has_logged_in_frontend_user() %}
@@ -34,5 +36,6 @@
                 {% if email|default and 'email' in showFieldsToGuests %}{{ insert_tag('email_open::'~ email)|raw }}{{ email }}</a><br>{% endif %}
             {% endif %}
         </small>
+        <!-- indexer::continue -->
     </div>
 </div>
