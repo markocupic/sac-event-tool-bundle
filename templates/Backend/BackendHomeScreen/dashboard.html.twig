@@ -1,31 +1,30 @@
 <div id="tl_backend_home_screen_my_events">
     <div id="tl_backend_home_screen_my_events_inner">
-
         <h2><i class="fa-solid fa-mountain-sun"></i> {{ 'MSC.bhs_dashb_sacEvents'|trans({}, 'contao_default') }}</h2>
-
         <table class="tl_listing with-border">
             {% set index = 0 %}
+            {% set colspan = 10 %}
             {% for event in events %}
                 {% if event.separator is defined %}
                     {% if event.separator == 'upcoming-events' %}
                         {% set index = 0 %}
                         <tr>
-                            <th colspan="10" class="separator">{{ 'MSC.bhs_dashb_yourUpcomingEvents'|trans({}, 'contao_default') }}</th>
+                            <th colspan="{{ colspan }}" class="separator">{{ 'MSC.bhs_dashb_yourUpcomingEvents'|trans({}, 'contao_default') }}</th>
                         </tr>
                         {% if has_upcoming_events is same as(false) %}
                             <tr class="even">
-                                <th colspan="10">{{ 'MSC.bhs_dashb_noUpcomingEventsDetected'|trans({}, 'contao_default') }}</th>
+                                <th colspan="{{ colspan }}">{{ 'MSC.bhs_dashb_noUpcomingEventsDetected'|trans({}, 'contao_default') }}</th>
                             </tr>
                         {% endif %}
                     {% endif %}
                     {% if event.separator == 'past-events' %}
                         {% set index = 0 %}
                         <tr>
-                            <th colspan="10" class="separator">{{ 'MSC.bhs_dashb_yourPastEvents'|trans({}, 'contao_default') }}</th>
+                            <th colspan="{{ colspan }}" class="separator">{{ 'MSC.bhs_dashb_yourPastEvents'|trans({}, 'contao_default') }}</th>
                         </tr>
                         {% if has_past_events is same as(false) %}
                             <tr class="even">
-                                <th colspan="10">{{ 'MSC.bhs_dashb_noPastEventsDetected'|trans({}, 'contao_default') }}</th>
+                                <th colspan="{{ colspan }}">{{ 'MSC.bhs_dashb_noPastEventsDetected'|trans({}, 'contao_default') }}</th>
                             </tr>
                         {% endif %}
                     {% endif %}
@@ -87,6 +86,13 @@
                     </tr>
                 {% endif %}
             {% endfor %}
+            {% if load_more_past_events_url %}
+                <tr>
+                    <th colspan="{{ colspan }}">
+                        <div class="tl_submit_container"><a class="tl_submit" data-action="contao--scroll-offset#store" href="{{ load_more_past_events_url }}">{{ 'MSC.bhs_dashb_loadMorePastEventsBtnLbl'|trans({}, 'contao_default') }}</a></div>
+                    </th>
+                </tr>
+            {% endif %}
         </table>
 
         <h2>{{ 'MSC.bhs_dashb_guidesAndTutorials'|trans({}, 'contao_default') }}</h2>

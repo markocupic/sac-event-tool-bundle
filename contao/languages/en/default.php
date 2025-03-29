@@ -146,6 +146,7 @@ $GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorials'] = 'Anleitungen und Tu
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorialsText'] = 'Die Seite "<a href="/service/anleitungen-und-tutorials.html" rel="noopener" target="_blank" style="text-decoration:underline" title="Anleitungen und Tutorials"><strong>Anleitungen und Tutorials</strong></a>" beim Menüpunkt "Service" im Frontend/Website unterstützt Sie bei der Verwendung des SAC Event-Tools (Backend/Contao).';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_noUpcomingEventsDetected'] = 'In nächster Zeit stehen bei Ihnen keine Events an, wo Sie eine Leitungsfunktion ausüben.';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_noPastEventsDetected'] = 'Es wurden keine Events gefunden, bei denen Sie in letzter Zeit eine Leitungsfunktion ausgeübt haben.';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_loadMorePastEventsBtnLbl'] = 'Lade weitere Events';
 
 // Event registration frontend module
 $GLOBALS['TL_LANG']['ERR']['evt_reg_unknownError'] = 'Es ist ein unerwarteter Fehler aufgetreten. Bitte benachrichtige den Administrator dieser Webseite, sollte der Fehler erneut auftreten.';

@@ -25,6 +25,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmailController;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
@@ -75,9 +76,13 @@ class DashboardController
         /** @var BackendUser $user */
         $user = $this->security->getUser();
 
+        $limit = (int) $this->requestStack->getCurrentRequest()->query->get('pastEventsLimit', 10);
+
         if ($user instanceof BackendUser) {
             $upcomingEvents = $this->getUpcomingEvents($user);
             $pastEvents = $this->getPastEvents($user);
+            $pastEventsCount = \count($pastEvents);
+            $pastEvents = \array_slice($pastEvents, 0, $limit);
 
             $events = array_merge(
                 [['separator' => 'upcoming-events']],
@@ -92,6 +97,8 @@ class DashboardController
                     'events' => $events,
                     'has_upcoming_events' => !empty($upcomingEvents),
                     'has_past_events' => !empty($pastEvents),
+                    'has_load_more_past_events_button' => $pastEventsCount > $limit,
+                    'load_more_past_events_url' => $pastEventsCount > $limit ? $this->urlParser->addQueryString('pastEventsLimit='.$limit + 10) : null,
                 ]
             );
         }
@@ -132,12 +139,16 @@ class DashboardController
         $arrAllowedCalIds = empty($arrAllowedCalIds) ? [0] : $arrAllowedCalIds;
 
         $result = $this->connection->executeQuery(
-            'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN ('.implode(',', $arrAllowedCalIds).') AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate <= ? AND t1.startDate > ? ORDER BY t1.startDate DESC LIMIT 0,10',
+            'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN ('.implode(',', $arrAllowedCalIds).') AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate <= ? ORDER BY t1.startDate DESC',
             [
                 $user->id,
                 $user->id,
                 $timeCut,
-                time() - 1.5 * 365 * 24 * 3600,
+            ],
+            [
+                Types::INTEGER,
+                Types::INTEGER,
+                Types::INTEGER,
             ]
         );
 
