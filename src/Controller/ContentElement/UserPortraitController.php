@@ -20,7 +20,6 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Twig\FragmentTemplate;
-use Contao\PageModel;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,11 +34,6 @@ class UserPortraitController extends AbstractContentElementController
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
     ) {
-    }
-
-    public function __invoke(Request $request, ContentModel $model, string $section, array|null $classes = null, PageModel|null $pageModel = null): Response
-    {
-        return parent::__invoke($request, $model, $section, $classes);
     }
 
     protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
