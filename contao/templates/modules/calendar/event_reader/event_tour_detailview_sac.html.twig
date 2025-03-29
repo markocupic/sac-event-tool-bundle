@@ -12,9 +12,7 @@
         <h4 class="event-state-headline mt-3 mb-0">{{ get_event_data(model, 'eventStateLabel') }}</h4>
     {% endif %}
 
-    <!-- indexer::continue -->
     <h1 class="content-headline mt-3">{{ get_event_data(model, 'title') }}</h1>
-    <!-- indexer::stop -->
 
     {% if  get_event_data(model, 'eventType') == 'lastMinuteTour' %}
         <h4 class="content-headline last-minute-tour">Last minute tour (Spontantour)</h4>
@@ -172,9 +170,7 @@
                                 {% if not get_event_data(model, 'disableOnlineRegistration') %}
                                     <div class="d-inline me-2 mt-3 mb-3">
                                         {# "book event" button #}
-                                        <!-- indexer::continue -->
                                         {{ "{{insert_module::408}}" }}
-                                        <!-- indexer::stop -->
                                     </div>
                                 {% endif %}
                                 {# Display the like button for the current event #}
@@ -303,7 +299,6 @@
                 <div class="links event-detail event-info-box icon-box-small">
                     <h5>Links</h5>
                     <div class="d-flex flex-wrap">
-
                         {% if not get_event_data(model, 'linkSacRoutePortal') is empty %}
                             <div class="me-2 mt-3 mb-3">
                                 <a href="{{ get_event_data(model, 'linkSacRoutePortal') }}" rel="noopener" target="_blank" title="Routen-Details auf SAC-Tourenportal" class="btn btn-block btn-primary">
@@ -344,7 +339,6 @@
         </div>
         {# End col right #}
     </div>
-
 
     {# gallery start #}
     {% if get_event_data(model, 'addGallery') %}
