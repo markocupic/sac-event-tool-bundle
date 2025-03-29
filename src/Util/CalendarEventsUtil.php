@@ -645,9 +645,19 @@ readonly class CalendarEventsUtil
 
         $arrContact = [];
         $arrContact[] = sprintf('<strong>%s %s</strong>', $objUser->lastname, $objUser->firstname);
-        $arrContact[] = sprintf('Tel.: %s', $objUser->phone);
-        $arrContact[] = sprintf('Mobile: %s', $objUser->mobile);
-        $arrContact[] = sprintf('E-Mail: %s', $objUser->email);
+
+        if ('' !== $objUser->phone) {
+            $arrContact[] = sprintf('Tel.: %s', $objUser->phone);
+        }
+
+        if ('' !== $objUser->mobile) {
+            $arrContact[] = sprintf('Mobile.: %s', $objUser->mobile);
+        }
+
+        if ('' !== $objUser->email) {
+            $arrContact[] = sprintf('E-Mail: %s', $objUser->email);
+        }
+
         $arrContact = array_filter($arrContact);
 
         return implode(', ', $arrContact);
