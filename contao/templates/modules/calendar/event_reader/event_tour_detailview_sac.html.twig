@@ -91,20 +91,20 @@
                     <h5>Leistungen/Preis</h5>
 
                     {% if is_with_mountainguide_offer %}
-                        <p><strong>Mit Bergführer/in als Bergführerangebot</strong></p>
+                        <p class="pb-1"><strong>Mit Bergführer/in als Bergführerangebot</strong></p>
                     {% endif %}
 
                     {% if is_with_mountainguide %}
-                        <p><strong>Mit Bergführer/in</strong></p>
+                        <p class="pb-1"><strong>Mit Bergführer/in</strong></p>
                     {% endif %}
 
                     {% if not get_event_data(model, 'leistungen') is empty %}
-                        <p>{{ get_event_data(model, 'leistungen')|nl2br }}</p>
+                        <p class="pb-1">{{ get_event_data(model, 'leistungen')|nl2br }}</p>
                     {% endif %}
 
                     <p>
                         <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">
-                            AGB (Auszug Kurs- und Tourenreglement)
+                            Kurs- und Tourenreglement (Auszug)
                         </a>
                     </p>
 
@@ -201,7 +201,7 @@
                         {% else %}
                             <p>Keine Online-Abmeldung</p>
                         {% endif %}
-                        <p><small>Es können ggf. Stornierungsgebühren anfallen (siehe AGBs).</small></p>
+                        <p><small>Es können ggf. Stornierungsgebühren anfallen (siehe <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">Kurs- und Tourenreglement</a>).</small></p>
                     </div>
                 {% endif %}
             </div>
