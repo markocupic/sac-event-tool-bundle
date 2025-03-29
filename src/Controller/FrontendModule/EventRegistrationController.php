@@ -247,7 +247,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $options = $resolver->resolve($options);
 
         if (!$eventModel->published) {
-            throw new EventRegistrationException('You can not subscribe to the current event because it is not published.', EventRegistrationException::LEVEL_ERROR, 'ERR.evt_reg_eventNotPublishedYet', [$eventModel->title]);
+            throw new EventRegistrationException('You can not subscribe to the current event because it is not published.', EventRegistrationException::LEVEL_ERROR, 'ERR.evt_reg_eventNotPublishedYet', []);
         }
 
         if (null === ($adapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class)->findOneByEventId($eventModel->id)) || !$adapter->findOneByEventId($eventModel->id)->allowRegistration) {
