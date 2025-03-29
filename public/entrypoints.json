@@ -1,3 +1,9 @@
 {
-  "entrypoints": {}
+  "entrypoints": {
+    "backend": {
+      "js": [
+        "/bundles/markocupicsaceventtool/backend.e264ae2b.js"
+      ]
+    }
+  }
 }

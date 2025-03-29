@@ -25,7 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EventFilterFormControllerTest extends TestCase
 {
     private EventFilterFormController $controller;
-    private null|MockObject $urlParserMock;
+    private MockObject|null $urlParserMock;
 
     protected function setUp(): void
     {
@@ -85,7 +85,7 @@ class EventFilterFormControllerTest extends TestCase
             ->expects($invokedCount)
             ->method('removeQueryString')
             ->willReturnCallback(
-                function ($queryKey, $url) use ($invokedCount): string{
+                function ($queryKey, $url) use ($invokedCount): string {
                     if (1 === $invokedCount->getInvocationCount()) {
                         $this->assertSame([['dateStart'], 'https://localhost/test?dateEnd=2025-12-31&dateStart=2025-01-01&getUpcoming=1&year=2025'], [$queryKey, $url]);
 
@@ -104,7 +104,7 @@ class EventFilterFormControllerTest extends TestCase
                         return 'https://localhost/test?getUpcoming=1';
                     }
 
-					throw new \LogicException('');
+                    throw new \LogicException('');
                 }
             )
         ;
@@ -213,9 +213,9 @@ class EventFilterFormControllerTest extends TestCase
 
                         return 'https://localhost/test?dateEnd=2025-12-31&dateStart=2025-01-01&year=2025';
                     }
-					throw new \LogicException('');
 
-				}
+                    throw new \LogicException('');
+                }
             )
         ;
 
@@ -253,9 +253,9 @@ class EventFilterFormControllerTest extends TestCase
 
                         return 'https://localhost/test?dateStart=2025-02-01&dateEnd=2025-12-31&year=2025';
                     }
-					throw new \LogicException('');
 
-				}
+                    throw new \LogicException('');
+                }
             )
         ;
 
@@ -281,7 +281,7 @@ class EventFilterFormControllerTest extends TestCase
             ->expects($invokedCount)
             ->method('addQueryString')
             ->willReturnCallback(
-                function ($queryString, $url) use ($invokedCount): string{
+                function ($queryString, $url) use ($invokedCount): string {
                     if (1 === $invokedCount->getInvocationCount()) {
                         $this->assertSame(['dateStart=2025-01-01', 'https://localhost/test?dateEnd=2025-12-31'], [$queryString, $url]);
 
@@ -293,8 +293,9 @@ class EventFilterFormControllerTest extends TestCase
 
                         return 'https://localhost/test?dateEnd=2025-12-31&dateStart=2025-01-01&year=2025';
                     }
-					throw new \LogicException('');
-				}
+
+                    throw new \LogicException('');
+                }
             )
         ;
 

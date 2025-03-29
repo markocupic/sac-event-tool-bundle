@@ -1,4 +1,5 @@
 {
+  "backend.js": "/bundles/markocupicsaceventtool/backend.e264ae2b.js",
   "images/events/course/booklet/fallback.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/fallback.jpg",
   "images/events/course/booklet/toc.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/toc.jpg",
   "images/registration_form/registration_form_bg_1.jpg": "/bundles/markocupicsaceventtool/images/registration_form/registration_form_bg_1.jpg",
@@ -66,5 +67,6 @@
   "icons/event_states/event_status_6.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_6.svg",
   "icons/event_states/event_status_1.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_1.svg",
   "icons/event_states/event_status_3.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_3.svg",
-  "icons/event_states/event_status_5.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_5.svg"
+  "icons/event_states/event_status_5.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_5.svg",
+  "backend.e264ae2b.js.map": "/bundles/markocupicsaceventtool/backend.e264ae2b.js.map"
 }
