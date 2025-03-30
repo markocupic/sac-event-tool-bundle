@@ -1,24 +1,31 @@
 {% for instructor in instructors %}
-    <div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4">
-        <div class="image_container portrait">
+    <div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4 contact-box">
+        <div class="image_container contact-box--picture">
             {% set figure = insert_tag('figure::'~instructor.avatar_path~'?size=18&metadata[title]='~instructor.name~'&enableLightbox=0&options[attr][class]=avatar-large&template=image') %}
             <a href="{{ instructor.href }}" data-title="Leiter Portrait ansehen">
                 {{ figure|raw }}
             </a>
         </div>
-        <div class="instructor-name">
-            <a href="{{ instructor.href }}" data-title="Leiter Portrait ansehen">{{ instructor.lastname }} {{ instructor.firstname }}{% if instructor.main_qualification %}, {{ instructor.main_qualification }}{% endif %}</a>
+        <div class="contact-box--instructor-name my-2">
+            <a href="{{ instructor.href }}" data-title="Leiter Portrait ansehen"><!-- indexer::continue -->{{ instructor.lastname }} {{ instructor.firstname }}<!-- indexer::stop --></a>
         </div>
-        {% for key,value in instructor.contact_options %}
-            <div class="ce_user_portrait_{{ key }}">
-                {% if 'phone' == key or 'mobile' == key %}
-                    <small><a href="tel:{{ value }}">{{ value }}</a></small>
-                {% elseif 'email' == key %}
-                    <small><a href="mailto:{{ value }}">{{ value }}</a></small>
-                {% else %}
-                    <small data-title="{{ value }}">{{ value }}</small>
-                {% endif %}
+        {% if instructor.main_qualification %}
+            <div class="contact-box--instructor-main-qualification my-2">
+                <small>{{ instructor.main_qualification }}</small>
             </div>
-        {% endfor %}
+        {% endif %}
+        {% if has_logged_in_frontend_user %}
+            {% for key,value in instructor.contact_options %}
+                <div class="contact-box--{{ key }} mb-2">
+                    {% if 'phone' == key or 'mobile' == key %}
+                        <small><a href="tel:{{ value }}">{{ value }}</a></small>
+                    {% elseif 'email' == key %}
+                        <small><a href="mailto:{{ value }}">{{ value }}</a></small>
+                    {% else %}
+                        <small data-title="{{ value }}">{{ value }}</small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endif %}
     </div>
 {% endfor %}

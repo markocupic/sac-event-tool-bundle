@@ -462,16 +462,14 @@ readonly class CalendarEventsUtil
             $arrInstructor['main_qualification'] = !empty($this->getMainQualification($objUser)) ? $this->getMainQualification($objUser) : '';
             $arrInstructor['contact_options'] = [];
 
-            if ($this->getContainer()->get('security.helper')->getUser() instanceof FrontendUser) {
-                $arrContact = ['phone', 'mobile', 'email'];
+            $arrContact = ['phone', 'mobile', 'email'];
 
-                foreach ($arrContact as $field) {
-                    if ('' === $objUser->{$field}) {
-                        continue;
-                    }
-
-                    $arrInstructor['contact_options'][$field] = $objUser->{$field};
+            foreach ($arrContact as $field) {
+                if ('' === $objUser->{$field}) {
+                    continue;
                 }
+
+                $arrInstructor['contact_options'][$field] = $objUser->{$field};
             }
 
             $arrItems[] = $arrInstructor;

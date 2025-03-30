@@ -121,11 +121,9 @@
                     <h5>Leitung/Betreuung</h5>
                     {% set contact_boxes = get_event_data(model, 'instructorContactBoxes?includeHidden=false') %}
                     {% if contact_boxes %}
-                        <!-- indexer::continue -->
                         <div class="row mt-3 g-2">
                             {{ contact_boxes|raw }}
                         </div>
-                        <!-- indexer::stop -->
                     {% else %}
                         <p>Leiter/in wurde gelöscht.</p>
                     {% endif %}
