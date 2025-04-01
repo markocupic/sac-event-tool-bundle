@@ -21,7 +21,7 @@
             {% set state = constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::SUBSCRIPTION_REFUSED') %}
             <button type="submit" name="changeSubscriptionStateWithEmail" value="{{ state }}" onclick="if (!confirm('{{ onclick_confirm_A }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-refuse-with-email">Ablehnen mit E-Mail</button>
             {% set state = constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::USER_HAS_UNSUBSCRIBED') %}
-            <button type="submit" name="changeSubscriptionStateWithEmail" value="{{ state }}" onclick="if (!confirm('{{ onclick_confirm_B }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-cancel-with-email">Stornieren (abgemeldet) mit E-Mail</button>
+            <button type="submit" name="changeSubscriptionStateWithEmail" value="{{ state }}" onclick="if (!confirm('{{ onclick_confirm_B }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-cancel-with-email">Abmeldung durch TN mit E-Mail</button>
         {% endif %}
     </div>
 
