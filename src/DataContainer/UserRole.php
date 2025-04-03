@@ -80,7 +80,7 @@ readonly class UserRole
 
         $msg = $this->translator->trans('MSC.roleCurrentlyVacant', [], 'contao_default');
 
-        $style = !$blnUsed ? sprintf(' title="%s" style="color:red"', htmlspecialchars($msg)) : '';
+        $style = !$blnUsed ? sprintf(' title="%s" style="color:red"', StringUtil::specialchars($msg)) : '';
 
         return sprintf('<span%s>%s</span> <span style="color:grey">%s</span>', $style, $row['title'], $row['email']);
     }
@@ -97,6 +97,8 @@ readonly class UserRole
 
         $imagePasteAfter = Image::getHtml('pasteafter.svg', $this->translator->trans('DCA.pasteafter.1', [$row['id']], 'contao_default'));
 
-        return '<a href="'.Backend::addToUrl('act='.$arrClipboard['mode'].'&amp;mode=1&amp;pid='.$row['id'].(!\is_array($arrClipboard['id']) ? '&amp;id='.$arrClipboard['id'] : '')).'" title="'.StringUtil::specialchars($this->translator->trans('DCA.pasteafter.1', [$row['id']], 'contao_default')).'" data-action="contao--scroll-offset#store">'.$imagePasteAfter.'</a> ';
+        $href = Backend::addToUrl('act='.$arrClipboard['mode'].'&amp;mode=1&amp;pid='.$row['id'].(!\is_array($arrClipboard['id']) ? '&amp;id='.$arrClipboard['id'] : ''));
+
+        return '<a href="'.StringUtil::specialcharsUrl($href).'" title="'.StringUtil::specialchars($this->translator->trans('DCA.pasteafter.1', [$row['id']], 'contao_default')).'" data-action="contao--scroll-offset#store">'.$imagePasteAfter.'</a> ';
     }
 }

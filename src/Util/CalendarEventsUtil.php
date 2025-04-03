@@ -869,7 +869,7 @@ readonly class CalendarEventsUtil
 
         if ($blnTooltip) {
             $strEventDuration = $blnAppendEventDuration ? ' ('.$this->getEventDuration($objEvent).')' : '';
-            $strTooltip = '<a tabindex="0" class="more-date-infos" data-bs-toggle="tooltip" data-placement="bottom" data-title="Eventdaten: '.implode(', ', $arrDates).'">und weitere</a>';
+            $strTooltip = '<a tabindex="0" class="more-date-infos" data-bs-toggle="tooltip" data-placement="bottom" data-title="Eventdaten: '.StringUtil::specialchars(implode(', ', $arrDates)).'">und weitere</a>';
 
             return date($dateFormat, $this->getStartTstamp($objEvent)).$strEventDuration.(!$blnInline ? '<br>' : ' ').$strTooltip;
         }
@@ -877,7 +877,7 @@ readonly class CalendarEventsUtil
         $dateString = '';
 
         foreach ($this->getEventTimestamps($objEvent) as $tstamp) {
-            $dateString .= sprintf('<time datetime="%s">%s</time>', date('Y-m-d', (int) $tstamp), date('D, d.m.Y', (int) $tstamp));
+            $dateString .= sprintf('<time datetime="%s">%s</time>', StringUtil::specialchars(date('Y-m-d', (int) $tstamp)), date('D, d.m.Y', (int) $tstamp));
         }
         $dateString .= $blnAppendEventDuration ? sprintf('<time>(%s)</time>', $this->getEventDuration($objEvent)) : '';
 
@@ -971,7 +971,7 @@ readonly class CalendarEventsUtil
 
     public function getPublicTransportBadge(): string
     {
-        return '<span class="badge badge-sm badge-pill bg-success" data-bs-toggle="tooltip" data-placement="top" data-title="Anreise mit ÖV">ÖV</span>';
+        return '<span class="badge badge-sm badge-pill bg-success" data-bs-toggle="tooltip" data-placement="top" data-title="Anreise mit &Ouml;V">&Ouml;V</span>';
     }
 
     public function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, bool $tooltip = false, bool $explanation = false): array
@@ -1020,7 +1020,7 @@ readonly class CalendarEventsUtil
 
             if ($tooltip) {
                 $html = '<span class="badge badge-sm badge-pill bg-primary" data-bs-toggle="tooltip" data-placement="top" data-title="Techn. Schwierigkeit: %s">%s</span>';
-                $arrReturn[] = sprintf($html, $strDiffTitle, $strDiff);
+                $arrReturn[] = sprintf($html, StringUtil::specialchars($strDiffTitle), $strDiff);
             } elseif ($explanation) {
                 $arrReturn[] = $strDiff.' ('.$strDiffTitle.')';
             } else {
@@ -1052,7 +1052,7 @@ readonly class CalendarEventsUtil
 
             if ($tooltip) {
                 $html = '<span class="badge badge-sm badge-pill bg-secondary" data-bs-toggle="tooltip" data-placement="top" data-title="Typ: %s">%s</span>';
-                $arrTourTypes[] = sprintf($html, $objTourType->title, $objTourType->{$field});
+                $arrTourTypes[] = sprintf($html, StringUtil::specialchars($objTourType->title), $objTourType->{$field});
             } else {
                 $arrTourTypes[] = $objTourType->{$field};
             }
@@ -1097,7 +1097,7 @@ readonly class CalendarEventsUtil
             }
 
             // Free places available
-            return sprintf($strBadge, 'dark', sprintf('noch %s freie Plätze', $objEvent->maxMembers - $registrationCount), $registrationCount.'/'.$objEvent->maxMembers);
+            return sprintf($strBadge, 'dark', sprintf('noch %s freie Plätze', StringUtil::specialchars($objEvent->maxMembers - $registrationCount)), $registrationCount.'/'.$objEvent->maxMembers);
         }
 
         // There is no booking limit. Show registered members
@@ -1150,6 +1150,8 @@ readonly class CalendarEventsUtil
                 'rt' => $this->getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(),
                 'ref' => $this->getContainer()->get('request_stack')->getCurrentRequest()->attributes->get('_contao_referer_id'),
             ]);
+            $href = StringUtil::ampersand($href);
+            $href = StringUtil::specialcharsUrl($href);
 
             if ($intNotConfirmed > 0) {
                 $strRegistrationsBadges .= sprintf('<span class="subscription-badge not-confirmed blink" data-title="%s unbeantwortete Anmeldeanfragen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
@@ -1296,7 +1298,7 @@ readonly class CalendarEventsUtil
         $params = sprintf('/%s', !empty($objEvent->alias) ? $objEvent->alias : $objEvent->id);
 
         $eventPreviewUrl = $urlParser->addQueryString('event_preview=true', $objPage->getAbsoluteUrl($params));
-        $eventPreviewUrl = StringUtil::ampersand($eventPreviewUrl);
+        $eventPreviewUrl = StringUtil::specialcharsUrl(StringUtil::ampersand($eventPreviewUrl));
 
         return $uriSigner->sign($eventPreviewUrl, 86400);
     }

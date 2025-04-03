@@ -554,7 +554,9 @@ class CalendarEvents
             return $this->image->getHtml($icon, $label).' ';
         }
 
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
+        $href = $this->backend->addToUrl($href.'&amp;id='.$row['id']);
+
+        return '<a href="'.$this->stringUtil->specialcharsUrl($href).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.delete.button', priority: 80)]
@@ -568,7 +570,9 @@ class CalendarEvents
             return $this->image->getHtml($icon, $label).' ';
         }
 
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
+        $href = $this->backend->addToUrl($href.'&amp;id='.$row['id']);
+
+        return '<a href="'.$this->stringUtil->specialcharsUrl($href).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.cut.button', priority: 70)]
@@ -582,7 +586,9 @@ class CalendarEvents
             return $this->image->getHtml($icon, $label).' ';
         }
 
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
+        $href = $this->backend->addToUrl($href.'&amp;id='.$row['id']);
+
+        return '<a href="'.$this->stringUtil->specialcharsUrl($href).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.copy.button', priority: 70)]
@@ -596,7 +602,9 @@ class CalendarEvents
             return $this->image->getHtml($icon, $label).' ';
         }
 
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
+        $href = $this->backend->addToUrl($href.'&amp;id='.$row['id']);
+
+        return '<a href="'.$this->stringUtil->specialcharsUrl($href).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.preview.button', priority: 70)]
@@ -606,6 +614,6 @@ class CalendarEvents
 
         $href = $this->calendarEventsUtil->generateEventPreviewUrl($eventModel);
 
-        return '<a href="'.$href.'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
+        return '<a href="'.$this->stringUtil->specialcharsUrl($href).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 }

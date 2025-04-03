@@ -240,7 +240,9 @@ readonly class CalendarEventsInstructorInvoice
             return Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
         }
 
-        return '<a href="'.Backend::addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        $href = Backend::addToUrl($href.'&amp;id='.$row['id']);
+
+        return '<a href="'.StringUtil::specialcharsUrl($href).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
     }
 
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.sendRapport.button', priority: 90)]
@@ -288,7 +290,7 @@ readonly class CalendarEventsInstructorInvoice
             'sid' => uniqid(),
         ]));
 
-        return '<a href="'.$href.'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        return '<a href="'.StringUtil::specialcharsUrl($href).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
     }
 
     /**

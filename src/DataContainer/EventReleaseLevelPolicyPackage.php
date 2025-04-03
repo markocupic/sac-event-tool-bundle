@@ -37,6 +37,8 @@ class EventReleaseLevelPolicyPackage
         /** @var BackendUser $user */
         $user = $this->security->getUser();
 
-        return $user->canEditFieldsOf('tl_event_release_level_policy_package') ? '<a href="'.Backend::addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
+        $href = Backend::addToUrl($href.'&amp;id='.$row['id']);
+
+        return $user->canEditFieldsOf('tl_event_release_level_policy_package') ? '<a href="'.StringUtil::specialcharsUrl($href).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
     }
 }

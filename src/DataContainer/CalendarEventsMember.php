@@ -600,8 +600,9 @@ class CalendarEventsMember
             'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
             'ref' => $request->attributes->get('_contao_referer_id'),
         ]);
+        $href = $this->stringUtil->ampersand($href);
 
-        return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->ampersand($href), $class, $title, $attributes, $label);
+        return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->specialcharsUrl($href), $this->stringUtil->specialchars($class), $this->stringUtil->specialchars($title), $attributes, $label);
     }
 
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.global_operations.sendEmail.button', priority: 100)]
@@ -609,13 +610,14 @@ class CalendarEventsMember
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        $url = System::getContainer()->get('router')->generate(EventParticipantEmailController::class);
-        $url = $this->urlParser->addQueryString('eventId='.$request->query->get('id'), $url);
-        $url = $this->urlParser->addQueryString('rt='.$this->contaoCsrfTokenManager->getDefaultTokenValue(), $url);
-        $url = $this->urlParser->addQueryString('sid='.uniqid(), $url);
-        $url = $this->uriSigner->sign($url);
+        $href = System::getContainer()->get('router')->generate(EventParticipantEmailController::class);
+        $href = $this->urlParser->addQueryString('eventId='.$request->query->get('id'), $href);
+        $href = $this->urlParser->addQueryString('rt='.$this->contaoCsrfTokenManager->getDefaultTokenValue(), $href);
+        $href = $this->urlParser->addQueryString('sid='.uniqid(), $href);
+        $href = $this->uriSigner->sign($href);
+        $href = $this->stringUtil->ampersand($href);
 
-        return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->ampersand($url), $class, $title, $attributes, $label);
+        return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->specialcharsUrl($href), $this->stringUtil->specialchars($class), $this->stringUtil->specialchars($title), $attributes, $label);
     }
 
     #[AsCallback(table: 'tl_calendar_events_member', target: 'edit.buttons', priority: 100)]

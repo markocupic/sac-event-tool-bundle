@@ -321,7 +321,9 @@ class CalendarEventsMember
             return $this->image->getHtml($icon).' ';
         }
 
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
+        $href = $this->backend->addToUrl($href.'&amp;id='.$row['id']);
+
+        return '<a href="'.$this->stringUtil->specialcharsUrl($href).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 
     /**
@@ -357,6 +359,8 @@ class CalendarEventsMember
             return $this->image->getHtml($icon).' ';
         }
 
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
+        $href = $this->backend->addToUrl($href.'&amp;id='.$row['id']);
+
+        return '<a href="'.$this->stringUtil->specialcharsUrl($href).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 }
