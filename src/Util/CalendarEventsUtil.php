@@ -1104,7 +1104,7 @@ readonly class CalendarEventsUtil
         return sprintf($strBadge, 'dark', $registrationCount.' bestätigte Plätze', $registrationCount.'/?');
     }
 
-    public function getEventStateOfSubscriptionBadgesString(CalendarEventsModel $objEvent): string
+    public function getSubscriptionStateBadges(CalendarEventsModel $objEvent): string
     {
         $this->framework->initialize();
 

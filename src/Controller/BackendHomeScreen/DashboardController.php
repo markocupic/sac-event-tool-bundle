@@ -197,7 +197,7 @@ class DashboardController
 
             $event = [];
             $event['row_class'] = $rowClass;
-            $event['badge'] = $this->calendarEventsUtil->getEventStateOfSubscriptionBadgesString($eventModel);
+            $event['badge'] = $this->calendarEventsUtil->getSubscriptionStateBadges($eventModel);
             $event['title'] = $title;
             $event['date'] = date($this->configAdapter->get('dateFormat'), (int) $eventModel->startDate);
             $event['state_icon'] = $this->calendarEventsUtil->getEventStateIcon($eventModel);

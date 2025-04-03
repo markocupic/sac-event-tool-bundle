@@ -1241,7 +1241,7 @@ class CalendarEvents
             $strAuthor = ' <span style="color:#b3b3b3;padding-left:3px">[Hauptleiter: '.$objUser->name.']</span><br>';
         }
 
-        $strRegistrations = $this->calendarEventsUtil->getEventStateOfSubscriptionBadgesString($objEvent);
+        $strRegistrations = $this->calendarEventsUtil->getSubscriptionStateBadges($objEvent);
 
         if ('' !== $strRegistrations) {
             $strRegistrations = '<br>'.$strRegistrations;
