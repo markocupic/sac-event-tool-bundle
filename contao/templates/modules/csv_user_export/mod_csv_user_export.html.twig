@@ -2,25 +2,18 @@
 This is the base template for
 - backend user Export in the frontend
 - frontend user Export in the frontend
-
 #}
 {% extends '@Contao/block_unsearchable' %}
 
 {% block content %}
-
-    {% do addJavascriptResource('https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js') %}
-    {% do addCssResource('https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.min.css') %}
-    {% do addCssResource('https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap2.min.css') %}
-    {% do addCssResource('https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap2.min.css.map') %}
-
+    {% do addJavascriptResource('https://cdn.jsdelivr.net/npm/choices.js@11.1.0/public/assets/scripts/choices.min.js') %}
+    {% do addCssResource('https://cdn.jsdelivr.net/npm/choices.js@11.1.0/public/assets/styles/choices.min.css') %}
     {{ form|raw }}
-
     <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-        jQuery(document).ready(function () {
-            $('#ctrl_user-roles').selectize({
-                plugins: ['remove_button']
-            });
+        const element = document.querySelector('#ctrl_user-roles');
+        const choices = new Choices(element, {
+            removeItems: true,
+            removeItemButton: true,
         });
     </script>
-
 {% endblock %}
