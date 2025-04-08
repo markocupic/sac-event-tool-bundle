@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\ContaoBackendMaintenance;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserPermissions;
 use Psr\Log\LoggerInterface;
 
@@ -33,24 +34,35 @@ class MaintainBackendUser
      */
     public function resetBackendUserPermissions(): void
     {
-        $hasUsers = false;
-        $stmt = $this->connection
-            ->executeQuery(
-                'SELECT username FROM tl_user WHERE username IS NOT NULL AND admin = ? AND inherit = ?',
+        $intProcessed = 0;
+
+        $arrUsers = $this->connection
+            ->fetchAllAssociative(
+                'SELECT username FROM tl_user WHERE admin = ? AND inherit = ?',
                 [
-                    '',
+                    false,
                     'extend',
+                ],
+                [
+                    Types::BOOLEAN,
+                    Types::STRING,
                 ]
             )
         ;
 
-        while (false !== ($userIdentifier = $stmt->fetchOne())) {
-            $hasUsers = true;
+        foreach ($arrUsers as $user) {
+            $userIdentifier = $user['username'];
+
+            if (empty($userIdentifier)) {
+                continue;
+            }
+
+            ++$intProcessed;
             $this->maintainBackendUserPermissions->resetBackendUserPermissions($userIdentifier, [], true);
         }
 
-        if (null !== $this->contaoGeneralLogger && true === $hasUsers) {
-            $strText = 'Successfully reset backend permissions of all non-admin users.';
+        if (null !== $this->contaoGeneralLogger && $intProcessed) {
+            $strText = 'Successfully reset backend permissions of all non-admin backend users.';
             $this->contaoGeneralLogger->info($strText);
         }
     }
