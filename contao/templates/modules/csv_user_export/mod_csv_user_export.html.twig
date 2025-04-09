@@ -6,8 +6,10 @@ This is the base template for
 {% extends '@Contao/block_unsearchable' %}
 
 {% block content %}
-    {% do addJavascriptResource('https://cdn.jsdelivr.net/npm/choices.js@11.1.0/public/assets/scripts/choices.min.js') %}
-    {% do addCssResource('https://cdn.jsdelivr.net/npm/choices.js@11.1.0/public/assets/styles/choices.min.css') %}
+    {% add to head %}
+        <script type="text/javascript" src="{{ asset('choices.js/scripts/choices.min.js', 'markocupic_sac_event_tool') }}"></script>
+        <link rel="stylesheet" href="{{ asset('choices.js/styles/choices.min.css', 'markocupic_sac_event_tool') }}">
+    {% endadd %}
     {{ form|raw }}
     <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
         const element = document.querySelector('#ctrl_user-roles');
