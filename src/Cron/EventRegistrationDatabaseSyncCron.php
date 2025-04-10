@@ -18,7 +18,6 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCronJob;
 use Markocupic\SacEventToolBundle\Database\SyncEventRegistrationDatabase;
 
 #[AsCronJob('40 4 * * *')]
-#[AsCronJob('40 5 * * *')]
 readonly class EventRegistrationDatabaseSyncCron
 {
     public function __construct(
