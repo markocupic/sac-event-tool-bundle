@@ -19,7 +19,6 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Markocupic\SacEventToolBundle\Database\SyncMemberDatabase;
 use Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser;
 
-#[AsCronJob('1 4 * * *')]
 #[AsCronJob('1 5 * * *')]
 readonly class MemberDatabaseSyncCron
 {
