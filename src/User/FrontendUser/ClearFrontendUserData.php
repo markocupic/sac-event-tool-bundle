@@ -21,18 +21,20 @@ use Contao\Date;
 use Contao\Folder;
 use Contao\MemberModel;
 use Contao\Message;
+use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Psr\Log\LoggerInterface;
 
-class ClearFrontendUserData
+readonly class ClearFrontendUserData
 {
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly string $projectDir,
-        private readonly string $sacevtUserFrontendAvatarDir,
-        private readonly LoggerInterface|null $contaoGeneralLogger = null,
+        private ContaoFramework $framework,
+        private Connection $connection,
+        private string $projectDir,
+        private string $sacevtUserFrontendAvatarDir,
+        private LoggerInterface|null $contaoGeneralLogger = null,
     ) {
     }
 
@@ -43,117 +45,106 @@ class ClearFrontendUserData
     {
         $this->framework->initialize();
 
-        /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
-        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+        $arrRegistrations = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events_member');
 
-        /** @var Config $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
+        foreach ($arrRegistrations as $registration) {
+            // Important!!! Do nothing if the participant was entered manually without an sacMemberId or member ID (tl_member)
+            if (empty($registration['contaoMemberId']) && empty($registration['sacMemberId'])) {
+                continue;
+            }
 
-        /** @var MemberModel $memberModelAdapter */
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-
-        $objEventsMember = $calendarEventsMemberModelAdapter->findAll();
-
-        while ($objEventsMember->next()) {
-            if ($objEventsMember->contaoMemberId > 0 || $objEventsMember->sacMemberId > 0) {
-                $blnFound = false;
-
-                if ($objEventsMember->contaoMemberId > 0) {
-                    if (null !== $memberModelAdapter->findByPk($objEventsMember->contaoMemberId)) {
-                        $blnFound = true;
-                    }
-                }
-
-                if ($objEventsMember->sacMemberId > 0) {
-                    if (null !== $memberModelAdapter->findOneBySacMemberId($objEventsMember->sacMemberId)) {
-                        $blnFound = true;
-                    }
-                }
-
-                if (!$blnFound) {
-                    $message = sprintf(
-                        'Could not assign a frontend user to the registration with ID %s (%s %s [%s]) and the event with ID %s "%s".',
-                        $objEventsMember->id,
-                        $objEventsMember->firstname,
-                        $objEventsMember->lastname,
-                        $objEventsMember->sacMemberId,
-                        $objEventsMember->eventId,
-                        $objEventsMember->eventName,
-                    );
-
-                    $this->contaoGeneralLogger?->info(
-                        $message,
-                        ['contao' => new ContaoContext(__FILE__.' Line: '.__LINE__, 'EVENT_MEMBER_NOT_FOUND')],
-                    );
-
-                    // Notify admin
-                    if (!empty($configAdapter->get('adminEmail'))) {
-                        mail(
-                            $configAdapter->get('adminEmail'),
-                            'Unbekannter Teilnehmer in Event '.$objEventsMember->eventName,
-                            $message.' In '.__FILE__.' LINE: '.__LINE__
-                        );
-                    }
-
-                    /*
-                     * @todo: Currently disabled because event registrations has been erroneously anonymized.
-                     */
-                    //$this->anonymizeEventRegistration($objEventsMember->current());
+            if ($registration['contaoMemberId'] > 0) {
+                if (null !== $this->framework->getAdapter(MemberModel::class)->findByPk($registration['contaoMemberId'])) {
+                    continue;
                 }
             }
+
+            if ($registration['sacMemberId'] > 0) {
+                if (null !== $this->framework->getAdapter(MemberModel::class)->findOneBySacMemberId($registration['sacMemberId'])) {
+                    continue;
+                }
+            }
+
+            $message = sprintf(
+                'Could not assign a frontend user to the registration with ID %s (%s %s [%s]) and the event with ID %s "%s" in %s:%d.',
+                $registration['id'],
+                $registration['firstname'],
+                $registration['lastname'],
+                $registration['sacMemberId'],
+                $registration['eventId'],
+                $registration['eventName'],
+                __METHOD__,
+                __LINE__,
+            );
+
+            $this->contaoGeneralLogger?->info($message);
+
+            // Notify admin
+            $adminEmail = $this->framework->getAdapter(Config::class)->get('adminEmail');
+
+            if (!empty($adminEmail)) {
+                $subject = sprintf(
+                    'Unknown event registration found Reg-ID: %d, Event "%s" Event-ID: %d',
+                    $registration['id'],
+                    $registration['eventName'],
+                    $registration['eventId'],
+                );
+
+                mail($adminEmail, $subject, $message);
+            }
+
+            /*
+             * @todo: Currently disabled because event registrations has been erroneously anonymized.
+             */
+            // $objEventRegistration = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findByPk($registration['id']);
+            // $this->anonymizeEventRegistration($objEventRegistration);
         }
     }
 
-    public function anonymizeEventRegistration(CalendarEventsMemberModel $objCalendarEventsMember): bool
+    public function anonymizeEventRegistration(CalendarEventsMemberModel $objEventRegistration): bool
     {
         $this->framework->initialize();
 
-        /** @var Date $dateAdapter */
-        $dateAdapter = $this->framework->getAdapter(Date::class);
-
-        if (!$objCalendarEventsMember->anonymized) {
-            $this->contaoGeneralLogger?->info(
-                sprintf(
-                    'Anonymized tl_calendar_events_member.id=%s. Firstname: %s, Lastname: %s (%s)"',
-                    $objCalendarEventsMember->id,
-                    $objCalendarEventsMember->firstname,
-                    $objCalendarEventsMember->lastname,
-                    $objCalendarEventsMember->sacMemberId
-                ),
-                ['contao' => new ContaoContext(__METHOD__, 'ANONYMIZED_CALENDAR_EVENTS_MEMBER_DATA')],
-            );
-
-            $objCalendarEventsMember->firstname = 'Vorname [anonymisiert]';
-            $objCalendarEventsMember->lastname = 'Nachname [anonymisiert]';
-            $objCalendarEventsMember->email = '';
-            $objCalendarEventsMember->sacMemberId = '';
-            $objCalendarEventsMember->street = 'Adresse [anonymisiert]';
-            $objCalendarEventsMember->postal = '0';
-            $objCalendarEventsMember->city = 'Ort [anonymisiert]';
-            $objCalendarEventsMember->mobile = '';
-            $objCalendarEventsMember->foodHabits = '';
-            $objCalendarEventsMember->dateOfBirth = '';
-            $objCalendarEventsMember->contaoMemberId = 0;
-            $objCalendarEventsMember->notes = 'Benutzerdaten anonymisiert am '.$dateAdapter->parse('d.m.Y', time());
-            $objCalendarEventsMember->emergencyPhone = '999 99 99';
-            $objCalendarEventsMember->emergencyPhoneName = ' [anonymisiert]';
-            $objCalendarEventsMember->anonymized = 1;
-            $objCalendarEventsMember->save();
-
-            return true;
+        if ($objEventRegistration->anonymized) {
+            return false;
         }
 
-        return false;
+        $this->contaoGeneralLogger?->info(
+            sprintf(
+                'Anonymized tl_calendar_events_member.id=%s. Firstname: %s, Lastname: %s (%s)"',
+                $objEventRegistration->id,
+                $objEventRegistration->firstname,
+                $objEventRegistration->lastname,
+                $objEventRegistration->sacMemberId
+            ),
+            ['contao' => new ContaoContext(__METHOD__, 'ANONYMIZED_CALENDAR_EVENTS_MEMBER_DATA')],
+        );
+
+        $objEventRegistration->firstname = 'Vorname [anonymisiert]';
+        $objEventRegistration->lastname = 'Nachname [anonymisiert]';
+        $objEventRegistration->email = '';
+        $objEventRegistration->sacMemberId = '';
+        $objEventRegistration->street = 'Adresse [anonymisiert]';
+        $objEventRegistration->postal = '0';
+        $objEventRegistration->city = 'Ort [anonymisiert]';
+        $objEventRegistration->mobile = '';
+        $objEventRegistration->foodHabits = '';
+        $objEventRegistration->dateOfBirth = '';
+        $objEventRegistration->contaoMemberId = 0;
+        $objEventRegistration->notes = 'Benutzerdaten anonymisiert am '.date('d.m.Y', time());
+        $objEventRegistration->emergencyPhone = '999 99 99';
+        $objEventRegistration->emergencyPhoneName = ' [anonymisiert]';
+        $objEventRegistration->anonymized = 1;
+        $objEventRegistration->save();
+
+        return true;
     }
 
     public function disableLogin(int $memberId): void
     {
         $this->framework->initialize();
 
-        /** @var MemberModel $memberModelAdapter */
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-
-        $objMember = $memberModelAdapter->findByPk($memberId);
+        $objMember = $this->framework->getAdapter(MemberModel::class)->findByPk($memberId);
 
         if (null !== $objMember) {
             $this->contaoGeneralLogger?->info(
@@ -175,10 +166,7 @@ class ClearFrontendUserData
     {
         $this->framework->initialize();
 
-        /** @var MemberModel $memberModelAdapter */
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-
-        $objMember = $memberModelAdapter->findByPk($memberId);
+        $objMember = $this->framework->getAdapter(MemberModel::class)->findByPk($memberId);
 
         if (null !== $objMember) {
             $this->contaoGeneralLogger?->info(
@@ -202,62 +190,51 @@ class ClearFrontendUserData
     {
         $this->framework->initialize();
 
-        /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
-        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-
-        /** @var MemberModel $memberModelAdapter */
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-
-        /** @var Message $messageAdapter */
-        $messageAdapter = $this->framework->getAdapter(Message::class);
-
-        /** @var Date $dateAdapter */
-        $dateAdapter = $this->framework->getAdapter(Date::class);
-
-        /** @var Config $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
         $arrEventsMember = [];
         $arrErrorMsg = [];
         $blnHasError = false;
-        $objMember = $memberModelAdapter->findByPk($memberId);
+        $objMember = $this->framework->getAdapter(MemberModel::class)->findByPk($memberId);
 
         if (null !== $objMember) {
             // Upcoming events
-            $arrEvents = $calendarEventsMemberModelAdapter->findUpcomingEventsByMemberId($objMember->id);
+            $arrEvents = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findUpcomingEventsByMemberId($objMember->id);
 
             foreach ($arrEvents as $arrEvent) {
-                $objEventsMember = $calendarEventsMemberModelAdapter->findByPk($arrEvent['registrationId']);
+                $objEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findByPk($arrEvent['registrationId']);
 
-                if (null !== $objEventsMember) {
-                    if (null !== $arrEvent['eventModel']) {
-                        $objEvent = $arrEvent['eventModel'];
-
-                        if ($blnForceClearing) {
-                            continue;
-                        }
-
-                        if (EventSubscriptionState::SUBSCRIPTION_REFUSED === $objEventsMember->stateOfSubscription) {
-                            continue;
-                        }
-
-                        $arrErrorMsg[] = sprintf(
-                            'Dein Profil kann nicht gelöscht werden, weil du beim Event "%s [%s]" vom %s auf der Buchungsliste stehst. Bitte melde dich zuerst vom Event ab oder nimm gegebenenfalls mit dem Leiter Kontakt auf.',
-                            $objEvent->title,
-                            $objEventsMember->stateOfSubscription,
-                            $dateAdapter->parse($configAdapter->get('dateFormat'), $objEvent->startDate),
-                        );
-
-                        $blnHasError = true;
-                    }
+                if (null === $objEventsMember) {
+                    continue;
                 }
+
+                if (null === $arrEvent['eventModel']) {
+                    continue;
+                }
+
+                $objEvent = $arrEvent['eventModel'];
+
+                if ($blnForceClearing) {
+                    continue;
+                }
+
+                if (EventSubscriptionState::SUBSCRIPTION_REFUSED === $objEventsMember->stateOfSubscription) {
+                    continue;
+                }
+
+                $arrErrorMsg[] = sprintf(
+                    'Dein Profil kann nicht gelöscht werden, weil du beim Event "%s [%s]" vom %s auf der Buchungsliste stehst. Bitte melde dich zuerst vom Event ab oder nimm gegebenenfalls mit dem Leiter Kontakt auf.',
+                    $objEvent->title,
+                    $objEventsMember->stateOfSubscription,
+                    $this->framework->getAdapter(Date::class)->parse($this->framework->getAdapter(Config::class)->get('dateFormat'), $objEvent->startDate),
+                );
+
+                $blnHasError = true;
             }
 
             // Past events
-            $arrEvents = $calendarEventsMemberModelAdapter->findPastEventsByMemberId($objMember->id, [], false, false);
+            $arrEvents = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findPastEventsByMemberId($objMember->id, [], false, false);
 
             foreach ($arrEvents as $arrEvent) {
-                $objEventsMember = $calendarEventsMemberModelAdapter->findByPk($arrEvent['registrationId']);
+                $objEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findByPk($arrEvent['registrationId']);
 
                 if (null !== $objEventsMember) {
                     $arrEventsMember[] = $objEventsMember->id;
@@ -266,7 +243,7 @@ class ClearFrontendUserData
 
             if ($blnHasError) {
                 foreach ($arrErrorMsg as $errorMsg) {
-                    $messageAdapter->add($errorMsg, 'TL_ERROR');
+                    $this->framework->getAdapter(Message::class)->addError($errorMsg);
                 }
 
                 return false;
@@ -274,11 +251,13 @@ class ClearFrontendUserData
 
             // Anonymize entries from tl_calendar_events_member
             foreach ($arrEventsMember as $eventsMemberId) {
-                $objEventsMember = $calendarEventsMemberModelAdapter->findByPk($eventsMemberId);
+                $objEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findByPk($eventsMemberId);
 
-                if (null !== $objEventsMember) {
-                    $this->anonymizeEventRegistration($objEventsMember);
+                if (null === $objEventsMember) {
+                    continue;
                 }
+
+                $this->anonymizeEventRegistration($objEventsMember);
             }
 
             // Delete avatar directory
@@ -290,9 +269,6 @@ class ClearFrontendUserData
         return false;
     }
 
-    /**
-     * @throws \Exception
-     */
     public function deleteAvatarDirectory(int $memberId): void
     {
         $this->framework->initialize();
