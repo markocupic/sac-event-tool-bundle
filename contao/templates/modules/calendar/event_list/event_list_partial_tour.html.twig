@@ -8,11 +8,11 @@
     <div class="event-container row">
         <div v-for="(row, index) of rows" class="event-item event-item-tour event col-12 col-md-6" data-aos="fade-down" data-aos-duration="600" data-aos-once="true" data-aos-anchor-placement="top-bottom" v-bind:data-selector="row.selector" v-bind:data-id="row.id" v-bind:data-event-type="row.tourTypesIds">
 
-            <div class="event-list-inner-box d-flex justify-content-between p-3 mb-3 bg-white border border-white">
+            <div class="event-list-inner-box d-flex justify-content-between p-2 p-sm-3 mb-3 bg-white border border-white">
 
                 {# start col-1 #}
                 <div class="event-list-tour-col-1" data-has-event-href="true" v-bind:data-href="row.eventUrl">
-                    <div class="event-list-date-badge-wrapper me-4 rounded-circle d-flex align-items-center justify-content-center">
+                    <div class="event-list-date-badge-wrapper me-2 me-sm-4 rounded-circle d-flex align-items-center justify-content-center">
                         <div class="d-flex flex-column">
                             <span class="event-list-badge-day text-center">
                                 <span v-html="row.startDateDay"></span>
@@ -30,7 +30,7 @@
                 {# end col-1 #}
 
                 {# start col-2 #}
-                <div class="event-list-tour-col-2 flex-grow-1">
+                <div class="event-list-tour-col-2 flex-grow-1 overflow-auto pe-1">
                     {# Event has been rescheduled #}
                     <div class="small text-danger me-1" v-if="row.eventState === 'event_status_6'">
                         <span class="small" v-html="row.eventStateLabel"></span>
@@ -38,27 +38,28 @@
 
                     {# row event period #}
                     <div class="d-flex flex-wrap">
-                        <div class="small me-1"><span v-html="row.eventPeriodLgInline"></span></div>
-                        <div class="small text-muted me-1">(Dauer: <span v-html="row.eventDuration"></span>)</div>
+                        <div class="small me-1"><span class="text-nowrap" v-html="row.eventPeriodLgInline"></span></div>
+                        <div class="small text-muted me-1 text-nowrap">(Dauer: <span v-html="row.eventDuration"></span>)</div>
                     </div>
                     {# end row event period #}
 
                     {# row last minute event #}
                     <div class="last-minute-tour d-block small" v-if="row.eventType === 'lastMinuteTour'">
                         <i class="fa-regular fa-clock me-1"></i>
-                        <span class="text-uppercase">last minute tour</span>
+                        <span class="text-uppercase text-nowrap">last minute tour</span>
                     </div>
                     {# end row last minute event #}
 
                     {# row state icon #}
                     <div class="title d-flex my-2 align-items-start">
-                        <span class="event-state-icon" v-html="row.eventStateIcon" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel"></span>
-                        <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link fw-bold"><strong>[[ row.eventTitle ]]</strong></a>
+                        <span class="">
+                            <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link fw-bold"><strong>[[ row.eventTitle ]]</strong></a>
+                        </span>
                     </div>
                     {# end row state icon #}
 
                     {# start row icons #}
-                    <div class="d-flex flex-wrap badge-container">
+                    <div class="d-flex flex-wrap badge-container text-nowrap">
                         <div class="d-flex flex-wrap" v-if="row.bookingCounter" v-html="row.bookingCounter"></div>
                         <div class="d-flex flex-wrap" v-if="row.suitableForBeginners">
                             <span class="badge badge-pill bg-warning" data-bs-toggle="tooltip" data-placement="top" data-title="Für Einsteiger geeignet">
@@ -80,6 +81,7 @@
 
                 {# start col-3 #}
                 <div class="event-list-tour-col-3">
+                    <div class="event-state-icon" v-html="row.eventStateIcon" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel"></div>
                     {% if not has_logged_in_frontend_user() %}
                         <button class="favor-event-btn p-0" data-sac-login-toggle="modal" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
                             <i class="fa-regular fa-heart"></i>
