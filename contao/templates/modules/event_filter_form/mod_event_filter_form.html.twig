@@ -15,7 +15,7 @@
                         {% if field != 'suitableForBeginners' and field != 'publicTransportEvent' and field != 'favoredEvent' %}
                             {% if form.hasFormField(field) %}
                                 <!-- start widget {{ field }} -->
-                                <div class="filter-board-widget col-6 col-sm-4" id="{{ field }}">
+                                <div class="filter-board-widget col-sm-4" id="{{ field }}">
                                     {{ form.getWidget(field).parse()|raw }}
                                 </div>
                                 <!-- end widget {{ field }} -->
@@ -24,19 +24,19 @@
                     {% endfor %}
 
                     {% if form.hasFormField('suitableForBeginners') %}
-                        <div class="filter-board-widget col-6 col-sm-4" id="suitableForBeginners">
+                        <div class="filter-board-widget col-sm-4" id="suitableForBeginners">
                             {{ form.getWidget('suitableForBeginners').parse()|raw }}
                         </div>
                     {% endif %}
 
                     {% if form.hasFormField('publicTransportEvent') %}
-                        <div class="filter-board-widget col-6 col-sm-4" id="publicTransportEvent">
+                        <div class="filter-board-widget col-sm-4" id="publicTransportEvent">
                             {{ form.getWidget('publicTransportEvent').parse()|raw }}
                         </div>
                     {% endif %}
 
                     {% if has_logged_in_frontend_user() and form.hasFormField('favoredEvent') %}
-                        <div class="filter-board-widget col-6 col-sm-4" id="favoredEvent">
+                        <div class="filter-board-widget col-sm-4" id="favoredEvent">
                             {{ form.getWidget('favoredEvent').parse()|raw }}
                         </div>
                     {% endif %}
