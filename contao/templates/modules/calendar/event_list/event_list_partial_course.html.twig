@@ -7,35 +7,78 @@
     <span v-if="blnIsBusy === true" class="ms-2 text-success"><small>Lade events...</small></span>
     <div class="event-container row g-3">
 
-        <div v-for="(row, index) of rows" class="col-12 col-md-6 event-item event-item-course event layout_upcoming" data-aos="fade-down" data-aos-duration="600" data-aos-once="true" data-aos-anchor-placement="top-bottom" v-bind:data-selector="row.selector" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
-            <div class="course-list-inner-box bg-white">
+        <div v-for="(row, index) of rows" class="event-list-item event-list-item--course js--event-list-item col-12 col-md-6" data-aos="fade-down" data-aos-duration="600" data-aos-once="true" data-aos-anchor-placement="top-bottom" v-bind:data-selector="row.selector" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
+            <div class="event-list-item--inner-box bg-white border border-light-subtle">
                 <div class="row gx-0">
                     <!-- Start left col -->
-                    <div class="col-0 col-xl-5 d-none d-xl-block">
+                    <div class="event-list-item--col-1 col-0 col-xl-5 d-none d-xl-block">
                         <div class="image-zoom-in">
-                            <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" v-bind:title="row.title" v-html="row.eventImage" class="responsive event-title-link"></a>
+                            <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" v-bind:title="row.title" v-html="row.eventImage" class="responsive"></a>
                         </div>
                     </div>
                     <!-- Start right col -->
                     <div class="col-12 col-xl-7 position-relative">
                         <div class="p-3">
                             <div class="d-flex">
-                                <div class="title-col-1 flex-grow-1">
-                                    <div class="title">
-                                        <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link lh-base">
-                                            <h4 class="d-flex headline m-0 p-0 lh-base">
-                                                <strong>[[ row.title ]]</strong>
-                                            </h4>
+                                <div class="event-list-item--col-2 flex-grow-1">
+                                    <div class="event-list-item--event-date-span detail-item mb-2 d-flex align-items-start">
+                                        {# <i class="fa-regular fa-fw fa-calendar-alt mt-1 me-1"></i> #}
+                                        <span class="d-flex flex-wrap">
+                                            <span v-html="row.eventPeriodLgInline"></span>
+                                        </span>
+                                    </div>
+                                    <div class="event-list-item--title my-1 my-sm-2 mt-0">
+                                        <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-list-item--title-link lh-base">
+                                            <strong>[[ row.title ]]</strong>
                                         </a>
                                     </div>
+                                    <div class="event-list-item--course-cat detail-item mb-2">
+                                        <span><strong>[[ row.courseTypeLevel0Name ]]: [[ row.courseTypeLevel1Name ]]</strong></span>
+                                    </div>
+                                    <div class="event-list-item--course-level detail-item mb-2 d-flex align-items-start">
+                                        {# <i class="fa-regular fa-fw fa-stairs mt-1 me-1"></i> #}
+                                        <span class="d-flex flex-wrap text-muted">
+                                            <span>Kursstufe: [[ row.courseLevelName ]]</span>
+                                        </span>
+                                    </div>
+                                    <div class="event-list-item--duration detail-item mb-2 d-flex align-items-start">
+                                        {# <i class="fa-regular fa-fw fa-calendar-alt mt-1 me-1"></i> #}
+                                        <span class="d-flex flex-wrap">
+                                            <span class="text-muted">Dauer: <span v-html="row.eventDuration"></span></span>
+                                        </span>
+                                    </div>
+                                    {# if the event has been rescheduled #}
+                                    <div class="event-list-item--rescheduled detail-item text-danger mb-2" v-if="row.eventState === 'event_status_6'">
+                                        <span class="text-muted" v-html="row.eventStateLabel"></span>
+                                    </div>
+                                    <div class="event-list-item--instructors detail-item mb-2 d-flex align-items-start">
+                                        {# <i class="fa-regular fa-fw fa-user mt-1 me-1"></i> #}
+                                        <span class="d-flex flex-wrap text-muted">
+                                            <span>[[ row.instructorsWithQualification ]]</span>
+                                        </span>
+                                    </div>
+                                    <div class="event-list-item--badge-container detail-item d-flex flex-wrap">
+                                        <div v-html="row.bookingCounter" class="me-1"></div>
+                                        <div v-if="row.isPublicTransportEvent" v-html="row.getPublicTransportBadge" class="me-1"></div>
+                                        <div class="event-list-item--see-more-link"><a v-bind:href="row.eventUrl"><span class="badge badge-sm badge-pill">Zum Angebot</span></a></div>
+                                    </div>
+                                    {# The logo will not be displayed if the event is organized by multiple groups. #}
+                                    <div class="event-list-item--organizer-logo-box detail-item" v-if="row.eventOrganizerLogos.length === 1">
+                                        {# position absolute bottom right #}
+                                        <div class="event-list-item--organizer-logo position-absolute">
+                                            <div v-html="row.eventOrganizerLogos[0]"></div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="title-col-2 ms-2">
+                                <div class="event-list-item--col-3 ms-2">
+                                    <div class="event-list-item--event-state-icon" v-html="row.eventStateIcon" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel" v-bind:class="row.eventState"></div>
+
                                     {% if not has_logged_in_frontend_user() %}
-                                        <button class="favor-event-btn p-0" data-sac-login-toggle="modal" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
+                                        <button class="event-list-item--like-button p-0" data-sac-login-toggle="modal" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
                                             <i class="fa-regular fa-heart"></i>
                                         </button>
                                     {% else %}
-                                        <button class="favor-event-btn p-0" @click="favorEvent(index)" v-bind:title="row.isFavoredEvent ? 'Aus Merkliste entfernen' : 'Zu Merkliste hinzufügen'">
+                                        <button class="event-list-item--like-button p-0" @click="favorEvent(index)" v-bind:title="row.isFavoredEvent ? 'Aus Merkliste entfernen' : 'Zu Merkliste hinzufügen'">
                                             <span v-if="!row.isFavoredEvent">
                                                 <i class="fa-regular fa-heart"></i>
                                             </span>
@@ -44,36 +87,6 @@
                                             </span>
                                         </button>
                                     {% endif %}
-                                </div>
-                            </div>
-
-                            <div class="detail-item small mb-3">
-                                <strong><span class="small">[[ row.courseTypeLevel0Name ]]: [[ row.courseTypeLevel1Name ]]</span></strong>
-                            </div>
-                            <div class="detail-item small mb-2 d-flex align-items-start">
-                                <i class="fa-regular fa-fw fa-stairs mt-1 me-1"></i><span>Kursstufe: [[ row.courseLevelName ]]</span>
-                            </div>
-                            <div class="detail-item small mb-2 d-flex flex-wrap align-items-start">
-                                <i class="fa-regular fa-fw fa-calendar-alt mt-1 me-1"></i><span class="me-1 small" v-html="row.eventPeriodLgInline"></span><span class="text-muted" v-html="'(Dauer: ' + row.eventDuration + ')'"></span>
-                            </div>
-                            {# if the event has been rescheduled #}
-                            <div class="detail-item small text-danger mb-2" v-if="row.eventState === 'event_status_6'">
-                                <span v-html="row.eventStateLabel"></span>
-                            </div>
-                            <div class="detail-item small mb-2 d-flex align-items-start">
-                                <i class="fa-regular fa-fw fa-user mt-1 me-1"></i><span>Leitung: [[ row.instructorsWithQualification ]]</span>
-                            </div>
-                            <div class="detail-item d-flex flex-wrap mb-2">
-                                <div class="event-state-icon me-1" v-html="row.eventStateIcon" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel" v-bind:class="row.eventState"></div>
-                                <div v-html="row.bookingCounter" class="me-1"></div>
-                                <div v-if="row.isPublicTransportEvent" v-html="row.getPublicTransportBadge" class="me-1"></div>
-                                <div class="more-btn"><a v-bind:href="row.eventUrl"><span class="badge badge-sm badge-pill">Zum Angebot</span></a></div>
-                            </div>
-                            {# The logo will not be displayed if the event is organized by multiple groups. #}
-                            <div class="detail-item" v-if="row.eventOrganizerLogos.length === 1">
-                                {# position absolute bottom right #}
-                                <div class="event-organizer-logo position-absolute">
-                                    <div v-html="row.eventOrganizerLogos[0]"></div>
                                 </div>
                             </div>
                         </div>
