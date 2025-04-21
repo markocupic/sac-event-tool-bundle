@@ -14,7 +14,7 @@
                 <small>{{ instructor.main_qualification }}</small>
             </div>
         {% endif %}
-        {% if has_logged_in_frontend_user %}
+        {% if has_logged_in_frontend_user() %}
             {% for key,value in instructor.contact_options %}
                 <div class="contact-box--{{ key }} mb-2">
                     {% if 'phone' == key or 'mobile' == key %}
