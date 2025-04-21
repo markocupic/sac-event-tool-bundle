@@ -28,6 +28,7 @@ use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\CoreBundle\Util\SymlinkUtil;
+use Contao\Date;
 use Contao\FilesModel;
 use Contao\Folder;
 use Contao\FrontendUser;
@@ -107,7 +108,7 @@ readonly class CalendarEventsUtil
                 break;
 
             case 'eventId':
-                $value = sprintf('%s-%s', date('Y', (int) $objEvent->startDate), $objEvent->id);
+                $value = sprintf('%s-%s', $this->getAdapter(Date::class)->parse('Y', (int) $objEvent->startDate), $objEvent->id);
                 break;
 
             case 'eventTitle':
@@ -140,27 +141,27 @@ readonly class CalendarEventsUtil
                 break;
 
             case 'startDateDay':
-                $value = date('d', (int) $objEvent->startDate);
+                $value = $this->getAdapter(Date::class)->parse('d', (int) $objEvent->startDate);
                 break;
 
             case 'startDateMonth':
-                $value = date('M', (int) $objEvent->startDate);
+                $value = $this->getAdapter(Date::class)->parse('M', (int) $objEvent->startDate);
                 break;
 
             case 'startDateYear':
-                $value = date('y', (int) $objEvent->startDate);
+                $value = $this->getAdapter(Date::class)->parse('y', (int) $objEvent->startDate);
                 break;
 
             case 'endDateDay':
-                $value = date('d', (int) $objEvent->endDate);
+                $value = $this->getAdapter(Date::class)->parse('d', (int) $objEvent->endDate);
                 break;
 
             case 'endDateMonth':
-                $value = date('M', (int) $objEvent->endDate);
+                $value = $this->getAdapter(Date::class)->parse('M', (int) $objEvent->endDate);
                 break;
 
             case 'endDateYear':
-                $value = date('y', (int) $objEvent->endDate);
+                $value = $this->getAdapter(Date::class)->parse('y', (int) $objEvent->endDate);
                 break;
 
             case 'eventPeriodSmTooltip':
@@ -183,22 +184,22 @@ readonly class CalendarEventsUtil
 
             case 'registrationStartDateWithOffsetFormatted':
                 $regStartTime = $objEvent->registrationStartDate + $this->getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
-                $value = date($this->getAdapter(Config::class)->get('dateFormat'), (int) $regStartTime);
+                $value = $this->getAdapter(Date::class)->parse($this->getAdapter(Config::class)->get('dateFormat'), (int) $regStartTime);
                 break;
 
             case 'registrationStartTimeWithOffsetFormatted':
                 $regStartTime = $objEvent->registrationStartDate + $this->getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
-                $value = date($this->getAdapter(Config::class)->get('datimFormat'), (int) $regStartTime);
+                $value = $this->getAdapter(Date::class)->parse($this->getAdapter(Config::class)->get('datimFormat'), (int) $regStartTime);
                 break;
 
             case 'registrationEndDateFormatted':
                 // If registration end time! is set to default --> 23:59 then only show registration end date!
-                $endDate = date($this->getAdapter(Config::class)->get('dateFormat'), (int) $objEvent->registrationEndDate);
+                $endDate = $this->getAdapter(Date::class)->parse($this->getAdapter(Config::class)->get('dateFormat'), (int) $objEvent->registrationEndDate);
 
                 if (abs($objEvent->registrationEndDate - strtotime($endDate)) === (24 * 3600) - 60) {
-                    $formatedEndDate = date($this->getAdapter(Config::class)->get('dateFormat'), (int) $objEvent->registrationEndDate);
+                    $formatedEndDate = $this->getAdapter(Date::class)->parse($this->getAdapter(Config::class)->get('dateFormat'), (int) $objEvent->registrationEndDate);
                 } else {
-                    $formatedEndDate = date($this->getAdapter(Config::class)->get('datimFormat'), (int) $objEvent->registrationEndDate);
+                    $formatedEndDate = $this->getAdapter(Date::class)->parse($this->getAdapter(Config::class)->get('datimFormat'), (int) $objEvent->registrationEndDate);
                 }
                 $value = $formatedEndDate;
                 break;
@@ -216,7 +217,7 @@ readonly class CalendarEventsUtil
 
                 if (EventState::STATE_RESCHEDULED === $objEvent->eventState) {
                     $dateFormat = $this->getAdapter(Config::class)->get('dateFormat');
-                    $newDate = $objEvent->rescheduledEventDate ? date($dateFormat, (int) $objEvent->rescheduledEventDate) : 'unbest';
+                    $newDate = $objEvent->rescheduledEventDate ? $this->getAdapter(Date::class)->parse($dateFormat, (int) $objEvent->rescheduledEventDate) : 'unbest';
                     $value = sprintf($GLOBALS['TL_LANG']['MSC']['calendar_events'][$this->getEventState($objEvent)], $newDate);
                 }
                 break;
@@ -851,33 +852,33 @@ readonly class CalendarEventsUtil
         if (1 === $eventDuration) {
             $strEventDuration = $blnAppendEventDuration ? ' ('.$this->getEventDuration($objEvent).')' : '';
 
-            return date($dateFormat, $this->getStartTstamp($objEvent)).$strEventDuration;
+            return $this->getAdapter(Date::class)->parse($dateFormat, $this->getStartTstamp($objEvent)).$strEventDuration;
         }
 
         if ($span === $eventDuration) {
             $strEventDuration = $blnAppendEventDuration ? ' ('.$this->getEventDuration($objEvent).')' : '';
 
-            return date($dateFormatShortened, $this->getStartTstamp($objEvent)).' - '.date($dateFormat, $this->getEndTstamp($objEvent)).$strEventDuration;
+            return $this->getAdapter(Date::class)->parse($dateFormatShortened, $this->getStartTstamp($objEvent)).' - '.$this->getAdapter(Date::class)->parse($dateFormat, $this->getEndTstamp($objEvent)).$strEventDuration;
         }
 
         $arrDates = [];
         $dates = $this->getEventTimestamps($objEvent);
 
         foreach ($dates as $date) {
-            $arrDates[] = date($dateFormat, (int) $date);
+            $arrDates[] = $this->getAdapter(Date::class)->parse($dateFormat, (int) $date);
         }
 
         if ($blnTooltip) {
             $strEventDuration = $blnAppendEventDuration ? ' ('.$this->getEventDuration($objEvent).')' : '';
             $strTooltip = '<a tabindex="0" class="more-date-infos" data-bs-toggle="tooltip" data-placement="bottom" data-title="Eventdaten: '.StringUtil::specialchars(implode(', ', $arrDates)).'">und weitere</a>';
 
-            return date($dateFormat, $this->getStartTstamp($objEvent)).$strEventDuration.(!$blnInline ? '<br>' : ' ').$strTooltip;
+            return $this->getAdapter(Date::class)->parse($dateFormat, $this->getStartTstamp($objEvent)).$strEventDuration.(!$blnInline ? '<br>' : ' ').$strTooltip;
         }
 
         $dateString = '';
 
         foreach ($this->getEventTimestamps($objEvent) as $tstamp) {
-            $dateString .= sprintf('<time datetime="%s">%s</time>', StringUtil::specialchars(date('Y-m-d', (int) $tstamp)), date('D, d.m.Y', (int) $tstamp));
+            $dateString .= sprintf('<time datetime="%s">%s</time>', StringUtil::specialchars($this->getAdapter(Date::class)->parse('Y-m-d', (int) $tstamp)), $this->getAdapter(Date::class)->parse('D, d.m.Y', (int) $tstamp));
         }
         $dateString .= $blnAppendEventDuration ? sprintf('<time>(%s)</time>', $this->getEventDuration($objEvent)) : '';
 
@@ -908,7 +909,7 @@ readonly class CalendarEventsUtil
 
         $regStartTime = $objEvent->registrationStartDate + $this->getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
 
-        return date($dateFormatStart, (int) $regStartTime).' - '.date($dateFormatEnd, (int) $objEvent->registrationEndDate);
+        return $this->getAdapter(Date::class)->parse($dateFormatStart, (int) $regStartTime).' - '.$this->getAdapter(Date::class)->parse($dateFormatEnd, (int) $objEvent->registrationEndDate);
     }
 
     public function getEventTimestamps(CalendarEventsModel $objEvent): array
@@ -971,7 +972,7 @@ readonly class CalendarEventsUtil
 
     public function getPublicTransportBadge(): string
     {
-        return '<span class="badge badge-sm badge-pill bg-success" data-bs-toggle="tooltip" data-placement="top" data-title="Anreise mit &Ouml;V">&Ouml;V</span>';
+        return '<span class="badge badge-sm badge-pill bg-success" data-bs-toggle="tooltip" data-placement="top" data-title="Anreise mit ÖV">ÖV</span>';
     }
 
     public function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, bool $tooltip = false, bool $explanation = false): array
