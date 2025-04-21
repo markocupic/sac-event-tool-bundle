@@ -1,0 +1,31 @@
+{# templates/content_element/example.html.twig #}
+{% extends "@Contao/content_element/_base.html.twig" %}
+
+{% block content %}
+    {% add to head %}
+        <style>
+            .button-list-horizontal-scroll .button-list-horizontal-scroll--wrapper {
+                overflow-x: auto;
+            }
+
+            .button-list-horizontal-scroll .button-list-horizontal-scroll--wrapper .button-list-horizontal-scroll--list {
+                display: inline-flex;
+                margin-bottom: 1.5rem;
+                text-wrap: nowrap;
+            }
+
+            .button-list-horizontal-scroll .button-list-horizontal-scroll--wrapper .button-list-horizontal-scroll--list > * {
+                margin-right: 0.5rem;
+            }
+        </style>
+    {% endadd %}
+    <div class="button-list-horizontal-scroll">
+        <nav class="button-list-horizontal-scroll--wrapper">
+            <div class="button-list-horizontal-scroll--list">
+                {% for fragment in nested_fragments %}
+                    {{ content_element(fragment) }}
+                {% endfor %}
+            </div>
+        </nav>
+    </div>
+{% endblock %}
