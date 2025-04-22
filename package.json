@@ -20,7 +20,7 @@
         "@symfony/webpack-encore": "^5.0",
         "autoprefixer": "^10.2",
         "core-js": "^3.15",
-        "file-loader": "^6.0",
+        "file-loader": "^6.2.0",
         "postcss-loader": "^8.0"
     },
     "browserslist": [

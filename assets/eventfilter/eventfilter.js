@@ -19,8 +19,11 @@ const EventListFilter = {
      * @param opt
      */
     initialize: function (opt) {
-        if (typeof window.jQuery === 'undefined') {
-            console.error('EventListFilter requires jQuery, but jQuery is not loaded.');
+
+        const filterBoard = document.querySelector('#event-filter-board-form');
+
+        if (!filterBoard) {
+            console.error('Filter board not found!');
             return;
         }
 
@@ -28,51 +31,27 @@ const EventListFilter = {
 
         self.options = opt;
 
-        // Initialize Select2 for organizer input
-        if (document.getElementById('ctrl_organizers')) {
-            $('#ctrl_organizers').select2();
+        const choices = ['#ctrl_organizers', '#ctrl_tourType', '#ctrl_courseType'];
+
+        for (const elementIdSelector of choices) {
+            const element = document.querySelector(elementIdSelector);
+            if (element) {
+                new Choices(element, {
+                    removeItems: true,
+                    removeItemButton: true,
+                });
+            }
         }
-
-        // Initialize Select2 for tourType input
-        if (document.getElementById('ctrl_tourType')) {
-            $('#ctrl_tourType').select2();
-        }
-
-        // Initialize Select2 for courseType input
-        if (document.getElementById('ctrl_courseType')) {
-            $('#ctrl_courseType').select2();
-        }
-
-        $('#ctrl_tourType').select2();
-        $('#ctrl_courseType').select2();
-
-        if ($('#ctrl_year')) {
-            window.setInterval(() => {
-                if ($('.select2-selection__choice').length) {
-                    $('.select2-selection').css({
-                        'height': 'auto',
-                    });
-                } else {
-                    $('.select2-selection').css({
-                        'height': $('#ctrl_year').outerHeight() + 'px',
-                    });
-                }
-
-            }, 100);
-        }
-
-        window.addEventListener('resize', function () {
-            $('.select2.select2-container').css({
-                'max-width': '100%', 'width': '100%',
-            });
-        });
 
         window.setTimeout(() => {
-            $('.filter-board-widget').css('visibility', 'visible');
+            const widgets = document.querySelectorAll('.filter-board-widget');
+            for (const widget of widgets) {
+                widget.style.visibility = 'visible';
+            }
         }, 20);
 
         // Reset form
-        $('.filter-board .reset-form').click(function (e) {
+        filterBoard.querySelector('.reset-form').addEventListener('click', (e) => {
             e.stopPropagation();
             e.preventDefault();
             window.location.href = location.href.replace(location.search, '');

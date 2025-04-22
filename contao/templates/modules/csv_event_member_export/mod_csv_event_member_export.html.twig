@@ -15,18 +15,6 @@
                 })
             }
         });
-
-        document.addEventListener("DOMContentLoaded", function () {
-
-            // Set Datepicker
-            var opt = {
-                dateFormat: '{{ dateFormat }}',
-                locale: 'de',
-            };
-
-            flatpickr('#ctrl_startDate', opt);
-            flatpickr('#ctrl_endDate', opt);
-        });
     </script>
 
 {% endblock %}

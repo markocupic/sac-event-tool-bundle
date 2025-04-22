@@ -6,16 +6,6 @@
 
 <?= $this->form->generate() ?>
 
-<script<?= $this->attr()->setIfExists('nonce', $this->nonce('script-src')) ?>>
-    //Set Datepicker
-    var opt = {
-        dateFormat: "d.m.Y",
-        locale: "de",
-    };
-    flatpickr('#ctrl_timeRangeStart', opt);
-    flatpickr('#ctrl_timeRangeEnd', opt);
-</script>
-
 <!---
 <button class="btn btn-info enable-fe-editing" data-label-enable="Frontend Editing aktivieren" data-label-disable="Frontend Editing deaktivieren">Frontend Editing aktivieren</button>
 <button class="btn btn-danger toggle-recurring-events" data-label-hide="Wiederkehrende Events ausblenden" data-label-show="Wiederkehrende Events einblenden">Wiederkehrende Events ausblenden</button>

@@ -1,7 +1,10 @@
 {% extends '@Contao/block_unsearchable' %}
 
 {% block content %}
-
+    {% add to head %}
+        <script type="text/javascript" src="{{ asset('choices.js/scripts/choices.min.js', 'markocupic_sac_event_tool') }}"></script>
+        <link rel="stylesheet" href="{{ asset('choices.js/styles/choices.min.css', 'markocupic_sac_event_tool') }}">
+    {% endadd %}
     <div class="filter-board {{ form.getFormId() }} block" id="{{ form.getFormId() }}">
         <form action="{{ form.getAction() }}" enctype="{{ form.getEnctype() }}" method="{{ form.getHttpMethod() }}">
             <input type="hidden" id="ctrl_getUpcoming" name="getUpcoming" value="1">

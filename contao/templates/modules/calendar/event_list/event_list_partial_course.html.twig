@@ -7,7 +7,7 @@
     <span v-if="blnIsBusy === true" class="ms-2 text-success"><small>Lade events...</small></span>
     <div class="event-container row g-3">
 
-        <div v-for="(row, index) of rows" class="event-list-item event-list-item--course js--event-list-item col-12 col-md-6" data-aos="fade-down" data-aos-duration="600" data-aos-once="true" data-aos-anchor-placement="top-bottom" v-bind:data-selector="row.selector" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
+        <div v-for="(row, index) of rows" class="event-list-item event-list-item--course js--event-list-item col-12 col-md-6" v-bind:data-selector="row.selector" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
             <div class="event-list-item--inner-box bg-white border border-light-subtle">
                 <div class="row gx-0">
                     <!-- Start left col -->
