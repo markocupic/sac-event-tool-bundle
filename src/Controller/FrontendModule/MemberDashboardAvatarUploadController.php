@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Codefog\HasteBundle\Form\Form;
+use Codefog\HasteBundle\UrlParser;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
@@ -54,6 +55,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         private readonly Security $security,
         private readonly RotateImage $rotateImage,
         private readonly Avatar $avatar,
+        private readonly UrlParser $urlParser,
         private readonly string $projectDir,
         private readonly string $sacevtUserFrontendAvatarDir,
         #[Autowire('%contao.image.valid_extensions%')]
@@ -113,20 +115,21 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         // Check for valid avatar image and valid upload directory
         $this->checkAvatar();
 
-        $arrUser['hasAvatar'] = false;
+        $template->set('has_avatar', false);
 
         if (!$objUploadFolder->isEmpty()) {
             $filesModel = $filesModelAdapter->findByPath($this->avatar->getAvatarResourcePath($user));
 
             if (null !== $filesModel) {
                 $template->set('avatar', $filesModel->row());
-                $arrUser['hasAvatar'] = true;
+                $rotateImageUrl = $this->urlParser->addQueryString('do=rotate-image&fileId='.$filesModel->id);
+                $template->set('rotateImageUrl', $rotateImageUrl);
+                $template->set('has_avatar', true);
             }
         }
 
         // Generate avatar uploader
         $this->template->form = $this->generateAvatarForm();
-
         $template->set('user', $arrUser);
         $template->set('userModel', $user);
 
@@ -231,19 +234,21 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         $objForm->addFormField('avatar', [
             'label' => 'Profilbild hochladen',
             'inputType' => 'upload',
-            'eval' => ['class' => 'custom-input-file', 'mandatory' => false],
+            'eval' => ['class' => 'd-none custom-input-file', 'mandatory' => false],
         ]);
 
-        $objForm->addFormField('delete-avatar', [
+        $objForm->addFormField('deleteAvatar', [
             // Do not show the legend and display the label only
             'label' => ['', 'Profilbild löschen'],
             'inputType' => 'checkbox',
+            'eval' => ['class' => 'd-none'],
         ]);
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', [
+        $objForm->addFormField('submitButton', [
             'label' => 'Speichern',
             'inputType' => 'submit',
+            'eval' => ['class' => 'd-none'],
         ]);
 
         // Create the folder if it not exists
@@ -256,7 +261,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
         if ($objForm->validate()) {
             // Delete avatar
-            if ($inputAdapter->post('delete-avatar')) {
+            if ($inputAdapter->post('deleteAvatar')) {
                 $this->deleteAvatar();
             }
 

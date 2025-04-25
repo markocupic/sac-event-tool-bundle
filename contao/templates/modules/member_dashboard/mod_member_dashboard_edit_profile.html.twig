@@ -1,21 +1,63 @@
 {% extends '@Contao/block_unsearchable' %}
 
 {% block content %}
-
-    {% if hasInfoMessage|default %}
-        <div class="alert alert-info" role="alert">
-            {{ infoMessage|raw }}
-        </div>
-    {% endif %}
-
-    {% if hasInfoMessage|default %}
-        {% for message in errorMessages %}
-            <div class="alert alert-danger" role="alert">
-                {{ message|raw }}
+    <div class="card mb-4 mb-xl-0 border border-light-subtle">
+        {#
+        <div class="card-header bg-light">Profilbild</div>
+        #}
+        <div class="card-body">
+            <p class="mt-4 mt-md-0">
+                <strong class="text-danger">{{ user.firstname }} {{ user.lastname }}</strong>
+                <br>
+                {{ user.street }}
+                <br>
+                {{ user.postal }} {{ user.city }}
+                <br>
+                <small class="text-muted">Zuletzt eingeloggt: {{ user.lastLogin|date('d.m.Y') }}</small>
+            </p>
+            <p>
+                <strong class="text-danger">Telefon:</strong> {{ user.phone }}
+                <br>
+                <strong class="text-danger">Mobile:</strong> {{ user.mobile }}
+                <br>
+                <strong class="text-danger">E-Mail:</strong> {{ user.email }}
+                <br>
+                <strong class="text-danger">Mitglieder-Nr.:</strong> {{ user.sacMemberId }}
+                <br>
+                <strong class="text-danger">Sektionen:</strong> {{ sac_sections|join(', ') }}
+            </p>
+            {% if user.hasLeadClimbingEducation %}
+                <p>
+                    <i class="fa-solid fa-mountain text-danger"></i>
+                    <strong class="text-danger">Seilschaftsführer-Ausbildung seit:</strong> {{ user.dateOfLeadClimbingEducation|date('d.m.Y') }}
+                </p>
+            {% endif %}
+            <div class="my-4">
+                <p><strong class="text-danger">Hinweis:</strong><br><strong>Deine Mitgliederdaten (Name, Adresse, Telefon, E-Mail)</strong> kannst du nur im <strong>SAC/CAS-Portal</strong> des Zentralverbandes<strong> ändern</strong>. Logge dich deshalb auf <a href="https://portal.sac-cas.ch/de" target="_blank" rel="noopener"><strong>portal.sac-cas.ch</strong></a> ein. Änderungen deiner Mitgliederdaten sind spätestens<strong> nach 24 Stunden</strong> hier wirksam und ersichtlich.</p>
             </div>
-        {% endfor %}
-    {% endif %}
-
-    {{ userProfileForm|raw }}
-
+            <form enctype="{{ form.getEnctype() }}" method="{{ form.getHttpMethod() }}" class="form-horizontal">
+                {{ form.getWidget('FORM_SUBMIT').generateWithError()|raw }}
+                {{ form.getWidget('REQUEST_TOKEN').generateWithError()|raw }}
+                <div class="formbody">
+                    <div class="row gy-4 gx-3">
+                        <div class="col-12">
+                            <label class="mb-1 form-label fw-bold" for="ctrl_emergencyPhone">{{ form.getWidget('emergencyPhone').label }}</label>
+                            {{ form.getWidget('emergencyPhone').generateWithError()|raw }}
+                        </div>
+                        <div class="col-12">
+                            <label class="mb-1 form-label fw-bold" for="ctrl_emergencyPhoneName">{{ form.getWidget('emergencyPhoneName').label }}</label>
+                            {{ form.getWidget('emergencyPhoneName').generateWithError()|raw }}
+                        </div>
+                        <div class="col-12">
+                            <label class="mb-1 form-label fw-bold" for="ctrl_foodHabits">{{ form.getWidget('foodHabits').label }}</label>
+                            {{ form.getWidget('foodHabits').generateWithError()|raw }}
+                        </div>
+                        <div class="col-6">
+                            {{ form.getWidget('submit').generateWithError()|raw }}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}

@@ -1,38 +1,94 @@
 {% extends '@Contao/block_unsearchable' %}
 
 {% block content %}
-
-    {% if hasInfoMessage %}
-        <div class="alert alert-info" role="alert">
-            {{ infoMessage }}
-        </div>
-    {% endif %}
-
-    {% if hasErrorMessage %}
-        {% for msg in errorMessages %}
-            <div class="alert alert-danger" role="alert">
-                {{ msg }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    <div class="row">
-        <div class="col-6 col-sm-9">
-            {{ form|raw }}
-        </div>
-        <div class="col-6 col-sm-3">
-            <figure class="member-dashboard-avatar d-flex justify-content-end mt-3 responsive thumbnail image_container">
-                {{ insert_tag('image::'~getAvatarResourcePath(userModel)~'?width=300')|raw }}
-                {% if avatar|default %}
-                    <a href="{{ insert_tag('env::request') }}?do=rotate-image&fileId={{ avatar.id }}" class="member-dashboard-rotate-image-button" title="Bild im UZS um 90° drehen"><i class="fa-solid fa-rotate-right turn-image"></i></a>
-                {% endif %}
-            </figure>
-            {% if user.hasAvatar is same as true %}
-                <div class="d-flex justify-content-end">
-                    <small><a href="{{ getAvatarResourcePath(userModel) }}" title="Profilbild downloaden" download>Profilbild downloaden</a></small>
+    <!-- Profile picture card-->
+    <div class="member-dashboard-avatar-upload">
+        <div class="member-dashboard-avatar-upload--inner">
+            {% if hasInfoMessage %}
+                <div class="alert alert-info" role="alert">
+                    {{ infoMessage }}
                 </div>
             {% endif %}
+            {% if hasErrorMessage %}
+                {% for msg in errorMessages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ msg }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <div class="card mb-4 mb-xl-0 border border-light-subtle">
+                {#
+                <div class="card-header bg-light">Profilbild</div>
+                #}
+                <div class="card-body text-center">
+                    <div class="member-dashboard-avatar-upload--picture-box position-relative">
+                        {{ insert_tag('image::'~getAvatarResourcePath(userModel)~'?mode=crop&height=300&width=300&class=mb-2 w-100 member-dashboard-avatar-upload--image img-account-profile rounded-circle')|raw }}
+                        {% if has_avatar %}
+                            <button class="member-dashboard-avatar-upload--rotate-profile-image-button" data-apiurl="{{ rotateImageUrl }}" title="Bild um 90° im Uhrzeigersinn drehen"><i class="fa-solid fa-lg fa-rotate"></i></button>
+                        {% endif %}
+                    </div>
+                    <div class="small font-italic text-muted mb-4">JPG oder PNG</div>
+                    {% if not has_avatar %}
+                        <button class="member-dashboard-avatar-upload--trigger-file-input-button btn btn-sm btn-primary" type="button">Profilbild uploaden</button>
+                    {% endif %}
+                    {% if has_avatar %}
+                        <button class="member-dashboard-avatar-upload--delete-profile-image-button btn-sm btn-danger" type="button" data-deleteconfirm="Soll dein Profilbild wirklich gelöscht werden?">Profilbild löschen</button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="member-dashboard-avatar-upload--form-box">
+                {{ form|raw }}
+            </div>
         </div>
     </div>
+    {% add to head %}
+        <script src="{{ asset('js/avatar_uploader.js', 'markocupic_sac_event_tool') }}"></script>
+    {% endadd %}
+    {% add to body %}
+        <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
+            document.addEventListener('DOMContentLoaded', () => {
+                const appContainer = document.querySelector('.member-dashboard-avatar-upload');
+                const uploadButton = appContainer.querySelector('.member-dashboard-avatar-upload--trigger-file-input-button');
+                const deleteButton = appContainer.querySelector('.member-dashboard-avatar-upload--delete-profile-image-button');
+                const rotateButton = appContainer.querySelector('.member-dashboard-avatar-upload--rotate-profile-image-button');
+                const fileInput = appContainer.querySelector('input[type="file"]');
 
+                if (uploadButton) {
+                    uploadButton.addEventListener('click', () => {
+                        fileInput.click();
+                    });
+                }
+
+                if (deleteButton) {
+                    deleteButton.addEventListener('click', async () => {
+                        if (!confirm(deleteButton.dataset.deleteconfirm)) {
+                            return;
+                        }
+
+                        const inputElement = appContainer.querySelector('input[type="hidden"][name="deleteAvatar"]');
+
+                        if (inputElement) {
+                            inputElement.value = '1';
+                            const form = appContainer.querySelector('form');
+                            form.submit();
+                        }
+                    });
+                }
+
+                if (rotateButton) {
+                    rotateButton.addEventListener('click', async (event) => {
+                        event.preventDefault();
+                        const apiUrl = event.currentTarget.dataset.apiurl;
+                        const imageElement = appContainer.querySelector('.member-dashboard-avatar-upload--image');
+                        await AvatarUploader.rotateImage(imageElement, 90, apiUrl);
+                    });
+                }
+
+                fileInput.addEventListener('change', async function () {
+                    await AvatarUploader.updateFileInput(fileInput);
+                    fileInput.closest('form').submit();
+                });
+            });
+        </script>
+    {% endadd %}
 {% endblock %}
