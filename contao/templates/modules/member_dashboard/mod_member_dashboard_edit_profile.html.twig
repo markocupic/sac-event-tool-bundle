@@ -32,8 +32,8 @@
                     <strong class="text-danger">Seilschaftsführer-Ausbildung seit:</strong> {{ user.dateOfLeadClimbingEducation|date('d.m.Y') }}
                 </p>
             {% endif %}
-            <div class="my-4">
-                <p><strong class="text-danger">Hinweis:</strong><br><strong>Deine Mitgliederdaten (Name, Adresse, Telefon, E-Mail)</strong> kannst du nur im <strong>SAC/CAS-Portal</strong> des Zentralverbandes<strong> ändern</strong>. Logge dich deshalb auf <a href="https://portal.sac-cas.ch/de" target="_blank" rel="noopener"><strong>portal.sac-cas.ch</strong></a> ein. Änderungen deiner Mitgliederdaten sind spätestens<strong> nach 24 Stunden</strong> hier wirksam und ersichtlich.</p>
+            <div class="my-4 alert alert-lighter" role="alert">
+                <p class="m-0"><strong class="text-danger">Hinweis:</strong><br><strong>Deine Mitgliederdaten (Name, Adresse, Telefon, E-Mail)</strong> kannst du nur im <strong>SAC/CAS-Portal</strong> des Zentralverbandes<strong> ändern</strong>. Logge dich deshalb auf <a href="https://portal.sac-cas.ch/de" target="_blank" rel="noopener"><strong>portal.sac-cas.ch</strong></a> ein. Änderungen deiner Mitgliederdaten sind spätestens<strong> nach 24 Stunden</strong> hier wirksam und ersichtlich.</p>
             </div>
             <form enctype="{{ form.getEnctype() }}" method="{{ form.getHttpMethod() }}" class="form-horizontal">
                 {{ form.getWidget('FORM_SUBMIT').generateWithError()|raw }}
