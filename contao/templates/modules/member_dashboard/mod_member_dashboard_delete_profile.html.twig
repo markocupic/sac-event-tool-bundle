@@ -1,7 +1,6 @@
 {% extends '@Contao/block_unsearchable' %}
 
 {% block content %}
-
     {% if hasInfoMessages is same as true %}
         {% for msg in infoMessages %}
             <div class="alert alert-info" role="alert">
@@ -9,7 +8,6 @@
             </div>
         {% endfor %}
     {% endif %}
-
     {% if hasErrorMessages is same as true %}
         {% for msg in errorMessages %}
             <div class="alert alert-danger" role="alert">
@@ -17,7 +15,6 @@
             </div>
         {% endfor %}
     {% endif %}
-
     {% if passedConfirmation is same as false %}
         <div class="alert alert-lighter flex-column" role="alert">
             Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten unwiderruflich gelöscht.
@@ -28,38 +25,38 @@
                 <a href="{{ insert_tag('env::request') }}?action=clear-profile" class="clear-profile-link btn btn-danger">Mein Profil löschen</a>
             </div>
         </div>
-    {% endif %}
-
-    {% if passedConfirmation is same as true %}
-        <div class="alert alert-lighter" id="lastWarningAlert" role="alert">
-            Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten unwiderruflich gelöscht.
-            Deine Tour-History ist danach nicht mehr aufrufbar und dein Konto wird deaktiviert und du wirst ausgeloggt.
-            Bitte beachte, dass dieser Vorgang nur ausgeführt werden kann, wenn du keine hängigen Tour-Buchungen hast.
-        </div>
-
-        <br>
-
-        {{ deleteProfileForm|raw }}
-
         <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-            document.addEventListener("DOMContentLoaded", () => {
-                $('.hasteform_form-clear-profile form ').submit(() => {
-                    if (confirm("Möchtest du dein Profil endgültig und unwiderruflich löschen? Die Daten können danach nicht mehr wiederhergestellt werden.")) {
-                        return true;
-                    }
-                    return false;
-                });
-            });
-        </script>
-
-        <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-            document.addEventListener("DOMContentLoaded", () => {
-                const toGo = document.getElementById('lastWarningAlert');
-                if (toGo) {
-                    toGo.scrollIntoView();
+            {# Do not put this inside document.addEventListener("DOMContentLoaded", () => {}) because document.currentScript.closest('div')... will not work #}
+            document.currentScript.closest('div')?.querySelector('a.clear-profile-link')?.addEventListener('click', (event) => {
+                if (!confirm("Möchtest du dein Profil endgültig und unwiderruflich löschen? Du kannst deine Daten danach nicht mehr wiederherstellen.")) {
+                    event.preventDefault();
                 }
             });
         </script>
     {% endif %}
+    {% if passedConfirmation is same as true %}
+        <div class="alert alert-danger" id="lastWarningAlert" role="alert">
+            Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten unwiderruflich gelöscht.
+            Deine Tour-History ist danach nicht mehr aufrufbar und dein Konto wird deaktiviert und du wirst ausgeloggt.
+            Bitte beachte, dass dieser Vorgang nur ausgeführt werden kann, wenn du keine hängigen Tour-Buchungen hast.
+        </div>
+        <br>
+        {{ deleteProfileForm|raw }}
+        <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
+            {# Do not put this inside document.addEventListener("DOMContentLoaded", () => {}) because document.currentScript.closest('div')... will not work #}
+            document.currentScript.closest('div')?.querySelector('form')?.addEventListener('submit', (event) => {
+                if (!confirm("Letzte Warnung! Möchtest du dein Profil endgültig und unwiderruflich löschen? Du kannst deine Daten danach nicht mehr wiederherstellen.")) {
+                    event.preventDefault();
+                }
+            });
+        </script>
+        <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
+            {# Do not put this inside document.addEventListener("DOMContentLoaded", () => {}) because document.currentScript.closest('div')... will not work #}
+            const target = document.currentScript.closest('div')?.querySelector('#lastWarningAlert');
 
+            if (target) {
+                target.scrollIntoView();
+            }
+        </script>
+    {% endif %}
 {% endblock %}
