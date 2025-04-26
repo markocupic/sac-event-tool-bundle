@@ -1,16 +1,11 @@
-/*
- * This file is part of SAC Event Tool Bundle.
- *
- * (c) Marko Cupic <m.cupic@gmx.ch>
- * @license GPL-3.0-or-later
- * For the full copyright and license information,
- * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/sac-event-tool-bundle
- */
 class AvatarUploader {
     static xhrPending = false;
 
     static resizeImageAsync = async function (file, maxWidth = 1500, maxHeight = 1500) {
+        if (!file.type.startsWith('image/')) {
+            throw new Error('Provided file is not an image.');
+        }
+
         const reader = new FileReader();
 
         return new Promise((resolve, reject) => {
@@ -20,7 +15,6 @@ class AvatarUploader {
                     let width = img.width;
                     let height = img.height;
 
-                    // Calculate new dimensions while maintaining aspect ratio
                     if (width > maxWidth || height > maxHeight) {
                         if (width > height) {
                             height *= maxWidth / width;
@@ -31,7 +25,6 @@ class AvatarUploader {
                         }
                     }
 
-                    // Create a canvas and draw the resized image
                     const canvas = document.createElement('canvas');
                     canvas.width = width;
                     canvas.height = height;
@@ -39,13 +32,12 @@ class AvatarUploader {
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Convert the canvas to a Blob
                     canvas.toBlob(
                         (blob) => {
-                            resolve(blob); // Pass the resized Blob
+                            resolve(blob);
                         },
                         file.type,
-                        1 // Quality parameter (1 is max quality for formats like JPEG)
+                        1
                     );
                 };
 
@@ -62,28 +54,35 @@ class AvatarUploader {
 
             reader.readAsDataURL(file);
         });
-    }
+    };
 
     static updateFileInput = async function (fileInput, maxWidth = 1500, maxHeight = 1500) {
         try {
-            const file = fileInput.files[0]; // Get the selected file
-            const resizedBlob = await AvatarUploader.resizeImageAsync(file, maxWidth, maxHeight);
-
-            // Create a new File object
-            const resizedFile = new File([resizedBlob], 'resized-image.jpg', {type: resizedBlob.type});
-
-            // Create a DataTransfer object to update the file input
+            const files = Array.from(fileInput.files); // Convert file list to an array
             const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(resizedFile);
 
-            // Replace the files in the file input
+            for (const file of files) {
+                if (file.type.startsWith('image/')) {
+                    try {
+                        const resizedBlob = await AvatarUploader.resizeImageAsync(file, maxWidth, maxHeight);
+                        const resizedFile = new File([resizedBlob], file.name, {type: resizedBlob.type});
+                        dataTransfer.items.add(resizedFile);
+                    } catch (error) {
+                        console.warn(`Failed to resize ${file.name}:`, error);
+                        dataTransfer.items.add(file); // Add the original file if resizing fails
+                    }
+                } else {
+                    console.warn(`${file.name} is not an image and was not resized.`);
+                    dataTransfer.items.add(file); // Add non-image files unchanged
+                }
+            }
+
             fileInput.files = dataTransfer.files;
-
-            console.log('File input updated with resized image:', fileInput.files);
+            console.log('File input updated with resized images:', fileInput.files);
         } catch (error) {
-            console.error('Error resizing or updating file input:', error);
+            console.error('Error updating file input:', error);
         }
-    }
+    };
 
     static rotateImage = async function (htmlImageElement, degrees, apiUrl) {
         if (AvatarUploader.xhrPending) {

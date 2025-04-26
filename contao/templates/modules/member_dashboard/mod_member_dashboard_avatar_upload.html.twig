@@ -16,7 +16,7 @@
                     </div>
                 {% endfor %}
             {% endif %}
-            <div class="card mb-4 mb-xl-0 border border-light-subtle">
+            <div class="card mb-4 mb-xl-0 p-0">
                 {#
                 <div class="card-header bg-light">Profilbild</div>
                 #}
@@ -24,7 +24,7 @@
                     <div class="member-dashboard-avatar-upload--picture-box position-relative">
                         {{ insert_tag('image::'~getAvatarResourcePath(userModel)~'?mode=crop&height=300&width=300&class=mb-2 w-100 member-dashboard-avatar-upload--image img-account-profile rounded-circle')|raw }}
                         {% if has_avatar %}
-                            <button class="member-dashboard-avatar-upload--rotate-profile-image-button" data-apiurl="{{ rotateImageUrl }}" title="Bild um 90° im Uhrzeigersinn drehen"><i class="fa-solid fa-lg fa-rotate"></i></button>
+                            <button class="member-dashboard-avatar-upload--rotate-profile-image-button" data-apiurl="{{ rotate_image_url }}" title="Bild um 90° im Uhrzeigersinn drehen"><i class="fa-solid fa-clock-rotate-left" data-fa-transform="flip-h"></i></button>
                         {% endif %}
                     </div>
                     <div class="small font-italic text-muted mb-4">JPG oder PNG</div>
@@ -32,13 +32,20 @@
                         <button class="member-dashboard-avatar-upload--trigger-file-input-button btn btn-sm btn-primary" type="button">Profilbild uploaden</button>
                     {% endif %}
                     {% if has_avatar %}
-                        <button class="member-dashboard-avatar-upload--delete-profile-image-button btn-sm btn-danger" type="button" data-deleteconfirm="Soll dein Profilbild wirklich gelöscht werden?">Profilbild löschen</button>
+                        <a href="{{ delete_image_url }}" class="member-dashboard-avatar-upload--delete-profile-image-button btn btn-sm btn-danger" onclick="if(!confirm('Soll dein Profilbild wirklich gelöscht werden?'))return false">Profilbild löschen</a>
+                    {% endif %}
+                    {% if has_avatar %}
+                        <div class="mt-2">
+                            <a href="{{ download_image_url }}" class="member-dashboard-avatar-upload--download-profile-image-link small">Profilbild downloaden</a>
+                        </div>
                     {% endif %}
                 </div>
             </div>
-            <div class="member-dashboard-avatar-upload--form-box">
-                {{ form|raw }}
-            </div>
+            {% if form|default %}
+                <div class="member-dashboard-avatar-upload--form-box">
+                    {{ form|raw }}
+                </div>
+            {% endif %}
         </div>
     </div>
     {% add to head %}
@@ -49,7 +56,6 @@
             document.addEventListener('DOMContentLoaded', () => {
                 const appContainer = document.querySelector('.member-dashboard-avatar-upload');
                 const uploadButton = appContainer.querySelector('.member-dashboard-avatar-upload--trigger-file-input-button');
-                const deleteButton = appContainer.querySelector('.member-dashboard-avatar-upload--delete-profile-image-button');
                 const rotateButton = appContainer.querySelector('.member-dashboard-avatar-upload--rotate-profile-image-button');
                 const fileInput = appContainer.querySelector('input[type="file"]');
 
@@ -59,35 +65,24 @@
                     });
                 }
 
-                if (deleteButton) {
-                    deleteButton.addEventListener('click', async () => {
-                        if (!confirm(deleteButton.dataset.deleteconfirm)) {
-                            return;
-                        }
-
-                        const inputElement = appContainer.querySelector('input[type="hidden"][name="deleteAvatar"]');
-
-                        if (inputElement) {
-                            inputElement.value = '1';
-                            const form = appContainer.querySelector('form');
-                            form.submit();
-                        }
-                    });
-                }
-
                 if (rotateButton) {
                     rotateButton.addEventListener('click', async (event) => {
                         event.preventDefault();
-                        const apiUrl = event.currentTarget.dataset.apiurl;
+                        const button = event.currentTarget;
+                        button.disabled = true;
+                        const apiUrl = button.dataset.apiurl;
                         const imageElement = appContainer.querySelector('.member-dashboard-avatar-upload--image');
                         await AvatarUploader.rotateImage(imageElement, 90, apiUrl);
+                        button.disabled = false;
                     });
                 }
 
-                fileInput.addEventListener('change', async function () {
-                    await AvatarUploader.updateFileInput(fileInput);
-                    fileInput.closest('form').submit();
-                });
+                if (fileInput) {
+                    fileInput.addEventListener('change', async function () {
+                        await AvatarUploader.updateFileInput(fileInput);
+                        fileInput.closest('form').submit();
+                    });
+                }
             });
         </script>
     {% endadd %}
