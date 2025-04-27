@@ -4,6 +4,11 @@
       "js": [
         "/bundles/markocupicsaceventtool/backend.e264ae2b.js"
       ]
+    },
+    "js/avatar_uploader": {
+      "js": [
+        "/bundles/markocupicsaceventtool/js/avatar_uploader.97ceb598.js"
+      ]
     }
   }
 }

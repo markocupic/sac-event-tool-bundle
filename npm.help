@@ -1,8 +1,9 @@
 # Go to the project directory first
 cd vendor/markocupic/sac-event-tool-bundle
 
+rd /s /q public
 # Update project files (builds the node_modules directory)
-npm update
+#npm update
 
 # Build assets
-npm run build
+#npm run build

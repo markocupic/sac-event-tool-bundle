@@ -6,7 +6,6 @@ Encore
     .setManifestKeyPrefix('')
 
     .addEntry('backend', './assets/backend.js') // Register Stimulus controllers
-    //.addEntry('frontend', './assets/frontend.js')
 
     .copyFiles({
         from: './assets/css',
@@ -48,10 +47,15 @@ Encore
         pattern: /(vue\.global\.prod\.js)$/,
     })
 
+    // Typescripts
+    .addEntry('js/avatar_uploader', './assets/ts/avatar_uploader.ts')
+    .enableTypeScriptLoader()
+
     .disableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()
     .enableSourceMaps()
     .enableVersioning()
+
 
     // enables @babel/preset-env polyfills
     .configureBabelPresetEnv((config) => {

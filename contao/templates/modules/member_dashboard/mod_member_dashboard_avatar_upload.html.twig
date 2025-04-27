@@ -20,7 +20,7 @@
                 {#
                 <div class="card-header bg-light">Profilbild</div>
                 #}
-                <div class="card-body text-center">
+                <div class="card-body px-0 text-center">
                     <div class="member-dashboard-avatar-upload--picture-box position-relative">
                         {{ insert_tag('image::'~getAvatarResourcePath(userModel)~'?mode=crop&height=300&width=300&class=mb-2 w-100 member-dashboard-avatar-upload--image img-account-profile rounded-circle')|raw }}
                         {% if has_avatar %}
@@ -39,10 +39,11 @@
                             <a href="{{ download_image_url }}" class="member-dashboard-avatar-upload--download-profile-image-link small">Profilbild downloaden</a>
                         </div>
                     {% endif %}
+                    <div class="member-dashboard-avatar-upload--upload-errors"></div>
                 </div>
             </div>
             {% if form|default %}
-                <div class="member-dashboard-avatar-upload--form-box">
+                <div class="member-dashboard-avatar-upload--form-box small text-danger">
                     {{ form|raw }}
                 </div>
             {% endif %}
@@ -61,28 +62,48 @@
 
                 if (uploadButton) {
                     uploadButton.addEventListener('click', () => {
+                        document.querySelector('.member-dashboard-avatar-upload--upload-errors').innerHTML = '';
                         fileInput.click();
                     });
                 }
 
                 if (rotateButton) {
                     rotateButton.addEventListener('click', async (event) => {
+                        document.querySelector('.member-dashboard-avatar-upload--upload-errors').innerHTML = '';
                         event.preventDefault();
                         const button = event.currentTarget;
                         button.disabled = true;
                         const apiUrl = button.dataset.apiurl;
                         const imageElement = appContainer.querySelector('.member-dashboard-avatar-upload--image');
-                        await AvatarUploader.rotateImage(imageElement, 90, apiUrl);
+                        await (new AvatarUploader()).rotateImage(imageElement, 90, apiUrl);
                         button.disabled = false;
                     });
                 }
 
                 if (fileInput) {
                     fileInput.addEventListener('change', async function () {
-                        await AvatarUploader.updateFileInput(fileInput);
-                        fileInput.closest('form').submit();
+                        document.querySelector('.member-dashboard-avatar-upload--upload-errors').innerHTML = '';
+                        const uploader = new AvatarUploader();
+                        await uploader.updateFileInput(fileInput, 600, 600, ['image/png', 'image/jpg', 'image/jpeg']);
+
+                        if (!uploader.hasErrors()) {
+                            fileInput.closest('form').submit();
+                        }
                     });
                 }
+
+                document.addEventListener('AVATAR_UPLOADER_ERROR', (event) => {
+                    if (document.querySelector('.member-dashboard-avatar-upload--upload-errors').innerHTML === '') {
+                        const ul = document.createElement('ul');
+                        document.querySelector('.member-dashboard-avatar-upload--upload-errors').appendChild(ul);
+                    }
+
+                    const li = document.createElement('li');
+                    li.classList.add('text-danger', 'small');
+                    li.textContent = event.detail.error;
+                    const ul = document.querySelector('.member-dashboard-avatar-upload--upload-errors ul');
+                    ul.appendChild(li);
+                });
             });
         </script>
     {% endadd %}
