@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvEventMemberExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvUserExportController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventDeregistrationController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventFilterFormController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventListController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationCheckoutLinkController;
@@ -63,3 +64,4 @@ $GLOBALS['TL_LANG']['FMD'][MemberDashboardUpcomingEventsController::TYPE] = ['SA
 $GLOBALS['TL_LANG']['FMD'][PilatusExportController::TYPE] = ['SAC Event-Export 2021 für Monatszeitschrift'];
 $GLOBALS['TL_LANG']['FMD'][TourDifficultyListController::TYPE] = ['Schwierigkeitsgrade Tabelle mit Erklärungen als Modalfenster'];
 $GLOBALS['TL_LANG']['FMD'][PrintTourListButtonController::TYPE] = ['Tour-Liste drucken button'];
+$GLOBALS['TL_LANG']['FMD'][EventDeregistrationController::TYPE] = ['SAC Mitgliederkonto Dashboard - Event-Abmeldeformular'];
