@@ -16,6 +16,7 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvEventMemberExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvUserExportController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventDeregistrationController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventFilterFormController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventListController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationCheckoutLinkController;
@@ -45,7 +46,8 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardAvatarUploadControlle
 $GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardDeleteProfileController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardEditProfileController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardPastEventsController::TYPE] = '{title_legend},name,headline,type;{member_dashboard_event_type_filter_legend},eventType;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardUpcomingEventsController::TYPE] = '{title_legend},name,headline,type;{member_dashboard_upcoming_events_legend},unregisterFromEventNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardUpcomingEventsController::TYPE] = '{title_legend},name,headline,type;{member_dashboard_upcoming_events_legend},eventDeregistrationPage;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][EventDeregistrationController::TYPE] = '{title_legend},name,headline,type;{member_dashboard_upcoming_events_legend},eventDeregistrationNotification;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][PilatusExportController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][TourDifficultyListController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][PrintTourListButtonController::TYPE] = '{title_legend},name,headline,type;{config_legend},watchEventListModule;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
@@ -84,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventType'] = [
     'sql'       => 'blob NULL',
 ];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['unregisterFromEventNotificationId'] = [
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventDeregistrationNotification'] = [
     'exclude'    => true,
     'search'     => true,
     'inputType'  => 'select',
@@ -181,6 +183,15 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['watchEventListModule'] = [
 	'exclude'    => true,
 	'inputType'  => 'radio',
 	'foreignKey' => 'tl_module.name',
+	'eval'       => ['mandatory' => true, 'fieldType' => 'radio'],
+	'sql'        => 'int(10) unsigned NOT NULL default 0',
+	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventDeregistrationPage'] = [
+	'exclude'    => true,
+	'inputType'  => 'pageTree',
+	'foreignKey' => 'tl_page.title',
 	'eval'       => ['mandatory' => true, 'fieldType' => 'radio'],
 	'sql'        => 'int(10) unsigned NOT NULL default 0',
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],

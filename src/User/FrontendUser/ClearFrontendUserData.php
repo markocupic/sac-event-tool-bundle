@@ -135,6 +135,11 @@ readonly class ClearFrontendUserData
         $objEventRegistration->emergencyPhone = '999 99 99';
         $objEventRegistration->emergencyPhoneName = ' [anonymisiert]';
         $objEventRegistration->anonymized = 1;
+
+        if (!empty($objEventRegistration->deregistrationCause)) {
+            $objEventRegistration->deregistrationCause = ' [anonymisiert]';
+        }
+
         $objEventRegistration->save();
 
         return true;

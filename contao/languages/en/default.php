@@ -169,6 +169,23 @@ $GLOBALS['TL_LANG']['ERR']['evt_reg_mainInstructorsEmailAddrNotFound'] = 'Dem Ha
 $GLOBALS['TL_LANG']['ERR']['evt_reg_membersEmailAddrNotFound'] = 'Leider wurde für dieses Mitgliederkonto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlege auf auf der Internetseite des Zentralverbands deine E-Mail-Adresse.';
 $GLOBALS['TL_LANG']['ERR']['evt_reg_bookingLimitReaches'] = 'Die maximale Teilnehmerzahl für diesen Event ist bereits erreicht. Wenn du dich trotzdem anmeldest, gelangst du auf die Warteliste und kannst bei Absagen evtl. nachrücken. Du kannst selbstverständlich auch mit dem/der Leiter/in Kontakt aufnehmen, um Genaueres zu erfahren.';
 
+// Event deregistration
+$GLOBALS['TL_LANG']['MSC']['evt_dereg_invalidRequest'] = 'Deine Anfrage ist leider ungültig.';
+$GLOBALS['TL_LANG']['MSC']['evt_dereg_title'] = 'Von "%s" abmelden';
+$GLOBALS['TL_LANG']['LBL']['evt_dereg_registrationCause'] = 'Bitte begründe in wenigen Sätzen deine Abmeldung.';
+$GLOBALS['TL_LANG']['LBL']['evt_dereg_submitBtn'] = 'Von Event abmelden';
+$GLOBALS['TL_LANG']['MSC']['evt_dereg_submitConfirm'] = 'Bist du sicher, dass du dich von "%s" abmelden willst?.';
+$GLOBALS['TL_LANG']['MSC']['evt_dereg_success'] = '%s, du hast dich erfolgreich von "%s" abgemeldet. Die Leitenden wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.';
+$GLOBALS['TL_LANG']['MSC']['evt_dereg_onlineDeregNotPossible'] = 'Liebe/Lieber %s, du kannst dich nicht online von "%s" abmelden. Bitte nimm mit der leitenden Person telefonischen Kontakt auf.';
+$GLOBALS['TL_LANG']['MSC']['evt_dereg_regNotFound'] = 'Liebe/Lieber %s, es wurde keine zur Registrierungs-ID (%d) passende Event-Registrierung gefunden. Bitte nimm mit der leitenden Person Kontakt auf, wenn du der Meinung bist, dass es sich hierbei um einen Irrtum handelt.';
+$GLOBALS['TL_LANG']['MSC']['evt_dereg_eventNotFound'] = 'Liebe/Lieber %s, es wurde kein zur Registrierungs-ID (%d) passender Event gefunden. Bitte nimm mit der leitenden Person Kontakt auf, wenn du der Meinung bist, dass es sich hierbei um einen Irrtum handelt.';
+$GLOBALS['TL_LANG']['MSC']['evt_dereg_alreadyDeregistered'] = 'Liebe/Lieber %s, du hast dich bereits vom Event "%s" abgemeldet. Es ist keine weitere Abmeldung mehr möglich/nötig.';
+$GLOBALS['TL_LANG']['MSC']['evt_dereg_deregNotPossibleEventAlreadyOver'] = 'Liebe/Lieber %s, du kannst dich nicht mehr von "%s" abmelden, da dieser Event bereits vorbei ist.';
+$GLOBALS['TL_LANG']['MSC']['evt_dereg_deregNotPossibleDeadlineExpired'] = 'Liebe/Lieber %s, du kannst dich nicht von "%s" abmelden, da die Abmeldefrist am %s abgelaufen ist. Nimm, falls nötig, Kontakt mit der leitenden Person auf.';
+$GLOBALS['TL_LANG']['MSC']['evt_dereg_userHasInvalidEmail'] = 'Liebe/Lieber %s, du kannst dich nicht von "%s" abmelden, weil für dein Konto keine gültige E-Mail-Adresse gefunden wurde. Bitte hinterlege auf der Webseite des <a href="https://www.sac-cas.ch" target="_blank" rel="noopener">Schweizer Alpen-Clubs SAC</a> deine E-Mail-Adresse.';
+$GLOBALS['TL_LANG']['MSC']['evt_dereg_accessNotAllowed'] = 'Liebe/Lieber %s, du kannst dich nicht von "%s" abmelden, weil du nicht über die dazu nötigen Berechtigungen verfügst.';
+$GLOBALS['TL_LANG']['MSC']['evt_dereg_mainInstructorNotFoundOrNotAvailableByEmail'] = 'Liebe/Lieber %s, du kannst dich nicht von "%s" abmelden, weil die leitende Person nicht gefunden wurde oder für sie keine gültige E-Mail-Adresse hinterlegt ist. Bitte nimm mit der leitenden Person telefonischen Kontakt auf.';
+
 // Event registration frontend module form labels
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ibanText'] = 'Bitte beachte, dass es sich bei diesem Anlass um einen Event mit Bezahlung durch Vorauskasse handelt. Deine Anmeldung wird erst bestätigt, nachdem der Teilnahmebeitrag bei uns eingegangen ist. Details dazu erhältst du nach der Anmeldung per E-Mail.';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ibanBeneficiary'] = 'Begünstigte/r';

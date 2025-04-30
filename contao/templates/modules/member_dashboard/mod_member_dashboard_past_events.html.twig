@@ -15,11 +15,9 @@
             </div>
         {% endfor %}
     {% endif %}
-
     <div class="table-responsive">
         <table class="table">
             {% for event in arrPastEvents %}
-
                 {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::COURSE') == event.objEvent.eventType|default %}
                     <tr>
                         <td>{{ event.dateSpan|raw }}</td>
@@ -31,7 +29,6 @@
                         </td>
                     </tr>
                 {% endif %}
-
                 {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::TOUR') == event.objEvent.eventType|default or constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::LAST_MINUTE_TOUR') == event.objEvent.eventType|default %}
                     <tr>
                         <td style="min-width:180px">{{ event.dateSpan|raw }}</td>
@@ -47,9 +44,7 @@
                         </td>
                     </tr>
                 {% endif %}
-
             {% endfor %}
-
         </table>
     </div>
 {% endblock %}

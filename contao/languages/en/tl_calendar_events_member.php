@@ -42,6 +42,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['emergency_phone_legend'] = 'No
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['sac_member_id_legend'] = 'SAC-Mitgliedernummer';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['education_legend'] = 'Ausbildung';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['agb_legend'] = 'AGB u.Ä.';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['deregistration_legend'] = 'Event-Abmeldung durch Teilnehmer';
 
 // Fields
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['uuid'] = ['Registrierungs-UUID', 'Geben Sie hier die Registrierungs-UUID ein.'];
@@ -80,6 +81,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['hasPaid'] = ['Teilnahmekosten 
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['paymentMethod'] = ['Zahlungsart', 'Geben Sie die Zahlungsart an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['agb'] = ['AGB akzeptiert', 'Der Teilnehmer hat die AGB bei Event Anmeldung akzeptiert.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['hasAcceptedPrivacyRules'] = ['Datenschutzrichtline zum Umgang mit Foto und Videomaterial akzeptiert', 'Der Teilnehmer hat die Datenschutzrichtline zu Bildmedien bei der Event Anmeldung akzeptiert.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['deregistrationCause'] = ['Grund für Abmeldung', 'Geben Sie einen Grund für die Abmeldung ein.'];
 
 // References
 $GLOBALS['TL_LANG']['tl_calendar_events_member'][BookingType::MANUALLY] = 'Manuelle Erfassung der Personalien des Event-Teilnehmers';

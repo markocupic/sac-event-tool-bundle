@@ -15,10 +15,8 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Model;
 
 use Contao\CalendarEventsModel;
-use Contao\Frontend;
 use Contao\MemberModel;
 use Contao\Model;
-use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Doctrine\DBAL\ArrayParameterType;
@@ -223,7 +221,6 @@ class CalendarEventsMemberModel extends Model
                     $rowEvent['eventRegistrationModel'] = self::findByPk($rowReg['id']);
                     $rowEvent['registrationId'] = $rowReg['id'];
                     $rowEvent['role'] = 'member';
-                    $rowEvent['unregisterUrl'] = Frontend::addToUrl(StringUtil::ampersand('do=unregisterUserFromEvent&registrationId='.$rowReg['id']));
                 } else {
                     // If member has the role "instructor"
                     if (true === $options['blnInstructorRole'] && $blnHasEventsAsInstructor) {

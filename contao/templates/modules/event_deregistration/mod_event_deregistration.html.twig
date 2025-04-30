@@ -1,0 +1,78 @@
+{% trans_default_domain 'contao_default' %}
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+    {% if errorMessage|default %}
+        <div class="alert alert-danger" role="alert">
+            <i class="fa-solid fa-exclamation-circle"></i>
+            <div>{{ errorMessage|raw }}</div>
+        </div>
+    {% endif %}
+
+    {% if infoMessage|default %}
+        <div class="alert alert-info" role="alert">
+            <i class="fa-solid fa-info-circle me-2"></i>
+            <div>{{ infoMessage|raw }}</div>
+        </div>
+    {% endif %}
+
+    {% if form|default %}
+        <p>Liebe/Lieber {{ user.firstname }}</p>
+        <p>Hier hast du die Möglichkeit, dich von <a href="get_event_data(event_model, 'eventUrl')" rel="noopener" target="_blank">"{{ event.title }}"</a> wieder abzumelden.</p>
+        <p class="mt-3">Bitte berücksichtige, dass Abmeldungen für Leitende immer mit Aufwand verbunden sind. Bei Verhinderung solltest du dich umgehend mit Begründung vom Event abmelden. So machst du Platz für weitere, sich auf der Warteliste befindende Teilnehmende.<br>Siehe: <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">Kurs- und Tourenreglement (Auszug)</a></p>
+        <p class="mt-3">Bei einer Abmeldung können ggf. <strong>Stornierungsgebühren</strong> anfallen. Erkundige dich deshalb vorgängig genau über die Bestimmungen für Abmeldungen von Events.</p>
+        <p class="mb-0 mt-5"><em>Auszug aus der Touren-/Kurs-Ausschreibung:</em></p>
+        <div class="event event-detailview border p-3">
+            {% set is_with_mountainguide_offer = constant('\\Markocupic\\SacEventToolBundle\\Config\\EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER') == get_event_data(event_model, 'mountainguide') ? true : false %}
+            {% set is_with_mountainguide = constant('\\Markocupic\\SacEventToolBundle\\Config\\EventMountainGuide::WITH_MOUNTAIN_GUIDE') == get_event_data(event_model, 'mountainguide') ? true : false %}
+            {% if not get_event_data(event_model, 'disableOnlineRegistration') %}
+                <div class="price event-detail event-info-box icon-box-small">
+                    <h5>Leistungen/Preis</h5>
+                    {% if is_with_mountainguide_offer %}
+                        <p class="pb-1"><strong>Mit Bergführer/in als Bergführerangebot</strong></p>
+                    {% endif %}
+                    {% if is_with_mountainguide %}
+                        <p class="pb-1"><strong>Mit Bergführer/in</strong></p>
+                    {% endif %}
+                    {% if not get_event_data(event_model, 'leistungen') is empty %}
+                        <p class="pb-1">{{ get_event_data(event_model, 'leistungen')|nl2br }}</p>
+                    {% endif %}
+                    <p>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">Kurs- und Tourenreglement (Auszug)</a>
+                    </p>
+                </div>
+            {% endif %}
+            {% if not get_event_data(event_model, 'disableOnlineRegistration') %}
+                <div class="booking-text event-detail event-info-box icon-box-small mt-5">
+                    <h5>Abmeldung</h5>
+                    {% if get_event_data(event_model, 'allowDeregistration') %}
+                        <p>Online-Abmeldung mit einer Frist von {{ get_event_data(event_model, 'deregistrationLimit') }} Tagen möglich.</p>
+                    {% else %}
+                        <p>Keine Online-Abmeldung</p>
+                    {% endif %}
+                    <p><small>Es können ggf. Stornierungsgebühren anfallen (siehe <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">Kurs- und Tourenreglement</a>).</small></p>
+                </div>
+            {% endif %}
+            {# AGB Modal #}
+            {{ render(controller(
+                'Markocupic\\SacEventToolBundle\\Controller\\Agb\\CourseAndTourRegulationsModalController::getModal',
+                { 'event': event_model }
+            )) }}
+            {# End AGB Modal #}
+        </div>
+        <div class="module-deregistration--form-container mt-5">
+            <h4>{{ 'MSC.evt_dereg_title'|trans([event.title])|raw }}</h4>
+            {{ form|raw }}
+            {% add to body %}
+                <script>
+                    document.querySelector(".module-deregistration--form-container form").addEventListener("submit", function (event) {
+                        const userConfirmed = confirm('{{ 'MSC.evt_dereg_submitConfirm'|trans([event.title])|raw }}');
+                        if (!userConfirmed) {
+                            event.preventDefault(); // Prevent form submission if user cancels
+                        }
+                    });
+                </script>
+            {% endadd %}
+        </div>
+    {% endif %}
+{% endblock %}

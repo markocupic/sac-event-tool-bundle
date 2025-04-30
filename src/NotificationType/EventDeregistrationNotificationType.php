@@ -19,9 +19,9 @@ use Terminal42\NotificationCenterBundle\Token\Definition\EmailTokenDefinition;
 use Terminal42\NotificationCenterBundle\Token\Definition\Factory\TokenDefinitionFactoryInterface;
 use Terminal42\NotificationCenterBundle\Token\Definition\TextTokenDefinition;
 
-class SignOutFromEventNotificationType implements NotificationTypeInterface
+class EventDeregistrationNotificationType implements NotificationTypeInterface
 {
-    public const NAME = 'sign_out_from_event';
+    public const NAME = 'event_deregistration';
 
     public function __construct(
         private readonly TokenDefinitionFactoryInterface $factory,
@@ -65,6 +65,7 @@ class SignOutFromEventNotificationType implements NotificationTypeInterface
                 'participant_email',
                 'participant_name',
                 'participant_uuid',
+                'deregistration_cause',
                 'sac_member_id',
                 'state_of_subscription',
             ],

@@ -122,6 +122,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		{education_legend},hasLeadClimbingEducation;
 		{emergency_phone_legend},emergencyPhone,emergencyPhoneName;
 		{stateOfParticipation_legend},hasParticipated;
+		{deregistration_legend},deregistrationCause;
 		{agb_legend},agb,hasAcceptedPrivacyRules
 		',
 	],
@@ -363,6 +364,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'options'   => BookingType::ALL,
 			'eval'      => ['readonly' => true, 'doNotShow' => true, 'includeBlankOption' => false, 'doNotCopy' => true],
 			'sql'       => "varchar(255) NOT NULL default '".BookingType::MANUALLY."'",
+		],
+		'deregistrationCause'         => [
+			'exclude'   => true,
+			'inputType' => 'textarea',
+			'eval'      => ['tl_class' => 'clr', 'doNotCopy' => true],
+			'sql'       => 'text NULL',
 		],
 		'allowMultiSignUp'            => [
 			'exclude'   => true,
