@@ -25,6 +25,17 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
+/**
+ * This controller is responsible for syncing event registration data by updating
+ * the "tl_calendar_events_member" table with the most recent contact information
+ * and details from the "tl_member" table.
+ *
+ * The primary functionality includes:
+ * - Fetching upcoming event IDs.
+ * - Fetching member IDs that need updates.
+ * - Synchronizing relevant member and event data.
+ * - Logging updates and errors during the synchronization process.
+ */
 #[Route('/_sync', name: self::class)]
 class SyncEventRegistrationDatabase extends AbstractController
 {
@@ -83,6 +94,19 @@ class SyncEventRegistrationDatabase extends AbstractController
         return (new Stopwatch())->start(self::STOP_WATCH_EVENT);
     }
 
+    private function getUpcomingEventsIDS(): array
+    {
+        return $this->connection->fetchFirstColumn(
+            'SELECT id FROM tl_calendar_events WHERE startDate > ? ORDER BY id',
+            [
+                time(),
+            ],
+            [
+                Types::INTEGER,
+            ],
+        );
+    }
+
     private function getContaoMemberIds(): array
     {
         return $this->connection->fetchFirstColumn(
@@ -94,24 +118,18 @@ class SyncEventRegistrationDatabase extends AbstractController
 				WHERE
 					t1.anonymized = 0
 				AND
-				    t1.bookingType = :bookingType
-				AND
 					t1.contaoMemberId = (SELECT id FROM tl_member AS t2 WHERE t2.id = t1.contaoMemberId)
 				GROUP BY
 					t1.sacMemberId
-			',
-            [
-                'bookingType' => BookingType::ONLINE_FORM,
-            ],
-            [
-                'bookingType' => Types::STRING,
-            ],
+				ORDER BY t1.contaoMemberId
+			'
         );
     }
 
     private function sync(): void
     {
         $arrContaoFrontendMemberIds = $this->getContaoMemberIds();
+        $arrUpcomingEventIds = $this->getUpcomingEventsIDS();
 
         $this->syncLog['processed_members'] = \count($arrContaoFrontendMemberIds);
 
@@ -138,16 +156,34 @@ class SyncEventRegistrationDatabase extends AbstractController
                 foreach ($arrRegAll as $arrReg) {
                     ++$this->syncLog['processed_registrations'];
 
-                    $set = [
-                        'gender' => $arrContaoMember['gender'],
-                        'firstname' => $arrContaoMember['firstname'],
-                        'lastname' => $arrContaoMember['lastname'],
-                        'street' => $arrContaoMember['street'],
-                        'postal' => $arrContaoMember['postal'],
-                        'city' => $arrContaoMember['city'],
-                        'dateOfBirth' => $arrContaoMember['dateOfBirth'],
-                        'phone' => $arrContaoMember['phone'],
-                    ];
+                    $set = [];
+
+                    // Do not update manual registrations!
+                    if (BookingType::ONLINE_FORM === $arrReg['bookingType']) {
+                        $set = array_merge($set, [
+                            'gender' => $arrContaoMember['gender'],
+                            'firstname' => $arrContaoMember['firstname'],
+                            'lastname' => $arrContaoMember['lastname'],
+                            'street' => $arrContaoMember['street'],
+                            'postal' => $arrContaoMember['postal'],
+                            'city' => $arrContaoMember['city'],
+                            'dateOfBirth' => $arrContaoMember['dateOfBirth'],
+                            'phone' => $arrContaoMember['phone'],
+                        ]);
+                    }
+
+                    // Only if the related event is the future:
+                    // Update emergencyPhone, emergencyPhoneName, foodHabits from tl_member (if not empty) -> tl_calendar_events_member
+                    if (\in_array($arrReg['eventId'], $arrUpcomingEventIds, true)) {
+                        if ('' !== trim($arrContaoMember['emergencyPhone']) && '' !== trim($arrContaoMember['emergencyPhoneName'])) {
+                            $set['emergencyPhone'] = $arrContaoMember['emergencyPhone'];
+                            $set['emergencyPhoneName'] = $arrContaoMember['emergencyPhoneName'];
+                        }
+
+                        if ('' !== trim((string) $arrContaoMember['foodHabits'])) {
+                            $set['foodHabits'] = $arrContaoMember['foodHabits'];
+                        }
+                    }
 
                     // Do not override these contact data fields with empty values
                     $arrContact = ['email', 'mobile'];
@@ -156,6 +192,10 @@ class SyncEventRegistrationDatabase extends AbstractController
                         if (!empty($arrContaoMember[$field])) {
                             $set[$field] = $arrContaoMember[$field];
                         }
+                    }
+
+                    if (empty($set)) {
+                        continue;
                     }
 
                     $intAffected = $this->connection->update(
@@ -183,11 +223,14 @@ class SyncEventRegistrationDatabase extends AbstractController
             }
 
             $this->connection->commit();
-        } catch (\Exception $e) {
+        } catch (\throwable $e) {
             $this->connection->rollBack();
             $this->syncLog['with_error'] = true;
             $this->syncLog['exceptions'][] = $e->getMessage();
-            $this->contaoErrorLogger->error(sprintf('There has been an error while trying to update contact data of event registration ID %d. Error: %s', $arrReg['id'], $e->getMessage()));
+
+            if (!empty($arrReg['id'])) {
+                $this->contaoErrorLogger->error(sprintf('There has been an error while trying to update contact data of event registration ID %d. Error: %s', $arrReg['id'], $e->getMessage()));
+            }
         }
     }
 }
