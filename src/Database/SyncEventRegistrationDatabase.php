@@ -18,7 +18,6 @@ use Contao\CoreBundle\Controller\AbstractController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
-use Markocupic\SacEventToolBundle\Config\BookingType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -29,12 +28,6 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  * This controller is responsible for syncing event registration data by updating
  * the "tl_calendar_events_member" table with the most recent contact information
  * and details from the "tl_member" table.
- *
- * The primary functionality includes:
- * - Fetching upcoming event IDs.
- * - Fetching member IDs that need updates.
- * - Synchronizing relevant member and event data.
- * - Logging updates and errors during the synchronization process.
  */
 #[Route('/_sync', name: self::class)]
 class SyncEventRegistrationDatabase extends AbstractController
@@ -94,7 +87,7 @@ class SyncEventRegistrationDatabase extends AbstractController
         return (new Stopwatch())->start(self::STOP_WATCH_EVENT);
     }
 
-    private function getUpcomingEventsIDS(): array
+    private function getUpcomingEventsIds(): array
     {
         return $this->connection->fetchFirstColumn(
             'SELECT id FROM tl_calendar_events WHERE startDate > ? ORDER BY id',
@@ -107,116 +100,73 @@ class SyncEventRegistrationDatabase extends AbstractController
         );
     }
 
+    /**
+     * Retrieves all distinct contaoMemberIds
+     * that have a corresponding entry in tl_member.
+     */
     private function getContaoMemberIds(): array
     {
         return $this->connection->fetchFirstColumn(
             '
-				SELECT
-					contaoMemberId
-				FROM
-					tl_calendar_events_member AS t1
-				WHERE
-					t1.anonymized = 0
-				AND
-					t1.contaoMemberId = (SELECT id FROM tl_member AS t2 WHERE t2.id = t1.contaoMemberId)
-				GROUP BY
-					t1.sacMemberId
-				ORDER BY t1.contaoMemberId
+			SELECT
+				DISTINCT t1.contaoMemberId
+			FROM
+				tl_calendar_events_member AS t1
+			JOIN
+				tl_member AS t2
+			ON
+				t1.contaoMemberId = t2.id
 			'
         );
     }
 
     private function sync(): void
     {
-        $arrContaoFrontendMemberIds = $this->getContaoMemberIds();
-        $arrUpcomingEventIds = $this->getUpcomingEventsIDS();
+        $contaoMemberIds = $this->getContaoMemberIds();
+        $upcomingEventIds = $this->getUpcomingEventsIds();
 
-        $this->syncLog['processed_members'] = \count($arrContaoFrontendMemberIds);
+        $this->syncLog['processed_members'] = \count($contaoMemberIds);
 
         $this->connection->beginTransaction();
 
         try {
-            foreach ($arrContaoFrontendMemberIds as $contaoMemberId) {
-                $arrContaoMember = $this->connection->fetchAssociative(
-                    'SELECT * FROM tl_member WHERE id = ?',
-                    [
-                        $contaoMemberId,
-                    ],
-                    [
-                        Types::INTEGER,
-                    ],
-                );
+            foreach ($contaoMemberIds as $contaoMemberId) {
+                $memberData = $this->fetchMemberData($contaoMemberId);
 
-                $arrRegAll = $this->connection->fetchAllAssociative(
-                    'SELECT * FROM tl_calendar_events_member WHERE contaoMemberId = ?',
-                    [$arrContaoMember['id']],
-                    [Types::INTEGER],
-                );
+                if (empty($memberData)) {
+                    continue;
+                }
 
-                foreach ($arrRegAll as $arrReg) {
+                $eventRegistrations = $this->fetchMemberEventRegistrations($memberData['id']);
+
+                foreach ($eventRegistrations as $registration) {
                     ++$this->syncLog['processed_registrations'];
 
-                    $set = [];
-
-                    // Do not update manual registrations!
-                    if (BookingType::ONLINE_FORM === $arrReg['bookingType']) {
-                        $set = array_merge($set, [
-                            'gender' => $arrContaoMember['gender'],
-                            'firstname' => $arrContaoMember['firstname'],
-                            'lastname' => $arrContaoMember['lastname'],
-                            'street' => $arrContaoMember['street'],
-                            'postal' => $arrContaoMember['postal'],
-                            'city' => $arrContaoMember['city'],
-                            'dateOfBirth' => $arrContaoMember['dateOfBirth'],
-                            'phone' => $arrContaoMember['phone'],
-                        ]);
-                    }
-
-                    // Only if the related event is the future:
-                    // Update emergencyPhone, emergencyPhoneName, foodHabits from tl_member (if not empty) -> tl_calendar_events_member
-                    if (\in_array($arrReg['eventId'], $arrUpcomingEventIds, true)) {
-                        if ('' !== trim($arrContaoMember['emergencyPhone']) && '' !== trim($arrContaoMember['emergencyPhoneName'])) {
-                            $set['emergencyPhone'] = $arrContaoMember['emergencyPhone'];
-                            $set['emergencyPhoneName'] = $arrContaoMember['emergencyPhoneName'];
-                        }
-
-                        if ('' !== trim((string) $arrContaoMember['foodHabits'])) {
-                            $set['foodHabits'] = $arrContaoMember['foodHabits'];
-                        }
-                    }
-
-                    // Do not override these contact data fields with empty values
-                    $arrContact = ['email', 'mobile'];
-
-                    foreach ($arrContact as $field) {
-                        if (!empty($arrContaoMember[$field])) {
-                            $set[$field] = $arrContaoMember[$field];
-                        }
-                    }
+                    $set = $this->generateUpdateData($memberData, $registration, $upcomingEventIds);
 
                     if (empty($set)) {
                         continue;
                     }
 
-                    $intAffected = $this->connection->update(
+                    $affectedRows = $this->connection->update(
                         'tl_calendar_events_member',
                         $set,
                         [
-                            'id' => $arrReg['id'],
+                            'id' => $registration['id'],
                         ],
                         [
                             'id' => Types::INTEGER,
                         ],
                     );
 
-                    if (!empty($intAffected)) {
+                    if (!empty($affectedRows)) {
                         ++$this->syncLog['updates'];
 
                         $this->syncLog['log'][] = sprintf(
                             'Update contact data for event registration ID %d with member %s %s.',
-                            $arrReg['id'],
-                            $arrContaoMember['firstname'],
-                            $arrContaoMember['lastname'],
+                            $registration['id'],
+                            $memberData['firstname'],
+                            $memberData['lastname'],
                         );
                     }
                 }
@@ -228,9 +178,65 @@ class SyncEventRegistrationDatabase extends AbstractController
             $this->syncLog['with_error'] = true;
             $this->syncLog['exceptions'][] = $e->getMessage();
 
-            if (!empty($arrReg['id'])) {
-                $this->contaoErrorLogger->error(sprintf('There has been an error while trying to update contact data of event registration ID %d. Error: %s', $arrReg['id'], $e->getMessage()));
+            if (!empty($registration['id'])) {
+                $this->contaoErrorLogger->error(sprintf('There has been an error while trying to update contact data of event registration ID %d. Error: %s', $registration['id'], $e->getMessage()));
             }
         }
+    }
+
+    private function fetchMemberData(int $memberId): array|false
+    {
+        return $this->connection->fetchAssociative(
+            'SELECT * FROM tl_member WHERE id = ?',
+            [$memberId],
+            [Types::INTEGER]
+        );
+    }
+
+    private function fetchMemberEventRegistrations(int $memberId): array
+    {
+        return $this->connection->fetchAllAssociative(
+            'SELECT * FROM tl_calendar_events_member WHERE contaoMemberId = ? AND anonymized = ?',
+            [$memberId, 0],
+            [Types::INTEGER, Types::INTEGER]
+        );
+    }
+
+    private function generateUpdateData(array $memberData, array $registration, array $upcomingEventIds): array
+    {
+        $updateData = [
+            'gender' => $memberData['gender'],
+            'firstname' => $memberData['firstname'],
+            'lastname' => $memberData['lastname'],
+            'street' => $memberData['street'],
+            'postal' => $memberData['postal'],
+            'city' => $memberData['city'],
+            'dateOfBirth' => $memberData['dateOfBirth'],
+            'phone' => $memberData['phone'],
+        ];
+
+        // Do not override these contact data fields with empty values
+        $arrContact = ['email', 'mobile'];
+
+        foreach ($arrContact as $field) {
+            if ('' !== $memberData[$field]) {
+                $updateData[$field] = $memberData[$field];
+            }
+        }
+
+        // Update emergencyPhone, emergencyPhoneName, foodHabits from tl_member (if not empty),
+        // but only if the related event is in the future!
+        if (\in_array($registration['eventId'], $upcomingEventIds, true)) {
+            if ('' !== trim($memberData['emergencyPhone']) && '' !== trim($memberData['emergencyPhoneName'])) {
+                $updateData['emergencyPhone'] = $memberData['emergencyPhone'];
+                $updateData['emergencyPhoneName'] = $memberData['emergencyPhoneName'];
+            }
+
+            if ('' !== trim((string) $memberData['foodHabits'])) {
+                $updateData['foodHabits'] = $memberData['foodHabits'];
+            }
+        }
+
+        return $updateData;
     }
 }
