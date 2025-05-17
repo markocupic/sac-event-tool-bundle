@@ -2,74 +2,46 @@
 {% extends '@Contao/block_unsearchable' %}
 
 {% block content %}
-
     {% if constant('CHECKOUT_STEP_REGISTRATION_INTERRUPTED', controller) == currentStep %}
-
         {% if errorMessage|default %}
-            <div class="alert alert-danger" role="alert">
-                <i class="fa-solid fa-exclamation-circle"></i>
-                <div>{{ errorMessage|raw }}</div>
-            </div>
+            {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-danger', add_icon: true, icon_class: 'fa-solid fa-exclamation-circle', text: errorMessage} %}
         {% endif %}
-
         {% if infoMessage|default %}
-            <div class="alert alert-info" role="alert">
-                <i class="fa-solid fa-info-circle me-2"></i>
-                <div>{{ infoMessage|raw }}</div>
-            </div>
+            {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: infoMessage} %}
         {% endif %}
-
     {% elseif constant('CHECKOUT_STEP_LOGIN', controller) == currentStep %}
-
         {{ stepIndicator|raw }}
-        <div class="alert alert-info" role="alert">
-            <i class="fa-solid fa-info-circle"></i>
-            <div>Bitte logge dich ein, um dich zu einem Event anzumelden.</div>
-        </div>
-
+        {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: 'Bitte logge dich ein, um dich zu einem Event anzumelden.'} %}
         <!-- Login form -->
         <div class="mt-5 mb-4">
             {{ insert_tag('insert_module::' ~ moduleModel.eventRegLoginModule)|raw }}
         </div>
-
     {% elseif constant('CHECKOUT_STEP_CONFIRM', controller) == currentStep %}
-
         {{ stepIndicator|raw }}
         {{ regInfo|raw }}
-
     {% elseif constant('CHECKOUT_STEP_REGISTER', controller) == currentStep %}
-
         {{ stepIndicator|raw }}
-
         {% if eventFullyBooked|default is same as(true) %}
-            <div class="alert alert-info" role="alert">
-                <i class="fa-solid fa-info-circle"></i>
-                <div>{{ 'ERR.evt_reg_bookingLimitReaches'|trans }}</div>
-            </div>
+            {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: 'ERR.evt_reg_bookingLimitReaches'|trans} %}
         {% endif %}
-
         <h4 class="content-headline text-danger mt-5 mb-0">Anmelden für {{ ('MSC.'~eventModel.eventType~'_short')|trans }}:</h4>
         <h2 class="content-headline mt-0 mb-4 text-black">{{ eventModel.title }}</h2>
-
         {% if eventModel.addIban %}
-            <div class="alert alert-info" role="alert">
-                <i class="fa-solid fa-info-circle"></i>
-                <div>
-                    {{ 'FORM.evt_reg_ibanText'|trans }}
-                    <br>
-                    <br>
-                    IBAN:
-                    <br>
-                    {{ eventModel.iban }}
-                    <br>
-                    <br>
-                    {{ 'FORM.evt_reg_ibanBeneficiary'|trans }}:
-                    <br>
-                    {{ eventModel.ibanBeneficiary|nl2br }}
-                </div>
-            </div>
+            {% set iban_info %}
+                {{ 'FORM.evt_reg_ibanText'|trans }}
+                <br>
+                <br>
+                IBAN:
+                <br>
+                {{ eventModel.iban }}
+                <br>
+                <br>
+                {{ 'FORM.evt_reg_ibanBeneficiary'|trans }}:
+                <br>
+                {{ eventModel.ibanBeneficiary|nl2br }}
+            {% endset %}
+            {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: iban_info} %}
         {% endif %}
-
         {# start form #}
         <div id="eventRegistrationForm" class="hasteform_form-event-registration block">
             <div class="row gx-5">
@@ -101,12 +73,7 @@
                                     <div class="mt-0 mb-2" data-reg-widget="mobile">
                                         {{ form.getWidget('mobile').parse()|raw }}
                                         <div data-ffield-explanation="mobile">
-                                            <div class="alert alert-success" role="alert">
-                                                <i class="fa-solid fa-check-circle"></i>
-                                                <div>
-                                                    {{ 'FORM.evt_reg_ffield_expl_mobile'|trans|raw }}
-                                                </div>
-                                            </div>
+                                            {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: 'FORM.evt_reg_ffield_expl_mobile'|trans } %}
                                         </div>
                                     </div>
                                 {% endif %}
@@ -127,12 +94,7 @@
                                     <div class="mt-0 mb-2" data-reg-widget="notes">
                                         {{ form.getWidget('notes').parse()|raw }}
                                         <div data-ffield-explanation="notes">
-                                            <div class="alert alert-success" role="alert">
-                                                <i class="fa-solid fa-check-circle"></i>
-                                                <div>
-                                                    {{ 'FORM.evt_reg_ffield_expl_notes'|trans|raw }}
-                                                </div>
-                                            </div>
+                                            {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: 'FORM.evt_reg_ffield_expl_notes'|trans } %}
                                         </div>
                                     </div>
                                 {% endif %}
@@ -141,12 +103,7 @@
                                     <div class="mt-0 mb-2" data-reg-widget="ahvNumber">
                                         {{ form.getWidget('ahvNumber').parse()|raw }}
                                         <div data-ffield-explanation="ahvNumber">
-                                            <div class="alert alert-success" role="alert">
-                                                <i class="fa-solid fa-check-circle"></i>
-                                                <div>
-                                                    {{ 'FORM.evt_reg_ffield_expl_ahvNumber'|trans|raw }}
-                                                </div>
-                                            </div>
+                                            {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: 'FORM.evt_reg_ffield_expl_ahvNumber'|trans } %}
                                         </div>
                                     </div>
                                 {% endif %}
