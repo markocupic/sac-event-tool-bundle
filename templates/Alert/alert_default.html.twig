@@ -1,0 +1,34 @@
+{% set wrapper_attributes = attrs()
+    .addClass('alert--wrapper alert--default')
+    .addClass('alert')
+    .addClass(wrapper_class|default)
+    .set('role', 'alert')
+    .mergeWith(wrapper_attributes|default) %}
+<div{{ wrapper_attributes }}>
+    {% if add_icon %}
+        <div class="alert--icon-wrapper">
+            {% set icon_attributes = attrs()
+                .addClass('alert--icon fa-fw')
+                .addClass(icon_class|default)
+                .mergeWith(icon_attributes|default) %}
+            <i{{ icon_attributes }}></i>
+        </div>
+    {% endif %}
+    <div class="alert--text-wrapper">
+        {% if headline_text|default %}
+            {% set headline_attributes = attrs()
+                .addClass('alert--headline')
+                .addClass(title_class|default)
+                .mergeWith(headline_attributes|default) %}
+            {% set headline_level = headline_level|default('5') %}
+            <h{{ headline_level }}{{ headline_attributes }}>{{ headline_text }}</h{{ headline_level }}>
+        {% endif %}
+        {% set text_attributes = attrs()
+            .addClass('alert--text')
+            .addClass(text_class|default)
+            .mergeWith(text_attributes|default) %}
+        <div{{ text_attributes }}>
+            {{ text|default('')|raw }}
+        </div>
+    </div>
+</div>
