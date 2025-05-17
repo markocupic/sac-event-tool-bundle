@@ -36,6 +36,7 @@ use Contao\System;
 use Contao\Template;
 use Contao\UserModel;
 use Contao\Validator;
+use Markocupic\ContaoFrontendUserNotification\Notification\DefaultFrontendUserNotification;
 use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\CarSeatInfo;
 use Markocupic\SacEventToolBundle\Config\EventState;
@@ -43,6 +44,7 @@ use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Config\TicketInfo;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\Exception\EventRegistrationException;
+use Markocupic\SacEventToolBundle\Database\SyncEventRegistrationDatabase;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
@@ -85,6 +87,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         private readonly RequestStack $requestStack,
         private readonly ScopeMatcher $scopeMatcher,
         private readonly Security $security,
+        private readonly SyncEventRegistrationDatabase $syncEventRegistrationDatabase,
         private readonly TicketInfo $ticketInfo,
         private readonly TranslatorInterface $translator,
         private readonly TwigEnvironment $twig,
@@ -431,15 +434,13 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $arrData['sectionId'] = $memberModel->sectionId;
 
         // Save emergency phone number to users profile.
-        if (empty($memberModel->emergencyPhone)) {
-            $memberModel->emergencyPhone = $arrData['emergencyPhone'];
-            $memberModel->save();
-        }
+        $memberModel->emergencyPhone = $arrData['emergencyPhone'];
 
         // Save emergency phone name to users profile.
-        if (empty($memberModel->emergencyPhoneName)) {
-            $memberModel->emergencyPhoneName = $arrData['emergencyPhoneName'];
-            $memberModel->save();
+        $memberModel->emergencyPhoneName = $arrData['emergencyPhoneName'];
+
+        if (!empty($arrData['foodHabits'])) {
+            $memberModel->foodHabits = $arrData['foodHabits'];
         }
 
         // Save AHV number to users profile.
@@ -448,11 +449,26 @@ class EventRegistrationController extends AbstractFrontendModuleController
             $memberModel->save();
         }
 
+        if ($memberModel->isModified()) {
+            $memberModel->save();
+        }
+
         unset($arrData['id']);
 
         $registrationModel = new CalendarEventsMemberModel();
         $registrationModel->setRow($arrData);
         $registrationModel->save();
+
+        // Update contactData & emergencyPhone, emergencyPhoneName and foodHabits in all event registrations of the user
+        if ($this->syncEventRegistrationDatabase->syncMember($memberModel->id)) {
+            new DefaultFrontendUserNotification(
+                $this->security->getUser(),
+                'event_registration_controller::update_contact_data',
+                'Mitteilung',
+                'All deine persönlichen Daten (Adresse, Tel.-Nr., Notfallangaben, Essgewohnheiten etc.) wurden anhand deiner Eingaben bei deinen laufenden Anmeldungen aktualisiert.',
+                time() + 60
+            );
+        }
 
         return $registrationModel;
     }

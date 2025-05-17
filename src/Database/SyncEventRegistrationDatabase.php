@@ -57,7 +57,7 @@ class SyncEventRegistrationDatabase extends AbstractController
 
         $stopWatchEvent = $this->stopWatchStart();
 
-        $this->sync();
+        $this->syncAll();
 
         $duration = round($stopWatchEvent->stop()->getDuration() / 1000);
         $this->syncLog['duration'] = $duration;
@@ -82,12 +82,7 @@ class SyncEventRegistrationDatabase extends AbstractController
         return $this->syncLog;
     }
 
-    private function stopWatchStart(): StopwatchEvent
-    {
-        return (new Stopwatch())->start(self::STOP_WATCH_EVENT);
-    }
-
-    private function getUpcomingEventsIds(): array
+    public function getUpcomingEventsIds(): array
     {
         return $this->connection->fetchFirstColumn(
             'SELECT id FROM tl_calendar_events WHERE startDate > ? ORDER BY id',
@@ -104,7 +99,7 @@ class SyncEventRegistrationDatabase extends AbstractController
      * Retrieves all distinct contaoMemberIds
      * that have a corresponding entry in tl_member.
      */
-    private function getContaoMemberIds(): array
+    public function getContaoMemberIds(): array
     {
         return $this->connection->fetchFirstColumn(
             '
@@ -120,67 +115,129 @@ class SyncEventRegistrationDatabase extends AbstractController
         );
     }
 
-    private function sync(): void
+    public function syncMember(int $memberId): int
     {
-        $contaoMemberIds = $this->getContaoMemberIds();
         $upcomingEventIds = $this->getUpcomingEventsIds();
-
-        $this->syncLog['processed_members'] = \count($contaoMemberIds);
-
+        $affectedRows = 0;
         $this->connection->beginTransaction();
 
         try {
-            foreach ($contaoMemberIds as $contaoMemberId) {
-                $memberData = $this->fetchMemberData($contaoMemberId);
+            $affectedRows = $this->processMember($memberId, $upcomingEventIds);
+            $this->connection->commit();
+        } catch (\Throwable $exception) {
+            $this->handleSyncError($exception);
+        }
 
-                if (empty($memberData)) {
-                    continue;
-                }
+        return $affectedRows;
+    }
 
-                $eventRegistrations = $this->fetchMemberEventRegistrations($memberData['id']);
+    private function stopWatchStart(): StopwatchEvent
+    {
+        return (new Stopwatch())->start(self::STOP_WATCH_EVENT);
+    }
 
-                foreach ($eventRegistrations as $registration) {
-                    ++$this->syncLog['processed_registrations'];
+    private function syncAll(): void
+    {
+        $memberIds = $this->getContaoMemberIds();
+        $upcomingEventIds = $this->getUpcomingEventsIds();
 
-                    $set = $this->generateUpdateData($memberData, $registration, $upcomingEventIds);
+        $this->logProcessedMembers(\count($memberIds));
+        $this->connection->beginTransaction();
 
-                    if (empty($set)) {
-                        continue;
-                    }
-
-                    $affectedRows = $this->connection->update(
-                        'tl_calendar_events_member',
-                        $set,
-                        [
-                            'id' => $registration['id'],
-                        ],
-                        [
-                            'id' => Types::INTEGER,
-                        ],
-                    );
-
-                    if (!empty($affectedRows)) {
-                        ++$this->syncLog['updates'];
-
-                        $this->syncLog['log'][] = sprintf(
-                            'Update contact data for event registration ID %d with member %s %s.',
-                            $registration['id'],
-                            $memberData['firstname'],
-                            $memberData['lastname'],
-                        );
-                    }
-                }
+        try {
+            foreach ($memberIds as $memberId) {
+                $this->processMember($memberId, $upcomingEventIds);
             }
 
             $this->connection->commit();
-        } catch (\throwable $e) {
-            $this->connection->rollBack();
-            $this->syncLog['with_error'] = true;
-            $this->syncLog['exceptions'][] = $e->getMessage();
+        } catch (\Throwable $exception) {
+            $this->handleSyncError($exception);
+        }
+    }
 
-            if (!empty($registration['id'])) {
-                $this->contaoErrorLogger->error(sprintf('There has been an error while trying to update contact data of event registration ID %d. Error: %s', $registration['id'], $e->getMessage()));
-            }
+    private function processMember(int $memberId, array $upcomingEventIds): int
+    {
+        $memberData = $this->fetchMemberData($memberId);
+
+        if (empty($memberData)) {
+            return 0; // Skip processing if no data
+        }
+
+        $registrations = $this->fetchMemberEventRegistrations($memberData['id']);
+
+        return $this->processEventRegistrations($registrations, $memberData, $upcomingEventIds);
+    }
+
+    private function processEventRegistrations(array $registrations, array $memberData, array $upcomingEventIds): int
+    {
+        $affectedRows = 0;
+
+        foreach ($registrations as $registration) {
+            $affectedRows += $this->processRegistration($registration, $memberData, $upcomingEventIds);
+        }
+
+        return $affectedRows;
+    }
+
+    private function logProcessedMembers(int $count): void
+    {
+        $this->syncLog['processed_members'] = $count;
+    }
+
+    private function processRegistration(array $registration, array $memberData, array $upcomingEventIds): int
+    {
+        ++$this->syncLog['processed_registrations'];
+
+        $updateData = $this->generateUpdateData($memberData, $registration, $upcomingEventIds);
+
+        if (empty($updateData)) {
+            return 0;
+        }
+
+        $affectedRows = $this->connection->update(
+            'tl_calendar_events_member',
+            $updateData,
+            ['id' => $registration['id']],
+            ['id' => Types::INTEGER]
+        );
+
+        if (!empty($affectedRows)) {
+            ++$this->syncLog['updates'];
+            $this->logUpdate($registration, $memberData);
+
+            return $affectedRows;
+        }
+
+        return 0;
+    }
+
+    private function logUpdate(array $registration, array $memberData): void
+    {
+        $this->syncLog['log'][] = sprintf(
+            'Update contact data for event registration ID %d with member %s %s.',
+            $registration['id'],
+            $memberData['firstname'],
+            $memberData['lastname']
+        );
+    }
+
+    private function handleSyncError(\Throwable $e): void
+    {
+        if ($this->connection->isTransactionActive()) {
+            $this->connection->rollBack();
+        }
+
+        $this->syncLog['with_error'] = true;
+        $this->syncLog['exceptions'][] = $e->getMessage();
+
+        if (!empty($registration['id'])) {
+            $this->contaoErrorLogger->error(
+                sprintf(
+                    'There has been an error while trying to update contact data of event registration ID %d. Error: %s',
+                    $registration['id'],
+                    $e->getMessage()
+                )
+            );
         }
     }
 

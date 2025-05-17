@@ -32,9 +32,25 @@
                     <strong class="text-danger">Seilschaftsführer-Ausbildung seit:</strong> {{ user.dateOfLeadClimbingEducation|date('d.m.Y') }}
                 </p>
             {% endif %}
-            <div class="my-4 alert alert-lighter" role="alert">
-                <p class="m-0"><strong class="text-danger">Hinweis:</strong><br><strong>Deine Mitgliederdaten (Name, Adresse, Telefon, E-Mail)</strong> kannst du nur im <strong>SAC/CAS-Portal</strong> des Zentralverbandes<strong> ändern</strong>. Logge dich deshalb auf <a href="https://portal.sac-cas.ch/de" target="_blank" rel="noopener"><strong>portal.sac-cas.ch</strong></a> ein. Änderungen deiner Mitgliederdaten sind spätestens<strong> nach 24 Stunden</strong> hier wirksam und ersichtlich.</p>
+            <div class="my-4 d-flex">
+                {% set content %}
+                    <p class="m-0">
+                        <strong>Deine Mitgliederdaten (Name, Adresse, Telefon, E-Mail)</strong> kannst du nur im <strong>SAC/CAS-Portal</strong> des Zentralverbandes<strong> ändern</strong>. Logge dich deshalb auf <a href="https://portal.sac-cas.ch/de" target="_blank" rel="noopener"><strong>portal.sac-cas.ch</strong></a> ein. Änderungen deiner Mitgliederdaten sind spätestens<strong> nach 24 Stunden</strong> hier wirksam und ersichtlich.</p>
+                {% endset %}
+                {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-lighter', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: content, headline_text: 'Änderung Mitgliederdaten'} %}
             </div>
+
+            {# Display a short message if the user has updated his contact/emergency data #}
+            {% if has_frontend_user_notifications('member_dashboard_edit_profile_controller::update_contact_data') %}
+                {% set messages = get_frontend_user_notifications('member_dashboard_edit_profile_controller::update_contact_data', true) %}
+                {% for message in messages %}
+                    <div class="my-4 d-flex">
+                        {# inject the message to the alert template #}
+                        {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-lighter', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: message.messageText} %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
             <form enctype="{{ form.getEnctype() }}" method="{{ form.getHttpMethod() }}" class="form-horizontal">
                 {{ form.getWidget('FORM_SUBMIT').generateWithError()|raw }}
                 {{ form.getWidget('REQUEST_TOKEN').generateWithError()|raw }}

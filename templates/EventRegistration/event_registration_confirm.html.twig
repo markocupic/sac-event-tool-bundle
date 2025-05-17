@@ -1,10 +1,10 @@
-<div class="mt-4 alert alert-info" role="alert">
-    <i class="fa-solid fa-check-circle me-2"></i>
-    <div>
+<div class="mt-4">
+    {% set message %}
         Du bist für "{{ event_model.title }}" registriert.
         <br>
         Status: {{ event_member_model.stateOfSubscriptionTrans }}
-    </div>
+    {% endset %}
+    {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: message } %}
 </div>
 
 <table class="table">
@@ -77,7 +77,19 @@
     {% endif %}
 </table>
 
-<p class="mt-5">
-    In deinem <strong>Mitgliederprofil</strong> kannst du den Status deiner Anmeldung einsehen und deine Buchungen gegebenenfalls <strong>stornieren</strong>.
-</p>
+{# Display a short message if the user has updated his contact/emergency data #}
+{% if has_frontend_user_notifications('event_registration_controller::update_contact_data') %}
+    {% set messages = get_frontend_user_notifications('event_registration_controller::update_contact_data', true) %}
+    {% for message in messages %}
+        <div class="mt-5">
+            {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: message.messageText|nl2br } %}
+        </div>
+    {% endfor %}
+{% endif %}
 
+<div class="mt-5">
+    {% set message %}
+        <p class="my-0">In deinem <strong>Mitgliederprofil</strong> kannst du den Status deiner Anmeldung einsehen und deine Buchungen gegebenenfalls <strong>stornieren</strong>.</p>
+    {% endset %}
+    {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: message } %}
+</div>

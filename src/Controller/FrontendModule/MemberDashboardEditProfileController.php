@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Codefog\HasteBundle\Form\Form;
+use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -27,7 +28,9 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\User;
+use Markocupic\ContaoFrontendUserNotification\Notification\DefaultFrontendUserNotification;
 use Markocupic\SacEventToolBundle\Config\Log;
+use Markocupic\SacEventToolBundle\Database\SyncEventRegistrationDatabase;
 use Markocupic\SacEventToolBundle\Model\SacSectionModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -46,6 +49,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly Security $security,
+        private readonly SyncEventRegistrationDatabase $syncEventRegistrationDatabase,
         private readonly TranslatorInterface $translator,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
@@ -135,7 +139,19 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
 
         if ($form->validate()) {
             // The model will now contain the changes, so you can save it.
-            $model->save();
+            if ($model->isModified()) {
+                $model->save();
+
+                if ($this->syncEventRegistrationDatabase->syncMember($model->id)) {
+                    new DefaultFrontendUserNotification(
+                        $this->security->getUser(),
+                        'member_dashboard_edit_profile_controller::update_contact_data',
+                        'Mitteilung',
+                        'All deine persönlichen Daten (Adresse, Tel.-Nr., Notfallangaben, Essgewohnheiten etc.) wurden anhand deiner Eingaben bei deinen laufenden Anmeldungen aktualisiert.',
+                        time() + 60
+                    );
+                }
+            }
 
             $this->contaoGeneralLogger->info(
                 sprintf(
@@ -146,6 +162,8 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
                 ),
                 ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DASHBOARD_UPDATE_PROFILE)]
             );
+
+            Controller::reload();
         }
 
         return $form;
