@@ -45,7 +45,7 @@
         {# start form #}
         <div id="eventRegistrationForm" class="hasteform_form-event-registration block">
             <div class="row gx-5">
-                <div class="col-12 col-lg-6">
+                <div class="col-12">
                     <form action="{{ form.getAction() }}" method="{{ form.getHttpMethod() }}" enctype="{{ form.getEnctype() }}">
                         <div class="formbody">
                             <div class="pe-lg-3">
@@ -135,9 +135,6 @@
                         </div>
                     </form>
                 </div>
-                <div class="col-0 col-lg-6 col-right">
-                    {# contains the background image for large screens #}
-                </div>
             </div>
         </div>
         {# end form #}
@@ -147,20 +144,12 @@
                     overflow: hidden;
                 }
 
-                #eventRegistrationForm .col-right {
-                    background-image: url('./bundles/markocupicsaceventtool/images/registration_form/registration_form_bg_1.jpg');
-                    background-size: cover;
-                    background-repeat: no-repeat;
-                    background-position: center top;
-                    filter: grayscale(0);
-                }
-
                 #eventRegistrationForm select, #eventRegistrationForm input, #eventRegistrationForm textarea {
                     background-color: #f8f9fa !important;
                 }
             </style>
         {% endadd %}
-
+        
         <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
             document.addEventListener('DOMContentLoaded', (event) => {
 
