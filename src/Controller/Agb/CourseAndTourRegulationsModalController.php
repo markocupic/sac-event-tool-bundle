@@ -22,11 +22,13 @@ use Contao\Validator;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\Response;
 
 class CourseAndTourRegulationsModalController extends AbstractController
 {
     private readonly Adapter $stringUtil;
+
     private readonly Adapter $validator;
 
     public function __construct(
@@ -40,12 +42,11 @@ class CourseAndTourRegulationsModalController extends AbstractController
 
     public function getModal(CalendarEventsModel $event, string $attrModalId = 'courseAndTourRegulationsModal', string $attrModalTitle = 'course and tour regulations'): Response
     {
-        $isDownloadable = false;
-
         $allowedEventTypes = [
             EventType::TOUR,
             EventType::LAST_MINUTE_TOUR,
             EventType::COURSE,
+			EventType::GENERAL_EVENT,
         ];
 
         if (\in_array($event->eventType, $allowedEventTypes, true)) {
@@ -55,12 +56,12 @@ class CourseAndTourRegulationsModalController extends AbstractController
                 $arrOrganizer = $this->connection->fetchAssociative(
                     'SELECT * FROM tl_event_organizer WHERE id = ?',
                     [
-                        $eventOrganizers[0],
-                    ]
+						(int) $eventOrganizers[0],
+                    ],
                 );
 
                 if ($arrOrganizer) {
-                    if (EventType::TOUR === $event->eventType || EventType::LAST_MINUTE_TOUR === $event->eventType) {
+                    if (EventType::GENERAL_EVENT === $event->eventType || EventType::TOUR === $event->eventType || EventType::LAST_MINUTE_TOUR === $event->eventType) {
                         $prefix = EventType::TOUR;
                     }
 
@@ -72,30 +73,29 @@ class CourseAndTourRegulationsModalController extends AbstractController
                         $regulationsExtract = $arrOrganizer[$prefix.'RegulationExtract'] ?? null;
 
                         if (!empty($regulationsExtract)) {
+							$isDownloadable = false;
+
                             if ($this->validator->isBinaryUuid($arrOrganizer[$prefix.'RegulationSRC'])) {
                                 $arrFile = $this->connection->fetchAssociative(
                                     'SELECT * FROM tl_files WHERE uuid = ?',
                                     [
                                         $arrOrganizer[$prefix.'RegulationSRC'],
-                                    ]
+                                    ],
                                 );
 
                                 if ($arrFile) {
-                                    if (is_file($this->projectDir.'/'.$arrFile['path'])) {
-                                        $isDownloadable = true;
+                                    if (is_file(Path::join($this->projectDir,$arrFile['path']))) {
+										$isDownloadable = true;
                                     }
                                 }
                             }
 
-                            return $this->render(
-                                '@MarkocupicSacEventTool/Agb/course_and_tour_regulations_modal.html.twig',
-                                [
-                                    'event_regulations_file' => true === $isDownloadable ? $arrFile : null,
-                                    'event_regulations_extract' => $regulationsExtract,
-                                    'attr_modal_id' => $attrModalId,
-                                    'attr_modal_title' => $attrModalTitle,
-                                ]
-                            );
+                            return $this->render('@MarkocupicSacEventTool/Agb/course_and_tour_regulations_modal.html.twig', [
+                                'event_regulations_file' => true === $isDownloadable ? $arrFile : null,
+                                'event_regulations_extract' => $regulationsExtract,
+                                'attr_modal_id' => $attrModalId,
+                                'attr_modal_title' => $attrModalTitle,
+                            ]);
                         }
                     }
                 }
