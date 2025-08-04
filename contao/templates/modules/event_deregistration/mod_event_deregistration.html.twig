@@ -18,7 +18,7 @@
 
     {% if form|default %}
         <p>Liebe/Lieber {{ user.firstname }}</p>
-        <p>Hier hast du die Möglichkeit, dich von <a href="get_event_data(event_model, 'eventUrl')" rel="noopener" target="_blank">"{{ event.title }}"</a> wieder abzumelden.</p>
+        <p>Hier hast du die Möglichkeit, dich von <a href="{{ get_event_data(event_model, 'eventUrl') }}" rel="noopener" target="_blank">"{{ event.title }}"</a> wieder abzumelden.</p>
         <p class="mt-3">Bitte berücksichtige, dass Abmeldungen für Leitende immer mit Aufwand verbunden sind. Bei Verhinderung solltest du dich umgehend mit Begründung vom Event abmelden. So machst du Platz für weitere, sich auf der Warteliste befindende Teilnehmende.<br>Siehe: <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">Kurs- und Tourenreglement (Auszug)</a></p>
         <p class="mt-3">Bei einer Abmeldung können ggf. <strong>Stornierungsgebühren</strong> anfallen. Erkundige dich deshalb vorgängig genau über die Bestimmungen für Abmeldungen von Events.</p>
         <p class="mb-0 mt-5"><em>Auszug aus der Touren-/Kurs-Ausschreibung:</em></p>
