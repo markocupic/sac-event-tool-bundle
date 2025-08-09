@@ -69,9 +69,10 @@ class FileBackupCron extends AbstractController
      * Every day at 3:45 AM.
      */
     #[AsCronJob('45 3 * * *')]
+	#[AsCronJob('44 12 * * *')]
     public function daily(): void
     {
-        $timeCut = strtotime('-1 hour');
+        $timeCut = strtotime('-14 days');
         $this->removeOutdatedBackups('daily', $timeCut);
         $this->backupFiles('daily');
     }
