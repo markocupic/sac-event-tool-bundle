@@ -21,6 +21,7 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Exception\PageNotFoundException;
+use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Routing\ContentUrlGenerator;
@@ -33,9 +34,9 @@ use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\System;
-use Contao\Template;
 use Contao\UserModel;
 use Contao\Validator;
+use Doctrine\DBAL\Connection;
 use Markocupic\ContaoFrontendUserNotification\Notification\DefaultFrontendUserNotification;
 use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\CarSeatInfo;
@@ -43,6 +44,7 @@ use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Config\TicketInfo;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\CheckoutAction;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\Exception\EventRegistrationException;
 use Markocupic\SacEventToolBundle\Database\SyncEventRegistrationDatabase;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
@@ -58,6 +60,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment as TwigEnvironment;
@@ -66,24 +69,24 @@ use Twig\Environment as TwigEnvironment;
 class EventRegistrationController extends AbstractFrontendModuleController
 {
     public const string TYPE = 'event_registration';
-    public const string CHECKOUT_STEP_LOGIN = 'login';
-    public const string CHECKOUT_STEP_REGISTER = 'register';
-    public const string CHECKOUT_STEP_CONFIRM = 'confirm';
-    public const string CHECKOUT_STEP_REGISTRATION_INTERRUPTED = 'registration_interrupted';
 
     // Class properties that are initialized after class instantiation
     private CalendarEventsModel|null $eventModel = null;
+
     private MemberModel|null $memberModel = null;
+
     private ModuleModel|null $moduleModel = null;
+
     private UserModel|null $mainInstructorModel = null;
-    private bool $validationFailed = false;
 
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly CarSeatInfo $carSeatInfo,
+        private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly LockFactory $lockFactory,
         private readonly RequestStack $requestStack,
         private readonly ScopeMatcher $scopeMatcher,
         private readonly Security $security,
@@ -91,9 +94,9 @@ class EventRegistrationController extends AbstractFrontendModuleController
         private readonly TicketInfo $ticketInfo,
         private readonly TranslatorInterface $translator,
         private readonly TwigEnvironment $twig,
+        private readonly UrlParser $urlParser,
         #[Autowire('%sacevt.event_registration.config.reg_start_time_offset%')]
         private readonly int $regStartTimeOffset,
-        private readonly UrlParser $urlParser,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
         private readonly LoggerInterface|null $contaoErrorLogger = null,
     ) {
@@ -125,12 +128,12 @@ class EventRegistrationController extends AbstractFrontendModuleController
         }
 
         if (($objUser = $this->security->getUser()) instanceof FrontendUser) {
-            $this->setMemberModel(MemberModel::findByPk($objUser->id));
+            $this->setMemberModel(MemberModel::findById($objUser->id));
         }
 
         $eventIdOrAlias = (string) $this->framework->getAdapter(Input::class)->get('auto_item');
 
-        // Get the event model from url query.
+        // Get the event model from URL parameters.
         try {
             $this->setEventModel($this->framework->getAdapter(CalendarEventsModel::class)->findByIdOrAlias($eventIdOrAlias));
         } catch (\Throwable $e) {
@@ -138,89 +141,111 @@ class EventRegistrationController extends AbstractFrontendModuleController
         }
 
         // Get the main instructor object.
-        $this->setMainInstructorModel($this->framework->getAdapter(UserModel::class)->findByPk($this->eventModel->mainInstructor));
+        $this->setMainInstructorModel($this->framework->getAdapter(UserModel::class)->findById($this->eventModel->mainInstructor));
 
         $messageAdapter = $this->framework->getAdapter(Message::class);
 
-        // Do numerous checks to be sure that the event is bookable.
-        // If validation fails write an info/error message to the session flash bag.
+        $lock = $this->lockFactory->createLock(resource: self::class.'-'.$this->eventModel->id, ttl: 30);
+        $lock->acquire(true);
+
+        $this->connection->beginTransaction();
+
         try {
+            $currentStep = $request->query->get('action');
+
             $options = [
                 'regStartTimeOffset' => $this->regStartTimeOffset,
             ];
 
+            // Do numerous checks to be sure that the event is bookable. If validation fails,
+            // write an info/error message to the session flash bag. Will throw an
+            // EventRegistrationException exception if the event is not bookable.
             $this->validateRegistrationRequest($this->eventModel, $this->memberModel, $this->mainInstructorModel, $options);
-        } catch (\Exception $e) {
-            match (true) {
-                $e instanceof EventRegistrationException && EventRegistrationException::LEVEL_INFO === $e->getErrorLevel() => $messageAdapter->addInfo($this->translator->trans($e->getTranslatableText(), $e->getParams(), 'contao_default')),
-                $e instanceof EventRegistrationException && EventRegistrationException::LEVEL_ERROR === $e->getErrorLevel() => $messageAdapter->addError($this->translator->trans($e->getTranslatableText(), $e->getParams(), 'contao_default')),
-                default => $messageAdapter->addError($this->translator->trans('ERR.evt_reg_unknownError', [], 'contao_default')),
-            };
 
-            if (($e instanceof EventRegistrationException && EventRegistrationException::LEVEL_ERROR === $e->getErrorLevel()) || (!$e instanceof EventRegistrationException)) {
+            if (null !== $this->memberModel && $this->framework->getAdapter(CalendarEventsMemberModel::class)->isRegistered($this->memberModel->id, $this->eventModel->id)) {
+                if ($url = $this->getActionUrlIfMiss(CheckoutAction::CHECKOUT_STEP_CONFIRM)) {
+                    return $this->redirect($url);
+                }
+            } elseif (null === $this->memberModel) {
+                if ($url = $this->getActionUrlIfMiss(CheckoutAction::CHECKOUT_STEP_LOGIN)) {
+                    return $this->redirect($url);
+                }
+            } else {
+                if ($url = $this->getActionUrlIfMiss(CheckoutAction::CHECKOUT_STEP_REGISTER)) {
+                    return $this->redirect($url);
+                }
+            }
+
+            switch ($currentStep) {
+                case CheckoutAction::CHECKOUT_STEP_LOGIN->value:
+                    break;
+                case CheckoutAction::CHECKOUT_STEP_REGISTER->value:
+                    // All ok! Booking request has passed all checks. So let's generate the
+                    // registration form now.
+                    $template->set('form', $this->generateForm($request));
+
+                    // Check if the event is already fully booked.
+                    if ($this->calendarEventsUtil->eventIsFullyBooked($this->eventModel)) {
+                        $template->set('eventFullyBooked', true);
+                    }
+
+                    break;
+                case CheckoutAction::CHECKOUT_STEP_CONFIRM->value:
+                    $template->set('regInfo', $this->renderEventRegistrationConfirmTemplate());
+                    break;
+
+                default:
+                    throw new \LogicException('This place in the code should never been reached.');
+            }
+
+            $this->connection->commit();
+        } catch (RedirectResponseException $e) {
+            $this->connection->commit();
+
+            throw $e;
+        } catch (EventRegistrationException $e) {
+            if ($this->connection->isTransactionActive()) {
+                $this->connection->rollBack();
+            }
+
+            // Display a message to the user.
+            $messageAdapter->add($this->translator->trans($e->getTranslatableText(), $e->getParams(), 'contao_default'), $e->getErrorLevel());
+
+            $this->addErrorMessageToTemplate($template, $request);
+
+            if (EventRegistrationException::LEVEL_ERROR === $e->getErrorLevel()) {
                 $this->contaoErrorLogger?->error($e->getMessage(), ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION_ERROR)]);
             }
 
-            $this->validationFailed = true;
-        }
-
-        if (null !== $this->memberModel && $this->framework->getAdapter(CalendarEventsMemberModel::class)->isRegistered($this->memberModel->id, $this->eventModel->id)) {
-            if ($url = $this->getRoute(self::CHECKOUT_STEP_CONFIRM)) {
+            if ($url = $this->getActionUrlIfMiss(CheckoutAction::CHECKOUT_STEP_REGISTRATION_INTERRUPTED)) {
                 return $this->redirect($url);
             }
-        } elseif ($this->validationFailed) {
-            if ($url = $this->getRoute(self::CHECKOUT_STEP_REGISTRATION_INTERRUPTED)) {
+        } catch (\Throwable $e) {
+            if ($this->connection->isTransactionActive()) {
+                $this->connection->rollBack();
+            }
+
+            // Display a message to the user.
+            $messageAdapter->addError($this->translator->trans('ERR.evt_reg_unknownError', [], 'contao_default'));
+
+            $this->addErrorMessageToTemplate($template, $request);
+
+            if (method_exists($e, 'getMessage')) {
+                $this->contaoErrorLogger?->error($e->getMessage(), ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION_ERROR)]);
+            }
+
+            if ($url = $this->getActionUrlIfMiss(CheckoutAction::CHECKOUT_STEP_REGISTRATION_INTERRUPTED)) {
                 return $this->redirect($url);
             }
-        } elseif (null === $this->memberModel) {
-            if ($url = $this->getRoute(self::CHECKOUT_STEP_LOGIN)) {
-                return $this->redirect($url);
-            }
-        } else {
-            if ($url = $this->getRoute(self::CHECKOUT_STEP_REGISTER)) {
-                return $this->redirect($url);
-            }
-        }
-
-        $currentStep = $request->query->get('action');
-
-        switch ($currentStep) {
-            case self::CHECKOUT_STEP_LOGIN:
-                break;
-            case self::CHECKOUT_STEP_REGISTER:
-                // All ok! Booking request has passed all checks. So let's generate the registration form now.
-                $template->set('form', $this->generateForm($request));
-
-                // Check if event is already fully booked.
-                if ($this->calendarEventsUtil->eventIsFullyBooked($this->eventModel)) {
-                    $template->set('eventFullyBooked', true);
-                }
-
-                break;
-            case self::CHECKOUT_STEP_CONFIRM:
-                $template->set('regInfo', $this->renderEventRegistrationConfirmTemplate());
-                break;
-            case self::CHECKOUT_STEP_REGISTRATION_INTERRUPTED:
-                if ($messageAdapter->hasError()) {
-                    $errorMessage = $this->getFirstErrorMessage($request);
-                    $template->set('errorMessage', $errorMessage);
-                }
-
-                if ($messageAdapter->hasInfo()) {
-                    $infoMessage = $this->getFirstInfoMessage($request);
-                    $template->set('infoMessage', $infoMessage);
-                }
-
-                break;
-
-            default:
-                throw new \LogicException('This place in the code should not be reachable.');
+        } finally {
+            $lock->release();
         }
 
         // Add more data to the template.
         $template = $this->addTemplateVars($template);
         $template->set('currentStep', $currentStep);
         $template->set('stepIndicator', $this->renderStepIndicatorTemplate($request->query->get('action')));
+        $template->set('actionEnum', array_column(CheckoutAction::cases(), 'value', 'name'));
 
         return $template->getResponse();
     }
@@ -238,6 +263,21 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private function setMainInstructorModel(UserModel|null $mainInstructorModel): void
     {
         $this->mainInstructorModel = $mainInstructorModel;
+    }
+
+    private function addErrorMessageToTemplate(FragmentTemplate $template, Request $request): void
+    {
+        $messageAdapter = $this->framework->getAdapter(Message::class);
+
+        if ($messageAdapter->hasError()) {
+            $errorMessage = $this->getFirstErrorMessage($request);
+            $template->set('errorMessage', $errorMessage);
+        }
+
+        if ($messageAdapter->hasInfo()) {
+            $infoMessage = $this->getFirstInfoMessage($request);
+            $template->set('infoMessage', $infoMessage);
+        }
     }
 
     private function validateRegistrationRequest(CalendarEventsModel $eventModel, MemberModel|null $memberModel = null, UserModel|null $mainInstructorModel = null, $options = []): void
@@ -305,12 +345,12 @@ class EventRegistrationController extends AbstractFrontendModuleController
         }
     }
 
-    private function getRoute(string $action): string|null
+	private function getActionUrlIfMiss(CheckoutAction $action): string|null
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ($request->query->get('action') !== $action) {
-            return $this->urlParser->addQueryString('action='.$action, $request->getUri());
+        if ($request->query->get('action') !== $action->value) {
+            return $this->urlParser->addQueryString('action='.$action->value, $request->getUri());
         }
 
         return null;
@@ -325,7 +365,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         $objForm->setAction($request->getUri());
 
-        if (null !== ($objJourney = $this->framework->getAdapter(CalendarEventsJourneyModel::class)->findByPk($this->eventModel->journey))) {
+        if (null !== ($objJourney = $this->framework->getAdapter(CalendarEventsJourneyModel::class)->findById($this->eventModel->journey))) {
             if ('public-transport' === $objJourney->alias) {
                 $objForm->addFormField('ticketInfo', $this->getFormFieldDca('ticketInfo'));
             }
@@ -354,8 +394,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         $objForm->addFormField('submit', $this->getFormFieldDca('submit'));
 
-        // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields.
-        // DO NOT use this method with generate() as the "form" template provides those fields by default.
+        // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields. DO NOT use this
+        // method with generate() as the "form" template provides those fields by default.
         $objForm->addContaoHiddenFields();
 
         // Get form presets from tl_member.
@@ -382,13 +422,13 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
                 // Contao system log
                 if ($this->contaoGeneralLogger) {
-                    $strText = sprintf(
+                    $strText = \sprintf(
                         'New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").',
                         $this->memberModel->firstname,
                         $this->memberModel->lastname,
                         $this->memberModel->id,
                         $this->eventModel->id,
-                        $this->eventModel->title
+                        $this->eventModel->title,
                     );
 
                     $this->contaoGeneralLogger->info($strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION)]);
@@ -459,21 +499,22 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $registrationModel->setRow($arrData);
         $registrationModel->save();
 
-        // Update contactData & emergencyPhone, emergencyPhoneName and foodHabits in all event registrations of the user
+        // Update contactData & emergencyPhone, emergencyPhoneName and foodHabits in all
+        // event registrations of the user
         if ($this->syncEventRegistrationDatabase->syncMember($memberModel->id)) {
             new DefaultFrontendUserNotification(
                 $this->security->getUser(),
                 'event_registration_controller::update_contact_data',
                 'Mitteilung',
                 'All deine persönlichen Daten (Adresse, Tel.-Nr., Notfallangaben, Essgewohnheiten etc.) wurden anhand deiner Eingaben bei deinen laufenden Anmeldungen aktualisiert.',
-                time() + 60
+                time() + 60,
             );
         }
 
         return $registrationModel;
     }
 
-    private function addTemplateVars(FragmentTemplate $template): Template
+    private function addTemplateVars(FragmentTemplate $template): FragmentTemplate
     {
         $template->set('controller', $this);
         $template->set('eventModel', $this->eventModel);
@@ -577,14 +618,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
             $arrEventsMember = array_map('html_entity_decode', $arrEventsMember);
             $arrMember = array_map('html_entity_decode', $arrMember);
 
-            return $this->twig->render(
-                '@MarkocupicSacEventTool/EventRegistration/event_registration_confirm.html.twig',
-                [
-                    'event_model' => $arrEvent,
-                    'event_member_model' => $arrEventsMember,
-                    'member_model' => $arrMember,
-                ]
-            );
+            return $this->twig->render('@MarkocupicSacEventTool/EventRegistration/event_registration_confirm.html.twig', [
+                'event_model' => $arrEvent,
+                'event_member_model' => $arrEventsMember,
+                'member_model' => $arrMember,
+            ]);
         }
 
         return '';
@@ -592,13 +630,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     private function renderStepIndicatorTemplate(string $strStep): string
     {
-        return $this->twig->render(
-            '@MarkocupicSacEventTool/EventRegistration/event_registration_step_indicator.html.twig',
-            [
-                'controller' => $this,
-                'current_step' => $strStep,
-            ]
-        );
+        return $this->twig->render('@MarkocupicSacEventTool/EventRegistration/event_registration_step_indicator.html.twig', [
+            'controller' => $this,
+            'current_step' => $strStep,
+            'actionEnum' => array_column(CheckoutAction::cases(), 'value', 'name'),
+        ]);
     }
 
     private function getFirstErrorMessage(Request $request): string|null

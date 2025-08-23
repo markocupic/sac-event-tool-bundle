@@ -2,24 +2,24 @@
 {% extends '@Contao/block_unsearchable' %}
 
 {% block content %}
-    {% if constant('CHECKOUT_STEP_REGISTRATION_INTERRUPTED', controller) == currentStep %}
+    {% if actionEnum.CHECKOUT_STEP_REGISTRATION_INTERRUPTED == currentStep %}
         {% if errorMessage|default %}
             {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-danger', add_icon: true, icon_class: 'fa-solid fa-exclamation-circle', text: errorMessage} %}
         {% endif %}
         {% if infoMessage|default %}
             {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: infoMessage} %}
         {% endif %}
-    {% elseif constant('CHECKOUT_STEP_LOGIN', controller) == currentStep %}
+    {% elseif actionEnum.CHECKOUT_STEP_LOGIN == currentStep %}
         {{ stepIndicator|raw }}
         {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: 'Bitte logge dich ein, um dich zu einem Event anzumelden.'} %}
         <!-- Login form -->
         <div class="mt-5 mb-4">
             {{ insert_tag('insert_module::' ~ moduleModel.eventRegLoginModule)|raw }}
         </div>
-    {% elseif constant('CHECKOUT_STEP_CONFIRM', controller) == currentStep %}
+    {% elseif actionEnum.CHECKOUT_STEP_CONFIRM == currentStep %}
         {{ stepIndicator|raw }}
         {{ regInfo|raw }}
-    {% elseif constant('CHECKOUT_STEP_REGISTER', controller) == currentStep %}
+    {% elseif actionEnum.CHECKOUT_STEP_REGISTER == currentStep %}
         {{ stepIndicator|raw }}
         {% if eventFullyBooked|default is same as(true) %}
             {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: 'ERR.evt_reg_bookingLimitReaches'|trans} %}
@@ -135,6 +135,18 @@
                         </div>
                     </form>
                 </div>
+                {% set script_attributes = attrs()
+                    .setIfExists('nonce', csp_nonce('script-src'))
+                    .mergeWith(script_attributes|default) %}
+                <script{{ script_attributes }}>
+                    document.currentScript.previousElementSibling.querySelector('form')?.addEventListener('submit', e => {
+                        // Prevent double form submission
+                        if (e.submitter) {
+                            setTimeout(() => e.submitter.disabled = true);
+                            setTimeout(() => e.submitter.disabled = false, 30000);
+                        }
+                    });
+                </script>
             </div>
         </div>
         {# end form #}
@@ -147,9 +159,13 @@
                 #eventRegistrationForm select, #eventRegistrationForm input, #eventRegistrationForm textarea {
                     background-color: #f8f9fa !important;
                 }
+
+                #eventRegistrationForm .submit[disabled] {
+                    background-color: #00618f !important;
+                }
             </style>
         {% endadd %}
-        
+
         <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
             document.addEventListener('DOMContentLoaded', (event) => {
 
