@@ -35,7 +35,6 @@ use PhpOffice\PhpWord\Element\Cell;
 use PhpOffice\PhpWord\Exception\Exception;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
-use Safe\DateTime;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ExportEvents2Docx
@@ -43,6 +42,7 @@ class ExportEvents2Docx
     private const TEMP_PATH = 'system/tmp';
 
     private string|null $strTable;
+
     private array|null $arrDatarecord;
 
     public function __construct(
@@ -63,8 +63,8 @@ class ExportEvents2Docx
         $this->strTable = 'tl_calendar_events';
         Controller::loadDataContainer('tl_calendar_events');
 
-        // Creating the new document...
-        // Tutorial http://phpword.readthedocs.io/en/latest/elements.html#titles
+        // Creating the new document... Tutorial
+        // http://phpword.readthedocs.io/en/latest/elements.html#titles
         $phpWord = new PhpWord();
 
         // Styles
@@ -95,8 +95,8 @@ class ExportEvents2Docx
         $widthCol_1 = round(45 * $twip);
         $widthCol_2 = round(115 * $twip);
 
-        $start = (new DateTime($year.'-01-01'))->getTimestamp();
-        $stop = (new DateTime($year + 1 .'-01-01'))->getTimestamp();
+        $start = (new \DateTime($year.'-01-01'))->getTimestamp();
+        $stop = (new \DateTime($year + 1 .'-01-01'))->getTimestamp();
 
         $objEvent = Database::getInstance()
             ->prepare('SELECT * FROM tl_calendar_events WHERE eventType = ? AND startTime >= ? AND endTime < ? AND published = ? ORDER BY courseTypeLevel0, title, startDate')
@@ -111,7 +111,7 @@ class ExportEvents2Docx
                     }
                 }
 
-                $eventModel = CalendarEventsModel::findByPk($objEvent->id);
+                $eventModel = CalendarEventsModel::findById($objEvent->id);
 
                 $this->arrDatarecord = $objEvent->row();
 
@@ -128,18 +128,16 @@ class ExportEvents2Docx
                 $textrun->addLink(Environment::get('host').'/', htmlspecialchars('KURSPROGRAMM '.$year, ENT_COMPAT, 'UTF-8'), $fStyleMediumRed);
                 $table->addCell(4500)->addImage($this->projectDir.'/files/fileadmin/page_assets/kursbroschuere/logo-sac-pilatus.png', ['height' => 40, 'align' => 'right']);
 
-                // Add footer
-                //$footer = $section->addFooter();
-                //$footer->addPreserveText(htmlspecialchars('Page {PAGE} of {NUMPAGES}.', ENT_COMPAT, 'UTF-8'), null, null);
-                //$footer->addLink('https://github.com/PHPOffice/PHPWord', htmlspecialchars('PHPWord on GitHub', ENT_COMPAT, 'UTF-8'));
-
-                // Add the title
+                // Add footer = $section->addFooter();
+                // footer->addPreserveText(htmlspecialchars('Page {PAGE} of {NUMPAGES}.',
+                // ENT_COMPAT, 'UTF-8'), null, null);
+                // footer->addLink('https://github.com/PHPOffice/PHPWord',
+                // htmlspecialchars('PHPWord on GitHub', ENT_COMPAT, 'UTF-8')); Add the title
                 $title = htmlspecialchars($this->formatValue('title', $objEvent->title, $eventModel));
                 $phpWord->addTitleStyle(1, $fStyleTitle, null);
                 $section->addTitle(htmlspecialchars($title, ENT_COMPAT, 'UTF-8'), 1);
 
-                // Add the table
-                //$firstRowStyle = array('bgColor' => '66BBFF');
+                // Add the table firstRowStyle = array('bgColor' => '66BBFF');
                 $firstRowStyle = [];
                 $phpWord->addTableStyle('Event-Item', $tableStyle, $firstRowStyle);
                 $table = $section->addTable('Event-Item');
@@ -198,9 +196,6 @@ class ExportEvents2Docx
         }
     }
 
-    /**
-     * @param $value
-     */
     private function formatValue(string $field, $value, CalendarEventsModel $objEvent): string
     {
         $table = $this->strTable;
@@ -217,12 +212,12 @@ class ExportEvents2Docx
                 $levelSub = $objEvent->courseTypeLevel1;
                 $strSub = '';
                 $strMain = '';
-                $objMain = CourseMainTypeModel::findByPk($levelMain);
+                $objMain = CourseMainTypeModel::findById($levelMain);
 
                 if (null !== $objMain) {
                     $strMain = $objMain->name;
                 }
-                $objSub = CourseSubTypeModel::findByPk($levelSub);
+                $objSub = CourseSubTypeModel::findById($levelSub);
 
                 if (null !== $objSub) {
                     $strSub = $objSub->code.' - '.$objSub->name;
@@ -235,8 +230,8 @@ class ExportEvents2Docx
 
                 if (\is_array(StringUtil::deserialize($value)) && !empty($value)) {
                     $arrValue = array_map(
-                        static fn ($v) => UserModel::findByPk((int) $v)->name,
-                        StringUtil::deserialize($value)
+                        static fn ($v) => UserModel::findById((int) $v)->name,
+                        StringUtil::deserialize($value),
                     );
                     $value = implode(', ', $arrValue);
                 }
@@ -245,8 +240,8 @@ class ExportEvents2Docx
             if ('instructor' === $field) {
                 $arrInstructors = $this->calendarEventsUtil->getInstructorsAsArray($objEvent);
                 $arrValue = array_map(
-                    static fn ($v) => UserModel::findByPk($v)->name,
-                    $arrInstructors
+                    static fn ($v) => UserModel::findById($v)->name,
+                    $arrInstructors,
                 );
                 $value = implode(', ', $arrValue);
             }
@@ -257,7 +252,7 @@ class ExportEvents2Docx
                 if (\is_array(StringUtil::deserialize($value)) && !empty($value)) {
                     $arrValue = array_map(
                         static function ($v) {
-                            $objOrganizer = EventOrganizerModel::findByPk($v);
+                            $objOrganizer = EventOrganizerModel::findById($v);
 
                             if (null !== $objOrganizer) {
                                 $v = $objOrganizer->title;
@@ -265,7 +260,7 @@ class ExportEvents2Docx
 
                             return $v;
                         },
-                        StringUtil::deserialize($value)
+                        StringUtil::deserialize($value),
                     );
                     $value = implode(', ', $arrValue);
                 }
@@ -279,11 +274,11 @@ class ExportEvents2Docx
 
             // Kusdatendaten in der Form d.m.Y, d.m.Y, ...
             if ('eventDates' === $field) {
-                $objEvent = CalendarEventsModel::findByPk($this->arrDatarecord['id']);
+                $objEvent = CalendarEventsModel::findById($this->arrDatarecord['id']);
                 $arr = $this->calendarEventsUtil->getEventTimestamps($objEvent);
                 $arr = array_map(
                     static fn ($tstamp) => Date::parse('d.m.Y', $tstamp),
-                    $arr
+                    $arr,
                 );
                 $value = implode(', ', $arr);
             }

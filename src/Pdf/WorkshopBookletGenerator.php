@@ -31,16 +31,19 @@ use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
 use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
-use Safe\DateTime;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class WorkshopBookletGenerator
 {
     private WorkshopTCPDF|null $pdf;
+
     private int|null $year;
+
     private int|null $eventId = null;
+
     private bool $download = false;
+
     private bool $printSingleEvent = false;
 
     public function __construct(
@@ -60,14 +63,14 @@ class WorkshopBookletGenerator
     }
 
     /**
-     * @throws \Exception
-     *
      * @return $this
+     *
+     * @throws \Exception
      */
     public function setYear(int $year): self
     {
         if (!checkdate(1, 1, $year)) {
-            throw new \Exception(sprintf('%s is not a valid year number. Please use a valid year number f.ex. "2020" as first parameter.', Date::parse('Y', strtotime((string) $year))));
+            throw new \Exception(\sprintf('%s is not a valid year number. Please use a valid year number f.ex. "2020" as first parameter.', Date::parse('Y', strtotime((string) $year))));
         }
         $this->year = $year;
 
@@ -75,13 +78,13 @@ class WorkshopBookletGenerator
     }
 
     /**
-     * @throws \Exception
-     *
      * @return $this
+     *
+     * @throws \Exception
      */
     public function setEventId(int $eventId): self
     {
-        if (null === CalendarEventsModel::findByPk($eventId)) {
+        if (null === CalendarEventsModel::findById($eventId)) {
             throw new \Exception('Please use a valid event id as first parameter.');
         }
 
@@ -109,7 +112,7 @@ class WorkshopBookletGenerator
         $addCover = true;
 
         // Print single event
-        if (null !== CalendarEventsModel::findByPk($this->eventId)) {
+        if (null !== CalendarEventsModel::findById($this->eventId)) {
             $this->printSingleEvent = true;
             $addToc = false;
             $addCover = false;
@@ -119,14 +122,13 @@ class WorkshopBookletGenerator
         $bundleSRC = System::getContainer()->get('kernel')->locateResource('@MarkocupicSacEventToolBundle');
         $fontDirectory = $bundleSRC.'src/Pdf/fonts/opensans';
 
-        // Create new PDF document
-        // Extend TCPDF for special footer and header handling
+        // Create new PDF document Extend TCPDF for special footer and header handling
         $this->pdf = new WorkshopTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
         \TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-Light.ttf', 'TrueTypeUnicode', '', 96);
         \TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-Bold.ttf', 'TrueTypeUnicode', '', 96);
         \TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-LightItalic.ttf', 'TrueTypeUnicode', '', 96);
 
-        //$this->pdf->setPrintHeader(false);
+        // $this->pdf->setPrintHeader(false);
         $this->pdf->setPrintFooter(false);
 
         // Set margins
@@ -166,19 +168,19 @@ class WorkshopBookletGenerator
             $stmt = $this->connection->executeQuery('SELECT * FROM tl_calendar_events WHERE id = ? AND published = ?', [$this->eventId, 1]);
         } else {
             $year = $this->year;
-            $start = (new DateTime($year.'-01-01'))->getTimestamp();
-            $stop = (new DateTime($year + 1 .'-01-01'))->getTimestamp();
+            $start = (new \DateTime($year.'-01-01'))->getTimestamp();
+            $stop = (new \DateTime($year + 1 .'-01-01'))->getTimestamp();
 
             $stmt = $this->connection->executeQuery(
                 'SELECT * FROM tl_calendar_events WHERE eventType = ? AND startTime >= ? AND endTime < ? AND published = ? ORDER BY courseTypeLevel0, title, startDate',
-                [EventType::COURSE, $start, $stop, '1']
+                [EventType::COURSE, $start, $stop, '1'],
             );
         }
 
         while (false !== ($row = $stmt->fetchAssociative())) {
             // Create a page for each event
             $this->pdf->type = 'eventPage';
-            $this->pdf->objEvent = CalendarEventsModel::findByPk($row['id']);
+            $this->pdf->objEvent = CalendarEventsModel::findById($row['id']);
             $this->pdf->AddPage('P', 'A4');
             $html = $this->generateHtmlContent();
             $this->pdf->writeHTML($html);
@@ -197,8 +199,8 @@ class WorkshopBookletGenerator
 
             $this->pdf->SetFont('opensanslight', '', 11);
 
-            // Add a simple Table Of Content at first page
-            // (check the example n. 59 for the HTML version)
+            // Add a simple Table Of Content at first page (check the example n. 59 for the
+            // HTML version)
             $this->pdf->addTOC(2, 'opensanslight', '.', 'INDEX', 'B', [255, 255, 255]);
 
             // end of TOC page
@@ -206,7 +208,7 @@ class WorkshopBookletGenerator
         }
 
         // Kursprogramm_%s.pdf
-        $filename = sprintf($this->sacevtEventCourseBookletFilenamePattern, $this->year);
+        $filename = \sprintf($this->sacevtEventCourseBookletFilenamePattern, $this->year);
         $path = $this->projectDir.'/'.$this->sacevtTempDir.'/'.$filename;
 
         if (false === $this->download) {
@@ -216,7 +218,7 @@ class WorkshopBookletGenerator
         }
 
         if ($this->printSingleEvent) {
-            $eventAlias = CalendarEventsModel::findByPk($this->eventId)->alias;
+            $eventAlias = CalendarEventsModel::findById($this->eventId)->alias;
             $path = \dirname($path).'/'.$eventAlias.'.pdf';
 
             $this->pdf->setTitle(basename($path));
@@ -239,7 +241,7 @@ class WorkshopBookletGenerator
 
     public function getDateString(int $eventId): string
     {
-        $objEvent = CalendarEventsModel::findByPk($eventId);
+        $objEvent = CalendarEventsModel::findById($eventId);
         $strDates = '';
 
         if (null !== $objEvent) {
@@ -275,7 +277,7 @@ class WorkshopBookletGenerator
     private function generateHtmlContent(): string
     {
         System::loadLanguageFile('tl_calendar_events');
-        $objEvent = CalendarEventsModel::findByPk($this->pdf->objEvent->id);
+        $objEvent = CalendarEventsModel::findById($this->pdf->objEvent->id);
         $this->pdf->Bookmark(html_entity_decode($objEvent->title), 0, 0, '', 'I', [0, 0, 0]);
 
         // Create template object
@@ -291,8 +293,8 @@ class WorkshopBookletGenerator
         $objPartial->durationInfo = $objEvent->durationInfo;
 
         // Course type
-        $objPartial->courseTypeLevel0 = CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name;
-        $objPartial->courseTypeLevel1 = CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name;
+        $objPartial->courseTypeLevel0 = CourseMainTypeModel::findById($objEvent->courseTypeLevel0)->name;
+        $objPartial->courseTypeLevel1 = CourseSubTypeModel::findById($objEvent->courseTypeLevel1)->name;
 
         // Course level
         $objPartial->courseLevel = $this->courseLevels->get($objEvent->courseLevel);
@@ -300,7 +302,7 @@ class WorkshopBookletGenerator
         // Organizers
         $arrItems = array_map(
             static function ($item) {
-                $objOrganizer = EventOrganizerModel::findByPk($item);
+                $objOrganizer = EventOrganizerModel::findById($item);
 
                 if (null !== $objOrganizer) {
                     $item = $objOrganizer->title;
@@ -308,7 +310,7 @@ class WorkshopBookletGenerator
 
                 return $item;
             },
-            StringUtil::deserialize($objEvent->organizers, true)
+            StringUtil::deserialize($objEvent->organizers, true),
         );
         $objPartial->organizers = implode(', ', $arrItems);
 
@@ -332,7 +334,7 @@ class WorkshopBookletGenerator
         $calendarEventsUtil = $this->calendarEventsUtil;
         $arrItems = array_map(
             static function ($userId) use ($calendarEventsUtil) {
-                $objUser = UserModel::findByPk($userId);
+                $objUser = UserModel::findById($userId);
 
                 if (null !== $objUser) {
                     $strQuali = '' !== $calendarEventsUtil->getMainQualification($objUser) ? ' ('.$calendarEventsUtil->getMainQualification($objUser).')' : '';
@@ -342,7 +344,7 @@ class WorkshopBookletGenerator
 
                 return '';
             },
-            $arrInstructors
+            $arrInstructors,
         );
 
         // Instructors

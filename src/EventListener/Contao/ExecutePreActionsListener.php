@@ -27,7 +27,6 @@ use Contao\StringUtil;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Safe\Exceptions\JsonException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -36,10 +35,15 @@ class ExecutePreActionsListener
 {
     // Adapters
     private Adapter $backendUserAdapter;
+
     private Adapter $configAdapter;
+
     private Adapter $dateAdapter;
+
     private Adapter $memberModelAdapter;
+
     private Adapter $stringUtilAdapter;
+
     private Adapter $validatorAdapter;
 
     public function __construct(
@@ -56,16 +60,17 @@ class ExecutePreActionsListener
         $this->validatorAdapter = $this->framework->getAdapter(Validator::class);
     }
 
-    /**
-     * @throws Exception
-     * @throws JsonException
-     */
+	/**
+	 * @param string $strAction
+	 * @return void
+	 */
     public function __invoke(string $strAction = ''): void
     {
         // Get current request
         $request = $this->requestStack->getCurrentRequest();
 
-        // Get suggested user data when registering manually a new event member in the Contao backend!
+        // Get suggested user data when registering manually a new event member in the
+        // Contao backend!
         if ('autocompleterLoadMemberDataFromSacMemberId' === $strAction) {
             // Output
             $json = ['status' => 'error'];
@@ -89,7 +94,7 @@ class ExecutePreActionsListener
                 $html .= '<button class="tl_button">Ja</button> <button class="tl_button">nein</button>';
                 $html .= '</div>';
 
-                $json['html'] = sprintf($html, $objMemberModel->firstname, $objMemberModel->lastname);
+                $json['html'] = \sprintf($html, $objMemberModel->firstname, $objMemberModel->lastname);
 
                 $json = array_map(
                     function ($val) {
@@ -99,7 +104,7 @@ class ExecutePreActionsListener
 
                         return $this->stringUtilAdapter->revertInputEncoding($val);
                     },
-                    $json
+                    $json,
                 );
             }
 
@@ -107,7 +112,8 @@ class ExecutePreActionsListener
             $this->json($json);
         }
 
-        // editAllNavbarHandler in the Contao backend when using the overrideAll or editAll mode
+        // editAllNavbarHandler in the Contao backend when using the overrideAll or
+        // editAll mode
         if ('editAllNavbarHandler' === $strAction) {
             if ('loadNavbar' === $request->request->get('subaction')) {
                 $json = [];
