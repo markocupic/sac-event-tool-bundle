@@ -39,8 +39,7 @@ class DownloadController extends AbstractController
     }
 
     /**
-     * Download workshops as pdf booklet
-     * /_download/print_workshop_booklet_as_pdf/2023
+     * Download workshops as a PDF booklet: /_download/print_workshop_booklet_as_pdf/2023
      * /_download/print_workshop_booklet_as_pdf -> current year.
      */
     #[Route('/_download/print_workshop_booklet_as_pdf/{year}', name: 'sac_event_tool_download_print_workshop_booklet_as_pdf', defaults: ['_scope' => 'frontend', '_token_check' => false])]
@@ -56,16 +55,15 @@ class DownloadController extends AbstractController
         // Log download
         $this->contaoGeneralLogger->info(
             'The course booklet has been downloaded.',
-            ['contao' => new ContaoContext(__METHOD__, Log::DOWNLOAD_WORKSHOP_BOOKLET)]
+            ['contao' => new ContaoContext(__METHOD__, Log::DOWNLOAD_WORKSHOP_BOOKLET)],
         );
 
         return $this->workshopBookletGenerator->generate();
     }
 
     /**
-     * Download events as docx file
-     * /_download/print_workshop_details_as_docx --> current year
-     * /_download/print_workshop_details_as_docx/2017
+     * Download events as docx document: /_download/print_workshop_details_as_docx
+     * --> current year /_download/print_workshop_details_as_docx/2017
      * /_download/print_workshop_details_as_docx/year=2017/89.
      */
     #[Route('/_download/print_workshop_details_as_docx/{year}/{eventId}', name: 'sac_event_tool_download_print_workshop_details_as_docx', defaults: ['_scope' => 'frontend', '_token_check' => false])]
@@ -74,7 +72,7 @@ class DownloadController extends AbstractController
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        $objEvent = $calendarEventsModelAdapter->findByPk($eventId);
+        $objEvent = $calendarEventsModelAdapter->findById($eventId);
 
         if (null !== $eventId && null === $objEvent) {
             return new Response('Download failed. Please check if the event id is valid.', Response::HTTP_BAD_REQUEST);
@@ -88,8 +86,7 @@ class DownloadController extends AbstractController
     }
 
     /**
-     * Download workshop details as pdf
-     * /_download/print_workshop_details_as_pdf/643.
+     * Download workshop details as a PDF document: /_download/print_workshop_details_as_pdf/643.
      */
     #[Route('/_download/print_workshop_details_as_pdf/{eventId}', name: 'sac_event_tool_download_print_workshop_details_as_pdf', defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function printWorkshopDetailsAsPdfAction(int $eventId): Response
@@ -97,7 +94,7 @@ class DownloadController extends AbstractController
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        $objEvent = $calendarEventsModelAdapter->findByPk($eventId);
+        $objEvent = $calendarEventsModelAdapter->findById($eventId);
 
         if (null !== $objEvent) {
             $this->workshopBookletGenerator->setEventId($eventId);
@@ -118,7 +115,7 @@ class DownloadController extends AbstractController
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        $objEvent = $calendarEventsModelAdapter->findByPk($eventId);
+        $objEvent = $calendarEventsModelAdapter->findById($eventId);
 
         if (null !== $objEvent) {
             return $this->eventICal->download($objEvent);
@@ -128,13 +125,12 @@ class DownloadController extends AbstractController
     }
 
     /**
-     * The defaultAction has to be at the bottom of the class
-     * Handles download requests.
+     * The defaultAction has to be at the bottom of the class Handles download requests.
      */
     #[Route('/_download/{slug}', name: 'sac_event_tool_download', defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function defaultAction($slug = ''): Response
     {
-        $msg = sprintf('Welcome to %s::%s. You have called the Service with this route: _download/%s', self::class, __FUNCTION__, $slug);
+        $msg = \sprintf('Welcome to %s::%s. You have called the Service with this route: _download/%s', self::class, __FUNCTION__, $slug);
 
         return new Response($msg);
     }
