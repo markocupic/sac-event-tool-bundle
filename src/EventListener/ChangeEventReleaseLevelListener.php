@@ -39,6 +39,7 @@ use Twig\Error\SyntaxError;
 final readonly class ChangeEventReleaseLevelListener
 {
     private Adapter $configAdapter;
+
     private Adapter $eventReleaseLevelPolicyModelAdapter;
 
     public function __construct(
@@ -84,7 +85,7 @@ final readonly class ChangeEventReleaseLevelListener
                 return;
             }
 
-            $objEventReleaseLevel = $this->eventReleaseLevelPolicyModelAdapter->findByPk($objEvent->eventReleaseLevel);
+            $objEventReleaseLevel = $this->eventReleaseLevelPolicyModelAdapter->findById($objEvent->eventReleaseLevel);
 
             if (null === $objEventReleaseLevel) {
                 return;
@@ -95,8 +96,8 @@ final readonly class ChangeEventReleaseLevelListener
             $objEmail->fromName = 'Administrator SAC Pilatus';
             $objEmail->replyTo('noreply@sac-pilatus.ch');
 
-            $objEmail->subject = sprintf('Neue Freigabestufe (%s) für Event %s.', $objEventReleaseLevel->level, StringUtil::revertInputEncoding($objEvent->title));
-            $objEmail->text = $this->parseEmailText($objEvent, UserModel::findByPk($user->id), $strDirection);
+            $objEmail->subject = \sprintf('Neue Freigabestufe (%s) für Event %s.', $objEventReleaseLevel->level, StringUtil::revertInputEncoding($objEvent->title));
+            $objEmail->text = $this->parseEmailText($objEvent, UserModel::findById($user->id), $strDirection);
 
             $objEmail->sendTo($recipients);
         }
@@ -109,10 +110,10 @@ final readonly class ChangeEventReleaseLevelListener
      */
     private function parseEmailText(CalendarEventsModel $objEvent, UserModel $objUser, string $strDirection): string
     {
-        $eventReleaseLevel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+        $eventReleaseLevel = EventReleaseLevelPolicyModel::findById($objEvent->eventReleaseLevel);
 
         if (null === $eventReleaseLevel) {
-            throw new \RuntimeException(sprintf('Could not find a event release level for event with ID %d.', $objEvent->id));
+            throw new \RuntimeException(\sprintf('Could not find a event release level for event with ID %d.', $objEvent->id));
         }
 
         $arrEvent = array_map(static fn ($val) => StringUtil::revertInputEncoding((string) $val), $objEvent->row());
@@ -120,28 +121,25 @@ final readonly class ChangeEventReleaseLevelListener
         $objInstructor = $this->calendarEventsUtil->getMainInstructor($objEvent);
 
         if (null === $objInstructor) {
-            throw new \RuntimeException(sprintf('Could not find a main instructor for event with ID %d.', $objEvent->id));
+            throw new \RuntimeException(\sprintf('Could not find a main instructor for event with ID %d.', $objEvent->id));
         }
 
-        return $this->twig->render(
-            '@MarkocupicSacEventTool/NotifyOnEventReleaseLevelChange/notify_on_event_release_level_change.twig',
-            [
-                'user' => $objUser->row(),
-                'instructor' => $objInstructor->row(),
-                'event' => $arrEvent,
-                'event_release_level' => $eventReleaseLevel->row(),
-                'action' => 'up' === $strDirection ? 'hochgestuft' : 'hinuntergestuft',
-                'event_link' => $this->router->generate(
-                    'contao_backend',
-                    [
-                        'do' => 'calendar',
-                        'table' => CalendarEventsModel::getTable(),
-                        'id' => $objEvent->id,
-                        'act' => 'edit',
-                    ],
-                    UrlGeneratorInterface::ABSOLUTE_URL,
-                ),
-            ]
-        );
+        return $this->twig->render('@MarkocupicSacEventTool/NotifyOnEventReleaseLevelChange/notify_on_event_release_level_change.twig', [
+            'user' => $objUser->row(),
+            'instructor' => $objInstructor->row(),
+            'event' => $arrEvent,
+            'event_release_level' => $eventReleaseLevel->row(),
+            'action' => 'up' === $strDirection ? 'hochgestuft' : 'hinuntergestuft',
+            'event_link' => $this->router->generate(
+                'contao_backend',
+                [
+                    'do' => 'calendar',
+                    'table' => CalendarEventsModel::getTable(),
+                    'id' => $objEvent->id,
+                    'act' => 'edit',
+                ],
+                UrlGeneratorInterface::ABSOLUTE_URL,
+            ),
+        ]);
     }
 }

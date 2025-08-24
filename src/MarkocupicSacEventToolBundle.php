@@ -34,9 +34,6 @@ class MarkocupicSacEventToolBundle extends Bundle
         return new MarkocupicSacEventToolExtension();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

@@ -51,6 +51,6 @@ class TwigEventDataManager extends AbstractExtension
     {
         $this->framework->initialize();
 
-        return $this->calendarEventsModel->findByPk($id);
+        return $this->calendarEventsModel->findById($id);
     }
 }

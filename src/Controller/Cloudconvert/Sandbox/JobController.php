@@ -41,7 +41,7 @@ class JobController extends AbstractController
     {
         $this->framework->initialize();
 
-        //die(md5_file($this->projectDir. '/files/file.docx'));
+        // die(md5_file($this->projectDir. '/files/file.docx'));
 
         $splFile = new \SplFileObject($this->projectDir.'/files/file.docx');
         $this->upload($splFile);
@@ -63,11 +63,11 @@ class JobController extends AbstractController
             ->addTask(
                 (new Task('convert', 'convert-my-file'))
                     ->set('input', 'upload-my-file')
-                    ->set('output_format', 'pdf')
+                    ->set('output_format', 'pdf'),
             )
             ->addTask(
                 (new Task('export/url', 'export-my-file'))
-                    ->set('input', 'convert-my-file')
+                    ->set('input', 'convert-my-file'),
             )
         ;
 

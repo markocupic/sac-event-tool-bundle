@@ -31,9 +31,8 @@ final readonly class MaintainBackendUsersHomeDirectoryOnLoginSuccess
     }
 
     /**
-     * Create user directories if they do not exist
-     * and
-     * Scan for unused/old directories and remove them.
+     * Create user directories if they do not exist and Scan for unused/old
+     * directories and remove them.
      *
      * @throws \Exception
      */

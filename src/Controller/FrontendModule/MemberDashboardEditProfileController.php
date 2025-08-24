@@ -38,12 +38,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsFrontendModule(MemberDashboardEditProfileController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_edit_profile')]
+#[AsFrontendModule(MemberDashboardEditProfileController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_member_dashboard_edit_profile')]
 class MemberDashboardEditProfileController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_edit_profile';
 
     private FrontendUser|null $user;
+
     private FragmentTemplate|null $template;
 
     public function __construct(
@@ -134,7 +135,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         }
 
         // Bind form to the MemberModel
-        $model = $this->framework->getAdapter(MemberModel::class)->findByPk($this->user->id);
+        $model = $this->framework->getAdapter(MemberModel::class)->findById($this->user->id);
         $form->setBoundModel($model);
 
         if ($form->validate()) {
@@ -148,19 +149,19 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
                         'member_dashboard_edit_profile_controller::update_contact_data',
                         'Mitteilung',
                         'All deine persönlichen Daten (Adresse, Tel.-Nr., Notfallangaben, Essgewohnheiten etc.) wurden anhand deiner Eingaben bei deinen laufenden Anmeldungen aktualisiert.',
-                        time() + 60
+                        time() + 60,
                     );
                 }
             }
 
             $this->contaoGeneralLogger->info(
-                sprintf(
+                \sprintf(
                     'Frontend user %s %s "%s" has updated his user profile.',
                     $this->user->firstname,
                     $this->user->lastname,
                     $this->user->username,
                 ),
-                ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DASHBOARD_UPDATE_PROFILE)]
+                ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DASHBOARD_UPDATE_PROFILE)],
             );
 
             Controller::reload();
@@ -175,7 +176,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
             return ['-'];
         }
 
-        $model = $this->framework->getAdapter(MemberModel::class)->findByPk($user->id);
+        $model = $this->framework->getAdapter(MemberModel::class)->findById($user->id);
 
         // SAC sections user belongs to
         $arrSectionNames = ['-'];

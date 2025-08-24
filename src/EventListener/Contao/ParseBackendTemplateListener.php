@@ -64,7 +64,7 @@ readonly class ParseBackendTemplateListener
 
             // Add icon explanation legend to tl_calendar_events_member
             if ('calendar' === $inputAdapter->get('do') && 'tl_calendar_events_member' === $inputAdapter->get('table')) {
-                $objEvent = $calendarEventsModelAdapter->findByPk($inputAdapter->get('id'));
+                $objEvent = $calendarEventsModelAdapter->findById($inputAdapter->get('id'));
 
                 if (null !== $objEvent) {
                     if (preg_match('/<table class=\"tl_listing(.*)<\/table>/sU', $strBuffer)) {
@@ -78,24 +78,22 @@ readonly class ParseBackendTemplateListener
                         $arrRegistration = [];
                         $arrRegistration['states'] = array_diff(EventSubscriptionState::ALL, [EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED]);
 
-                        $html = $this->twig->render(
-                            '@MarkocupicSacEventTool/Backend/CalendarEventsMember/explanations.html.twig',
-                            [
-                                'event' => $arrEvent,
-                                'registration' => $arrRegistration,
-                            ]
-                        );
+                        $html = $this->twig->render('@MarkocupicSacEventTool/Backend/CalendarEventsMember/explanations.html.twig', [
+                            'event' => $arrEvent,
+                            'registration' => $arrRegistration,
+                        ]);
 
                         // Add legend to the listing table
                         $strBuffer = preg_replace('/<table class=\"tl_listing(.*)<\/table>/sU', '${0}'.$html, $strBuffer);
                     }
 
-                    // Show a pop-up window if the participant is not confirmed and the instructor tries to change the participation status.
+                    // Show a pop-up window if the participant is not confirmed and the instructor
+                    // tries to change the participation status.
                     if (preg_match_all('/<a href=\"\/contao\?do=calendar\&amp;id=(\\d+)&amp;table=tl_calendar_events_member&amp;act=toggle&amp;field=hasParticipated(.*)\"(.*)onclick="(.*)">(.*)<\/a>/sU', $strBuffer, $matches)) {
                         foreach (array_keys($matches[0]) as $k) {
                             $regId = $matches[1][$k];
 
-                            $registration = $calendarEventsMemberModelAdapter->findByPk($regId);
+                            $registration = $calendarEventsMemberModelAdapter->findById($regId);
                             $allowedSubscriptionStates = [EventSubscriptionState::SUBSCRIPTION_ACCEPTED];
 
                             if (null !== $registration) {
@@ -103,11 +101,11 @@ readonly class ParseBackendTemplateListener
                                     continue;
                                 }
 
-                                $onClickAttr = sprintf("if(window.confirm('Der Anmeldestatus dieser Person hat nicht den Status &laquo;BESTÄTIGT&raquo;. Bist du sicher, dass du den Teilnahmestatus ändern willst?')){%s}else{return false}", $matches[4][$k]);
+                                $onClickAttr = \sprintf("if(window.confirm('Der Anmeldestatus dieser Person hat nicht den Status &laquo;BESTÄTIGT&raquo;. Bist du sicher, dass du den Teilnahmestatus ändern willst?')){%s}else{return false}", $matches[4][$k]);
                                 $strLink = $matches[0][$k];
                                 $strLinkNew = str_replace(
                                     'onclick="'.$matches[4][$k].'"',
-                                    sprintf('onclick="%s"', $onClickAttr),
+                                    \sprintf('onclick="%s"', $onClickAttr),
                                     $strLink,
                                 );
 
@@ -130,7 +128,7 @@ readonly class ParseBackendTemplateListener
         // Set adapters
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-        $objEvent = $calendarEventsModelAdapter->findByPk($inputAdapter->get('id'));
+        $objEvent = $calendarEventsModelAdapter->findById($inputAdapter->get('id'));
 
         if (null === $objEvent) {
             return '';
@@ -152,7 +150,8 @@ readonly class ParseBackendTemplateListener
         $factory = new MenuFactory();
         $menu = $factory->createItem('Event Dashboard');
 
-        // HOOK: Use hooks to generate the mini dashboard. So other plugins are able to add items as well.
+        // HOOK: Use hooks to generate the mini dashboard. So other plugins are able to
+        // add items as well.
         if (isset($GLOBALS['TL_HOOKS']['generateEventDashboard']) && \is_array($GLOBALS['TL_HOOKS']['generateEventDashboard'])) {
             foreach ($GLOBALS['TL_HOOKS']['generateEventDashboard'] as $callback) {
                 System::importStatic($callback[0])->{$callback[1]}($menu, $objEvent);

@@ -38,8 +38,11 @@ class CalendarEventsMember
 
     // Adapters
     private Adapter $backend;
+
     private Adapter $calendarEvents;
+
     private Adapter $image;
+
     private Adapter $stringUtil;
 
     public function __construct(
@@ -87,15 +90,15 @@ class CalendarEventsMember
             }
         }
 
-        // This should prevent deep link hacking attempts
-        // (the user types the url manually to perform a certain action).
+        // This should prevent deep link hacking attempts (the user types the url
+        // manually to perform a certain action).
         if ($request->query->has('act')) {
             $act = $request->query->get('act');
 
             $blnAllow = false;
 
-            // Allow only these actions: show, create, edit, toggle, delete
-            // Do not allow: select, editAll, deleteAll, copyAll, overrideAll
+            // Allow only these actions: show, create, edit, toggle, delete Do not allow:
+            // select, editAll, deleteAll, copyAll, overrideAll
             switch ($act) {
                 case 'show':
                     $blnAllow = true;
@@ -151,20 +154,18 @@ class CalendarEventsMember
                     break;
 
                 default:
-                    // Do not allow: select, editAll, deleteAll, copyAll, overrideAll
-                    // $blnAllow = false; // Variable already equals the assigned value
+                    // Do not allow: select, editAll, deleteAll, copyAll, overrideAll $blnAllow =
+                    // false; // Variable already equals the assigned value
             }
 
             if (!$blnAllow) {
-                throw new AccessDeniedException(sprintf('Not enough permissions to perform the "%s" action on the current event.', $act));
+                throw new AccessDeniedException(\sprintf('Not enough permissions to perform the "%s" action on the current event.', $act));
             }
         }
     }
 
     /**
      * Make input fields readonly, if the registration is of type 'onlineForm'.
-     *
-     * @param DataContainer $dc
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 110)]
     public function makeFieldsReadonly(DataContainer $dc): void
@@ -173,7 +174,7 @@ class CalendarEventsMember
             return;
         }
 
-        if ($dc->id && null !== ($registration = CalendarEventsMemberModel::findByPk($dc->id))) {
+        if ($dc->id && null !== ($registration = CalendarEventsMemberModel::findById($dc->id))) {
             if (BookingType::ONLINE_FORM !== $registration->bookingType) {
                 return;
             }
@@ -210,15 +211,14 @@ class CalendarEventsMember
 
                 $inputType = $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields'][$fieldName]['inputType'] ?? '';
 
-                // A checkbox can not be readonly
-                // So let's transform it to a text input field.
+                // A checkbox can not be readonly So let's transform it to a text input field.
                 if ('checkbox' === $inputType) {
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields'][$fieldName]['inputType'] = 'text';
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields'][$fieldName]['eval']['tl_class'] = 'w50';
                 }
 
-                // But this won't work if the field belongs to a subpalette.
-                // So remove the field from the subpalette and append it right after its selector.
+                // But this won't work if the field belongs to a subpalette. So remove the field
+                // from the subpalette and append it right after its selector.
                 if ('dateOfLeadClimbingEducation' === $fieldName) {
                     PaletteManipulator::create()
                         ->removeField('dateOfLeadClimbingEducation')
@@ -234,8 +234,10 @@ class CalendarEventsMember
     }
 
     /**
-     * Generate href for $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']
-     * Generate href for $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice'].
+     * Generate href for
+     * $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']
+     * Generate href for
+     * $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice'].
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 120)]
     public function setGlobalOperations(DataContainer $dc): void
@@ -264,18 +266,18 @@ class CalendarEventsMember
 
         $eventId = $request->query->get('id', 0);
 
-        $objEvent = $this->calendarEvents->findByPk($eventId);
+        $objEvent = $this->calendarEvents->findById($eventId);
 
         if (null !== $objEvent) {
             // Check if backend user is allowed
             if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id)) {
                 if (EventType::TOUR === $objEvent->eventType || EventType::LAST_MINUTE_TOUR === $objEvent->eventType) {
                     $href = $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'];
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'] = sprintf($href, $eventId);
+                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'] = \sprintf($href, $eventId);
                     $blnAllowTourReportButton = true;
 
                     $href = $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']['href'];
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']['href'] = sprintf($href, $eventId);
+                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']['href'] = \sprintf($href, $eventId);
                     $blnAllowInstructorInvoiceButton = true;
                 }
             }
@@ -292,15 +294,6 @@ class CalendarEventsMember
 
     /**
      * Return the delete user button.
-     *
-     * @param array       $row
-     * @param string|null $href
-     * @param string      $label
-     * @param string      $title
-     * @param string|null $icon
-     * @param string      $attributes
-     *
-     * @return string
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.operations.edit.button', priority: 100)]
     public function editButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
@@ -328,15 +321,6 @@ class CalendarEventsMember
 
     /**
      * Return the delete user button.
-     *
-     * @param array       $row
-     * @param string|null $href
-     * @param string      $label
-     * @param string      $title
-     * @param string|null $icon
-     * @param string      $attributes
-     *
-     * @return string
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.operations.delete.button', priority: 100)]
     public function deleteButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string

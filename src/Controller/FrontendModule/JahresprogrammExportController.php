@@ -39,19 +39,27 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(JahresprogrammExportController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_jahresprogramm_export')]
+#[AsFrontendModule(JahresprogrammExportController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_jahresprogramm_export')]
 class JahresprogrammExportController extends AbstractPrintExportController
 {
     public const TYPE = 'jahresprogramm_export';
+
     private const DEFAULT_EVENT_RELEASE_LEVEL = 3;
 
     private FragmentTemplate|null $template = null;
+
     private int|null $startDate = null;
+
     private int|null $endDate = null;
+
     private int|null $organizer = null;
+
     private string|null $eventType = null;
+
     private int $eventReleaseLevel = self::DEFAULT_EVENT_RELEASE_LEVEL;
+
     private array|null $events = null;
+
     private array|null $instructors = null;
 
     public function __construct(
@@ -187,7 +195,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                 $this->template->eventTypeLabel = $GLOBALS['TL_LANG']['MSC'][$this->eventType];
                 $this->template->startDate = $this->startDate;
                 $this->template->endDate = $this->endDate;
-                $this->template->organizer = $this->organizer > 0 ? $eventOrganizerModelAdapter->findByPk($this->organizer)->title : 'Alle Gruppen';
+                $this->template->organizer = $this->organizer > 0 ? $eventOrganizerModelAdapter->findById($this->organizer)->title : 'Alle Gruppen';
                 $this->template->events = $this->events;
                 $this->template->instructors = $this->instructors;
 
@@ -218,7 +226,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
         while ($objEvents->next()) {
             // Check if event is at least on second-highest level (Level 3/4)
-            $eventModel = $calendarEventsModelAdapter->findByPk($objEvents->id);
+            $eventModel = $calendarEventsModelAdapter->findById($objEvents->id);
 
             $arrTimestamps = $this->calendarEventsUtil->getEventTimestamps($eventModel);
 
@@ -246,7 +254,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                 continue;
             }
 
-            $events[] = (int) ($objEvents->id);
+            $events[] = (int) $objEvents->id;
         }
 
         $arrInstructors = [];
@@ -272,7 +280,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     if (EventType::COURSE === $objEvent->eventType) {
                         // KU = Kurs
                         $arrTourType[] = 'KU';
-                        //$dateFormat = 'j.n.';
+                        // $dateFormat = 'j.n.';
                         $dateFormat = 'D, j.n.';
                     }
                     $showHeadline = true;
@@ -291,7 +299,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     }
 
                     if ($this->organizer) {
-                        if (null !== ($eventOrganizerModel = $eventOrganizerModelAdapter->findByPk($this->organizer))) {
+                        if (null !== ($eventOrganizerModel = $eventOrganizerModelAdapter->findById($this->organizer))) {
                             $showHeadline = (bool) $eventOrganizerModel->annualProgramShowHeadline;
                             $showTeaser = (bool) $eventOrganizerModel->annualProgramShowTeaser;
                             $showDetails = (bool) $eventOrganizerModel->annualProgramShowDetails;
@@ -305,8 +313,8 @@ class JahresprogrammExportController extends AbstractPrintExportController
                         $arrOrganizers = $stringUtilAdapter->deserialize($objEvent->organizers, true);
 
                         foreach ($arrOrganizers as $orgId) {
-                            $arrTitle[] = $eventOrganizerModelAdapter->findByPk($orgId)->title;
-                            $arrTitlePrint[] = $eventOrganizerModelAdapter->findByPk($orgId)->titlePrint;
+                            $arrTitle[] = $eventOrganizerModelAdapter->findById($orgId)->title;
+                            $arrTitlePrint[] = $eventOrganizerModelAdapter->findById($orgId)->titlePrint;
                         }
                     }
                     $organizerTitle = implode(', ', $arrTitle);
@@ -319,8 +327,8 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $arrData['organizerTitle'] = $organizerTitle;
                     $arrData['organizerTitlePrint'] = $organizerTitlePrint;
                     $arrData['courseLevel'] = $objEvent->courseLevel ? $this->courseLevels->get($objEvent->courseLevel) : '';
-                    $arrData['courseTypeLevel0'] = null !== $courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0) ? $courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0)->name : '';
-                    $arrData['courseTypeLevel1'] = null !== $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1) ? $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1)->name : '';
+                    $arrData['courseTypeLevel0'] = null !== $courseMainTypeModelAdapter->findById($objEvent->courseTypeLevel0) ? $courseMainTypeModelAdapter->findById($objEvent->courseTypeLevel0)->name : '';
+                    $arrData['courseTypeLevel1'] = null !== $courseSubTypeModelAdapter->findById($objEvent->courseTypeLevel1) ? $courseSubTypeModelAdapter->findById($objEvent->courseTypeLevel1)->name : '';
                     $arrData['date'] = $this->getEventPeriod($objEvent->current(), $dateFormat);
                     $arrData['month'] = $dateAdapter->parse('F', $objEvent->startDate);
                     $arrData['instructors'] = implode(', ', $this->calendarEventsUtil->getInstructorNamesAsArray($objEvent->current()));
@@ -436,7 +444,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                 }
 
                 $specialUsers[] = [
-                    'title' => $userRoleModelAdapter->findByPk($userRole)->title,
+                    'title' => $userRoleModelAdapter->findById($userRole)->title,
                     'users' => $arrUsers,
                 ];
             }

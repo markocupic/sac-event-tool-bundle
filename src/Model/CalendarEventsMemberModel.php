@@ -38,7 +38,7 @@ class CalendarEventsMemberModel extends Model
 
     public static function isRegistered(int $memberId, int $eventId): bool
     {
-        $objMember = MemberModel::findByPk($memberId);
+        $objMember = MemberModel::findById($memberId);
 
         if (null === $objMember) {
             return false;
@@ -60,7 +60,7 @@ class CalendarEventsMemberModel extends Model
             [
                 Types::INTEGER,
                 Types::STRING,
-            ]
+            ],
         );
 
         if (false === $eventReg) {
@@ -84,10 +84,10 @@ class CalendarEventsMemberModel extends Model
             [
                 Types::INTEGER,
                 Types::INTEGER,
-            ]
+            ],
         );
 
-        return false === $id ? null : static::findByPk($id);
+        return false === $id ? null : static::findById($id);
     }
 
     public static function findEventsByMemberId(int $memberId, array $options): array
@@ -111,7 +111,7 @@ class CalendarEventsMemberModel extends Model
         ;
 
         $arrEvents = [];
-        $objMember = MemberModel::findByPk($memberId);
+        $objMember = MemberModel::findById($memberId);
         $blnHasEventsAsInstructor = false;
 
         if (null === $objMember) {
@@ -131,7 +131,7 @@ class CalendarEventsMemberModel extends Model
                 [
                     Types::INTEGER,
                     Types::INTEGER,
-                ]
+                ],
             );
         } else {
             $eventIDS = $database->fetchFirstColumn(
@@ -141,7 +141,7 @@ class CalendarEventsMemberModel extends Model
                 ],
                 [
                     Types::INTEGER,
-                ]
+                ],
             );
         }
 
@@ -156,7 +156,7 @@ class CalendarEventsMemberModel extends Model
                     ],
                     [
                         Types::INTEGER,
-                    ]
+                    ],
                 );
 
                 if (\count($arrEventIDSAsInstructor)) {
@@ -206,10 +206,10 @@ class CalendarEventsMemberModel extends Model
                     [
                         Types::INTEGER,
                         Types::INTEGER,
-                    ]
+                    ],
                 );
 
-                $objEvent = CalendarEventsModel::findByPk($arrEvent['id']);
+                $objEvent = CalendarEventsModel::findById($arrEvent['id']);
                 $rowEvent = $objEvent->row();
                 $rowEvent['dateSpan'] = System::getContainer()->get(CalendarEventsUtil::class)->getEventPeriod($objEvent, 'd.m.Y');
                 $rowEvent['objEvent'] = $objEvent;
@@ -218,7 +218,7 @@ class CalendarEventsMemberModel extends Model
 
                 if (false !== $rowReg) {
                     // If member has the role "participant"
-                    $rowEvent['eventRegistrationModel'] = self::findByPk($rowReg['id']);
+                    $rowEvent['eventRegistrationModel'] = self::findById($rowReg['id']);
                     $rowEvent['registrationId'] = $rowReg['id'];
                     $rowEvent['role'] = 'member';
                 } else {
@@ -287,7 +287,7 @@ class CalendarEventsMemberModel extends Model
                     Types::INTEGER,
                     Types::INTEGER,
                     Types::STRING,
-                ]
+                ],
             );
 
             if ($regCount < $objEvent->maxMembers) {

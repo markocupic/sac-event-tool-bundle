@@ -25,8 +25,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Mirror/Update tl_user from tl_member
- * Unidirectional sync tl_member -> tl_user.
+ * Mirror/Update tl_user from tl_member Unidirectional sync tl_member -> tl_user.
  */
 #[Route('%contao.backend.route_prefix%/sync_member_to_user', name: self::class, defaults: ['_scope' => 'backend', '_token_check' => true])]
 class SyncMemberToUserController extends AbstractBackendController

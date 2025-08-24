@@ -30,7 +30,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EventReleaseLevelUtil
 {
     private Adapter $config;
+
     private Adapter $date;
+
     private Adapter $message;
 
     public function __construct(
@@ -57,7 +59,7 @@ class EventReleaseLevelUtil
             return false;
         }
 
-        $eventReleaseModel = EventReleaseLevelPolicyModel::findByPk($eventReleaseLevelId);
+        $eventReleaseModel = EventReleaseLevelPolicyModel::findById($eventReleaseLevelId);
 
         return $maxEventReleaseModel->pid === $eventReleaseModel->pid;
     }
@@ -66,7 +68,7 @@ class EventReleaseLevelUtil
     {
         $calendar = $objEvent->getRelated('pid');
 
-        $except = sprintf(
+        $except = \sprintf(
             'Could not find the parent calendar for event "%s" (ID: %d).',
             $objEvent->title,
             $objEvent->id,
@@ -76,14 +78,13 @@ class EventReleaseLevelUtil
             throw new \Exception($except);
         }
 
-        $targetEventReleaseModel = EventReleaseLevelPolicyModel::findByPk($targetEventReleaseLevelId);
+        $targetEventReleaseModel = EventReleaseLevelPolicyModel::findById($targetEventReleaseLevelId);
         $minEventReleaseModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($objEvent->id);
 
         if (!$this->hasValidEventReleaseLevel($objEvent, $targetEventReleaseLevelId)) {
             if (null === $minEventReleaseModel) {
-                // If we have no event release level policy package
-                // assigned to the event,
-                // we set the event release level to 0 (undefined).
+                // If we have no event release level policy package assigned to the event, we set
+                // the event release level to 0 (undefined).
                 $objEvent->eventReleaseLevel = 0;
             } else {
                 // Set the lowest possible event release level.
@@ -113,9 +114,7 @@ class EventReleaseLevelUtil
             return $objEvent->eventReleaseLevel;
         }
 
-        // Accept 0,
-        // if we have no event release level policy package
-        // assigned to the event.
+        // Accept 0, if we have no event release level policy package assigned to the event.
         if (0 === $targetEventReleaseLevelId) {
             $objEvent->published = 0;
 
@@ -130,7 +129,7 @@ class EventReleaseLevelUtil
         $maxEventReleaseModel = EventReleaseLevelPolicyModel::findMaxLevelByEventId($objEvent->id);
 
         if (null === $maxEventReleaseModel) {
-            $except = sprintf(
+            $except = \sprintf(
                 'Could not determine the highest event release level for the event "%s" (ID: %d).',
                 $objEvent->title,
                 $objEvent->id,
@@ -140,12 +139,11 @@ class EventReleaseLevelUtil
         }
 
         if ($maxEventReleaseModel->id === $targetEventReleaseLevelId) {
-            // Do not allow non-admins to shift
-            // the event release level to the top level.
+            // Do not allow non-admins to shift the event release level to the top level.
             if (
-                !$this->security->isGranted('ROLE_ADMIN') &&
-                $calendar->enableMaxEventReleaseLevelProtection &&
-                time() < $calendar->maxEventReleaseLevelTimeLimit
+                !$this->security->isGranted('ROLE_ADMIN')
+                && $calendar->enableMaxEventReleaseLevelProtection
+                && time() < $calendar->maxEventReleaseLevelTimeLimit
             ) {
                 $objEvent->published = 0;
 

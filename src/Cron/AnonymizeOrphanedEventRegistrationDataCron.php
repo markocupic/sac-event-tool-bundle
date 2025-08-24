@@ -28,8 +28,7 @@ class AnonymizeOrphanedEventRegistrationDataCron
     }
 
     /**
-     * Anonymize orphaned event registration data records
-     * (tl_calendar_events_member).
+     * Anonymize orphaned event registration data records (tl_calendar_events_member).
      */
     public function __invoke(): void
     {

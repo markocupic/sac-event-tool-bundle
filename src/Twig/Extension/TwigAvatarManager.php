@@ -37,8 +37,7 @@ class TwigAvatarManager extends AbstractExtension
     /**
      * Get the resource path to the avatar inside your Twig template.
      *
-     * Inside your Twig template:
-     * #user# -> \Contao\UserModel or \Contao\MemberModel
+     * Inside your Twig template: #user# -> \Contao\UserModel or \Contao\MemberModel
      * {{ getAvatarResourcePath(#user#) }}.
      *
      * @see: https://docs.contao.org/dev/framework/asset-management.

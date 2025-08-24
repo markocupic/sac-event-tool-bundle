@@ -48,13 +48,14 @@ readonly class ClearFrontendUserData
         $arrRegistrations = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events_member');
 
         foreach ($arrRegistrations as $registration) {
-            // Important!!! Do nothing if the participant was entered manually without an sacMemberId or member ID (tl_member)
+            // Important!!! Do nothing if the participant was entered manually without an
+            // sacMemberId or member ID (tl_member)
             if (empty($registration['contaoMemberId']) && empty($registration['sacMemberId'])) {
                 continue;
             }
 
             if ($registration['contaoMemberId'] > 0) {
-                if (null !== $this->framework->getAdapter(MemberModel::class)->findByPk($registration['contaoMemberId'])) {
+                if (null !== $this->framework->getAdapter(MemberModel::class)->findById($registration['contaoMemberId'])) {
                     continue;
                 }
             }
@@ -65,7 +66,7 @@ readonly class ClearFrontendUserData
                 }
             }
 
-            $message = sprintf(
+            $message = \sprintf(
                 'Could not assign a frontend user to the registration with ID %s (%s %s [%s]) and the event with ID %s "%s" in %s:%d.',
                 $registration['id'],
                 $registration['firstname'],
@@ -83,7 +84,7 @@ readonly class ClearFrontendUserData
             $adminEmail = $this->framework->getAdapter(Config::class)->get('adminEmail');
 
             if (!empty($adminEmail)) {
-                $subject = sprintf(
+                $subject = \sprintf(
                     'Unknown event registration found Reg-ID: %d, Event "%s" Event-ID: %d',
                     $registration['id'],
                     $registration['eventName'],
@@ -96,7 +97,8 @@ readonly class ClearFrontendUserData
             /*
              * @todo: Currently disabled because event registrations has been erroneously anonymized.
              */
-            // $objEventRegistration = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findByPk($registration['id']);
+            // $objEventRegistration =
+            // $this->framework->getAdapter(CalendarEventsMemberModel::class)->findByPk($registration['id']);
             // $this->anonymizeEventRegistration($objEventRegistration);
         }
     }
@@ -110,12 +112,12 @@ readonly class ClearFrontendUserData
         }
 
         $this->contaoGeneralLogger?->info(
-            sprintf(
+            \sprintf(
                 'Anonymized tl_calendar_events_member.id=%s. Firstname: %s, Lastname: %s (%s)"',
                 $objEventRegistration->id,
                 $objEventRegistration->firstname,
                 $objEventRegistration->lastname,
-                $objEventRegistration->sacMemberId
+                $objEventRegistration->sacMemberId,
             ),
             ['contao' => new ContaoContext(__METHOD__, 'ANONYMIZED_CALENDAR_EVENTS_MEMBER_DATA')],
         );
@@ -149,16 +151,16 @@ readonly class ClearFrontendUserData
     {
         $this->framework->initialize();
 
-        $objMember = $this->framework->getAdapter(MemberModel::class)->findByPk($memberId);
+        $objMember = $this->framework->getAdapter(MemberModel::class)->findById($memberId);
 
         if (null !== $objMember) {
             $this->contaoGeneralLogger?->info(
-                sprintf(
+                \sprintf(
                     'Login for member with ID:%s [%s] has been deactivated.',
                     $objMember->id,
-                    $objMember->sacMemberId
+                    $objMember->sacMemberId,
                 ),
-                ['contao' => new ContaoContext(__METHOD__, Log::DISABLE_FRONTEND_USER_LOGIN)]
+                ['contao' => new ContaoContext(__METHOD__, Log::DISABLE_FRONTEND_USER_LOGIN)],
             );
 
             $objMember->login = 0;
@@ -171,11 +173,11 @@ readonly class ClearFrontendUserData
     {
         $this->framework->initialize();
 
-        $objMember = $this->framework->getAdapter(MemberModel::class)->findByPk($memberId);
+        $objMember = $this->framework->getAdapter(MemberModel::class)->findById($memberId);
 
         if (null !== $objMember) {
             $this->contaoGeneralLogger?->info(
-                sprintf(
+                \sprintf(
                     'Member with ID %s (%s %s) has been deleted.',
                     $objMember->id,
                     $objMember->firstname,
@@ -198,14 +200,14 @@ readonly class ClearFrontendUserData
         $arrEventsMember = [];
         $arrErrorMsg = [];
         $blnHasError = false;
-        $objMember = $this->framework->getAdapter(MemberModel::class)->findByPk($memberId);
+        $objMember = $this->framework->getAdapter(MemberModel::class)->findById($memberId);
 
         if (null !== $objMember) {
             // Upcoming events
             $arrEvents = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findUpcomingEventsByMemberId($objMember->id);
 
             foreach ($arrEvents as $arrEvent) {
-                $objEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findByPk($arrEvent['registrationId']);
+                $objEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findById($arrEvent['registrationId']);
 
                 if (null === $objEventsMember) {
                     continue;
@@ -225,7 +227,7 @@ readonly class ClearFrontendUserData
                     continue;
                 }
 
-                $arrErrorMsg[] = sprintf(
+                $arrErrorMsg[] = \sprintf(
                     'Dein Profil kann nicht gelöscht werden, weil du beim Event "%s [%s]" vom %s auf der Buchungsliste stehst. Bitte melde dich zuerst vom Event ab oder nimm gegebenenfalls mit dem Leiter Kontakt auf.',
                     $objEvent->title,
                     $objEventsMember->stateOfSubscription,
@@ -239,7 +241,7 @@ readonly class ClearFrontendUserData
             $arrEvents = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findPastEventsByMemberId($objMember->id, [], false, false);
 
             foreach ($arrEvents as $arrEvent) {
-                $objEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findByPk($arrEvent['registrationId']);
+                $objEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findById($arrEvent['registrationId']);
 
                 if (null !== $objEventsMember) {
                     $arrEventsMember[] = $objEventsMember->id;
@@ -256,7 +258,7 @@ readonly class ClearFrontendUserData
 
             // Anonymize entries from tl_calendar_events_member
             foreach ($arrEventsMember as $eventsMemberId) {
-                $objEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findByPk($eventsMemberId);
+                $objEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findById($eventsMemberId);
 
                 if (null === $objEventsMember) {
                     continue;
@@ -283,7 +285,7 @@ readonly class ClearFrontendUserData
             $objDir = new Folder($strDir);
 
             $this->contaoGeneralLogger?->info(
-                sprintf(
+                \sprintf(
                     'Deleted avatar directory "%s" for member with ID %s.',
                     $strDir,
                     $memberId,

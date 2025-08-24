@@ -25,7 +25,7 @@ use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsContentElement(UserPortraitController::TYPE, category:'sac_event_tool_content_elements')]
+#[AsContentElement(UserPortraitController::TYPE, category: 'sac_event_tool_content_elements')]
 class UserPortraitController extends AbstractContentElementController
 {
     public const TYPE = 'user_portrait';

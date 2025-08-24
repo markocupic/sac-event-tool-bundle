@@ -32,8 +32,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EventFilterFormController extends AbstractFrontendModuleController
 {
     public const string TYPE = 'event_filter_form';
+
     public const string DATE_FORMAT = 'Y-m-d';
+
     private const MIN_YEAR = 2017;
+
     private int $urlFixCount = 0;
 
     public function __construct(
@@ -94,8 +97,8 @@ class EventFilterFormController extends AbstractFrontendModuleController
         $objForm->addFieldsFromDca(
             'tl_event_filter_form',
             static function ($strField, $arrDca) use ($arrAllowedFields) {
-                // Make sure to skip elements without an input type
-                // otherwise we will run into an exception
+                // Make sure to skip elements without an input type otherwise we will run
+                // into an exception
                 if (!isset($arrDca['inputType'])) {
                     return false;
                 }
@@ -104,10 +107,9 @@ class EventFilterFormController extends AbstractFrontendModuleController
                     return false;
                 }
 
-                // You must return true
-                // otherwise the field will be skipped
+                // You must return true otherwise the field will be skipped
                 return true;
-            }
+            },
         );
 
         // Let's add  a submit button
@@ -132,12 +134,12 @@ class EventFilterFormController extends AbstractFrontendModuleController
 
                 // Multi selects
                 if (\in_array($k, $arrMultiSelects, true)) {
-                    // As of Symfony 6, non-scalar values are no longer supported
-                    // we must use $request->query->all()[$k]
+                    // As of Symfony 6, non-scalar values are no longer supported we must use
+                    // $request->query->all()[$k]
                     $value = $request->query->all()[$k] ?? [];
 
-                    // e.g the organizers GET param can be transmitted like this:
-                    // organizers=5 or organizers[]=5&organizers[]=6 or organizers=5,6
+                    // e.g the organizers GET param can be transmitted like this: organizers=5 or
+                    // organizers[]=5&organizers[]=6 or organizers=5,6
                     if (\is_scalar($value)) {
                         $value = [$value];
                     } elseif (\is_array($value)) {
@@ -187,7 +189,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
 
         return 1 === preg_match(
             '/^('.$validYearRange.')$/',
-            $year
+            $year,
         );
     }
 
@@ -211,17 +213,18 @@ class EventFilterFormController extends AbstractFrontendModuleController
         // Build the new query string
         $sortedQueryString = http_build_query($queryParams);
 
-        // Reconstruct the URL with the sorted query string
-        // Rebuild the URL from its parts and the sorted query string
+        // Reconstruct the URL with the sorted query string Rebuild the URL from its
+        // parts and the sorted query string
         $scheme = $parsedUrl['scheme'] ?? 'https';
         $host = $parsedUrl['host'] ?? '';
         $path = $parsedUrl['path'] ?? '';
 
-        return sprintf('%s://%s%s?%s', $scheme, $host, $path, $sortedQueryString);
+        return \sprintf('%s://%s%s?%s', $scheme, $host, $path, $sortedQueryString);
     }
 
     /**
-     * Sanitizes the given URL by adding, removing, or modifying query parameters based on specific conditions.
+     * Sanitizes the given URL by adding, removing, or modifying query parameters
+     * based on specific conditions.
      *
      * This method performs several validation and sanitization tasks:
      * - Adds a default `getUpcoming` parameter if certain conditions are met.
@@ -235,8 +238,8 @@ class EventFilterFormController extends AbstractFrontendModuleController
      * - Prevents `dateStart` or `dateEnd` from existing independently by automatically adding the missing parameter with a valid default value.
      * - Sorts query parameters for consistent ordering.
      *
-     * This function modifies the URL to meet the application's expected parameter structure
-     * and tracks the number of modifications applied.
+     * This function modifies the URL to meet the application's expected parameter
+     * structure and tracks the number of modifications applied.
      */
     protected function sanitizeUrl(Request $request): string
     {
@@ -309,8 +312,8 @@ class EventFilterFormController extends AbstractFrontendModuleController
                 continue;
             }
 
-            // Replace the first 4 digits (year) in dateStart with the year param
-            // if the year number in dateStart does not match the year.
+            // Replace the first 4 digits (year) in dateStart with the year param if the year
+            // number in dateStart does not match the year.
             if (!empty($arrAll['year']) && !empty($arrAll['dateStart'])) {
                 $newDate = $arrAll['year'].substr($arrAll['dateStart'], 4);
 
@@ -324,8 +327,8 @@ class EventFilterFormController extends AbstractFrontendModuleController
                 }
             }
 
-            // Replace the first 4 digits (year) in dateEnd with the year param
-            // if the year number in dateEnd does not match the year.
+            // Replace the first 4 digits (year) in dateEnd with the year param if the year
+            // number in dateEnd does not match the year.
             if (!empty($arrAll['year']) && !empty($arrAll['dateEnd'])) {
                 $newDate = $arrAll['year'].substr($arrAll['dateEnd'], 4);
 

@@ -31,12 +31,12 @@ readonly class Util
     {
         return $this->connection
             ->fetchAllKeyValue('SELECT sectionId, name FROM tl_sac_section ORDER BY sectionId ASC')
-            ;
+        ;
     }
 
     /**
-     * Display the section name instead of the section id
-     * 4250,4252 becomes SAC PILATUS, SAC PILATUS NAPF.
+     * Display the section name instead of the section id 4250,4252 becomes SAC
+     * PILATUS, SAC PILATUS NAPF.
      */
     public function decryptSectionIds(array $data, array $row, DataContainer $dc, string $strTable): array
     {

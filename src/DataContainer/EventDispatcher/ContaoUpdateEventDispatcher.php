@@ -24,15 +24,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * This service makes it possible to monitor changes to Contao tables
- * that were made in the Contao backend.
- * Use ContaoPreUpdateEvent or ContaoPostUpdateEvent listeners
- * to compare data records before the change and after the change.
+ * This service makes it possible to monitor changes to Contao tables that were
+ * made in the Contao backend. Use ContaoPreUpdateEvent or ContaoPostUpdateEvent
+ * listeners to compare data records before the change and after the change.
  */
 class ContaoUpdateEventDispatcher
 {
     private string|null $tableName = null;
+
     private int|null $recordId = null;
+
     private array $preUpdateRecord = [];
 
     public function __construct(
@@ -43,9 +44,8 @@ class ContaoUpdateEventDispatcher
     }
 
     /**
-     * Dispatch the Contao-Pre-Update-Event.
-     * We use a very low priority to ensure
-     * that the callbacks are triggered as late as possible.
+     * Dispatch the Contao-Pre-Update-Event. We use a very low priority to ensure that
+     * the callbacks are triggered as late as possible.
      *
      * @param array $updatedFields the modifications to be applied to the record
      */
@@ -71,8 +71,7 @@ class ContaoUpdateEventDispatcher
     }
 
     /**
-     * Dispatch the Contao-Post-Update-Event.
-     * We use a very low priority to ensure
+     * Dispatch the Contao-Post-Update-Event. We use a very low priority to ensure
      * that the callbacks are triggered as late as possible.
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: -99999)]
@@ -80,8 +79,8 @@ class ContaoUpdateEventDispatcher
     public function dispatchPostUpdateEvent(DataContainer $dc): void
     {
         if (!$this->validatePreUpdateState($dc)) {
-            // Stop here if the config.onbeforesubmit callback has not been triggered
-            // because of an empty form submit.
+            // Stop here if the config.onbeforesubmit callback has not been triggered because
+            // of an empty form submit.
             return;
         }
 
@@ -103,15 +102,15 @@ class ContaoUpdateEventDispatcher
     protected function fetchRecord(string $tableName, int $recordId): array
     {
         return $this->connection->fetchAssociative(
-            sprintf('SELECT * FROM %s WHERE id = ?', $tableName),
+            \sprintf('SELECT * FROM %s WHERE id = ?', $tableName),
             [$recordId],
-            [Types::INTEGER]
+            [Types::INTEGER],
         );
     }
 
     /**
-     * Validates that the config.onbeforesubmit callback has been triggered
-     * and the pre-update state is consistent and valid.
+     * Validates that the config.onbeforesubmit callback has been triggered and the
+     * pre-update state is consistent and valid.
      */
     protected function validatePreUpdateState(DataContainer $dc): bool
     {

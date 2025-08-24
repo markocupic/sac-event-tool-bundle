@@ -48,7 +48,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CsvUserExportController extends AbstractFrontendModuleController
 {
     public const TYPE = 'csv_user_export';
+
     private const FIELD_DELIMITER = ';';
+
     private const FIELD_ENCLOSURE = '"';
 
     public function __construct(
@@ -249,7 +251,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
                                 array_filter(
                                     array_map(
                                         static function ($id) use ($groupModelAdapter) {
-                                            $objGroupModel = $groupModelAdapter->findByPk($id);
+                                            $objGroupModel = $groupModelAdapter->findById($id);
 
                                             if (null !== $objGroupModel) {
                                                 if (\strlen((string) $objGroupModel->name)) {
@@ -261,9 +263,9 @@ class CsvUserExportController extends AbstractFrontendModuleController
 
                                             return '';
                                         },
-                                        $arrGroupsUserBelongsTo
-                                    )
-                                )
+                                        $arrGroupsUserBelongsTo,
+                                    ),
+                                ),
                             );
                         } else {
                             // Make a row for each group/role
@@ -276,7 +278,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
                                     }
                                 }
 
-                                $objGroupModel = $groupModelAdapter->findByPk($groupId);
+                                $objGroupModel = $groupModelAdapter->findById($groupId);
 
                                 if (null !== $objGroupModel) {
                                     if (\strlen((string) $objGroupModel->name)) {
@@ -321,7 +323,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
         $arrHeadline = [];
 
         foreach ($arrFields as $field) {
-            $fieldName = $this->translator->trans(sprintf('%s.%s.0', $strTable, $field), [], 'contao_default') ?: $field;
+            $fieldName = $this->translator->trans(\sprintf('%s.%s.0', $strTable, $field), [], 'contao_default') ?: $field;
             $arrHeadline[] = $fieldName;
         }
 
@@ -373,7 +375,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
         foreach ($arrData as $arrRow) {
             $arrLine = array_map(
                 static fn ($v) => html_entity_decode(htmlspecialchars_decode((string) $v)),
-                $arrRow
+                $arrRow,
             );
             $arrFinal[] = $arrLine;
         }

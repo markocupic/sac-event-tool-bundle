@@ -39,8 +39,7 @@ class ReplaceInsertTagsListener
         // Trim whitespaces
         $strTag = '' !== $strTag ? trim($strTag) : $strTag;
 
-        // Replace external link
-        // {{external_link::http://google.ch::more}}
+        // Replace external link {{external_link::http://google.ch::more}}
         if (str_contains($strTag, 'external_link')) {
             $elements = explode('::', $strTag);
 
@@ -52,14 +51,12 @@ class ReplaceInsertTagsListener
                     $label = $elements[2];
                 }
 
-                return sprintf('<a href="%s" target="_blank" rel="noopener">%s</a>', $href, $label);
+                return \sprintf('<a href="%s" target="_blank" rel="noopener">%s</a>', $href, $label);
             }
         }
 
-        // Redirect to an internal page
-        // {{redirect::###pageIdOrAlias###::###params###}}
-        // {{redirect::konto-aktivieren}}
-        // {{redirect::some-page-alias::?foo=bar&var=bla}}
+        // Redirect to an internal page {{redirect::###pageIdOrAlias###::###params###}}
+        // {{redirect::konto-aktivieren}} {{redirect::some-page-alias::?foo=bar&var=bla}}
         if (str_contains($strTag, 'redirect')) {
             $elements = explode('::', $strTag);
 
@@ -72,14 +69,13 @@ class ReplaceInsertTagsListener
                 $objPage = $pageModelAdapter->findByIdOrAlias($elements[1]);
 
                 if (null !== $objPage) {
-                    $strLocation = sprintf('%s%s', $objPage->getFrontendUrl(), $params);
+                    $strLocation = \sprintf('%s%s', $objPage->getFrontendUrl(), $params);
                     $controllerAdapter->redirect($strLocation);
                 }
             }
         }
 
-        // {{count_frontend_user}} -> 86
-        // {{count_frontend_user::10}} -> 80 floor value
+        // {{count_frontend_user}} -> 86 {{count_frontend_user::10}} -> 80 floor value
         if (str_starts_with($strTag, 'count_frontend_users')) {
             $floor = (int) ($elements[1] ?? 1);
             $count = $this->connection->fetchOne('SELECT COUNT(id) FROM tl_member WHERE isSacMember = ?', [true], [Types::BOOLEAN]);
@@ -87,8 +83,8 @@ class ReplaceInsertTagsListener
             return (string) (floor($count / $floor) * $floor);
         }
 
-        // {{count_by_event_type::tour}} -> 764
-        // {{count_by_event_type::tour::100}} -> 700 floor value
+        // {{count_by_event_type::tour}} -> 764 {{count_by_event_type::tour::100}} -> 700
+        // floor value
         if (str_starts_with($strTag, 'count_by_event_type')) {
             $elements = explode('::', $strTag);
 

@@ -43,14 +43,14 @@ class EventReleaseLevelPolicyUtil
     {
         $allowedIDS = [];
 
-        $currentEventReleaseLevelPolicyModel = $this->eventReleaseLevelPolicyModel->findByPk($eventModel->eventReleaseLevel);
+        $currentEventReleaseLevelPolicyModel = $this->eventReleaseLevelPolicyModel->findById($eventModel->eventReleaseLevel);
 
         if (null === $currentEventReleaseLevelPolicyModel) {
             return $allowedIDS;
         }
 
         // Test downwards
-        $prevLevel = $this->eventReleaseLevelPolicyModel->findByPk($currentEventReleaseLevelPolicyModel->id);
+        $prevLevel = $this->eventReleaseLevelPolicyModel->findById($currentEventReleaseLevelPolicyModel->id);
 
         $stop = false;
 
@@ -74,7 +74,7 @@ class EventReleaseLevelPolicyUtil
         $allowedIDS[] = $currentEventReleaseLevelPolicyModel->id;
 
         // Test upwards
-        $nextLevel = $this->eventReleaseLevelPolicyModel->findByPk($currentEventReleaseLevelPolicyModel->id);
+        $nextLevel = $this->eventReleaseLevelPolicyModel->findById($currentEventReleaseLevelPolicyModel->id);
 
         $stop = false;
 

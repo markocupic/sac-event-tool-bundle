@@ -52,7 +52,7 @@ class PreviewUrlConvertListener
 
     private function getEventModel(Request $request): CalendarEventsModel|null
     {
-        //#1: if (!$request->query->has('calendar')) {
+        // #1: if (!$request->query->has('calendar')) {
         if (!$request->query->has('calendar')) {
             return null;
         }
@@ -60,7 +60,7 @@ class PreviewUrlConvertListener
         /** @var CalendarEventsModel $adapter */
         $adapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        //#2: return $adapter->findByPk($request->query->get('calendar'));
-        return $adapter->findByPk($request->query->get('calendar'));
+        // #2: return $adapter->findByPk($request->query->get('calendar'));
+        return $adapter->findById($request->query->get('calendar'));
     }
 }

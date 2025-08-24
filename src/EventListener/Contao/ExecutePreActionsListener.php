@@ -26,7 +26,6 @@ use Contao\MemberModel;
 use Contao\StringUtil;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -60,10 +59,6 @@ class ExecutePreActionsListener
         $this->validatorAdapter = $this->framework->getAdapter(Validator::class);
     }
 
-	/**
-	 * @param string $strAction
-	 * @return void
-	 */
     public function __invoke(string $strAction = ''): void
     {
         // Get current request

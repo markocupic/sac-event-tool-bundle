@@ -35,6 +35,7 @@ use Symfony\Component\HttpFoundation\Response;
 class EventListController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_list';
+
     protected ModuleModel|null $model = null;
 
     public function __construct(
@@ -169,13 +170,13 @@ class EventListController extends AbstractFrontendModuleController
                 break;
 
             case 'calendarIds':
-
                 if ($this->model->applyCalFilter) {
                     $arrCalIds = $stringUtilAdapter->deserialize($this->model->cal_calendar, true);
                     $value = !empty($arrCalIds) ? $arrCalIds : [0];
                 } else {
                     if (!\is_array($value)) {
-                        // It can be transmitted like this: calendarIds=5,7 or calendarIds[]=5&amp;calendarIds[]=7
+                        // It can be transmitted like this: calendarIds=5,7 or
+                        // calendarIds[]=5&amp;calendarIds[]=7
                         $value = explode(',', (string) $value);
                     }
                 }

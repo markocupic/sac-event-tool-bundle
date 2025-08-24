@@ -43,8 +43,8 @@ class TwigLoggedInFrontendUserManager extends AbstractExtension
     /**
      * Returns true if a Contao frontend member is logged in.
      *
-     * Inside your Twig template:
-     * {% if has_logged_in_frontend_user() is sames as true %}Frontend user logged in{% endif %}
+     * Inside your Twig template: {% if has_logged_in_frontend_user() is sames as true
+     * %}Frontend user logged in{% endif %}
      *
      * @see: https://docs.contao.org/dev/framework/asset-management.
      */
@@ -54,12 +54,11 @@ class TwigLoggedInFrontendUserManager extends AbstractExtension
     }
 
     /**
-     * Returns the logged in Contao member (\Contao\MemberModel) if there is a logged in Contao frontend user
-     * or null if there is no logged in Contao frontend user.
+     * Returns the logged in Contao member (\Contao\MemberModel) if there is a logged
+     * in Contao frontend user or null if there is no logged in Contao frontend user.
      *
-     * Inside your Twig template:
-     * {% set user = get_logged_in_frontend_user() %}
-     * Hi, my name is {{ user.firstname }}
+     * Inside your Twig template: {% set user = get_logged_in_frontend_user() %} Hi,
+     * my name is {{ user.firstname }}
      *
      * @see: https://docs.contao.org/dev/framework/asset-management.
      */

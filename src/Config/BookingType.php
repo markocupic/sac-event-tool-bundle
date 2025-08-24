@@ -17,7 +17,9 @@ namespace Markocupic\SacEventToolBundle\Config;
 class BookingType
 {
     public const ONLINE_FORM = 'onlineForm';
+
     public const MANUALLY = 'manually';
+
     public const ALL = [
         self::ONLINE_FORM,
         self::MANUALLY,

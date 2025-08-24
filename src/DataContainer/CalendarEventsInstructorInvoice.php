@@ -82,7 +82,7 @@ readonly class CalendarEventsInstructorInvoice
 
         if ($dc->currentPid) {
             if (\in_array($action, $arrOperations, true)) {
-                $objInvoice = CalendarEventsInstructorInvoiceModel::findByPk($request->query->get('id'));
+                $objInvoice = CalendarEventsInstructorInvoiceModel::findById($request->query->get('id'));
 
                 if (null !== $objInvoice) {
                     if (null !== $objInvoice->getRelated('pid')) {
@@ -90,7 +90,7 @@ readonly class CalendarEventsInstructorInvoice
                     }
                 }
             } else {
-                $objEvent = CalendarEventsModel::findByPk($dc->currentPid);
+                $objEvent = CalendarEventsModel::findById($dc->currentPid);
             }
 
             if (isset($objEvent)) {
@@ -136,7 +136,7 @@ readonly class CalendarEventsInstructorInvoice
 
         $id = $request->query->get('id');
 
-        $objEventInvoice = CalendarEventsInstructorInvoiceModel::findByPk($id);
+        $objEventInvoice = CalendarEventsInstructorInvoiceModel::findById($id);
 
         if (null !== $objEventInvoice) {
             $action = $request->query->get('action');
@@ -171,7 +171,7 @@ readonly class CalendarEventsInstructorInvoice
     public function warnIfReportFormHasNotFilledIn(DataContainer $dc): void
     {
         if ($dc->currentPid) {
-            $objEvent = CalendarEventsModel::findByPk($dc->currentPid);
+            $objEvent = CalendarEventsModel::findById($dc->currentPid);
 
             if (null !== $objEvent) {
                 if (!$objEvent->filledInEventReportForm) {
@@ -193,7 +193,7 @@ readonly class CalendarEventsInstructorInvoice
         $action = $request->query->get('action', '');
 
         if ($dc->currentPid && 'sendRapport' === $action) {
-            $objEvent = CalendarEventsModel::findByPk($dc->currentPid);
+            $objEvent = CalendarEventsModel::findById($dc->currentPid);
 
             if (null !== $objEvent) {
                 if (!$objEvent->filledInEventReportForm) {
@@ -220,7 +220,7 @@ readonly class CalendarEventsInstructorInvoice
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.sorting.child_record')]
     public function listInvoices(array $row): string
     {
-        return '<div class="tl_content_left"><span class="level">Vergütungsformular mit Tourrapport von: '.UserModel::findByPk($row['userPid'])->name.'</span> <span>['.CalendarEventsModel::findByPk($row['pid'])->title.']</span></div>';
+        return '<div class="tl_content_left"><span class="level">Vergütungsformular mit Tourrapport von: '.UserModel::findById($row['userPid'])->name.'</span> <span>['.CalendarEventsModel::findById($row['pid'])->title.']</span></div>';
     }
 
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.edit.button', priority: 90)]
@@ -251,7 +251,7 @@ readonly class CalendarEventsInstructorInvoice
         $blnAllow = false;
         $blnRapportNotificationEnabled = false;
 
-        $objEvent = CalendarEventsModel::findByPk($row['pid']);
+        $objEvent = CalendarEventsModel::findById($row['pid']);
 
         $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
         $organizers = EventOrganizerModel::findByIds($arrOrganizers);
@@ -259,7 +259,8 @@ readonly class CalendarEventsInstructorInvoice
         if (null !== $organizers) {
             while ($organizers->next()) {
                 if ($organizers->enableRapportNotification) {
-                    // Only show the icon without a link, if rapport notification is disabled in the organizer model.
+                    // Only show the icon without a link, if rapport notification is disabled in the
+                    // organizer model.
                     $blnRapportNotificationEnabled = true;
                 }
             }
@@ -314,8 +315,8 @@ readonly class CalendarEventsInstructorInvoice
         // Override value from database
         $value = '';
 
-        if (null !== ($objInvoice = CalendarEventsInstructorInvoiceModel::findByPk($dc->id))) {
-            if ($objInvoice->userPid > 0 && null !== ($objUser = UserModel::findByPk($objInvoice->userPid))) {
+        if (null !== ($objInvoice = CalendarEventsInstructorInvoiceModel::findById($dc->id))) {
+            if ($objInvoice->userPid > 0 && null !== ($objUser = UserModel::findById($objInvoice->userPid))) {
                 $value = $objUser->iban;
                 $objInvoice->iban = $value;
                 $objInvoice->save();
@@ -342,7 +343,7 @@ readonly class CalendarEventsInstructorInvoice
             return $value;
         }
 
-        $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->pid);
+        $objEvent = CalendarEventsModel::findById($dc->activeRecord->pid);
 
         if (null === $objEvent) {
             return $value;

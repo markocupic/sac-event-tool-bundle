@@ -67,7 +67,8 @@ class WebhookController extends AbstractController
 
         $exportTask = $job->getTasks()
             ->whereStatus(Task::STATUS_FINISHED) // get the task with 'finished' status ...
-            ->whereName('export-my-file')[0]; // ... and with the name 'export-it'
+            ->whereName('export-my-file')[0] // ... and with the name 'export-it'
+        ;
 
         return new Response('all ok');
     }

@@ -55,8 +55,8 @@ readonly class UserRole
     }
 
     /**
-     * Add the "role currently vacant" label to each record,
-     * if the user role could not be found in tl_user.
+     * Add the "role currently vacant" label to each record, if the user role could
+     * not be found in tl_user.
      *
      * @throws Exception
      */
@@ -80,9 +80,9 @@ readonly class UserRole
 
         $msg = $this->translator->trans('MSC.roleCurrentlyVacant', [], 'contao_default');
 
-        $style = !$blnUsed ? sprintf(' title="%s" style="color:red"', StringUtil::specialchars($msg)) : '';
+        $style = !$blnUsed ? \sprintf(' title="%s" style="color:red"', StringUtil::specialchars($msg)) : '';
 
-        return sprintf('<span%s>%s</span> <span style="color:grey">%s</span>', $style, $row['title'], $row['email']);
+        return \sprintf('<span%s>%s</span> <span style="color:grey">%s</span>', $style, $row['title'], $row['email']);
     }
 
     /**

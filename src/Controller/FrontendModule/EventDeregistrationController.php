@@ -59,7 +59,9 @@ class EventDeregistrationController extends AbstractFrontendModuleController
     public const string TYPE = 'event_deregistration';
 
     private ModuleModel|null $moduleModel = null;
+
     private FrontendUser|null $user = null;
+
     private FragmentTemplate|null $template = null;
 
     public function __construct(
@@ -127,10 +129,11 @@ class EventDeregistrationController extends AbstractFrontendModuleController
         $arrTokens = array_map('html_entity_decode', $arrTokens);
 
         if (!empty($objEvent->registrationGoesTo)) {
-            $objUser = $this->framework->getAdapter(UserModel::class)->findByPk($objEvent->registrationGoesTo);
+            $objUser = $this->framework->getAdapter(UserModel::class)->findById($objEvent->registrationGoesTo);
 
             if (!Validator::isEmail((string) $objUser?->email)) {
-                // This should not be the case, because we are testing already for a valid email in self::canDeregister()
+                // This should not be the case, because we are testing already for a valid email
+                // in self::canDeregister()
                 throw new \RuntimeException('Instructor email address is not valid.');
             }
 
@@ -139,13 +142,13 @@ class EventDeregistrationController extends AbstractFrontendModuleController
         }
 
         $this->contaoGeneralLogger?->info(
-            sprintf(
+            \sprintf(
                 'User with SAC-Member-ID %d has unsubscribed himself from event with ID: %d ("%s")',
                 $objRegistration->sacMemberId,
                 $objRegistration->eventId,
-                $objRegistration->eventName
+                $objRegistration->eventName,
             ),
-            ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)]
+            ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)],
         );
 
         $notificationId = $event->getFrontendModuleModel()?->eventDeregistrationNotification;
@@ -170,9 +173,9 @@ class EventDeregistrationController extends AbstractFrontendModuleController
 
         $regId = (int) $request->query->get('regId');
 
-        $registration = CalendarEventsMemberModel::findByPk($regId);
-        $event = CalendarEventsModel::findByPk($registration?->eventId);
-        $user = MemberModel::findByPk($this->user->id);
+        $registration = CalendarEventsMemberModel::findById($regId);
+        $event = CalendarEventsModel::findById($registration?->eventId);
+        $user = MemberModel::findById($this->user->id);
 
         $this->template = $template;
         $this->template->set('user', $user->row());
@@ -244,10 +247,11 @@ class EventDeregistrationController extends AbstractFrontendModuleController
      */
     private function canDeregister(int $regId): bool
     {
-        $objRegistration = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findByPk($regId);
+        $objRegistration = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findById($regId);
 
-        // If the registration for an event has just been canceled by the participant,
-        // a token is inserted into the session containing information about the event and the registration.
+        // If the registration for an event has just been canceled by the participant, a
+        // token is inserted into the session containing information about the event and
+        // the registration.
         $deregSuccessToken = $this->requestStack->getCurrentRequest()->getSession()->get('evt_dereg_success_'.$regId);
 
         if (isset($deregSuccessToken['regId']) && $deregSuccessToken['regId'] === $regId && $deregSuccessToken['expiration'] > time()) {
@@ -257,7 +261,7 @@ class EventDeregistrationController extends AbstractFrontendModuleController
         $objEvent = $objRegistration?->getRelated('eventId');
 
         if (null === $objRegistration) {
-            throw new EventDeregistrationException(sprintf('Could not find a registration with ID %d.', $regId), 'error', 'MSC.evt_dereg_regNotFound', [$this->user->firstname, $regId]);
+            throw new EventDeregistrationException(\sprintf('Could not find a registration with ID %d.', $regId), 'error', 'MSC.evt_dereg_regNotFound', [$this->user->firstname, $regId]);
         }
 
         if (null === $objEvent) {
@@ -272,12 +276,12 @@ class EventDeregistrationController extends AbstractFrontendModuleController
             throw new EventDeregistrationException('User has no valid email address.', 'error', 'MSC.evt_dereg_userHasInvalidEmail', [$this->user->firstname, $objEvent->title]);
         }
 
-        if (null === $objEvent->getRelated('mainInstructor') || !Validator::isEmail(UserModel::findByPk($objEvent->getRelated('mainInstructor')->id)->email)) {
+        if (null === $objEvent->getRelated('mainInstructor') || !Validator::isEmail(UserModel::findById($objEvent->getRelated('mainInstructor')->id)->email)) {
             throw new EventDeregistrationException('Main instructor not found or the main instructor has no valid email address.', 'error', 'MSC.evt_dereg_mainInstructorNotFoundOrNotAvailableByEmail', [$this->user->firstname, $objEvent->title]);
         }
 
         if (!empty($objEvent->registrationGoesTo)) {
-            $objUser = $this->framework->getAdapter(UserModel::class)->findByPk($objEvent->registrationGoesTo);
+            $objUser = $this->framework->getAdapter(UserModel::class)->findById($objEvent->registrationGoesTo);
 
             if (null === $objUser || !Validator::isEmail($objUser->email)) {
                 throw new EventDeregistrationException('Main instructor not found or the main instructor has no valid email address.', 'error', 'MSC.evt_dereg_mainInstructorNotFoundOrNotAvailableByEmail', [$this->user->firstname, $objEvent->title]);
@@ -321,12 +325,12 @@ class EventDeregistrationController extends AbstractFrontendModuleController
 
     private function deregister(int $regId, array $arrDataSubmit): bool
     {
-        $objRegistration = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findByPk($regId);
+        $objRegistration = $this->framework->getAdapter(CalendarEventsMemberModel::class)->findById($regId);
 
         $shouldDelete = false;
 
-        // If the state of subscription is set "refused" the record will be deleted
-        // @todo should we extend this behaviour to other subscription states?
+        // If the state of subscription is set "refused" the record will be deleted @todo
+        // should we extend this behaviour to other subscription states?
         if (EventSubscriptionState::SUBSCRIPTION_REFUSED === $objRegistration->stateOfSubscription) {
             $shouldDelete = true;
         }
@@ -336,13 +340,13 @@ class EventDeregistrationController extends AbstractFrontendModuleController
         // Unregister from event
         $objRegistration->stateOfSubscription = EventSubscriptionState::USER_HAS_UNSUBSCRIBED;
 
-        $memberModel = $this->framework->getAdapter(MemberModel::class)->findByPk($this->user->id);
+        $memberModel = $this->framework->getAdapter(MemberModel::class)->findById($this->user->id);
 
         $objRegistration->deregistrationCause = Input::post('deregistration_cause', null); // Input encoding!
 
         try {
-            // Deregistration can be canceled via event listener.
-            // In the event listener you have to throw a EventDeregistrationException.
+            // Deregistration can be canceled via event listener. In the event listener you
+            // have to throw a EventDeregistrationException.
             $event = new EventDeregistrationEvent($this->requestStack->getCurrentRequest(), $objRegistration, $objEvent, $memberModel, $this->moduleModel, $shouldDelete, $arrDataSubmit);
             $this->eventDispatcher->dispatch($event);
         } catch (EventDeregistrationException $e) {
@@ -364,14 +368,14 @@ class EventDeregistrationController extends AbstractFrontendModuleController
         }
 
         $this->contaoGeneralLogger?->info(
-            sprintf(
+            \sprintf(
                 'User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s").%s',
                 $objRegistration->sacMemberId,
                 $objRegistration->eventId,
                 $objRegistration->eventName,
                 $event->shouldDelete() ? ' The data record was deleted.' : '',
             ),
-            ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)]
+            ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)],
         );
 
         if ($event->shouldDelete()) {

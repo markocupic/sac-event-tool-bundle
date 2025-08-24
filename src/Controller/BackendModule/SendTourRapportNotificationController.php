@@ -50,11 +50,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment as Twig;
 
 /**
- * Roughly speaking, this Contao backend controller sends the goal report and the billing form to the "Tourenchef" and/or "Administration" via email.
- * The extension generates an email form with the input fields "recipients", "subject" and "text".
- * The recipient input field is automatically filled with the e-mail addresses that were set in the event organizer settings.
- * The billing form and tour report are automatically attached to the message.
- * Both files are converted from docx to pdf using the CloudConvert API before sending.
+ * Roughly speaking, this Contao backend controller sends the goal report and the
+ * billing form to the "Tourenchef" and/or "Administration" via email. The
+ * extension generates an email form with the input fields "recipients", "subject"
+ * and "text". The recipient input field is automatically filled with the e-mail
+ * addresses that were set in the event organizer settings. The billing form and
+ * tour report are automatically attached to the message. Both files are converted
+ * from docx to pdf using the CloudConvert API before sending.
  *
  * involved files:
  * vendor/markocupic/sac-event-tool-bundle/templates/backend/tl_calendar_events_member/be_event_participant_email.html.twig
@@ -68,12 +70,19 @@ class SendTourRapportNotificationController extends AbstractBackendController
     public const SESSION_BAG_KEY = 'sacevt_send_tour_notification';
 
     private string|null $sid = null;
+
     private Adapter $stringUtil;
+
     private Adapter $urlUtil;
+
     private Adapter $controller;
+
     private Adapter $message;
+
     private Adapter $system;
+
     private Adapter $events;
+
     private Adapter $config;
 
     public function __construct(
@@ -151,14 +160,11 @@ class SendTourRapportNotificationController extends AbstractBackendController
             return $this->render('@MarkocupicSacEventTool/TourRapport/tour_rapport_notification.twig', $view);
         }
 
-        // Form inputs have passed validation:
-        // I. Generate tour report file and convert from docx to pdf using the CloudConvert API.
-        // II. Generate tour invoice file and convert from docx to pdf using the CloudConvert API.
-        // III. Send notification via email.
-        // IV. Redirect back to the referer page
-
-        // I. Generate tour report file and convert from docx to pdf using the
-        //  API.
+        // Form inputs have passed validation: I. Generate tour report file and convert
+        // from docx to pdf using the CloudConvert API. II. Generate tour invoice file
+        // and convert from docx to pdf using the CloudConvert API. III. Send
+        // notification via email. IV. Redirect back to the referer page I. Generate tour
+        // report file and convert from docx to pdf using the  API.
         try {
             $rapportFile = $this->tourRapportGenerator
                 ->generate(
@@ -171,7 +177,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
             ;
 
             if (false === $rapportFile->getSize() || 5000 > $rapportFile->getSize()) {
-                throw new \Exception(sprintf('File conversion failed. File size of the converted file "%s" is too small. File size: %d bytes!', $rapportFile->getFilename(), $rapportFile->getSize()));
+                throw new \Exception(\sprintf('File conversion failed. File size of the converted file "%s" is too small. File size: %d bytes!', $rapportFile->getFilename(), $rapportFile->getSize()));
             }
         } catch (TourRapportGeneratorException|HttpClientException|\Exception $e) {
             $message = match (true) {
@@ -190,7 +196,8 @@ class SendTourRapportNotificationController extends AbstractBackendController
             return $this->redirectBackToRefererPage($request);
         }
 
-        // II. Generate tour invoice file and convert from docx to pdf using the CloudConvert API.
+        // II. Generate tour invoice file and convert from docx to pdf using the
+        // CloudConvert API.
         try {
             $invoiceFile = $this->tourRapportGenerator
                 ->generate(
@@ -203,7 +210,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
             ;
 
             if (false === $invoiceFile->getSize() || 5000 > $invoiceFile->getSize()) {
-                throw new \Exception(sprintf('File conversion failed. File size of the converted file "%s" is too small. File size: %d bytes!', $invoiceFile->getFilename(), $invoiceFile->getSize()));
+                throw new \Exception(\sprintf('File conversion failed. File size of the converted file "%s" is too small. File size: %d bytes!', $invoiceFile->getFilename(), $invoiceFile->getSize()));
             }
         } catch (TourRapportGeneratorException|HttpClientException|\Exception $e) {
             $message = match (true) {
@@ -298,7 +305,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
 
     protected function getInvoice(int $id): CalendarEventsInstructorInvoiceModel
     {
-        $invoice = CalendarEventsInstructorInvoiceModel::findByPk($id);
+        $invoice = CalendarEventsInstructorInvoiceModel::findById($id);
 
         if (null === $invoice) {
             throw new \InvalidArgumentException('Invoice with ID '.$id.' not found.');
@@ -325,7 +332,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
     {
         $invoice = $this->getInvoice($id);
 
-        $user = UserModel::findByPk($invoice->userPid);
+        $user = UserModel::findById($invoice->userPid);
 
         if (null === $user) {
             throw new \InvalidArgumentException('User with ID '.$invoice->userPid.' not found.');
@@ -371,9 +378,8 @@ class SendTourRapportNotificationController extends AbstractBackendController
                 if ($organizer->enableRapportNotification) {
                     ++$i;
 
-                    // We let the user enter the recipients manually,
-                    // if the event belongs to more than one organizer,
-                    // because we don't want an event to be billed multiple times
+                    // We let the user enter the recipients manually, if the event belongs to more
+                    // than one organizer, because we don't want an event to be billed multiple times
                     if ($i > 1 && !empty($organizer->eventRapportNotificationRecipients) && !empty($arrRecipients)) {
                         return [];
                     }
@@ -438,8 +444,8 @@ class SendTourRapportNotificationController extends AbstractBackendController
             return $form;
         }
 
-        // !important otherwise the docx files will be converted
-        // and Contao will try to send the email
+        // !important otherwise the docx files will be converted and Contao will try to
+        // send the email
         $form->setIsSubmitted(false);
 
         // Preset input fields "subject" and "text" with a default text
@@ -448,29 +454,23 @@ class SendTourRapportNotificationController extends AbstractBackendController
                 $form->getWidget('recipients')->value = implode(',', $this->getRecipients($event));
 
                 // Render email subject
-                $subject = $this->twig->render(
-                    '@MarkocupicSacEventTool/Email/TourRapport/email_tour_rapport.twig',
-                    [
-                        'renderEmailSubject' => true,
-                        'event' => $event,
-                        'instructor' => $biller,
-                    ]
-                );
+                $subject = $this->twig->render('@MarkocupicSacEventTool/Email/TourRapport/email_tour_rapport.twig', [
+                    'renderEmailSubject' => true,
+                    'event' => $event,
+                    'instructor' => $biller,
+                ]);
 
                 $subject = $this->stringUtil->revertInputEncoding($subject);
 
                 $form->getWidget('subject')->value = $subject;
 
                 // Render email text
-                $text = $this->twig->render(
-                    '@MarkocupicSacEventTool/Email/TourRapport/email_tour_rapport.twig',
-                    [
-                        'renderEmailText' => true,
-                        'event' => $event,
-                        'instructor' => $biller,
-                        'event_url' => $this->events->generateEventUrl($event, true),
-                    ]
-                );
+                $text = $this->twig->render('@MarkocupicSacEventTool/Email/TourRapport/email_tour_rapport.twig', [
+                    'renderEmailText' => true,
+                    'event' => $event,
+                    'instructor' => $biller,
+                    'event_url' => $this->events->generateEventUrl($event, true),
+                ]);
 
                 $text = $this->stringUtil->revertInputEncoding($text);
 
@@ -604,7 +604,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
                 'Backend User: '.$security->getUser()->username,
                 'Rapport ID: '.(string) $rapport_id,
                 'Error message: '.$e->getMessage(),
-                'Instance of: '.\get_class($e),
+                'Instance of: '.$e::class,
                 'Code: '.$e->getCode(),
                 'Line: '.$e->getLine(),
                 'Stack trace: '."\r\n".$e->getTraceAsString(),

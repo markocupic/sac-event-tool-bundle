@@ -31,6 +31,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class EventRegistrationListGeneratorCsv
 {
     private const DELIMITER = ';';
+
     private const FIELDS = [
         'id',
         'stateOfSubscription',
@@ -60,6 +61,7 @@ class EventRegistrationListGeneratorCsv
 
     // Adapters
     private Adapter $configAdapter;
+
     private Adapter $controllerAdapter;
 
     public function __construct(
@@ -91,7 +93,7 @@ class EventRegistrationListGeneratorCsv
         // Insert headline
         $arrHeadline = array_map(
             static fn ($field) => $GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0] ?? $field,
-            self::FIELDS
+            self::FIELDS,
         );
 
         $csv->insertOne($arrHeadline);
@@ -124,13 +126,13 @@ class EventRegistrationListGeneratorCsv
         $eventTitle = preg_replace('/[^a-zA-Z0-9_-]+/', '_', strtolower($event->title));
 
         // Generate the file name
-        $filename = sprintf($this->sacevtEventMemberListFileNamePattern, $eventTitle, 'csv');
+        $filename = \sprintf($this->sacevtEventMemberListFileNamePattern, $eventTitle, 'csv');
 
         // Sent the file to the browser.
         $response = new StreamedResponse(
             static function () use ($csv, $filename): void {
                 $csv->output($filename);
-            }
+            },
         );
 
         $response->headers->set('Content-Type', 'application/vnd.ms-excel');

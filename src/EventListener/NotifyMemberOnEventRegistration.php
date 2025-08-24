@@ -36,12 +36,17 @@ final class NotifyMemberOnEventRegistration
     public const int PRIORITY = 10000;
 
     private Adapter $eventsAdapter;
+
     private Adapter $userModelAdapter;
 
     private array $arrData = [];
+
     private MemberModel|null $memberModel = null;
+
     private CalendarEventsModel|null $eventModel = null;
+
     private CalendarEventsMemberModel|null $eventMemberModel = null;
+
     private ModuleModel|null $moduleModel = null;
 
     public function __construct(
@@ -85,7 +90,7 @@ final class NotifyMemberOnEventRegistration
 
     private function getTokens(): array
     {
-        $instructor = $this->userModelAdapter->findByPk($this->eventModel->mainInstructor);
+        $instructor = $this->userModelAdapter->findById($this->eventModel->mainInstructor);
         $delegatedInstructor = $this->getDelegatedInstructor();
 
         $tokens = [
@@ -130,7 +135,7 @@ final class NotifyMemberOnEventRegistration
             return null;
         }
 
-        $user = $this->userModelAdapter->findByPk($this->eventModel->registrationGoesTo);
+        $user = $this->userModelAdapter->findById($this->eventModel->registrationGoesTo);
 
         if (!empty($user->email) && !empty($user->name)) {
             return [

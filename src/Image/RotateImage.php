@@ -44,7 +44,7 @@ class RotateImage
         $this->framework->initialize();
 
         if (!file_exists($filesModel->getAbsolutePath())) {
-            $this->messageAdapter->addError(sprintf('File "%s" not found.', $filesModel->getAbsolutePath()));
+            $this->messageAdapter->addError(\sprintf('File "%s" not found.', $filesModel->getAbsolutePath()));
 
             return false;
         }
@@ -52,7 +52,7 @@ class RotateImage
         $objFile = new File($filesModel->path);
 
         if (!$objFile->isGdImage) {
-            $this->messageAdapter->addError(sprintf('File "%s" could not be rotated, because it is not an image.', $filesModel->getAbsolutePath()));
+            $this->messageAdapter->addError(\sprintf('File "%s" could not be rotated, because it is not an image.', $filesModel->getAbsolutePath()));
 
             return false;
         }

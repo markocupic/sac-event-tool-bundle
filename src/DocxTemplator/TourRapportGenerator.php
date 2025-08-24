@@ -33,6 +33,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class TourRapportGenerator
 {
     private Adapter $calendarEventsModel;
+
     private Adapter $userModel;
 
     public function __construct(
@@ -53,16 +54,15 @@ class TourRapportGenerator
     }
 
     /**
-     * This method will generate either
-     * the event report or the invoice/reimbursement form
-     * as a file on the file system.
+     * This method will generate either the event report or the invoice/reimbursement
+     * form as a file on the file system.
      */
     public function generate(DocumentType $documentType, CalendarEventsInstructorInvoiceModel $eventInvoice, OutputType $outputType, string $docxTemplateSrc, string $strFilenamePattern): \SplFileObject
     {
-        $event = $this->calendarEventsModel->findByPk($eventInvoice->pid);
+        $event = $this->calendarEventsModel->findById($eventInvoice->pid);
 
         if (null === $event) {
-            throw new TourRapportGeneratorException(sprintf('Event with ID %d not found.', $eventInvoice->pid), $this->translator->trans('ERR.evt_strn_event_not_found', [$eventInvoice->pid], 'contao_default'));
+            throw new TourRapportGeneratorException(\sprintf('Event with ID %d not found.', $eventInvoice->pid), $this->translator->trans('ERR.evt_strn_event_not_found', [$eventInvoice->pid], 'contao_default'));
         }
 
         if (!$this->docxEventHelper->checkEventRapportHasFilledInCorrectly($eventInvoice)) {
@@ -74,30 +74,27 @@ class TourRapportGenerator
         }
 
         // "Zahlungsempfänger"
-        $beneficiary = $this->userModel->findByPk($eventInvoice->userPid);
+        $beneficiary = $this->userModel->findById($eventInvoice->userPid);
 
         if (null === $beneficiary) {
-            throw new TourRapportGeneratorException(sprintf('User with ID %d not found.', $eventInvoice->userPid), $this->translator->trans('ERR.evt_strn_user_not_found', [$eventInvoice->userPid], 'contao_default'));
+            throw new TourRapportGeneratorException(\sprintf('User with ID %d not found.', $eventInvoice->userPid), $this->translator->trans('ERR.evt_strn_user_not_found', [$eventInvoice->userPid], 'contao_default'));
         }
 
         $docxTemplateSrc = Path::makeAbsolute($docxTemplateSrc, $this->projectDir);
 
-        $fileName = sprintf($strFilenamePattern, $event->id.'_'.$eventInvoice->userPid, 'docx');
+        $fileName = \sprintf($strFilenamePattern, $event->id.'_'.$eventInvoice->userPid, 'docx');
         $targetPathDocx = Path::makeAbsolute(Path::join($this->sacevtTempDir, $fileName), $this->projectDir);
         $targetPathPdf = str_replace('.docx', '.pdf', $targetPathDocx);
 
         $objPhpWord = new MsWordTemplateProcessor($docxTemplateSrc, $targetPathDocx);
 
-        // Page #1
-        // Tour rapport
+        // Page #1 Tour rapport
         $this->docxEventHelper->setTourRapportData($objPhpWord, $event, $eventInvoice, $beneficiary);
 
-        // Page #1 + #2
-        // Event data
+        // Page #1 + #2 Event data
         $this->docxEventHelper->setEventData($objPhpWord, $event);
 
-        // Page #2
-        // Member list
+        // Page #2 Member list
         if (DocumentType::RAPPORT === $documentType) {
             $this->docxEventMemberHelper->setEventMemberData($objPhpWord, $event, $this->docxEventMemberHelper->getParticipatedEventMembers($event));
         }
@@ -117,7 +114,7 @@ class TourRapportGenerator
                 ->uncached(false)
                 ->setCacheHashCode($hashCode)
                 ->convertTo($outputType->value, $targetPathPdf)
-                ;
+            ;
         }
 
         // OutputType::DOCX === $outputType

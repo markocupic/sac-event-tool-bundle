@@ -89,7 +89,7 @@ class ContentElementMigration extends AbstractMigration
             [
                 'content_element_type' => Types::STRING,
                 'template_name' => Types::STRING,
-            ]
+            ],
         );
     }
 

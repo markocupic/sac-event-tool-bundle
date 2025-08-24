@@ -40,7 +40,6 @@ readonly class EventMember
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
         /** @var MemberModel $memberModelAdapter */
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-        /** @var $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
 
         $i = 0;
@@ -50,7 +49,7 @@ readonly class EventMember
 
         if (!empty($arrInstructors)) {
             foreach ($arrInstructors as $userId) {
-                $objUserModel = $userModelAdapter->findByPk($userId);
+                $objUserModel = $userModelAdapter->findById($userId);
                 $strMemberInSection = '';
 
                 if (null !== $objUserModel) {
@@ -141,13 +140,13 @@ readonly class EventMember
 
                 if (\strlen($objEventMember->carInfo)) {
                     if ((int) $objEventMember->carInfo > 0) {
-                        $transportInfo .= sprintf(' Auto mit %s Plätzen', $objEventMember->carInfo);
+                        $transportInfo .= \sprintf(' Auto mit %s Plätzen', $objEventMember->carInfo);
                     }
                 }
 
                 // GA, Halbtax, Tageskarte
                 if (\strlen($objEventMember->ticketInfo)) {
-                    $transportInfo .= sprintf(' Ticket: Mit %s', $objEventMember->ticketInfo);
+                    $transportInfo .= \sprintf(' Ticket: Mit %s', $objEventMember->ticketInfo);
                 }
 
                 // Phone
@@ -184,11 +183,11 @@ readonly class EventMember
             function ($id): string|null {
                 $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
-                $objUser = $userModelAdapter->findByPk($id);
+                $objUser = $userModelAdapter->findById($id);
 
                 return $objUser?->name;
             },
-            $aInstructors
+            $aInstructors,
         );
 
         $arrInstructors = array_filter($arrInstructors);
@@ -205,7 +204,7 @@ readonly class EventMember
 
         return $calendarEventsMemberModelAdapter->findBy(
             ['tl_calendar_events_member.eventId=?', 'tl_calendar_events_member.hasParticipated=?'],
-            [$objEvent->id, 1]
+            [$objEvent->id, 1],
         );
     }
 

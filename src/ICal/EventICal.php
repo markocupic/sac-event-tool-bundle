@@ -34,6 +34,7 @@ use Symfony\Component\HttpFoundation\Response;
 class EventICal
 {
     private Adapter $events;
+
     private Adapter $stringUtil;
 
     public function __construct(
@@ -65,9 +66,9 @@ class EventICal
             $occurrence = new SingleDay(
                 new Date(
                     new \DateTime(
-                        date('d.m.Y', (int) $timestamp)
-                    )
-                )
+                        date('d.m.Y', (int) $timestamp),
+                    ),
+                ),
             );
 
             $vEvent = new Event();
@@ -89,7 +90,7 @@ class EventICal
 
         $disposition = HeaderUtils::makeDisposition(
             HeaderUtils::DISPOSITION_ATTACHMENT,
-            sprintf('%s.ics', $objEvent->alias),
+            \sprintf('%s.ics', $objEvent->alias),
         );
 
         $response->headers->addCacheControlDirective('must-revalidate');

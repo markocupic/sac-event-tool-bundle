@@ -38,8 +38,7 @@ class TwigQrCodeManager extends AbstractExtension
     /**
      * Get the event qr code file path inside your twig template.
      *
-     * Inside your Twig template:
-     * #event# -> \Contao\CalendarEventsModel or event id
+     * Inside your Twig template: #event# -> \Contao\CalendarEventsModel or event id
      * {{ getEventQrCode(#event#) }}.
      *
      * @see: https://docs.contao.org/dev/framework/asset-management.
@@ -47,7 +46,7 @@ class TwigQrCodeManager extends AbstractExtension
     public function getEventQrCode(CalendarEventsModel|int $varEvent): string
     {
         if (\is_int($varEvent)) {
-            $event = $this->framework->getAdapter(CalendarEventsModel::class)->findByPk($varEvent);
+            $event = $this->framework->getAdapter(CalendarEventsModel::class)->findById($varEvent);
         } else {
             $event = $varEvent;
         }

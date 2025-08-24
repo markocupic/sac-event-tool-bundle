@@ -20,8 +20,8 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 
 /**
- * This is the base class for:
- * JahresprogrammExportController and PilatusExportController.
+ * This is the base class for: JahresprogrammExportController and
+ * PilatusExportController.
  */
 abstract class AbstractPrintExportController extends AbstractFrontendModuleController
 {
@@ -41,7 +41,7 @@ abstract class AbstractPrintExportController extends AbstractFrontendModuleContr
 
         if (null !== $objEvent) {
             if ($objEvent->eventReleaseLevel > 0) {
-                $objEventReleaseLevel = $eventReleaseLevelPolicyModelAdapter->findByPk($objEvent->eventReleaseLevel);
+                $objEventReleaseLevel = $eventReleaseLevelPolicyModelAdapter->findById($objEvent->eventReleaseLevel);
 
                 if (null !== $objEventReleaseLevel) {
                     if (null === $minLevel) {

@@ -26,8 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Mirror/Update tl_member from SAC Member Database Zentralverband Bern
- * Unidirectional sync
- * SAC Member Database Zentralverband Bern -> tl_member.
+ * Unidirectional sync SAC Member Database Zentralverband Bern -> tl_member.
  */
 #[Route('%contao.backend.route_prefix%/sync_sac_member_database', name: self::class, defaults: ['_scope' => 'backend', '_token_check' => true])]
 class SyncMemberDatabaseController extends AbstractBackendController

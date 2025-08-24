@@ -36,19 +36,27 @@ use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(PilatusExportController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_pilatus_export')]
+#[AsFrontendModule(PilatusExportController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_pilatus_export')]
 class PilatusExportController extends AbstractPrintExportController
 {
     public const TYPE = 'pilatus_export';
+
     private const DEFAULT_EVENT_RELEASE_LEVEL = 3;
 
     private ModuleModel|null $model;
+
     private Form|null $objForm = null;
+
     private int|null $startDate = null;
+
     private int|null $endDate = null;
+
     private int $eventReleaseLevel = self::DEFAULT_EVENT_RELEASE_LEVEL;
+
     private array|null $htmlCourseTable = null;
+
     private array|null $htmlTourTable = null;
+
     private array $events = [];
 
     // Editable course fields.
@@ -279,7 +287,7 @@ class PilatusExportController extends AbstractPrintExportController
         $results = $qb->executeQuery();
 
         while (false !== ($arrEvent = $results->fetchAssociative())) {
-            $objEvent = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
+            $objEvent = $calendarEventsModelAdapter->findById($arrEvent['id']);
 
             if (null === $objEvent) {
                 continue;
@@ -306,7 +314,7 @@ class PilatusExportController extends AbstractPrintExportController
             $arrRow['instructors'] = implode(', ', $this->calendarEventsUtil->getInstructorNamesAsArray($objEvent));
             $arrRow['organizers'] = implode(', ', $this->calendarEventsUtil->getEventOrganizersAsArray($objEvent, 'titlePrint'));
             $arrRow['eventId'] = date('Y', (int) $objEvent->startDate).'-'.$objEvent->id;
-            $arrRow['journey'] = null !== $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey) ? $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey)->title : null;
+            $arrRow['journey'] = null !== $calendarEventsJourneyModelAdapter->findById($objEvent->journey) ? $calendarEventsJourneyModelAdapter->findById($objEvent->journey)->title : null;
 
             if (EventType::COURSE === $objEvent->eventType) {
                 $arrRow['eventId'] = $objEvent->courseId;

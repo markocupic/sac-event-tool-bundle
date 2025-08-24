@@ -46,7 +46,7 @@ readonly class GenerateTourListBookletHandler
         $user = $message->getUser();
         $filename = $message->getFilename();
         $outputType = $message->getOutputType();
-        $memberModel = MemberModel::findByPk($user->id);
+        $memberModel = MemberModel::findById($user->id);
         $notificationType = 'personal-tour-list-ready-for-download';
         $endOfLifeTstamp = time() + 7 * 24 * 3600;
 
@@ -71,22 +71,26 @@ readonly class GenerateTourListBookletHandler
 
     private function generateMessageTitle(MemberModel $memberModel): string
     {
-        $text = sprintf('Hallo %s!', $memberModel->firstname);
+        $text = \sprintf('Hallo %s!', $memberModel->firstname);
 
         return $this->revertInputEncoding($text);
     }
 
     private function generateMessageText(FrontendUserNotificationModel $notificationModel, FilesModel $filesModel, string $filename): string
     {
-        $url = $this->router->generate(DownloadController::class, [
-            'file' => base64_encode($filesModel->getAbsolutePath()),
-            'filename' => base64_encode($filename),
-            'notificationId' => $notificationModel->id,
-        ], UrlGeneratorInterface::ABSOLUTE_URL);
+        $url = $this->router->generate(
+            DownloadController::class,
+            [
+                'file' => base64_encode($filesModel->getAbsolutePath()),
+                'filename' => base64_encode($filename),
+                'notificationId' => $notificationModel->id,
+            ],
+            UrlGeneratorInterface::ABSOLUTE_URL,
+        );
 
         $urlSigned = $this->uriSigner->sign($url);
 
-        $text = sprintf('<div class="lh-lg mb-3 small">Du kannst dein persönliches Tourenprogramm jetzt herunterladen:<br><a href="%s" title="Download starten">%s</a></div>', $urlSigned, $filename);
+        $text = \sprintf('<div class="lh-lg mb-3 small">Du kannst dein persönliches Tourenprogramm jetzt herunterladen:<br><a href="%s" title="Download starten">%s</a></div>', $urlSigned, $filename);
 
         return $this->revertInputEncoding($text);
     }
