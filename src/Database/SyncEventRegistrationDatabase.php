@@ -33,6 +33,7 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
 class SyncEventRegistrationDatabase extends AbstractController
 {
     private const string STOP_WATCH_EVENT = 'update_event_reg_data';
+
     private array $syncLog = [
         'processed_registrations' => 0,
         'processed_members' => 0,
@@ -63,7 +64,7 @@ class SyncEventRegistrationDatabase extends AbstractController
         $this->syncLog['duration'] = $duration;
 
         if (null !== $this->contaoGeneralLogger) {
-            $strText = sprintf(
+            $strText = \sprintf(
                 'Successful update of the member data in the event registration table "tl_calendar_events_member": processed: %d, updates: %d, errors: %d, duration: %s.',
                 $this->syncLog['processed_registrations'],
                 $this->syncLog['updates'],
@@ -96,8 +97,7 @@ class SyncEventRegistrationDatabase extends AbstractController
     }
 
     /**
-     * Retrieves all distinct contaoMemberIds
-     * that have a corresponding entry in tl_member.
+     * Retrieves all distinct contaoMemberIds that have a corresponding entry in tl_member.
      */
     public function getContaoMemberIds(): array
     {
@@ -111,7 +111,7 @@ class SyncEventRegistrationDatabase extends AbstractController
 				tl_member AS t2
 			ON
 				t1.contaoMemberId = t2.id
-			'
+			',
         );
     }
 
@@ -198,7 +198,7 @@ class SyncEventRegistrationDatabase extends AbstractController
             'tl_calendar_events_member',
             $updateData,
             ['id' => $registration['id']],
-            ['id' => Types::INTEGER]
+            ['id' => Types::INTEGER],
         );
 
         if (!empty($affectedRows)) {
@@ -213,11 +213,11 @@ class SyncEventRegistrationDatabase extends AbstractController
 
     private function logUpdate(array $registration, array $memberData): void
     {
-        $this->syncLog['log'][] = sprintf(
+        $this->syncLog['log'][] = \sprintf(
             'Update contact data for event registration ID %d with member %s %s.',
             $registration['id'],
             $memberData['firstname'],
-            $memberData['lastname']
+            $memberData['lastname'],
         );
     }
 
@@ -230,15 +230,12 @@ class SyncEventRegistrationDatabase extends AbstractController
         $this->syncLog['with_error'] = true;
         $this->syncLog['exceptions'][] = $e->getMessage();
 
-        if (!empty($registration['id'])) {
             $this->contaoErrorLogger->error(
-                sprintf(
-                    'There has been an error while trying to update contact data of event registration ID %d. Error: %s',
-                    $registration['id'],
-                    $e->getMessage()
-                )
+                \sprintf(
+                    'There has been an error while trying to update event registration contact data. Error: %s',
+                    $e->getMessage(),
+                ),
             );
-        }
     }
 
     private function fetchMemberData(int $memberId): array|false
@@ -246,7 +243,7 @@ class SyncEventRegistrationDatabase extends AbstractController
         return $this->connection->fetchAssociative(
             'SELECT * FROM tl_member WHERE id = ?',
             [$memberId],
-            [Types::INTEGER]
+            [Types::INTEGER],
         );
     }
 
@@ -255,7 +252,7 @@ class SyncEventRegistrationDatabase extends AbstractController
         return $this->connection->fetchAllAssociative(
             'SELECT * FROM tl_calendar_events_member WHERE contaoMemberId = ? AND anonymized = ?',
             [$memberId, 0],
-            [Types::INTEGER, Types::INTEGER]
+            [Types::INTEGER, Types::INTEGER],
         );
     }
 
@@ -281,8 +278,8 @@ class SyncEventRegistrationDatabase extends AbstractController
             }
         }
 
-        // Update emergencyPhone, emergencyPhoneName, foodHabits from tl_member (if not empty),
-        // but only if the related event is in the future!
+        // Update emergencyPhone, emergencyPhoneName, foodHabits from tl_member (if not
+        // empty), but only if the related event is in the future!
         if (\in_array($registration['eventId'], $upcomingEventIds, true)) {
             if ('' !== trim($memberData['emergencyPhone']) && '' !== trim($memberData['emergencyPhoneName'])) {
                 $updateData['emergencyPhone'] = $memberData['emergencyPhone'];
