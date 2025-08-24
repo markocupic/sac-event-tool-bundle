@@ -1,0 +1,218 @@
+{% trans_default_domain 'contao_default' %}
+<h4 class="content-headline text-danger mt-0 mb-0">Anmelden für {{ ('MSC.'~eventModel.eventType~'_short')|trans }}:</h4>
+<h2 class="content-headline mt-0 mb-4 text-black">{{ eventModel.title }}</h2>
+
+{% if errorMessage|default %}
+    {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-danger', add_icon: true, icon_class: 'fa-solid fa-exclamation-circle', text: errorMessage} %}
+{% endif %}
+
+{% if infoMessage|default %}
+    {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: infoMessage} %}
+{% endif %}
+
+{% if eventModel.addIban %}
+    {% set iban_info %}
+        {{ 'FORM.evt_reg_ibanText'|trans }}
+        <br>
+        <br>
+        IBAN:
+        <br>
+        {{ eventModel.iban }}
+        <br>
+        <br>
+        {{ 'FORM.evt_reg_ibanBeneficiary'|trans }}:
+        <br>
+        {{ eventModel.ibanBeneficiary|nl2br }}
+    {% endset %}
+    {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: iban_info} %}
+{% endif %}
+{% if form|default %}
+    {% if eventFullyBooked|default %}
+        {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: 'ERR.evt_reg_bookingLimitReaches'|trans} %}
+    {% endif %}
+    {# start form #}
+    <div id="eventRegistrationForm" class="hasteform_form-event-registration block">
+        <div class="row gx-5">
+            <div class="col-12">
+                <form action="{{ form.getAction() }}" method="{{ form.getHttpMethod() }}" enctype="{{ form.getEnctype() }}">
+                    <div class="formbody">
+                        <div class="pe-lg-3">
+                            {% if form.hasFormField('FORM_SUBMIT') %}
+                                {{ form.getWidget('FORM_SUBMIT').parse()|raw }}
+                            {% endif %}
+
+                            {% if form.hasFormField('REQUEST_TOKEN') %}
+                                {{ form.getWidget('REQUEST_TOKEN').parse()|raw }}
+                            {% endif %}
+
+                            {% if form.hasFormField('carInfo') %}
+                                <div class="mt-0 mb-2" data-reg-widget="carInfo">
+                                    {{ form.getWidget('carInfo').parse()|raw }}
+                                </div>
+                            {% endif %}
+
+                            {% if form.hasFormField('ticketInfo') %}
+                                <div class="mt-0 mb-2" data-reg-widget="ticketInfo">
+                                    {{ form.getWidget('ticketInfo').parse()|raw }}
+                                </div>
+                            {% endif %}
+
+                            {% if form.hasFormField('mobile') %}
+                                <div class="mt-0 mb-2" data-reg-widget="mobile">
+                                    {{ form.getWidget('mobile').parse()|raw }}
+                                    <div data-ffield-explanation="mobile">
+                                        {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: 'FORM.evt_reg_ffield_expl_mobile'|trans } %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if form.hasFormField('emergencyPhone') %}
+                                <div class="mt-0 mb-2" data-reg-widget="emergencyPhone">
+                                    {{ form.getWidget('emergencyPhone').parse()|raw }}
+                                </div>
+                            {% endif %}
+
+                            {% if form.hasFormField('emergencyPhoneName') %}
+                                <div class="mt-0 mb-2" data-reg-widget="emergencyPhoneName">
+                                    {{ form.getWidget('emergencyPhoneName').parse()|raw }}
+                                </div>
+                            {% endif %}
+
+                            {% if form.hasFormField('notes') %}
+                                <div class="mt-0 mb-2" data-reg-widget="notes">
+                                    {{ form.getWidget('notes').parse()|raw }}
+                                    <div data-ffield-explanation="notes">
+                                        {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: 'FORM.evt_reg_ffield_expl_notes'|trans } %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if form.hasFormField('ahvNumber') %}
+                                <div class="mt-0 mb-2" data-reg-widget="ahvNumber">
+                                    {{ form.getWidget('ahvNumber').parse()|raw }}
+                                    <div data-ffield-explanation="ahvNumber">
+                                        {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: 'FORM.evt_reg_ffield_expl_ahvNumber'|trans } %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if form.hasFormField('foodHabits') %}
+                                <div class="mt-0 mb-3" data-reg-widget="foodHabits">
+                                    {{ form.getWidget('foodHabits').parse()|raw }}
+                                </div>
+                            {% endif %}
+
+                            {% if form.hasFormField('agb') %}
+                                <div class="mt-0 mb-3" data-reg-widget="agb">
+                                    {{ form.getWidget('agb').parse()|raw }}
+                                </div>
+                            {% endif %}
+
+                            {% if form.hasFormField('hasAcceptedPrivacyRules') %}
+                                <div class="mt-0 mb-3" data-reg-widget="hasAcceptedPrivacyRules">
+                                    {{ form.getWidget('hasAcceptedPrivacyRules').parse()|raw }}
+                                </div>
+                            {% endif %}
+
+                            <div class="widget widget-submit">
+                                <div class="d-grid">
+                                    <button type="submit" id="ctrl_submit" class="submit btn btn-primary" name="submit">{{ 'FORM.evt_reg_submit'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% set script_attributes = attrs()
+                .setIfExists('nonce', csp_nonce('script-src'))
+                .mergeWith(script_attributes|default) %}
+            <script{{ script_attributes }}>
+                document.currentScript.previousElementSibling.querySelector('form')?.addEventListener('submit', e => {
+                    // Prevent double form submission
+                    if (e.submitter) {
+                        setTimeout(() => e.submitter.disabled = true);
+                        setTimeout(() => e.submitter.disabled = false, 30000);
+                    }
+                });
+            </script>
+        </div>
+        {% add to head %}
+            <style>
+                #eventRegistrationForm {
+                    overflow: hidden;
+                }
+
+                #eventRegistrationForm select, #eventRegistrationForm input, #eventRegistrationForm textarea {
+                    background-color: #f8f9fa !important;
+                }
+
+                #eventRegistrationForm .submit[disabled] {
+                    background-color: #00618f !important;
+                }
+            </style>
+        {% endadd %}
+
+        <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
+            document.addEventListener('DOMContentLoaded', (event) => {
+
+                const widgets = document.querySelectorAll('[data-reg-widget]');
+                if (widgets) {
+                    widgets.forEach((widget) => {
+                        const ff = widget.querySelector('input,textarea,select');
+                        if (ff) {
+                            ff.addEventListener('focus', (event) => {
+                                if (!widget.classList.contains('ff-active')) {
+                                    widget.classList.add('ff-active');
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        </script>
+
+        {# AGB Modal #}
+        {{ render(controller(
+            'Markocupic\\SacEventToolBundle\\Controller\\Agb\\CourseAndTourRegulationsModalController::getModal',
+            { 'event': eventModel }
+        )) }}
+        {# End AGB Modal #}
+
+        {# hasAcceptedPrivacyRules Modal #}
+        <div class="modal fade" id="hasAcceptedPrivacyRulesModal" tabindex="-1" role="dialog" aria-labelledby="hasAcceptedPrivacyRulesTitle" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen-xl-down modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="agbTitle">Hinweise zum Datenschutz und zu meinen Persönlichkeitsrechten</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="list-bullet">
+                            <li>
+                                Die Sektion SAC Pilatus bearbeitet die von Dir angegebenen Personendaten entsprechend
+                                dem Bundesgesetz über den Datenschutz (DSG), insbesondere zum Zweck,
+                                Dir die sichere Teilnahme an unseren Kursen, Touren oder anderen Veranstaltungen ("Veranstaltungen") zu ermöglichen.<br>
+                                Dem <a href="https://www.sac-pilatus.ch/datenschutz.html" rel="noopener" target="_blank">Datenschutz</a> der Sektion Pilatus ist zuzustimmen.
+                            </li>
+                            <li>
+                                Anlässlich unserer Veranstaltungen werden teilweise Foto- und Videoaufnahmen gemacht,
+                                auf denen gegebenenfalls auch Teilnehmende erkennbar sind.
+                                Die Foto- und Videoaufnahmen können unter Umständen in unseren Publikationen
+                                (Mitgliederzeitschrift, Jahresprogramm, etc.) abgedruckt oder auf unserer Website angezeigt werden.
+                                Falls Du damit nicht einverstanden bist, meldest Du Dich bitte vor dem Start der Veranstaltung
+                                bei einer Leitungsperson und teilst ihr mit,
+                                dass Du mit Foto- und Videoaufnahmen von Dir nicht einverstanden bist.
+                                Andernfalls gehen wir davon aus, dass Du dagegen keine Einwände hast.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schliessen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {# End hasAcceptedPrivacyRules Modal #}
+    </div>
+    {# end form #}
+{% endif %}
