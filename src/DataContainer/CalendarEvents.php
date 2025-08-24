@@ -123,6 +123,8 @@ class CalendarEvents
         $this->userModel = $this->framework->getAdapter(UserModel::class);
     }
 
+
+
     /**
      * Set the "on create new" palette.
      */
@@ -464,6 +466,25 @@ class CalendarEvents
             $this->controller->redirect($this->system->getReferer());
         }
     }
+
+	#[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit')]
+	public function validateAutoConfirm(DataContainer $dc): void
+	{
+		if (!$dc->id) {
+			return;
+		}
+
+		$record = $dc->getCurrentRecord();
+
+		if (empty($record)) {
+			return;
+		}
+
+		if ($record['autoConfirm'] && $record['addIban']) {
+			$this->connection->update('tl_calendar_events', ['autoConfirm' => 0], ['id' => $dc->id]);
+			$this->message->addError($this->translator->trans('ERR.autoConfirm_and_addIban_not_allowed', [], 'contao_default'));
+		}
+	}
 
     /**
      * Set defaults.

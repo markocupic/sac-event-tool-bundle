@@ -138,8 +138,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             $template['form'] = $this->generateForm($eventModel, $memberModel, $moduleModel, $request);
 
             $this->connection->commit();
-
-		} catch (RedirectResponseException $e) {
+        } catch (RedirectResponseException $e) {
             $this->connection->commit();
 
             throw $e;
@@ -424,7 +423,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         $arrData['dateAdded'] = strtotime('now');
         $arrData['tstamp'] = strtotime('now');
         $arrData['uuid'] = Uuid::uuid4()->toString();
-        $arrData['stateOfSubscription'] = $this->calendarEventsUtil->eventIsFullyBooked($eventModel) ? EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST : EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED;
+        $arrData['stateOfSubscription'] = $this->resolveSubscriptionsState($eventModel);
         $arrData['bookingType'] = BookingType::ONLINE_FORM;
         $arrData['sectionId'] = $memberModel->sectionId;
 
@@ -467,6 +466,25 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         }
 
         return $registrationModel;
+    }
+
+    private function resolveSubscriptionsState(CalendarEventsModel $eventModel): string
+    {
+        $state = $this->calendarEventsUtil->eventIsFullyBooked($eventModel) ? EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST : EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED;
+
+        if (EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST === $state) {
+            return $state;
+        }
+
+        if (!$eventModel->autoConfirm) {
+            return $state;
+        }
+
+        if ($eventModel->addIban) {
+            return $state;
+        }
+
+        return EventSubscriptionState::SUBSCRIPTION_ACCEPTED;
     }
 
     private function addErrorMessageToTemplate(array &$template, Request $request): void

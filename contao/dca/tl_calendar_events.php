@@ -89,7 +89,7 @@ PaletteManipulator::create()
 	->addField(['location', 'coordsCH1903', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'linkSacRoutePortal', 'addIban'], 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['terms', 'issues'], 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['addMinAndMaxMembers'], 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo', 'autoConfirm'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['allowDeregistration'], 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['askForAhvNumber'], 'sign_up_form_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['customizeEventRegistrationConfirmationEmailText'], 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
@@ -110,7 +110,7 @@ PaletteManipulator::create()
 	->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['location', 'coordsCH1903', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'linkSacRoutePortal', 'addIban'], 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['addMinAndMaxMembers'], 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo', 'autoConfirm'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['allowDeregistration'], 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['askForAhvNumber'], 'sign_up_form_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['customizeEventRegistrationConfirmationEmailText'], 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
@@ -132,7 +132,7 @@ PaletteManipulator::create()
 	->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['location', 'coordsCH1903', 'journey', 'generalEventDetailText', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'addIban'], 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['addMinAndMaxMembers'], 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo', 'autoConfirm'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['allowDeregistration'], 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['askForAhvNumber'], 'sign_up_form_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['customizeEventRegistrationConfirmationEmailText'], 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
@@ -152,7 +152,7 @@ PaletteManipulator::create()
 	->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['terms', 'issues', 'location', 'coordsCH1903', 'journey', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'addIban'], 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['addMinAndMaxMembers'], 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo', 'autoConfirm'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['allowDeregistration'], 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['askForAhvNumber'], 'sign_up_form_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['customizeEventRegistrationConfirmationEmailText'], 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
@@ -172,8 +172,8 @@ PaletteManipulator::create()
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year'] = [
 	'href'                   => 'transformDates=+52weeks',
 	'class'                  => 'global_op_icon_class',
-	'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/calendar-plus-regular.svg',
-	'attributes'             => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()" accesskey="e"',
+	'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/calendar-plus-regular.svg',
+	'attributes'             => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
 	'custom_glob_op'         => true,
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => 10],
 ];
@@ -181,8 +181,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1year'] = [
 	'href'                   => 'transformDates=-52weeks',
 	'class'                  => 'global_op_icon_class',
-	'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/calendar-minus-regular.svg',
-	'attributes'             => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()" accesskey="e"',
+	'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/calendar-minus-regular.svg',
+	'attributes'             => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
 	'custom_glob_op'         => true,
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => 8],
 ];
@@ -190,7 +190,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1yea
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = [
 	'href'                   => 'action=onloadCallbackExportCalendar',
 	'class'                  => 'header_icon',
-	'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/file-excel-regular.svg',
+	'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/file-excel-regular.svg',
 	'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 	'custom_glob_op'         => true,
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => -10],
@@ -199,7 +199,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCal
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = [
 	'href'                   => 'action=onloadCallbackExportCalendar',
 	'class'                  => 'header_icon',
-	'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/file-excel-regular.svg',
+	'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/file-excel-regular.svg',
 	'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 	'custom_glob_op'         => true,
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => -10],
@@ -211,22 +211,22 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle']['showIn
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['preview'] = [
 	'href'       => 'action=preview', // use a button callback to generate the url
 	'attributes' => 'target="_blank" rel="noopener"',
-	'icon'       => Bundle::ASSET_DIR.'/icons/fontawesome/default/presentation-screen-solid.svg',
+	'icon'       => Bundle::ASSET_DIR . '/icons/fontawesome/default/presentation-screen-solid.svg',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] = [
 	'href' => 'table=tl_calendar_events_member',
-	'icon' => Bundle::ASSET_DIR.'/icons/fontawesome/default/people-group-solid.svg',
+	'icon' => Bundle::ASSET_DIR . '/icons/fontawesome/default/people-group-solid.svg',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['downgradeEventReleaseLevel'] = [
 	'href' => 'act=edit&action=downgradeEventReleaseLevel', // use a button callback to generate the url
-	'icon' => Bundle::ASSET_DIR.'/icons/fontawesome/default/square-arrow-down-solid.svg',
+	'icon' => Bundle::ASSET_DIR . '/icons/fontawesome/default/square-arrow-down-solid.svg',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['upgradeEventReleaseLevel'] = [
 	'href' => 'act=edit&action=upgradeEventReleaseLevel', // use a button callback to generate the url
-	'icon' => Bundle::ASSET_DIR.'/icons/fontawesome/default/square-arrow-up-solid.svg',
+	'icon' => Bundle::ASSET_DIR . '/icons/fontawesome/default/square-arrow-up-solid.svg',
 ];
 
 // Override DCA: tl_class
@@ -587,6 +587,15 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationGoesTo'] = [
 	'inputType' => 'select',
 	'eval'      => ['multiple' => false, 'chosen' => false, 'includeBlankOption' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => "int(10) unsigned NOT NULL default 0",
+];
+
+// Add new field autoConfirm
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['autoConfirm'] = [
+	'exclude'   => true,
+	'filter'    => true,
+	'inputType' => 'checkbox',
+	'eval'      => ['tl_class' => 'm12 clr'],
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field setRegistrationPeriod
