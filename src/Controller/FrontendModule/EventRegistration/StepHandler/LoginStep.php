@@ -48,11 +48,6 @@ class LoginStep implements StepHandlerInterface, ValidationStepInterface
         return self::PRIORITY;
     }
 
-    public function getTemplate(): string
-    {
-        return self::TEMPLATE;
-    }
-
     public function doAutoForward(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): bool
     {
         return true;

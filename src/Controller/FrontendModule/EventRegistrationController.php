@@ -52,7 +52,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
     public function __invoke(Request $request, ModuleModel $model, string $section, array|null $classes = null, PageModel|null $page = null): Response
     {
         if ($this->scopeMatcher->isFrontendRequest($request)) {
-            // Do not index nor cache page.
+            // Do not index nor cache this page.
             if (null !== $page) {
                 $page->noSearch = true;
                 $page->cache = false;
@@ -66,7 +66,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        // Get the event model from URL parameters.
+        // Resolve the event model from URL parameters.
         try {
             $eventModel = $this->getEventModel();
         } catch (\Throwable $e) {
@@ -79,8 +79,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
             return $this->redirect($url);
         }
 
-        // Check all previous steps if they are valid,
-		// if not, redirect to the first invalid step
+        // Check all previous steps if they are valid, if not, redirect to the first
+        // invalid step
         foreach ($this->stepManager->getPreviousSteps($step) as $previousStep) {
             if ($previousStep instanceof ValidationStepInterface && !$previousStep->validate($eventModel, $request, $model)) {
                 return $this->redirectToStep($previousStep, $request);

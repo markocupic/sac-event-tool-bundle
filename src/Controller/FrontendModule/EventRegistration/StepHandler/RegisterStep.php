@@ -82,11 +82,6 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         return self::PRIORITY;
     }
 
-    public function getTemplate(): string
-    {
-        return self::TEMPLATE;
-    }
-
     public function doAutoForward(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): bool
     {
         return true;
@@ -102,8 +97,6 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
 
         $memberModel = $this->framework->getAdapter(MemberModel::class)->findById($user->id);
 
-        // Redirect the user to the confirmation step if they have already registered for
-        // this event.
         if ($this->framework->getAdapter(CalendarEventsMemberModel::class)->isRegistered($memberModel->id, $eventModel->id)) {
             return true;
         }
@@ -128,7 +121,9 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
                 'regStartTimeOffset' => $this->regStartTimeOffset,
             ];
 
-            $this->validateRegistrationRequest($eventModel, $memberModel, $mainInstructorModel, $options);
+            // Run numerous test to check if the event can be registered. If one of the tests
+            // fails, an EventRegistrationException exception is thrown.
+            $this->validateEventRegistrationEligibility($eventModel, $memberModel, $mainInstructorModel, $options);
 
             // Check if the event is already fully booked.
             if ($this->calendarEventsUtil->eventIsFullyBooked($eventModel)) {
@@ -148,9 +143,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             }
 
             // Display a message to the user.
-            $this->framework->getAdapter(Message::class)
-                ->add($this->translator->trans($e->getTranslatableText(), $e->getParams(), 'contao_default'), $e->getErrorLevel())
-            ;
+            $this->framework->getAdapter(Message::class)->add($this->translator->trans($e->getTranslatableText(), $e->getParams(), 'contao_default'), $e->getErrorLevel());
 
             $this->addErrorMessageToTemplate($template, $request);
 
@@ -163,10 +156,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             }
 
             // Display a message to the user. Display a message to the user.
-            $this->framework
-                ->getAdapter(Message::class)
-                ->addError($this->translator->trans('ERR.evt_reg_unknownError', [], 'contao_default'))
-            ;
+            $this->framework->getAdapter(Message::class)->addError($this->translator->trans('ERR.evt_reg_unknownError', [], 'contao_default'));
 
             $this->addErrorMessageToTemplate($template, $request);
 
@@ -179,10 +169,10 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
 
         $template['eventModel'] = $eventModel;
 
-        return new Response($this->twig->render($this->getTemplate(), $template));
+        return new Response($this->twig->render(self::TEMPLATE, $template));
     }
 
-    private function validateRegistrationRequest(CalendarEventsModel $eventModel, MemberModel|null $memberModel = null, UserModel|null $mainInstructorModel = null, $options = []): void
+    private function validateEventRegistrationEligibility(CalendarEventsModel $eventModel, MemberModel $memberModel, UserModel|null $mainInstructorModel = null, $options = []): void
     {
         $resolver = new OptionsResolver();
         $resolver->setDefaults([
@@ -230,7 +220,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             throw new EventRegistrationException('If no registration time has been set, online registration is only possible up to 24 h before the event start date.', EventRegistrationException::LEVEL_INFO, 'ERR.evt_reg_registrationPossible24HoursBeforeEventStart', []);
         }
 
-        if ($memberModel && true === $this->calendarEventsUtil->areBookingDatesOccupied($eventModel, $memberModel)) {
+        if (true === $this->calendarEventsUtil->areBookingDatesOccupied($eventModel, $memberModel)) {
             throw new EventRegistrationException('You can not subscribe because you are already registered for another event at the same time.', EventRegistrationException::LEVEL_INFO, 'ERR.evt_reg_eventDateOverlapError', []);
         }
 
@@ -242,7 +232,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             throw new EventRegistrationException('You can not register for the event because the main instructor has an invalid email address.', EventRegistrationException::LEVEL_ERROR, 'ERR.evt_reg_mainInstructorsEmailAddrNotFound', [$eventModel->mainInstructor]);
         }
 
-        if (null !== $memberModel && !Validator::isEmail($memberModel->email)) {
+        if (!Validator::isEmail($memberModel->email)) {
             throw new EventRegistrationException('You can not subscribe to this event because of an invalid or not existent email address.', EventRegistrationException::LEVEL_INFO, 'ERR.evt_reg_membersEmailAddrNotFound', []);
         }
     }
@@ -258,32 +248,32 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
 
         if (null !== ($objJourney = $this->framework->getAdapter(CalendarEventsJourneyModel::class)->findById($eventModel->journey))) {
             if ('public-transport' === $objJourney->alias) {
-                $objForm->addFormField('ticketInfo', $this->getFormFieldDca('ticketInfo'));
+                $objForm->addFormField('ticketInfo', $this->getFormFieldConfig('ticketInfo'));
             }
 
             if ('car' === $objJourney->alias) {
-                $objForm->addFormField('carInfo', $this->getFormFieldDca('carInfo'));
+                $objForm->addFormField('carInfo', $this->getFormFieldConfig('carInfo'));
             }
         }
 
         if ($eventModel->askForAhvNumber) {
-            $objForm->addFormField('ahvNumber', $this->getFormFieldDca('ahvNumber'));
+            $objForm->addFormField('ahvNumber', $this->getFormFieldConfig('ahvNumber'));
         }
 
-        $objForm->addFormField('mobile', $this->getFormFieldDca('mobile'));
-        $objForm->addFormField('emergencyPhone', $this->getFormFieldDca('emergencyPhone'));
-        $objForm->addFormField('emergencyPhoneName', $this->getFormFieldDca('emergencyPhoneName'));
-        $objForm->addFormField('notes', $this->getFormFieldDca('notes'));
+        $objForm->addFormField('mobile', $this->getFormFieldConfig('mobile'));
+        $objForm->addFormField('emergencyPhone', $this->getFormFieldConfig('emergencyPhone'));
+        $objForm->addFormField('emergencyPhoneName', $this->getFormFieldConfig('emergencyPhoneName'));
+        $objForm->addFormField('notes', $this->getFormFieldConfig('notes'));
 
         // Do only ask for food habits if we have a multi-day event.
-        if ($this->isMultiDayEvent($eventModel)) {
-            $objForm->addFormField('foodHabits', $this->getFormFieldDca('foodHabits'));
+        if ($this->hasMultiDaySpan($eventModel)) {
+            $objForm->addFormField('foodHabits', $this->getFormFieldConfig('foodHabits'));
         }
 
-        $objForm->addFormField('agb', $this->getFormFieldDca('agb'));
-        $objForm->addFormField('hasAcceptedPrivacyRules', $this->getFormFieldDca('hasAcceptedPrivacyRules'));
+        $objForm->addFormField('agb', $this->getFormFieldConfig('agb'));
+        $objForm->addFormField('hasAcceptedPrivacyRules', $this->getFormFieldConfig('hasAcceptedPrivacyRules'));
 
-        $objForm->addFormField('submit', $this->getFormFieldDca('submit'));
+        $objForm->addFormField('submit', $this->getFormFieldConfig('submit'));
 
         // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields. DO NOT use this
         // method with generate() as the "form" template provides those fields by default.
@@ -343,7 +333,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         return $objForm;
     }
 
-    private function getFormFieldDca(string $field): array
+    private function getFormFieldConfig(string $field): array
     {
         $formFields = [
             'ticketInfo' => [
@@ -502,7 +492,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         }
     }
 
-    private function isMultiDayEvent(CalendarEventsModel $eventModel): bool
+    private function hasMultiDaySpan(CalendarEventsModel $eventModel): bool
     {
         $durationInDays = \count($this->calendarEventsUtil->getEventTimestamps($eventModel));
         $startDate = $this->calendarEventsUtil->getStartTstamp($eventModel);

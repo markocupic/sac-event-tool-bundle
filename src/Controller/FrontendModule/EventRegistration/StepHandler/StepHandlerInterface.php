@@ -25,8 +25,6 @@ interface StepHandlerInterface
 
     public static function getPriority(): int;
 
-    public function getTemplate(): string;
-
     public function doAutoForward(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): bool;
 
     public function getResponse(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): Response;

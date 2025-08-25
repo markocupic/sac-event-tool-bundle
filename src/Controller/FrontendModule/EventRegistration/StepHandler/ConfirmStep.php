@@ -56,11 +56,6 @@ class ConfirmStep implements StepHandlerInterface
         return self::PRIORITY;
     }
 
-    public function getTemplate(): string
-    {
-        return self::TEMPLATE;
-    }
-
     public function doAutoForward(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): bool
     {
         return false;
@@ -99,6 +94,6 @@ class ConfirmStep implements StepHandlerInterface
             'member_model' => array_map('html_entity_decode', $arrMember),
         ];
 
-        return new Response($this->twig->render($this->getTemplate(), $template));
+        return new Response($this->twig->render(self::TEMPLATE, $template));
     }
 }
