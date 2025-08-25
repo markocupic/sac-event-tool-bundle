@@ -47,11 +47,11 @@ use Twig\Environment;
 #[AutoconfigureTag('sacevt.event_registration.step_handler')]
 class RegisterStep implements StepHandlerInterface, ValidationStepInterface
 {
-    public const string STEP = 'register';
+	public const string STEP = 'register';
 
-    public const string TEMPLATE = '@MarkocupicSacEventTool/EventRegistration/step_register.html.twig';
+    private const string TEMPLATE = '@MarkocupicSacEventTool/EventRegistration/step_register.html.twig';
 
-    public const int PRIORITY = 200;
+    private const int PRIORITY = 200;
 
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,

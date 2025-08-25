@@ -33,9 +33,9 @@ class ConfirmStep implements StepHandlerInterface
 {
     public const string STEP = 'confirm';
 
-    public const string TEMPLATE = '@MarkocupicSacEventTool/EventRegistration/step_confirm.html.twig';
+    private const string TEMPLATE = '@MarkocupicSacEventTool/EventRegistration/step_confirm.html.twig';
 
-    public const int PRIORITY = 100;
+    private const int PRIORITY = 100;
 
     public function __construct(
         private readonly ContaoFramework $framework,

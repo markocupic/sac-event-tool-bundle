@@ -26,11 +26,11 @@ use Twig\Environment;
 #[AutoconfigureTag('sacevt.event_registration.step_handler')]
 class LoginStep implements StepHandlerInterface, ValidationStepInterface
 {
-    public const string STEP = 'login';
+	public const string STEP = 'login';
 
-    public const string TEMPLATE = '@MarkocupicSacEventTool/EventRegistration/step_login.html.twig';
+    private const string TEMPLATE = '@MarkocupicSacEventTool/EventRegistration/step_login.html.twig';
 
-    public const int PRIORITY = 300;
+    private const int PRIORITY = 300;
 
     public function __construct(
         private readonly Environment $twig,
