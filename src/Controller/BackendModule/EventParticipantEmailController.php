@@ -63,22 +63,34 @@ use Twig\Environment as Twig;
 class EventParticipantEmailController extends AbstractBackendController
 {
     public const string SESSION_BAG_KEY = 'sacevt_event_participant_email';
+
     public const int MAX_FILE_SIZE = 4000000;
+
     public const array ALLOWED_EXTENSIONS = ['csv', 'bmp', 'png', 'svg', 'jpg', 'jpeg', 'tiff', 'doc', 'docx', 'pdf', 'xls', 'xlsx', 'txt', 'zip', 'rtf'];
 
     private CalendarEventsModel|null $event = null;
+
     private BackendUser|null $user = null;
+
     private string|null $sid = null;
 
     // Adapters
     private Adapter $stringUtil;
+
     private Adapter $calendarEvents;
+
     private Adapter $calendarEventsMember;
+
     private Adapter $controller;
+
     private Adapter $environment;
+
     private Adapter $events;
+
     private Adapter $message;
+
     private Adapter $userModel;
+
     private Adapter $validator;
 
     public function __construct(
@@ -173,7 +185,7 @@ class EventParticipantEmailController extends AbstractBackendController
         $this->sid = $sid;
 
         // Get the event
-        $this->event = $this->calendarEvents->findByPk($eventId);
+        $this->event = $this->calendarEvents->findById($eventId);
 
         if (null === $this->event) {
             $this->message->addError($this->translator->trans('MSC.evt_epe_eventNotFound', [$eventId], 'contao_default'));
@@ -252,23 +264,17 @@ class EventParticipantEmailController extends AbstractBackendController
         // Preset input fields "subject" and "text" with a default text
         if ('email_app_form' !== $request->request->get('FORM_SUBMIT')) {
             if (empty($form->getWidget('text')->value) && empty($form->getWidget('subject')->value)) {
-                $form->getWidget('subject')->value = $this->twig->render(
-                    '@MarkocupicSacEventTool/Email/EventRegistration/email_event_participant.twig',
-                    [
-                        'renderEmailSubject' => true,
-                        'event' => $this->event,
-                    ]
-                );
+                $form->getWidget('subject')->value = $this->twig->render('@MarkocupicSacEventTool/Email/EventRegistration/email_event_participant.twig', [
+                    'renderEmailSubject' => true,
+                    'event' => $this->event,
+                ]);
 
-                $form->getWidget('text')->value = $this->twig->render(
-                    '@MarkocupicSacEventTool/Email/EventRegistration/email_event_participant.twig',
-                    [
-                        'renderEmailText' => true,
-                        'event' => $this->event,
-                        'user' => $this->userModel->findByPk($this->user->id),
-                        'event_url' => $this->events->generateEventUrl($this->event, true),
-                    ]
-                );
+                $form->getWidget('text')->value = $this->twig->render('@MarkocupicSacEventTool/Email/EventRegistration/email_event_participant.twig', [
+                    'renderEmailText' => true,
+                    'event' => $this->event,
+                    'user' => $this->userModel->findById($this->user->id),
+                    'event_url' => $this->events->generateEventUrl($this->event, true),
+                ]);
             }
         }
 
@@ -289,9 +295,9 @@ class EventParticipantEmailController extends AbstractBackendController
             $arrRecipient = explode('-', $recipient);
 
             if ('tl_user' === $arrRecipient[0]) {
-                $arrEmailRecipients[] = $this->userModel->findByPk($arrRecipient[1])->email;
+                $arrEmailRecipients[] = $this->userModel->findById($arrRecipient[1])->email;
             } else {
-                $arrEmailRecipients[] = $this->calendarEventsMember->findByPk($arrRecipient[1])->email;
+                $arrEmailRecipients[] = $this->calendarEventsMember->findById($arrRecipient[1])->email;
             }
         }
 
@@ -337,12 +343,10 @@ class EventParticipantEmailController extends AbstractBackendController
         } catch (\Exception $e) {
             $blnSend = false;
         } finally {
-            // In any case, delete the temporarily created files.
-            //foreach ($arrOrigFilenamePaths as $path) {
-                // $fs->remove($path);
-                // Because Symfony mailer works via messenger,
-                // the files will already been deleted, when Symfony mailer starts sending the email.
-            //}
+            // In any case, delete the temporarily created files. oreach
+            // ($arrOrigFilenamePaths as $path) { $fs->remove($path); Because Symfony mailer
+            // works via messenger, the files will already been deleted, when Symfony mailer
+            // starts sending the email.
         }
 
         return $blnSend;
@@ -504,12 +508,12 @@ class EventParticipantEmailController extends AbstractBackendController
         $arrInstrIds = $this->calendarEventsUtil->getInstructorsAsArray($this->event);
 
         foreach ($arrInstrIds as $userId) {
-            $objInstructor = $this->userModel->findByPk($userId);
+            $objInstructor = $this->userModel->findById($userId);
 
             if (null !== $objInstructor) {
                 if (!empty($objInstructor->email)) {
                     if ($this->validator->isEmail($objInstructor->email)) {
-                        $options['tl_user-'.$objInstructor->id] = sprintf(
+                        $options['tl_user-'.$objInstructor->id] = \sprintf(
                             '<strong>%s %s (Leiter)</strong>',
                             $objInstructor->firstname,
                             $objInstructor->lastname,
@@ -525,14 +529,14 @@ class EventParticipantEmailController extends AbstractBackendController
                 'SELECT * FROM tl_calendar_events_member WHERE eventId = ? ORDER BY stateOfSubscription, firstname',
                 [
                     $this->event->id,
-                ]
+                ],
             )
         ;
 
         while (false !== ($arrReg = $stmt->fetchAssociative())) {
             if ($this->validator->isEmail($arrReg['email'])) {
                 $arrSubscriptionStates = EventSubscriptionState::ALL;
-                $registrationModel = $this->calendarEventsMember->findByPk($arrReg['id']);
+                $registrationModel = $this->calendarEventsMember->findById($arrReg['id']);
 
                 if (null === $registrationModel) {
                     continue;
@@ -544,7 +548,7 @@ class EventParticipantEmailController extends AbstractBackendController
                 $regState = \in_array($regState, $arrSubscriptionStates, true) ? $regState : EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED;
                 $strLabel = $GLOBALS['TL_LANG']['MSC'][$regState] ?? $regState;
 
-                $options['tl_calendar_events_member-'.$arrReg['id']] = sprintf(
+                $options['tl_calendar_events_member-'.$arrReg['id']] = \sprintf(
                     '%s %s %s (%s)',
                     $icon,
                     $arrReg['firstname'],

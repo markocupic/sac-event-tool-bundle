@@ -25,6 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EventRegistrationUtil
 {
     private Adapter $stringUtilAdapter;
+
     private Adapter $imageAdapter;
 
     public function __construct(
@@ -37,11 +38,11 @@ class EventRegistrationUtil
 
     public function getSubscriptionStateIcon(CalendarEventsMemberModel $registrationModel): string
     {
-        $icon = sprintf('%s/icons/subscription-states/%s.svg', Bundle::ASSET_DIR, $registrationModel->stateOfSubscription);
+        $icon = \sprintf('%s/icons/subscription-states/%s.svg', Bundle::ASSET_DIR, $registrationModel->stateOfSubscription);
         $state = $this->translator->trans('MSC.'.$registrationModel->stateOfSubscription, [], 'contao_default');
 
         $strAlt = $this->stringUtilAdapter->specialchars($registrationModel->stateOfSubscription);
-        $strAttributes = sprintf('title="%s"', $this->stringUtilAdapter->specialchars($state));
+        $strAttributes = \sprintf('title="%s"', $this->stringUtilAdapter->specialchars($state));
 
         return $this->imageAdapter->getHtml($icon, $strAlt, $strAttributes);
     }

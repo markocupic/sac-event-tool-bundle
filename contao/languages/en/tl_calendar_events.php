@@ -89,6 +89,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['linkSacRoutePortal'] = ['Link zu SAC-
 $GLOBALS['TL_LANG']['tl_calendar_events']['setRegistrationPeriod'] = ['Anmeldezeitraum definieren', 'Definieren Sie hier den Zeitraum, indem sich Teilnehmer für den Event mit dem Anmeldeformular anmelden können.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['disableOnlineRegistration'] = ['Online-Anmeldung deaktivieren', 'Wenn Sie diese Einstellung wählen, wird das Online-Anmeldeformular deaktiviert.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['registrationGoesTo'] = ['Online-Anmeldungen gehen an diese Person (anstatt an Hauptleiter)', 'Geben Sie hier eine Person an, welche bei Online-Anmeldungen benachrichtigt wird und die Teilnehmerliste administrieren kann. Alle Online-Anmeldungen laufen gewöhnlich über den Hauptleiter.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['autoConfirm'] = ['Online-Anmeldungen automatisch bestätigen (für Veranstaltungen)', 'Die Anmeldeanfrage wird den Teilnehmenden direkt automatisch bestätigt, sofern eingeschaltet.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['registrationStartDate'] = ['Anmeldung möglich ab', 'Definieren Sie hier, ab wann eine Anmeldung mit dem Anmeldformular möglich sein soll.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['registrationEndDate'] = ['Anmeldung möglich bis', 'Definieren Sie hier, bis wann eine Anmeldung mit dem Anmeldformular möglich sein soll.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventReleaseLevel'] = ['Freigabestufe', 'Definieren Sie hier die Freigabestufe.'];

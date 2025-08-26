@@ -34,8 +34,8 @@ $GLOBALS['TL_LANG']['CTE'][PurgeEventFavoritesLinkController::TYPE] = ['Vorgemer
 $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
 if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isFrontendRequest($request)) {
-    $GLOBALS['TL_LANG']['MSC']['username'] = 'SAC Mitgliedernummer';
-    $GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
+	$GLOBALS['TL_LANG']['MSC']['username'] = 'SAC Mitgliedernummer';
+	$GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
 }
 
 // DCA
@@ -47,6 +47,9 @@ $GLOBALS['TL_LANG']['ERR']['clearMemberProfile'] = 'Das Mitglied mit ID %d kann 
 
 // tl_event_release_level_policy
 $GLOBALS['TL_LANG']['MSC']['level'] = 'Stufe';
+
+// tl_calendar_events
+$GLOBALS['TL_LANG']['ERR']['autoConfirm_and_addIban_not_allowed'] = 'Die Felder "IBAN-Nummer anzeigen" und "Online-Anmeldungen automatisch bestätigen" dürfen nicht beide aktiviert sein. Das Feld "Online-Anmeldungen automatisch bestätigen" wurde deshalb deaktiviert. Bitte überprüfen Sie Ihre Einstellungen.';
 
 // tl_calendar_events_member
 $GLOBALS['TL_LANG']['ERR']['accessDenied'] = 'Zutritt verweigert.';
@@ -80,13 +83,13 @@ $GLOBALS['TL_LANG']['MSC']['courseLevel'][3] = 'Fortbildungskurs';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][4] = 'Tourenleiter Fortbildungskurs';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][5] = 'Tourenleiter Fortbildungskurs';
 $GLOBALS['TL_LANG']['MSC'][EventType::COURSE] = 'Kurs';
-$GLOBALS['TL_LANG']['MSC'][EventType::COURSE.'_short'] = 'Kurs';
+$GLOBALS['TL_LANG']['MSC'][EventType::COURSE . '_short'] = 'Kurs';
 $GLOBALS['TL_LANG']['MSC'][EventType::TOUR] = 'Tour';
-$GLOBALS['TL_LANG']['MSC'][EventType::TOUR.'_short'] = 'Tour';
+$GLOBALS['TL_LANG']['MSC'][EventType::TOUR . '_short'] = 'Tour';
 $GLOBALS['TL_LANG']['MSC'][EventType::LAST_MINUTE_TOUR] = 'Last Minute Tour';
-$GLOBALS['TL_LANG']['MSC'][EventType::LAST_MINUTE_TOUR.'_short'] = 'Last Minute Tour';
+$GLOBALS['TL_LANG']['MSC'][EventType::LAST_MINUTE_TOUR . '_short'] = 'Last Minute Tour';
 $GLOBALS['TL_LANG']['MSC'][EventType::GENERAL_EVENT] = 'Veranstaltung (Fitnesstrainings, Skiturnen, Kultur, Vorträge + sektionsübergreifende Events)';
-$GLOBALS['TL_LANG']['MSC'][EventType::GENERAL_EVENT.'_short'] = 'Veranstaltung';
+$GLOBALS['TL_LANG']['MSC'][EventType::GENERAL_EVENT . '_short'] = 'Veranstaltung';
 $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][EventMountainGuide::NO_MOUNTAIN_GUIDE] = '«ohne Bergführer/in» und «ohne Bergführerangebot»';
 $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][EventMountainGuide::WITH_MOUNTAIN_GUIDE] = '«mit Bergführer/in» und «ohne Bergführerangebot»';
 $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER] = '«mit Bergführer/in» und «mit Bergführerangebot»';

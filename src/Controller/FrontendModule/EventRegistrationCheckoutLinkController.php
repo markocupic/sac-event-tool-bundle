@@ -26,12 +26,13 @@ use Contao\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(EventRegistrationCheckoutLinkController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_event_registration_checkout_link')]
+#[AsFrontendModule(EventRegistrationCheckoutLinkController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_event_registration_checkout_link')]
 class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_registration_checkout_link';
 
     private PageModel|null $objJumpTo = null;
+
     private CalendarEventsModel|null $objEvent = null;
 
     public function __construct(

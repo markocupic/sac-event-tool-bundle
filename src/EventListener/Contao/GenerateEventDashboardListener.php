@@ -63,7 +63,7 @@ readonly class GenerateEventDashboardListener
             ->setLinkAttribute('class', 'tl_submit')
             ->setLinkAttribute('target', '_blank')
             ->setLinkAttribute('rel', 'noopener')
-            //->setLinkAttribute('accesskey', 'm')
+            // ->setLinkAttribute('accesskey', 'm')
             ->setLinkAttribute('title', 'Event bearbeiten')
         ;
 
@@ -78,7 +78,7 @@ readonly class GenerateEventDashboardListener
             ->setLinkAttribute('class', 'tl_submit')
             ->setLinkAttribute('target', '_blank')
             ->setLinkAttribute('rel', 'noopener')
-            //->setLinkAttribute('accesskey', 'm')
+            // ->setLinkAttribute('accesskey', 'm')
             ->setLinkAttribute('title', 'Eventliste anzeigen')
         ;
 
@@ -112,7 +112,8 @@ readonly class GenerateEventDashboardListener
             ;
         }
 
-        // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und Vergütungsformular drucken und einreichen" button
+        // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und
+        // Vergütungsformular drucken und einreichen" button
         if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $eventId)) {
             if (EventType::TOUR === $objEvent->eventType || EventType::LAST_MINUTE_TOUR === $objEvent->eventType) {
                 $href = $this->router->generate(

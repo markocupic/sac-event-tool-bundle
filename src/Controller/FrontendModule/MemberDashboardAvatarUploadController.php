@@ -50,6 +50,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     public const string TYPE = 'member_dashboard_avatar_upload';
 
     private FrontendUser|null $user;
+
     private FragmentTemplate|null $template;
 
     public function __construct(
@@ -117,7 +118,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         // Check for valid avatar image and valid upload directory
         $this->tidyAvatar();
 
-        $user = $this->framework->getAdapter(MemberModel::class)->findByPk($this->user->id);
+        $user = $this->framework->getAdapter(MemberModel::class)->findById($this->user->id);
 
         $this->template = $template;
         $template->set('user', $user->row());
@@ -167,7 +168,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
     private function getUserAvatarUploadDir(): string
     {
-        return sprintf(
+        return \sprintf(
             '%s/%s',
             $this->sacevtUserFrontendAvatarDir,
             $this->user->id,
@@ -279,11 +280,11 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             $this->deleteAvatar();
 
             // Generate target path
-            $strAvatarRelativePath = Path::canonicalize(sprintf(
+            $strAvatarRelativePath = Path::canonicalize(\sprintf(
                 '%s/avatar-%s.%s',
                 $objUploadFolder->path,
                 $this->user->id,
-                strtolower(Path::getExtension($arrFile['name']))
+                strtolower(Path::getExtension($arrFile['name'])),
             ));
 
             $strAvatarAbsolutePath = Path::makeAbsolute($strAvatarRelativePath, $this->projectDir);
@@ -297,7 +298,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             $fileModel = $dbafsAdapter->addResource($strAvatarRelativePath);
 
             if ($fileModel) {
-                $oMember = $memberModelAdapter->findByPk($this->user->id);
+                $oMember = $memberModelAdapter->findById($this->user->id);
                 $oMember->avatar = $fileModel->uuid;
                 $oMember->save();
             }

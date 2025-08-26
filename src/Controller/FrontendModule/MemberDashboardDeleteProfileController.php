@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
-#[AsFrontendModule(MemberDashboardDeleteProfileController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_delete_profile')]
+#[AsFrontendModule(MemberDashboardDeleteProfileController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_member_dashboard_delete_profile')]
 class MemberDashboardDeleteProfileController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_delete_profile';

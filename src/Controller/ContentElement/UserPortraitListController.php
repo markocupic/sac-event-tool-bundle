@@ -155,8 +155,8 @@ class UserPortraitListController extends AbstractContentElementController
                             $objTemplate->hasRoleEmail = true;
                         }
 
-                        // Overwrite private address with role address
-                        // Be careful to only apply this setting once per user
+                        // Overwrite private address with role address Be careful to only apply this
+                        // setting once per user
                         $arrAddress = $stringUtilAdapter->deserialize($model->userList_replacePrivateAdressWithRoleAdress, true);
 
                         foreach ($arrAddress as $field) {

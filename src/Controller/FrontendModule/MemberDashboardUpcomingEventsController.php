@@ -39,6 +39,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
     public const string TYPE = 'member_dashboard_upcoming_events';
 
     private FrontendUser|null $user = null;
+
     private FragmentTemplate|null $template = null;
 
     public function __construct(
@@ -100,7 +101,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
                 return $row;
             },
-            $arrUpcoming
+            $arrUpcoming,
         );
         $this->template->set('arrUpcomingEvents', $arrUpcoming);
 
@@ -109,13 +110,13 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
     private function generateDeregistrationUrl(CalendarEventsMemberModel $registrationModel, ModuleModel $moduleModel): string
     {
-        $objPage = $this->framework->getAdapter(PageModel::class)->findByPk($moduleModel->eventDeregistrationPage);
+        $objPage = $this->framework->getAdapter(PageModel::class)->findById($moduleModel->eventDeregistrationPage);
 
         if (null === $objPage) {
             return '';
         }
 
-        $queryString = sprintf('regId=%d&callbackUrl=%s', $registrationModel->id, $this->requestStack->getCurrentRequest()->getUri());
+        $queryString = \sprintf('regId=%d&callbackUrl=%s', $registrationModel->id, $this->requestStack->getCurrentRequest()->getUri());
 
         $url = $this->urlParser->addQueryString($queryString, $objPage->getFrontendUrl());
 

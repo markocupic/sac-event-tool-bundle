@@ -36,7 +36,9 @@ use Symfony\Component\Filesystem\Path;
 class TourListGenerator extends AbstractController
 {
     private const string TEMPLATE = 'vendor/markocupic/sac-event-tool-bundle/contao/templates/docx/tour_listing_booklet.docx';
+
     private const int TEASER_LENGTH = 220;
+
     private const string STORAGE_DIR = 'files/sektion/tmp/tourlist_booklet/tmp';
 
     public function __construct(
@@ -83,8 +85,8 @@ class TourListGenerator extends AbstractController
 
         $templateProcessor = new MsWordTemplateProcessor(Path::join($this->projectDir, self::TEMPLATE), Path::join($this->projectDir, self::STORAGE_DIR, $filename.'.docx'));
 
-        //$this->addTourTypeSection($templateProcessor);
-        //$this->addTourTechDiffSection($templateProcessor);
+        // $this->addTourTypeSection($templateProcessor);
+        // $this->addTourTechDiffSection($templateProcessor);
         $this->addTourListSection($templateProcessor, $arrIds);
 
         $splFileObject = $templateProcessor->generate();
@@ -101,7 +103,7 @@ class TourListGenerator extends AbstractController
         $filesModel = Dbafs::addResource(Path::makeRelative($splFileObject->getRealPath(), $this->projectDir));
 
         if (null === $filesModel) {
-            throw new \Exception(sprintf('Could not add the file %s to DBAFS.', $splFileObject->getRealPath()));
+            throw new \Exception(\sprintf('Could not add the file %s to DBAFS.', $splFileObject->getRealPath()));
         }
 
         return $filesModel;
@@ -158,7 +160,7 @@ class TourListGenerator extends AbstractController
         foreach ($arrIds as $eventId) {
             ++$index_outer;
 
-            $event = CalendarEventsModel::findByPk($eventId);
+            $event = CalendarEventsModel::findById($eventId);
 
             // Push data to clone
             $templateProcessor->setValue('id_#'.$index_outer, $this->prepareString((string) $event->id), 1);
@@ -223,7 +225,7 @@ class TourListGenerator extends AbstractController
                     $pathinfo = pathinfo($arrOrgLogoPaths[$i]);
                     $dirname = $pathinfo['dirname'];
                     $filename = $pathinfo['filename'];
-                    $pngPath = Path::join($dirname, sprintf('png/%s.png', $filename));
+                    $pngPath = Path::join($dirname, \sprintf('png/%s.png', $filename));
                     $templateProcessor->setImageValue('org_img_'.$i.'_#'.$index_outer, $pngPath);
                 } else {
                     $templateProcessor->setValue('org_img_'.$i.'_#'.$index_outer.':40:40', '');
@@ -242,7 +244,7 @@ class TourListGenerator extends AbstractController
         $fs->mkdir(Path::join($this->projectDir, 'system/tmp/qrcodes'));
 
         // Generate path
-        $filepath = Path::join($this->projectDir, sprintf('system/tmp/qrcodes/event_booklet_event_qrcode_%s.png', $event->id));
+        $filepath = Path::join($this->projectDir, \sprintf('system/tmp/qrcodes/event_booklet_event_qrcode_%s.png', $event->id));
 
         // Defaults
         $opt = [
@@ -267,6 +269,6 @@ class TourListGenerator extends AbstractController
             return $filepath;
         }
 
-        throw new \Exception(sprintf('Could not generate QR code from url "%s".', $url));
+        throw new \Exception(\sprintf('Could not generate QR code from url "%s".', $url));
     }
 }

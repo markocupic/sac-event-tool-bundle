@@ -24,7 +24,7 @@ use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(TourDifficultyListController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_tour_difficulty_list')]
+#[AsFrontendModule(TourDifficultyListController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_tour_difficulty_list')]
 class TourDifficultyListController extends AbstractFrontendModuleController
 {
     public const TYPE = 'tour_difficulty_list';
@@ -46,7 +46,7 @@ class TourDifficultyListController extends AbstractFrontendModuleController
                 if ($pid !== $objDifficulty->pid) {
                     $objDifficulty->isCatStart = true;
                     $tourDifficultyCategoryAdapter = $this->framework->getAdapter(TourDifficultyCategoryModel::class);
-                    $objDifficultyCategory = $tourDifficultyCategoryAdapter->findByPk($objDifficulty->pid);
+                    $objDifficultyCategory = $tourDifficultyCategoryAdapter->findById($objDifficulty->pid);
 
                     if (null !== $objDifficultyCategory) {
                         $objDifficulty->catTitle = $objDifficultyCategory->title;

@@ -30,8 +30,7 @@ readonly class MemberDatabaseSyncCron
     }
 
     /**
-     * Sync SAC member database.
-     * Sync tl_member with tl_user.
+     * Sync SAC member database. Sync tl_member with tl_user.
      *
      * @throws \Exception
      */

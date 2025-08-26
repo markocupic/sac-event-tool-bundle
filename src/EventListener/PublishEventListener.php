@@ -80,8 +80,8 @@ final readonly class PublishEventListener
                     $objEmail->fromName = 'Administrator SAC Pilatus';
                     $objEmail->replyTo('noreply@sac-pilatus.ch');
 
-                    $objEmail->subject = sprintf('Event %s wurde veröffentlicht', StringUtil::revertInputEncoding($objCalendarEvent->title));
-                    $objEmail->text = $this->parseEmailText($objCalendarEvent, UserModel::findByPk($user->id));
+                    $objEmail->subject = \sprintf('Event %s wurde veröffentlicht', StringUtil::revertInputEncoding($objCalendarEvent->title));
+                    $objEmail->text = $this->parseEmailText($objCalendarEvent, UserModel::findById($user->id));
 
                     $objEmail->sendTo($objCalendar->notifyOnEventReleaseLevelChange);
                 }
@@ -96,10 +96,10 @@ final readonly class PublishEventListener
      */
     private function parseEmailText(CalendarEventsModel $objEvent, UserModel $objUser): string
     {
-        $eventReleaseLevel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+        $eventReleaseLevel = EventReleaseLevelPolicyModel::findById($objEvent->eventReleaseLevel);
 
         if (null === $eventReleaseLevel) {
-            throw new \RuntimeException(sprintf('Could not find a event release level for event with ID %d.', $objEvent->id));
+            throw new \RuntimeException(\sprintf('Could not find a event release level for event with ID %d.', $objEvent->id));
         }
 
         $arrEvent = array_map(static fn ($val) => StringUtil::revertInputEncoding((string) $val), $objEvent->row());
@@ -107,27 +107,24 @@ final readonly class PublishEventListener
         $objInstructor = $this->calendarEventsUtil->getMainInstructor($objEvent);
 
         if (null === $objInstructor) {
-            throw new \RuntimeException(sprintf('Could not find a main instructor for event with ID %d.', $objEvent->id));
+            throw new \RuntimeException(\sprintf('Could not find a main instructor for event with ID %d.', $objEvent->id));
         }
 
-        return $this->twig->render(
-            '@MarkocupicSacEventTool/NotifyOnEventReleaseLevelChange/notify_on_event_publish.twig',
-            [
-                'user' => $objUser->row(),
-                'instructor' => $objInstructor->row(),
-                'event' => $arrEvent,
-                'event_release_level' => $eventReleaseLevel->row(),
-                'event_link' => $this->router->generate(
-                    'contao_backend',
-                    [
-                        'do' => 'calendar',
-                        'table' => CalendarEventsModel::getTable(),
-                        'id' => $objEvent->id,
-                        'act' => 'edit',
-                    ],
-                    UrlGeneratorInterface::ABSOLUTE_URL,
-                ),
-            ]
-        );
+        return $this->twig->render('@MarkocupicSacEventTool/NotifyOnEventReleaseLevelChange/notify_on_event_publish.twig', [
+            'user' => $objUser->row(),
+            'instructor' => $objInstructor->row(),
+            'event' => $arrEvent,
+            'event_release_level' => $eventReleaseLevel->row(),
+            'event_link' => $this->router->generate(
+                'contao_backend',
+                [
+                    'do' => 'calendar',
+                    'table' => CalendarEventsModel::getTable(),
+                    'id' => $objEvent->id,
+                    'act' => 'edit',
+                ],
+                UrlGeneratorInterface::ABSOLUTE_URL,
+            ),
+        ]);
     }
 }

@@ -30,12 +30,9 @@ class EventReleaseLevelPolicyModel extends Model
      */
     protected static $strTable = 'tl_event_release_level_policy';
 
-    /**
-     * @param $eventReleaseRecordId
-     */
     public static function findNextLevel($eventReleaseRecordId): static|null
     {
-        $eventReleaseLevelModel = static::findByPk($eventReleaseRecordId);
+        $eventReleaseLevelModel = static::findById($eventReleaseRecordId);
 
         if (null !== $eventReleaseLevelModel) {
             $eventReleasePackageModel = $eventReleaseLevelModel->getRelated('pid');
@@ -56,12 +53,9 @@ class EventReleaseLevelPolicyModel extends Model
         return null;
     }
 
-    /**
-     * @param $eventId
-     */
     public static function findMinLevelByEventId($eventId): static|null
     {
-        $objEvent = CalendarEventsModel::findByPk($eventId);
+        $objEvent = CalendarEventsModel::findById($eventId);
 
         if (null === $objEvent) {
             return null;
@@ -74,7 +68,7 @@ class EventReleaseLevelPolicyModel extends Model
         }
 
         if ($objEventType->levelAccessPermissionPackage > 0) {
-            $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findByPk($objEventType->levelAccessPermissionPackage);
+            $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findById($objEventType->levelAccessPermissionPackage);
         }
 
         if (null === $objEventReleaseLevelPolicyPackageModel) {
@@ -97,12 +91,9 @@ class EventReleaseLevelPolicyModel extends Model
         return $objReleaseLevelModel;
     }
 
-    /**
-     * @param $eventId
-     */
     public static function findMaxLevelByEventId($eventId): static|null
     {
-        $objEvent = CalendarEventsModel::findByPk($eventId);
+        $objEvent = CalendarEventsModel::findById($eventId);
 
         if (null === $objEvent) {
             return null;
@@ -115,7 +106,7 @@ class EventReleaseLevelPolicyModel extends Model
         }
 
         if ($objEventType->levelAccessPermissionPackage > 0) {
-            $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findByPk($objEventType->levelAccessPermissionPackage);
+            $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findById($objEventType->levelAccessPermissionPackage);
         }
 
         if (null === $objEventReleaseLevelPolicyPackageModel) {
@@ -138,12 +129,9 @@ class EventReleaseLevelPolicyModel extends Model
         return $objReleaseLevelModel;
     }
 
-    /**
-     * @param $levelId
-     */
     public static function findPrevLevel($levelId): static|null
     {
-        $eventReleaseLevelModel = static::findByPk($levelId);
+        $eventReleaseLevelModel = static::findById($levelId);
 
         if (null !== $eventReleaseLevelModel) {
             $eventReleasePackageModel = $eventReleaseLevelModel->getRelated('pid');
@@ -164,10 +152,6 @@ class EventReleaseLevelPolicyModel extends Model
         return null;
     }
 
-    /**
-     * @param $eventId
-     * @param $level
-     */
     public static function levelExists($eventId, $level = null): bool
     {
         $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($eventId);
@@ -184,10 +168,6 @@ class EventReleaseLevelPolicyModel extends Model
         return false;
     }
 
-    /**
-     * @param $pid
-     * @param $level
-     */
     public static function findOneByPidAndLevel($pid, $level = null): static|null
     {
         $t = static::$strTable;
@@ -198,12 +178,9 @@ class EventReleaseLevelPolicyModel extends Model
         return static::findOneBy($arrColumns, $arrVars, []);
     }
 
-    /**
-     * @param $eventId
-     */
     public static function findOneByEventId($eventId): static|null
     {
-        $event = CalendarEventsModel::findByPk($eventId);
+        $event = CalendarEventsModel::findById($eventId);
 
         if (null === $event) {
             return null;

@@ -45,20 +45,32 @@ class NotifyEventRegistrationStateController
     public const string PARAM_KEY = 'notify_event_registration_state';
 
     private CalendarEventsMemberModel|null $registration;
+
     private CalendarEventsModel|null $event;
+
     private BackendUser|null $user;
+
     private string|null $action;
+
     private array|null $configuration;
 
     // Adapters
     private Adapter $events;
+
     private Adapter $stringUtil;
+
     private Adapter $calendarEvents;
+
     private Adapter $calendarEventsMember;
+
     private Adapter $config;
+
     private Adapter $controller;
+
     private Adapter $member;
+
     private Adapter $message;
+
     private Adapter $validator;
 
     public function __construct(
@@ -120,14 +132,14 @@ class NotifyEventRegistrationStateController
             $this->controller->redirect($this->getErrorUri());
         }
 
-        $this->registration = $this->calendarEventsMember->findByPk($id);
+        $this->registration = $this->calendarEventsMember->findById($id);
 
         if (null === $this->registration) {
             $this->message->addInfo('Es wurde keine gültige Event-Registrierung gefunden.');
             $this->controller->redirect($this->getErrorUri());
         }
 
-        $this->event = $this->calendarEvents->findByPk($this->registration->eventId);
+        $this->event = $this->calendarEvents->findById($this->registration->eventId);
 
         if (null === $this->event) {
             $this->message->addInfo('Es wurde kein zur Registrierung gehörender Event gefunden.');
@@ -143,7 +155,7 @@ class NotifyEventRegistrationStateController
         $this->action = $request->query->get('action', null);
 
         if (empty($this->action) || !\in_array($this->action, EventSubscriptionState::ALL, true) || null === ($this->configuration = $this->getActionConfig($this->action))) {
-            $this->message->addInfo(sprintf('Ungültiger Query-Parameter "action" => "%s".', $this->action));
+            $this->message->addInfo(\sprintf('Ungültiger Query-Parameter "action" => "%s".', $this->action));
             $this->controller->redirect($this->getErrorUri());
         }
     }
@@ -217,8 +229,8 @@ class NotifyEventRegistrationStateController
             $arrEmailTextTokens = $this->getTokenArray();
 
             if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $this->action && $this->event->customizeEventRegistrationConfirmationEmailText && !empty($this->event->customEventRegistrationConfirmationEmailText)) {
-                // Only for accept_with_email!!!
-                // Replace tags for custom notification set in the events settings (tags can be used case-insensitive!)
+                // Only for accept_with_email!!! Replace tags for custom notification set in the
+                // events settings (tags can be used case-insensitive!)
                 $emailBodyText = $this->event->customEventRegistrationConfirmationEmailText;
 
                 foreach ($arrEmailTextTokens as $k => $v) {
@@ -270,19 +282,20 @@ class NotifyEventRegistrationStateController
         $email->subject = $this->stringUtil->revertInputEncoding($form->getWidget('subject')->value);
         $email->text = $this->stringUtil->revertInputEncoding(strip_tags((string) $form->getWidget('text')->value));
 
-        // Check if event participant has already been booked on another event at the same time.
+        // Check if event participant has already been booked on another event at the
+        // same time.
         $objMember = $this->member->findOneBySacMemberId($this->registration->sacMemberId);
 
         if (
-            EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $this->action &&
-            null !== $objMember &&
-            !$this->registration->allowMultiSignUp &&
-            $this->calendarEventsUtil->areBookingDatesOccupied($this->event, $objMember)
+            EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $this->action
+            && null !== $objMember
+            && !$this->registration->allowMultiSignUp
+            && $this->calendarEventsUtil->areBookingDatesOccupied($this->event, $objMember)
         ) {
             $this->message->addError(
                 'Es ist ein Fehler aufgetreten. '.
                 'Der Teilnehmer kann nicht angemeldet werden, weil er zur selben Zeit bereits an einem anderen Event bestätigt wurde. '.
-                'Wenn Sie die Anmeldeanfrage trotzdem bestätigen möchten, so wählen Sie die Option "Mehrfachbuchung zulassen" aus.'
+                'Wenn Sie die Anmeldeanfrage trotzdem bestätigen möchten, so wählen Sie die Option "Mehrfachbuchung zulassen" aus.',
             );
         } elseif (
             EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $this->action
@@ -291,7 +304,7 @@ class NotifyEventRegistrationStateController
             $this->message->addError(
                 'Es ist ein Fehler aufgetreten. '.
                 'Da die maximale Teilnehmerzahl bereits erreicht ist, '.
-                'kann für den Teilnehmer die Teilnahme am Event nicht bestätigt werden.'
+                'kann für den Teilnehmer die Teilnahme am Event nicht bestätigt werden.',
             );
         } elseif ($this->validator->isEmail($this->registration->email)) {
             // Send email notification
@@ -321,7 +334,7 @@ class NotifyEventRegistrationStateController
         if ($hasError) {
             $this->message->addInfo(
                 'Es ist ein Fehler aufgetreten. '.
-                'Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.'
+                'Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.',
             );
 
             return false;
@@ -339,8 +352,8 @@ class NotifyEventRegistrationStateController
             ', ',
             array_map(
                 static fn ($tstamp) => date($df, (int) $tstamp),
-                $eventDates
-            )
+                $eventDates,
+            ),
         );
 
         return [

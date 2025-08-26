@@ -101,8 +101,8 @@ class Member
     }
 
     /**
-     * Display the section name instead of the section id
-     * 4250,4252 becomes SAC PILATUS, SAC PILATUS NAPF.
+     * Display the section name instead of the section id 4250,4252 becomes SAC
+     * PILATUS, SAC PILATUS NAPF.
      */
     #[AsCallback(table: 'tl_member', target: 'config.onshow', priority: 100)]
     public function decryptSectionIds(array $data, array $row, DataContainer $dc): array

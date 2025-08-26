@@ -1,8 +1,7 @@
 <?php
 
 /**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic.
+ * SAC Event Tool Web Plugin for Contao Copyright (c) 2008-2020 Marko Cupic.
  *
  * @see https://github.com/markocupic/sac-event-tool-bundle
  */
@@ -28,8 +27,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 class CorsListener
 {
     /**
-     * This wii enable Cors requests
-     * Add headers on kernel.response event.
+     * This wii enable Cors requests Add headers on kernel.response event.
      */
     public function __invoke(ResponseEvent $event): void
     {

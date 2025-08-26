@@ -1,11 +1,12 @@
-<div class="mt-4">
-    {% set message %}
-        Du bist für "{{ event_model.title }}" registriert.
-        <br>
-        Status: {{ event_member_model.stateOfSubscriptionTrans }}
-    {% endset %}
-    {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: message } %}
-</div>
+{% trans_default_domain 'contao_default' %}
+
+{% set alert_type = event_member_model.stateOfSubscription == 'subscription-accepted' ? 'alert-success' : 'alert-info' %}
+{% set message %}
+    Du bist für "{{ event_model.title }}" registriert.
+    <br>
+    Status: {{ event_member_model.stateOfSubscriptionTrans }}
+{% endset %}
+{% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: alert_type, add_icon: true, icon_class: 'fa-solid fa-check-circle', text: message } %}
 
 <table class="table">
     <tr>

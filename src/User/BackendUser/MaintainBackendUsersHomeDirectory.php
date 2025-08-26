@@ -62,14 +62,14 @@ class MaintainBackendUsersHomeDirectory
             $filesAdapter->getInstance()->copy($this->sacevtUserBackendHomeDir.'/new/avatar/default.jpg', $this->sacevtUserBackendHomeDir.'/'.$objUser->id.'/avatar/default.jpg');
 
             $this->contaoGeneralLogger?->info(
-                sprintf(
+                \sprintf(
                     'Created a new home directory (and added file mounts) for user with ID %s in "%s".',
                     $objUser->id,
                     $this->sacevtUserBackendHomeDir.'/'.$objUser->id,
                 ),
                 [
                     'contao' => new ContaoContext(__METHOD__, Log::CREATE_USER_HOME_DIRECTORY),
-                ]
+                ],
             );
         }
 
@@ -108,7 +108,7 @@ class MaintainBackendUsersHomeDirectory
                 }
 
                 if (is_dir($this->projectDir.'/'.$this->sacevtUserBackendHomeDir.'/'.$userDir)) {
-                    if (!$userModelAdapter->findByPk($userDir)) {
+                    if (!$userModelAdapter->findById($userDir)) {
                         $objFolder = new Folder($this->sacevtUserBackendHomeDir.'/'.$userDir);
 
                         $objFolder->renameTo($this->sacevtUserBackendHomeDir.'/old__'.$userDir);

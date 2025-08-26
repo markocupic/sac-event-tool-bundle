@@ -29,7 +29,7 @@ class EventDeregistrationException extends \RuntimeException
         private readonly array $params = [],
     ) {
         if (!\array_key_exists($type, self::TYPE_MAP)) {
-            $error = sprintf('Invalid error level "%s". Error type must be one of these: %s.', $type, implode(', ', array_keys(self::TYPE_MAP)));
+            $error = \sprintf('Invalid error level "%s". Error type must be one of these: %s.', $type, implode(', ', array_keys(self::TYPE_MAP)));
 
             throw new \InvalidArgumentException($error);
         }

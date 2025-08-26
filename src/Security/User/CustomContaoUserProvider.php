@@ -24,8 +24,7 @@ use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
- * Override the ContaoUserProvider
- * to allow backend login with the sacMemberId.
+ * Override the ContaoUserProvider to allow backend login with the sacMemberId.
  *
  * @implements UserProviderInterface<User>
  */
@@ -40,7 +39,7 @@ class CustomContaoUserProvider extends ContaoUserProvider
         private readonly string $userClass,
     ) {
         if (BackendUser::class !== $userClass && FrontendUser::class !== $userClass) {
-            throw new \RuntimeException(sprintf('Unsupported class "%s".', $userClass));
+            throw new \RuntimeException(\sprintf('Unsupported class "%s".', $userClass));
         }
 
         parent::__construct($framework, $userClass);

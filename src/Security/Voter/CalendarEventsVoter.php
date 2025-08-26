@@ -29,10 +29,15 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class CalendarEventsVoter extends Voter
 {
     public const string CAN_DELETE_EVENT = 'sacevt_can_delete_event';
+
     public const string CAN_WRITE_EVENT = 'sacevt_can_write_event';
+
     public const string CAN_CUT_EVENT = 'sacevt_can_cut_event';
+
     public const string CAN_UPGRADE_EVENT_RELEASE_LEVEL = 'sacevt_can_upgrade_event_release_level';
+
     public const string CAN_DOWNGRADE_EVENT_RELEASE_LEVEL = 'sacevt_can_downgrade_event_release_level';
+
     public const string CAN_ADMINISTER_EVENT_REGISTRATIONS = 'sacevt_can_administer_event_registrations';
 
     private const array EVENT_PERMISSIONS_ALL = [
@@ -46,10 +51,13 @@ class CalendarEventsVoter extends Voter
 
     // Adapters
     private Adapter $calendarEvent;
+
     private Adapter $eventReleaseLevelPolicy;
+
     private Adapter $stringUtil;
 
     private CalendarEventsModel|null $event = null;
+
     private BackendUser|null $user = null;
 
     public function __construct(
@@ -81,7 +89,7 @@ class CalendarEventsVoter extends Voter
     public function canChangeReleaseLevel(CalendarEventsModel $eventsModel, BackendUser $user, EventReleaseLevelPolicyModel $eventReleaseLevelPolicyModel, string $direction): bool
     {
         if ('up' !== $direction && 'down' !== $direction) {
-            throw new \Exception(sprintf('Direction must be "up" or "down" "%s" given!', $direction));
+            throw new \Exception(\sprintf('Direction must be "up" or "down" "%s" given!', $direction));
         }
 
         if ('up' === $direction) {
@@ -151,8 +159,6 @@ class CalendarEventsVoter extends Voter
     }
 
     /**
-     * @param $subject
-     *
      * @throws \Exception
      */
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
@@ -164,7 +170,7 @@ class CalendarEventsVoter extends Voter
             return false;
         }
 
-        $this->event = $this->calendarEvent->findByPk($subject);
+        $this->event = $this->calendarEvent->findById($subject);
 
         if (null === $this->event) {
             return false;
@@ -176,7 +182,7 @@ class CalendarEventsVoter extends Voter
             self::CAN_CUT_EVENT => $this->canCutEvent(),
             self::CAN_UPGRADE_EVENT_RELEASE_LEVEL, self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL => $this->canSwitchReleaseLevel($attribute),
             self::CAN_ADMINISTER_EVENT_REGISTRATIONS => $this->canAdministerEventRegistrations(),
-            default => throw new \LogicException(sprintf('You vote on a unsupported attribute "%s"!', $attribute)),
+            default => throw new \LogicException(\sprintf('You vote on a unsupported attribute "%s"!', $attribute)),
         };
     }
 
@@ -193,12 +199,12 @@ class CalendarEventsVoter extends Voter
     private function canDeleteEvent(): bool
     {
         if (!empty($this->event->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findByPk($this->event->eventReleaseLevel);
+            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($this->event->eventReleaseLevel);
 
             if (null === $releaseLevelPolicy) {
                 $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
 
-                throw new \Exception(sprintf($msg, $this->event->id));
+                throw new \Exception(\sprintf($msg, $this->event->id));
             }
         } else {
             // Grant delete-access if the event is not assigned to a release level.
@@ -212,10 +218,8 @@ class CalendarEventsVoter extends Voter
 
         if ($releaseLevelPolicy->allowDeleteAccessToAuthor) {
             if ((int) $this->user->id === (int) $this->event->author) {
-                // Grant delete-access if...
-                // authors have delete-access
-                // and
-                // the user has the role "author" on the current event
+                // Grant delete-access if... authors have delete-access and the user has the role
+                // "author" on the current event
                 return true;
             }
         }
@@ -224,10 +228,8 @@ class CalendarEventsVoter extends Voter
 
         if ($releaseLevelPolicy->allowDeleteAccessToInstructors) {
             if (\in_array($this->user->id, $arrEventInstructors, false)) {
-                // Grant delete-access if...
-                // instructors have delete-access
-                // and
-                // the user has the role "instructor" on the current event
+                // Grant delete-access if... instructors have delete-access and the user has the
+                // role "instructor" on the current event
                 return true;
             }
         }
@@ -263,12 +265,12 @@ class CalendarEventsVoter extends Voter
     private function canCutEvent(): bool
     {
         if (!empty($this->event->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findByPk($this->event->eventReleaseLevel);
+            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($this->event->eventReleaseLevel);
 
             if (null === $releaseLevelPolicy) {
                 $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
 
-                throw new \Exception(sprintf($msg, $this->event->id));
+                throw new \Exception(\sprintf($msg, $this->event->id));
             }
         } else {
             // Grant cut-access if the event is not assigned to a release level.
@@ -282,10 +284,8 @@ class CalendarEventsVoter extends Voter
 
         if ($releaseLevelPolicy->allowCutAccessToAuthor) {
             if ((int) $this->user->id === (int) $this->event->author) {
-                // Grant cut-access if...
-                // authors have cut-access
-                // and
-                // the user has the role "author" on the current event
+                // Grant cut-access if... authors have cut-access and the user has the role
+                // "author" on the current event
                 return true;
             }
         }
@@ -294,10 +294,8 @@ class CalendarEventsVoter extends Voter
 
         if ($releaseLevelPolicy->allowCutAccessToInstructors) {
             if (\in_array($this->user->id, $arrEventInstructors, false)) {
-                // Grant cut-access if...
-                // instructors have cut-access
-                // and
-                // the user has the role "instructor" on the current event
+                // Grant cut-access if... instructors have cut-access and the user has the role
+                // "instructor" on the current event
                 return true;
             }
         }
@@ -334,12 +332,12 @@ class CalendarEventsVoter extends Voter
     private function canWriteEvent(): bool
     {
         if (!empty($this->event->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findByPk($this->event->eventReleaseLevel);
+            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($this->event->eventReleaseLevel);
 
             if (null === $releaseLevelPolicy) {
                 $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
 
-                throw new \Exception(sprintf($msg, $this->event->id));
+                throw new \Exception(\sprintf($msg, $this->event->id));
             }
         } else {
             // Grant write- or write-access if the event is not assigned to a release level.
@@ -353,10 +351,8 @@ class CalendarEventsVoter extends Voter
 
         if ($releaseLevelPolicy->allowWriteAccessToAuthor) {
             if ((int) $this->user->id === (int) $this->event->author) {
-                // Grant write-access if...
-                // authors have write-access
-                // and
-                // the user has the role "author" on the current event
+                // Grant write-access if... authors have write-access and the user has the role
+                // "author" on the current event
                 return true;
             }
         }
@@ -365,10 +361,8 @@ class CalendarEventsVoter extends Voter
 
         if ($releaseLevelPolicy->allowWriteAccessToInstructors) {
             if (\in_array($this->user->id, $arrEventInstructors, false)) {
-                // Grant write-access if...
-                // instructors have write-access
-                // and
-                // the user has the role "instructor" on the current event
+                // Grant write-access if... instructors have write-access and the user has the
+                // role "instructor" on the current event
                 return true;
             }
         }
@@ -398,7 +392,8 @@ class CalendarEventsVoter extends Voter
     }
 
     /**
-     * Allow to administer event registrations (means the user is allowed to add new event registrations too)...
+     * Allow to administer event registrations (means the user is allowed to add new
+     * event registrations too)...
      * - if the event is not assigned to an event release level
      * - to all admins (regardless of the current time)
      * - to allowed instructors if the registrations start date has expired
@@ -411,12 +406,12 @@ class CalendarEventsVoter extends Voter
     private function canAdministerEventRegistrations(): bool
     {
         if (!empty($this->event->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findByPk($this->event->eventReleaseLevel);
+            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($this->event->eventReleaseLevel);
 
             if (null === $releaseLevelPolicy) {
                 $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
 
-                throw new \Exception(sprintf($msg, $this->event->id));
+                throw new \Exception(\sprintf($msg, $this->event->id));
             }
         } else {
             // Grant access if the event is not assigned to a release level.
@@ -436,10 +431,8 @@ class CalendarEventsVoter extends Voter
 
         if ($releaseLevelPolicy->allowAdministerEventRegistrationsToAuthors) {
             if ((int) $this->user->id === (int) $this->event->author) {
-                // Grant action if...
-                // if authors are allowed
-                // and
-                // the user has the role "author" on the current event
+                // Grant action if... if authors are allowed and the user has the role "author"
+                // on the current event
                 return true;
             }
         }
@@ -448,10 +441,8 @@ class CalendarEventsVoter extends Voter
 
         if ($releaseLevelPolicy->allowAdministerEventRegistrationsToInstructors) {
             if (\in_array($this->user->id, $arrEventInstructors, true)) {
-                // Grant action if...
-                // instructors are allowed
-                // and
-                // the user has the role "instructor" on the current event
+                // Grant action if... instructors are allowed and the user has the role
+                // "instructor" on the current event
                 return true;
             }
         }
@@ -493,12 +484,12 @@ class CalendarEventsVoter extends Voter
     private function canSwitchReleaseLevel(string $attribute): bool
     {
         if (!empty($this->event->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findByPk($this->event->eventReleaseLevel);
+            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($this->event->eventReleaseLevel);
 
             if (null === $releaseLevelPolicy) {
                 $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
 
-                throw new \Exception(sprintf($msg, $this->event->id));
+                throw new \Exception(\sprintf($msg, $this->event->id));
             }
         } else {
             // Grant write- or write-access if the event is not assigned to a release level.
@@ -510,7 +501,7 @@ class CalendarEventsVoter extends Voter
         } elseif (self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL === $attribute) {
             $direction = 'down';
         } else {
-            throw new \LogicException(sprintf('$attribute should be either "%s" or "%s" "%s" given.', self::CAN_UPGRADE_EVENT_RELEASE_LEVEL, self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $attribute));
+            throw new \LogicException(\sprintf('$attribute should be either "%s" or "%s" "%s" given.', self::CAN_UPGRADE_EVENT_RELEASE_LEVEL, self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $attribute));
         }
 
         return $this->canChangeReleaseLevel($this->event, $this->user, $releaseLevelPolicy, $direction);

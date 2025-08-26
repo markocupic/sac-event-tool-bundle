@@ -34,7 +34,9 @@ class EventRegistrationListGeneratorDocx
 {
     // Adapters
     private Adapter $calendarEventsMemberModelAdapter;
+
     private Adapter $controllerAdapter;
+
     private Adapter $messageAdapter;
 
     public function __construct(
@@ -70,7 +72,7 @@ class EventRegistrationListGeneratorDocx
             ],
             [
                 'order' => 'tl_calendar_events_member.lastname, tl_calendar_events_member.firstname',
-            ]
+            ],
         );
 
         if (null === $objEventMember) {
@@ -81,7 +83,7 @@ class EventRegistrationListGeneratorDocx
 
         $docxTemplateSrc = Path::makeAbsolute($this->sacevtEventTemplateMemberList, $this->projectDir);
 
-        $targetFilePath = $this->sacevtTempDir.'/'.sprintf($this->sacevtEventMemberListFileNamePattern, time(), 'docx');
+        $targetFilePath = $this->sacevtTempDir.'/'.\sprintf($this->sacevtEventMemberListFileNamePattern, time(), 'docx');
         $targetFilePath = Path::makeAbsolute($targetFilePath, $this->projectDir);
 
         // Create PhpWord instance

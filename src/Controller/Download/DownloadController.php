@@ -39,7 +39,8 @@ class DownloadController extends AbstractController
     }
 
     /**
-     * Download workshops as a PDF booklet: /_download/print_workshop_booklet_as_pdf/2023
+     * Download workshops as a PDF booklet:
+     * /_download/print_workshop_booklet_as_pdf/2023
      * /_download/print_workshop_booklet_as_pdf -> current year.
      */
     #[Route('/_download/print_workshop_booklet_as_pdf/{year}', name: 'sac_event_tool_download_print_workshop_booklet_as_pdf', defaults: ['_scope' => 'frontend', '_token_check' => false])]
@@ -62,8 +63,9 @@ class DownloadController extends AbstractController
     }
 
     /**
-     * Download events as docx document: /_download/print_workshop_details_as_docx
-     * --> current year /_download/print_workshop_details_as_docx/2017
+     * Download events as docx document:
+     * /_download/print_workshop_details_as_docx --> current year
+     * /_download/print_workshop_details_as_docx/2017
      * /_download/print_workshop_details_as_docx/year=2017/89.
      */
     #[Route('/_download/print_workshop_details_as_docx/{year}/{eventId}', name: 'sac_event_tool_download_print_workshop_details_as_docx', defaults: ['_scope' => 'frontend', '_token_check' => false])]
@@ -86,7 +88,8 @@ class DownloadController extends AbstractController
     }
 
     /**
-     * Download workshop details as a PDF document: /_download/print_workshop_details_as_pdf/643.
+     * Download workshop details as a PDF document:
+     * /_download/print_workshop_details_as_pdf/643.
      */
     #[Route('/_download/print_workshop_details_as_pdf/{eventId}', name: 'sac_event_tool_download_print_workshop_details_as_pdf', defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function printWorkshopDetailsAsPdfAction(int $eventId): Response

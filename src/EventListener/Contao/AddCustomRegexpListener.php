@@ -40,8 +40,8 @@ readonly class AddCustomRegexpListener
         if ('durationInfo' === $strRegexp) {
             $request = $this->requestStack->getCurrentRequest();
 
-            // $request->request->get('eventDates') will throw an exception,
-            // because $_POST['eventDates'] is a non-scalar value.
+            // $request->request->get('eventDates') will throw an exception, because
+            // $_POST['eventDates'] is a non-scalar value.
             $post = $request->request->all();
 
             if (empty($varValue) || empty($post['eventDates'][0])) {

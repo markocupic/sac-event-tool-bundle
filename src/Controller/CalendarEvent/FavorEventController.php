@@ -51,7 +51,7 @@ class FavorEventController extends AbstractController
             return new JsonResponse($json, Response::HTTP_FORBIDDEN);
         }
 
-        $event = CalendarEventsModel::findByPk($eventId);
+        $event = CalendarEventsModel::findById($eventId);
 
         if (null === $event) {
             $json = ['status' => 'success', 'message' => 'Event not found.', 'isFavored' => false];

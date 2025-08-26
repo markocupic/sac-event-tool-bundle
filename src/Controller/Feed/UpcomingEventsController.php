@@ -38,8 +38,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class UpcomingEventsController extends AbstractController
 {
     private readonly Adapter $calendarEventsModel;
+
     private readonly Adapter $events;
+
     private readonly Adapter $environment;
+
     private readonly Adapter $stringUtil;
 
     public function __construct(
@@ -89,69 +92,67 @@ class UpcomingEventsController extends AbstractController
             'xmlns:atom' => 'http://www.w3.org/2005/Atom',
         ]);
 
-        // Add channel fields
-
-        // Add an atom link
+        // Add channel fields Add an atom link
         $rss->addChannelField(
             new Item('atom:link', '', [], [
                 'href' => $this->environment->get('base').$filePath,
                 'rel' => 'self',
                 'type' => 'application/rss+xml',
-            ])
+            ]),
         );
 
         $rss->addChannelField(
-            new Item('title', str_replace(['&quot;', '&#40;', '&#41;'], ['"', '(', ')'], $this->stringUtil->specialchars(strip_tags($this->stringUtil->stripInsertTags($sectionName.' upcoming events')))))
+            new Item('title', str_replace(['&quot;', '&#40;', '&#41;'], ['"', '(', ')'], $this->stringUtil->specialchars(strip_tags($this->stringUtil->stripInsertTags($sectionName.' upcoming events'))))),
         );
 
         $rss->addChannelField(
-            new Item('description', $this->stringUtil->specialchars('Provides the latest events for https://www.sac-cas.ch/de/der-sac/sektionen'), ['cdata' => false])
+            new Item('description', $this->stringUtil->specialchars('Provides the latest events for https://www.sac-cas.ch/de/der-sac/sektionen'), ['cdata' => false]),
         );
 
         $rss->addChannelField(
-            new Item('link', $this->stringUtil->specialchars($this->environment->get('url')))
+            new Item('link', $this->stringUtil->specialchars($this->environment->get('url'))),
         );
 
         $rss->addChannelField(
-            new Item('language', $this->sacevtLocale)
+            new Item('language', $this->sacevtLocale),
         );
 
         $rss->addChannelField(
-            new Item('copyright', 'Copyright '.date('Y').', '.$sectionName)
+            new Item('copyright', 'Copyright '.date('Y').', '.$sectionName),
         );
 
         $rss->addChannelField(
-            new Item('pubDate', date('r', time() - 3600))
+            new Item('pubDate', date('r', time() - 3600)),
         );
 
         $rss->addChannelField(
-            new Item('lastBuildDate', date('r', time()))
+            new Item('lastBuildDate', date('r', time())),
         );
 
         $rss->addChannelField(
-            new Item('ttl', '60')
+            new Item('ttl', '60'),
         );
 
         $rss->addChannelField(
-            new Item('category', 'Mountaineering events: '.$sectionName)
+            new Item('category', 'Mountaineering events: '.$sectionName),
         );
 
         $rss->addChannelField(
-            new Item('category', 'Touren')
+            new Item('category', 'Touren'),
         );
 
         $rss->addChannelField(
-            new Item('generator', $this->stringUtil->specialchars(self::class))
+            new Item('generator', $this->stringUtil->specialchars(self::class)),
         );
 
         $stmt = $this->getEvents($section, $limit);
 
         while (false !== ($arrEvent = $stmt->fetchAssociative())) {
-            $eventsModel = $this->calendarEventsModel->findByPk($arrEvent['id']);
+            $eventsModel = $this->calendarEventsModel->findById($arrEvent['id']);
 
             $arrEvent = array_map(
                 static fn ($varValue) => str_replace(['&quot;', '&#40;', '&#41;', '[-]', '&shy;', '[nbsp]', '&nbsp;'], ['"', '(', ')', '', '', ' ', ' '], (string) $varValue),
-                $arrEvent
+                $arrEvent,
             );
 
             $rss->addChannelItemField(
@@ -164,7 +165,7 @@ class UpcomingEventsController extends AbstractController
                     new Item('guid', $this->stringUtil->specialchars($this->events->generateEventUrl($eventsModel, true))),
                     new Item('tourdb:startdate', date('Y-m-d', (int) $eventsModel->startDate)),
                     new Item('tourdb:enddate', date('Y-m-d', (int) $eventsModel->endDate)),
-                ])
+                ]),
             );
         }
 

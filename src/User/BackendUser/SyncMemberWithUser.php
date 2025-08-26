@@ -22,8 +22,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
- * Mirror/Update tl_user from tl_member
- * Unidirectional sync tl_member -> tl_user.
+ * Mirror/Update tl_user from tl_member Unidirectional sync tl_member -> tl_user.
  */
 class SyncMemberWithUser
 {
@@ -69,8 +68,7 @@ class SyncMemberWithUser
 
                 if (false !== $arrMember) {
                     $set = [
-                        // Be sure to set the correct data type!
-                        // Otherwise, the record will be updated
+                        // Be sure to set the correct data type! Otherwise, the record will be updated
                         // due to wrong type cast only.
                         'firstname' => (string) $arrMember['firstname'],
                         'lastname' => (string) $arrMember['lastname'],
@@ -88,7 +86,7 @@ class SyncMemberWithUser
                     ];
 
                     if ($this->connection->update('tl_user', $set, ['id' => $arrUser['id']])) {
-                        $msg = sprintf(
+                        $msg = \sprintf(
                             'Synced tl_user with tl_member. Updated tl_user (%s %s [SAC Member-ID: %s]).',
                             $arrMember['firstname'],
                             $arrMember['lastname'],
@@ -97,7 +95,7 @@ class SyncMemberWithUser
 
                         $this->contaoGeneralLogger?->info(
                             $msg,
-                            ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS)]
+                            ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS)],
                         );
                         ++$this->syncLog['updates'];
                         $this->syncLog['log'][] = $msg;
@@ -109,7 +107,7 @@ class SyncMemberWithUser
                     ];
 
                     if ($this->connection->update('tl_user', $set, ['id' => $arrUser['id']])) {
-                        $msg = sprintf(
+                        $msg = \sprintf(
                             'Updated "%s". Set tl_user.sacMemberId to "0" after syncing tl_member with tl_user. "%s" no longer seems to be a club member.',
                             $arrUser['name'],
                             $arrUser['name'],
@@ -117,7 +115,7 @@ class SyncMemberWithUser
 
                         $this->contaoGeneralLogger?->info(
                             $msg,
-                            ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS)]
+                            ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS)],
                         );
 
                         ++$this->syncLog['disabled'];
@@ -135,7 +133,7 @@ class SyncMemberWithUser
 
         $this->syncLog['duration'] = round($stopWatchEvent->stop()->getDuration() / 1000, 6);
 
-        $msg = sprintf(
+        $msg = \sprintf(
             'Successfully completed the merging process from tl_member to tl_user. Processed %d data records. Total updates: %d. Disabled %d user(s). Duration: %d s.',
             $this->syncLog['processed'],
             $this->syncLog['updates'],
@@ -145,7 +143,7 @@ class SyncMemberWithUser
 
         $this->contaoGeneralLogger?->info(
             $msg,
-            ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS)]
+            ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS)],
         );
     }
 

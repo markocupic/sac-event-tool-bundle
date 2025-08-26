@@ -44,11 +44,17 @@ class CalendarEvents
 {
     // Adapters
     private Adapter $backend;
+
     private Adapter $calendarEventsModel;
+
     private Adapter $controller;
+
     private Adapter $image;
+
     private Adapter $message;
+
     private Adapter $stringUtil;
+
     private Adapter $system;
 
     public function __construct(
@@ -105,14 +111,15 @@ class CalendarEvents
                         // Prevent unauthorized editing
                         $request = $this->requestStack->getCurrentRequest();
 
-                        $objEventsModel = $this->calendarEventsModel->findByPk($dc->id);
+                        $objEventsModel = $this->calendarEventsModel->findById($dc->id);
 
-                        if (null === EventReleaseLevelPolicyModel::findByPk($objEventsModel->eventReleaseLevel)) {
+                        if (null === EventReleaseLevelPolicyModel::findById($objEventsModel->eventReleaseLevel)) {
                             return;
                         }
 
                         if (!$this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $dc->id)) {
-                            // User has no write access to the data record, that's why we display field values without a form input
+                            // User has no write access to the data record, that's why we display field
+                            // values without a form input
                             foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldName) {
                                 $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [\Markocupic\SacEventToolBundle\DataContainer\CalendarEvents::class, 'showFieldValue'];
                             }
@@ -124,10 +131,10 @@ class CalendarEvents
                                 $this->controller->redirect($this->system->getReferer());
                             }
                         } else {
-                            // User has write access to all fields on the first e.r.level.
-                            // If the e.r.level is > 1 ...
-                            // fields with the flag $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] === true,
-                            // are readonly
+                            // User has write access to all fields on the first e.r.level. If the e.r.level
+                            // is > 1 ... fields with the flag
+                            // $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly']
+                            // === true, are readonly
                             $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($dc->id);
 
                             // The event belongs not to an e.r.l.package
@@ -210,10 +217,10 @@ class CalendarEvents
                         }
 
                         foreach ($arrIDS as $id) {
-                            $objEventsModel = $this->calendarEventsModel->findByPk($id);
+                            $objEventsModel = $this->calendarEventsModel->findById($id);
 
                             if (null === $objEventsModel) {
-                                throw new \RuntimeException(sprintf('Could not find event with ID %d', $id));
+                                throw new \RuntimeException(\sprintf('Could not find event with ID %d', $id));
                             }
 
                             if (!$this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $id)) {
@@ -248,7 +255,7 @@ class CalendarEvents
                         $blnAllow = true;
 
                         foreach ($arrIDS as $id) {
-                            $objEventsModel = $this->calendarEventsModel->findByPk($id);
+                            $objEventsModel = $this->calendarEventsModel->findById($id);
 
                             if (null === $objEventsModel) {
                                 $blnAllow = false;
@@ -262,7 +269,7 @@ class CalendarEvents
                         }
 
                         if (!$blnAllow) {
-                            $this->message->addError(sprintf('Keine Berechtigung die Events mit IDS %s zu verschieben.', implode(', ', $arrIDS)));
+                            $this->message->addError(\sprintf('Keine Berechtigung die Events mit IDS %s zu verschieben.', implode(', ', $arrIDS)));
                             $this->controller->redirect($this->system->getReferer());
                         }
                     }
@@ -273,7 +280,8 @@ class CalendarEvents
             case 'editAll':
                 (
                     function () use ($dc, $request): void {
-                        // Allow the "select" and editAll action only, if an "eventReleaseLevel" filter is set.
+                        // Allow the "select" and editAll action only, if an "eventReleaseLevel" filter
+                        // is set.
                         $objSessionBag = $request->getSession()->getBag('contao_backend');
 
                         $session = $objSessionBag->all();
@@ -283,7 +291,8 @@ class CalendarEvents
                         if (!isset($session['filter'][$filter]['eventReleaseLevel'])) {
                             $this->message->addError($this->translator->trans('ERR.setEvtRelLevelForSelectAll', [], 'contao_default'));
 
-                            // Redirect the user back to the previously called page if no event release leve is set.
+                            // Redirect the user back to the previously called page if no event release leve
+                            // is set.
                             $this->controller->redirect($this->system->getReferer());
                         }
                     }
@@ -308,8 +317,8 @@ class CalendarEvents
 
                 (
                     function () use ($act, $request): void {
-                        // Do not allow editing write-protected fields in editAll/overrideAll mode
-                        // Use input_field_callback to only display the field values without the form input field
+                        // Do not allow editing write-protected fields in editAll/overrideAll mode Use
+                        // input_field_callback to only display the field values without the form input field
                         if ('editAll' !== $act) {
                             return;
                         }
@@ -331,12 +340,13 @@ class CalendarEvents
                             return;
                         }
 
-                        // It is sufficient if we only snap the release level of the first event of the entire selection.
-                        // As the event release level filter is set, the other events all have the same release level anyway.
-                        $eventModel = CalendarEventsModel::findByPk($arrIDS[0]);
+                        // It is sufficient if we only snap the release level of the first event of the
+                        // entire selection. As the event release level filter is set, the other events
+                        // all have the same release level anyway.
+                        $eventModel = CalendarEventsModel::findById($arrIDS[0]);
 
                         if (null === $eventModel) {
-                            throw new \RuntimeException(sprintf('Event with ID %d not found.', $arrIDS[0]));
+                            throw new \RuntimeException(\sprintf('Event with ID %d not found.', $arrIDS[0]));
                         }
 
                         // Find the lowest possible event release level for any event from this selection.
@@ -365,8 +375,8 @@ class CalendarEvents
             case 'overrideAll':
                 (
                     function () use ($request): void {
-                        // Do not allow editing write-protected fields in editAll/overrideAll mode
-                        // Use input_field_callback to only display the field values without the form input field
+                        // Do not allow editing write-protected fields in editAll/overrideAll mode Use
+                        // input_field_callback to only display the field values without the form input field
                         if ('1' === !$request->query->get('fields')) {
                             return;
                         }
@@ -384,12 +394,13 @@ class CalendarEvents
                             return;
                         }
 
-                        // It is sufficient if we only snap the release level of the first event of the entire selection.
-                        // As the event release level filter is set, the other events all have the same release level anyway.
-                        $eventModel = CalendarEventsModel::findByPk($arrIDS[0]);
+                        // It is sufficient if we only snap the release level of the first event of the
+                        // entire selection. As the event release level filter is set, the other events
+                        // all have the same release level anyway.
+                        $eventModel = CalendarEventsModel::findById($arrIDS[0]);
 
                         if (null === $eventModel) {
-                            throw new \RuntimeException(sprintf('Event with ID %d not found.', $arrIDS[0]));
+                            throw new \RuntimeException(\sprintf('Event with ID %d not found.', $arrIDS[0]));
                         }
 
                         // Find the lowest possible event release level for any event from this selection.
@@ -438,10 +449,10 @@ class CalendarEvents
             return;
         }
 
-        $objEvent = $this->calendarEventsModel->findByPk($dc->id);
+        $objEvent = $this->calendarEventsModel->findById($dc->id);
 
         if (null === $objEvent) {
-            throw new \RuntimeException(sprintf('Event with ID %d not found.', $dc->id));
+            throw new \RuntimeException(\sprintf('Event with ID %d not found.', $dc->id));
         }
 
         if ('upgradeEventReleaseLevel' === $action) {
@@ -454,10 +465,10 @@ class CalendarEvents
             }
         }
 
-        $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+        $objReleaseLevelModel = EventReleaseLevelPolicyModel::findById($objEvent->eventReleaseLevel);
 
         if (null === $objReleaseLevelModel) {
-            throw new \RuntimeException(sprintf('Could not find a valid event release level for event with ID %d.', $dc->id));
+            throw new \RuntimeException(\sprintf('Could not find a valid event release level for event with ID %d.', $dc->id));
         }
 
         $targetReleaseLevel = 'upgradeEventReleaseLevel' === $action ? $objReleaseLevelModel->level + 1 : $objReleaseLevelModel->level - 1;
@@ -466,7 +477,7 @@ class CalendarEvents
             $this->controller->redirect($this->system->getReferer());
         }
 
-        $objReleaseLevelModelCurrent = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+        $objReleaseLevelModelCurrent = EventReleaseLevelPolicyModel::findById($objEvent->eventReleaseLevel);
         $titleCurrent = $objReleaseLevelModelCurrent ? $objReleaseLevelModelCurrent->title : 'not defined';
 
         if ('upgradeEventReleaseLevel' === $action) {
@@ -499,7 +510,7 @@ class CalendarEvents
 
             // System log
             $this->contaoGeneralLogger?->info(
-                sprintf(
+                \sprintf(
                     'Event release level for event with ID %d ["%s"] has been %s from "%s" to "%s".',
                     $objEvent->id,
                     $objEvent->title,
@@ -523,7 +534,7 @@ class CalendarEvents
         $mode = str_contains((string) $href, 'upgradeEventReleaseLevel') ? 'upgradeEventReleaseLevel' : 'downgradeEventReleaseLevel';
 
         $blnAllow = true;
-        $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
+        $objReleaseLevelModel = EventReleaseLevelPolicyModel::findById($row['eventReleaseLevel']);
         $targetReleaseLevel = null;
 
         if ('upgradeEventReleaseLevel' === $mode) {
@@ -610,7 +621,7 @@ class CalendarEvents
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.preview.button', priority: 70)]
     public function previewIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
-        $eventModel = $this->calendarEventsModel->findByPk($row['id']);
+        $eventModel = $this->calendarEventsModel->findById($row['id']);
 
         $href = $this->calendarEventsUtil->generateEventPreviewUrl($eventModel);
 

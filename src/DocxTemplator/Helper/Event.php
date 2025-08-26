@@ -146,8 +146,7 @@ class Event
         $countMale = 0;
         $countDivers = 0;
 
-        // Count participants
-        // Member list
+        // Count participants Member list
         $objEventMember = $this->eventMemberHelper->getParticipatedEventMembers($objEvent);
 
         if (null !== $objEventMember) {
@@ -190,7 +189,7 @@ class Event
             $controllerAdapter->redirect($systemAdapter->getReferer());
         }
 
-        $transport = $calendarEventsJourneyModel->findByPk($objEvent->journey)->title ?? 'keine Angabe';
+        $transport = $calendarEventsJourneyModel->findById($objEvent->journey)->title ?? 'keine Angabe';
         $objPhpWord->replace('eventTransport', $this->prepareString($transport));
         $objPhpWord->replace('eventCanceled', EventState::STATE_CANCELED === $objEvent->eventState ? 'Ja' : 'Nein');
         $objPhpWord->replace('eventHasExecutedLikePredicted', EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED === $objEvent->executionState ? 'Ja' : 'Nein');
@@ -264,10 +263,10 @@ class Event
         /** @var UserModel $userModelAdapter */
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
-        $objEvent = $calendarEventsModelAdapter->findByPk($objEventInvoice->pid);
+        $objEvent = $calendarEventsModelAdapter->findById($objEventInvoice->pid);
 
         // $objBiller "Der Rechnungssteller"
-        $objBiller = $userModelAdapter->findByPk($objEventInvoice->userPid);
+        $objBiller = $userModelAdapter->findById($objEventInvoice->userPid);
 
         if (null !== $objEvent && null !== $objBiller) {
             // Check if tour report has filled in

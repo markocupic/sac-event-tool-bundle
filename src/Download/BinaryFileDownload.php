@@ -22,7 +22,8 @@ use Symfony\Component\String\UnicodeString;
 class BinaryFileDownload
 {
     /**
-     * Returns a BinaryFileResponse object with original or customized file name and disposition header.
+     * Returns a BinaryFileResponse object with original or customized file name and
+     * disposition header.
      */
     public function sendFileToBrowser(string $filePath, string $fileName = '', bool $inline = false, bool $deleteFileAfterSend = false): BinaryFileResponse
     {

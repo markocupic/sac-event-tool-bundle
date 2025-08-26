@@ -31,9 +31,8 @@ final readonly class ResetBackendUsersPermissionsOnLoginSuccess
     }
 
     /**
-     * Clear user properties of the logged in Contao backend user,
-     * who inherit rights from one or more group policies.
-     * This way we can prevent a policy mess.
+     * Clear user properties of the logged in Contao backend user, who inherit rights
+     * from one or more group policies. This way we can prevent a policy mess.
      */
     public function __invoke(LoginSuccessEvent $event): void
     {
@@ -65,7 +64,7 @@ final readonly class ResetBackendUsersPermissionsOnLoginSuccess
                     'extend',
                 ],
             )
-            ;
+        ;
 
         if (false !== $userId) {
             $this->maintainBackendUserPermissions->resetBackendUserPermissions($userIdentifier, [], true);

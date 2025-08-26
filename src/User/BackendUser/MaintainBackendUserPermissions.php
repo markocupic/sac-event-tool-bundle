@@ -25,6 +25,7 @@ use Doctrine\DBAL\Exception;
 class MaintainBackendUserPermissions
 {
     private Adapter $stringUtil;
+
     private Adapter $date;
 
     public function __construct(
@@ -64,7 +65,8 @@ class MaintainBackendUserPermissions
             // Contao core permissions
             $arrInherit = ['modules', 'themes', 'elements', 'fields', 'pagemounts', 'alpty', 'filemounts', 'fop', 'forms', 'formp', 'imageSizes', 'amg'];
 
-            // Custom permissions like: faqs,faqp,news,newp,newsfeeds,newsfeedp,calendars,calendarp,calendarfeeds,calendarfeedp,newsletters,newsletterp,calendar_containers,calendar_containerp
+            // Custom permissions like:
+            // faqs,faqp,news,newp,newsfeeds,newsfeedp,calendars,calendarp,calendarfeeds,calendarfeedp,newsletters,newsletterp,calendar_containers,calendar_containerp
             if (!empty($GLOBALS['TL_PERMISSIONS']) && \is_array($GLOBALS['TL_PERMISSIONS'])) {
                 $arrInherit = array_merge($arrInherit, $GLOBALS['TL_PERMISSIONS']);
             }
@@ -121,9 +123,10 @@ class MaintainBackendUserPermissions
 
                                 $value = $this->stringUtil->deserialize($arrGroup[$field], true);
 
-                                // The page/file picker can return integers instead of arrays, so use empty() instead of is_array() and StringUtil::deserialize(true) here
+                                // The page/file picker can return integers instead of arrays, so use empty()
+                                // instead of is_array() and StringUtil::deserialize(true) here
                                 if (!empty($value)) {
-                                    $arrInheritNew[$field] = array_merge((\is_array($arrInheritNew[$field]) ? $arrInheritNew[$field] : ($arrInheritNew[$field] ? [$arrInheritNew[$field]] : [])), $value);
+                                    $arrInheritNew[$field] = array_merge(\is_array($arrInheritNew[$field]) ? $arrInheritNew[$field] : ($arrInheritNew[$field] ? [$arrInheritNew[$field]] : []), $value);
                                     $arrInheritNew[$field] = array_unique($arrInheritNew[$field]);
                                 }
                             }

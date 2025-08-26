@@ -46,12 +46,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
-#[AsFrontendModule(MemberDashboardPastEventsController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_past_events')]
+#[AsFrontendModule(MemberDashboardPastEventsController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_member_dashboard_past_events')]
 class MemberDashboardPastEventsController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_past_events';
 
     private FrontendUser|null $objUser;
+
     private FragmentTemplate|null $template;
 
     public function __construct(
@@ -160,7 +161,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         $dateAdapter = $this->framework->getAdapter(Date::class);
 
         if (null !== $this->objUser) {
-            $objRegistration = $calendarEventsMemberModelAdapter->findByPk($inputAdapter->get('id'));
+            $objRegistration = $calendarEventsMemberModelAdapter->findById($inputAdapter->get('id'));
 
             if (null !== $objRegistration) {
                 if ((int) $this->objUser->sacMemberId === (int) $objRegistration->sacMemberId) {
@@ -175,15 +176,14 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     if (null !== $objEvent) {
                         $startDate = $dateAdapter->parse('Y', $objEvent->startDate);
 
-                        // Build up $arrData;
-                        // Get event dates from event object
+                        // Build up $arrData; Get event dates from event object
                         $arrDates = array_map(
                             function ($tstmp) {
                                 $dateAdapter = $this->framework->getAdapter(Date::class);
 
                                 return $dateAdapter->parse('d.m.Y', $tstmp);
                             },
-                            $this->calendarEventsUtil->getEventTimestamps($objEvent)
+                            $this->calendarEventsUtil->getEventTimestamps($objEvent),
                         );
 
                         // Course id
@@ -196,12 +196,12 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     // Log
                     $this->logger?->log(
                         LogLevel::INFO,
-                        sprintf('New event confirmation download. SAC-User-ID: %d. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id),
-                        ['contao' => new ContaoContext(__METHOD__, Log::DOWNLOAD_CERTIFICATE_OF_ATTENDANCE)]
+                        \sprintf('New event confirmation download. SAC-User-ID: %d. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id),
+                        ['contao' => new ContaoContext(__METHOD__, Log::DOWNLOAD_CERTIFICATE_OF_ATTENDANCE)],
                     );
 
                     $filenamePattern = str_replace('%%d', '%d', $this->sacevtEventCourseConfirmationFileNamePattern);
-                    $filename = sprintf($filenamePattern, $objMember->sacMemberId, $objRegistration->id, 'docx');
+                    $filename = \sprintf($filenamePattern, $objMember->sacMemberId, $objRegistration->id, 'docx');
                     $destFilename = Path::makeAbsolute($this->sacevtTempDir.'/'.$filename, $this->projectDir);
 
                     $docxTemplateSrc = Path::makeAbsolute($this->sacevtEventTemplateCourseConfirmation, $this->projectDir);
@@ -228,7 +228,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                         ->file($objSplFileDocx->getRealPath())
                         ->uncached(false)
                         ->convertTo('pdf')
-                        ;
+                    ;
 
                     return $this->file($objSplFilePdf->getRealPath());
                 }

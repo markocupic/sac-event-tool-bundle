@@ -26,12 +26,9 @@ class EventReleaseLevelPolicyPackageModel extends Model
      */
     protected static $strTable = 'tl_event_release_level_policy_package';
 
-    /**
-     * @param $eventId
-     */
     public static function findReleaseLevelPolicyPackageModelByEventId($eventId): static|null
     {
-        $objEvent = CalendarEventsModel::findByPk($eventId);
+        $objEvent = CalendarEventsModel::findById($eventId);
 
         if (null === $objEvent) {
             return null;
@@ -43,6 +40,6 @@ class EventReleaseLevelPolicyPackageModel extends Model
             return null;
         }
 
-        return static::findByPk($objEventType->levelAccessPermissionPackage);
+        return static::findById($objEventType->levelAccessPermissionPackage);
     }
 }

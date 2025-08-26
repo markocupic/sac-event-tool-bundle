@@ -33,7 +33,7 @@ class PreviewUrlCreateListener
 
     public function onPreviewUrlCreate(PreviewUrlCreateEvent $event): void
     {
-        //#1: if (!$this->framework->isInitialized() || 'calendar' !== $event->getKey()) {
+        // #1: if (!$this->framework->isInitialized() || 'calendar' !== $event->getKey()) {
         if (!$this->framework->isInitialized() || 'calendar' !== $event->getKey()) {
             return;
         }
@@ -77,6 +77,6 @@ class PreviewUrlCreateListener
         /** @var CalendarEventsModel $adapter */
         $adapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        return $adapter->findByPk($id);
+        return $adapter->findById($id);
     }
 }

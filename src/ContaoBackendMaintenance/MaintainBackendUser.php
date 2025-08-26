@@ -46,7 +46,7 @@ class MaintainBackendUser
                 [
                     Types::BOOLEAN,
                     Types::STRING,
-                ]
+                ],
             )
         ;
 

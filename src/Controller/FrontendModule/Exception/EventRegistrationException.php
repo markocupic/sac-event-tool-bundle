@@ -26,11 +26,11 @@ class EventRegistrationException extends \RuntimeException
         private readonly string $translatableText,
         private readonly array $params = [],
     ) {
-        if(!\in_array($errorLevel, [self::LEVEL_INFO, self::LEVEL_ERROR], true)) {
+        if (!\in_array($errorLevel, [self::LEVEL_INFO, self::LEVEL_ERROR], true)) {
             throw new \InvalidArgumentException(\sprintf('Invalid error level "%s". Error type must be one of these: %s.', $errorLevel, implode(', ', [self::LEVEL_INFO, self::LEVEL_ERROR])));
         }
 
-		parent::__construct($reason);
+        parent::__construct($reason);
     }
 
     public function getReason(): string

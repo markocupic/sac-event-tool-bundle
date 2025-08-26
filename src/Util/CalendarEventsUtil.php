@@ -68,9 +68,6 @@ readonly class CalendarEventsUtil
     ) {
     }
 
-    /**
-     * @param Template|null $objTemplate
-     */
     public function getEventData(CalendarEventsModel $objEvent, string $strProperty, Template|null $objTemplate = null): mixed
     {
         $this->framework->initialize();
@@ -108,7 +105,7 @@ readonly class CalendarEventsUtil
                 break;
 
             case 'eventId':
-                $value = sprintf('%s-%s', $this->getAdapter(Date::class)->parse('Y', (int) $objEvent->startDate), $objEvent->id);
+                $value = \sprintf('%s-%s', $this->getAdapter(Date::class)->parse('Y', (int) $objEvent->startDate), $objEvent->id);
                 break;
 
             case 'eventTitle':
@@ -193,7 +190,8 @@ readonly class CalendarEventsUtil
                 break;
 
             case 'registrationEndDateFormatted':
-                // If registration end time! is set to default --> 23:59 then only show registration end date!
+                // If registration end time! is set to default --> 23:59 then only show
+                // registration end date!
                 $endDate = $this->getAdapter(Date::class)->parse($this->getAdapter(Config::class)->get('dateFormat'), (int) $objEvent->registrationEndDate);
 
                 if (abs($objEvent->registrationEndDate - strtotime($endDate)) === (24 * 3600) - 60) {
@@ -218,7 +216,7 @@ readonly class CalendarEventsUtil
                 if (EventState::STATE_RESCHEDULED === $objEvent->eventState) {
                     $dateFormat = $this->getAdapter(Config::class)->get('dateFormat');
                     $newDate = $objEvent->rescheduledEventDate ? $this->getAdapter(Date::class)->parse($dateFormat, (int) $objEvent->rescheduledEventDate) : 'unbest';
-                    $value = sprintf($GLOBALS['TL_LANG']['MSC']['calendar_events'][$this->getEventState($objEvent)], $newDate);
+                    $value = \sprintf($GLOBALS['TL_LANG']['MSC']['calendar_events'][$this->getEventState($objEvent)], $newDate);
                 }
                 break;
 
@@ -269,7 +267,7 @@ readonly class CalendarEventsUtil
 
             case 'journey':
                 $adapter = $this->getAdapter(CalendarEventsJourneyModel::class);
-                $value = null !== $adapter->findByPk($objEvent->journey) ? $adapter->findByPk($objEvent->journey)->title : '';
+                $value = null !== $adapter->findById($objEvent->journey) ? $adapter->findById($objEvent->journey)->title : '';
                 break;
 
             case 'courseTypeLevel1':
@@ -285,7 +283,7 @@ readonly class CalendarEventsUtil
                     $pictureSize = $options['size'];
                     $src = $this->getEventImagePath($objEvent);
                     $parser = $this->getContainer()->get('contao.insert_tag.parser');
-                    $value = $parser->replace(sprintf('{{picture::%s?size=%s}}', $src, $pictureSize));
+                    $value = $parser->replace(\sprintf('{{picture::%s?size=%s}}', $src, $pictureSize));
                 }
                 break;
 
@@ -295,16 +293,16 @@ readonly class CalendarEventsUtil
 
             case 'courseTypeLevel0Name':
                 $adapter = $this->getAdapter(CourseMainTypeModel::class);
-                $value = $adapter->findByPk($objEvent->courseTypeLevel0)?->name ?? '';
+                $value = $adapter->findById($objEvent->courseTypeLevel0)?->name ?? '';
                 break;
 
             case 'courseTypeLevel1Name':
                 $adapter = $this->getAdapter(CourseSubTypeModel::class);
-                $value = $adapter->findByPk($objEvent->courseTypeLevel1)?->name ?? '';
+                $value = $adapter->findById($objEvent->courseTypeLevel1)?->name ?? '';
                 break;
 
-            // inside vue.js templates: eventOrganizerLogos?width=60
-            // The first parameter defines the logo width
+            // inside vue.js templates: eventOrganizerLogos?width=60 The first parameter
+            // defines the logo width
             case 'eventOrganizerLogos':
                 $width = !empty($options['width']) ? $options['width'] : '60';
                 $strInsertTag = '{{image::%s?width='.$width.'&alt=%s}}';
@@ -437,7 +435,7 @@ readonly class CalendarEventsUtil
 
         $avatarManager = $this->getContainer()->get(Avatar::class);
 
-        $objPage = $this->getAdapter(PageModel::class)->findByPk($objCalendar->userPortraitJumpTo);
+        $objPage = $this->getAdapter(PageModel::class)->findById($objCalendar->userPortraitJumpTo);
 
         if (null === $objPage) {
             throw new \Exception('Page model not found.');
@@ -447,7 +445,7 @@ readonly class CalendarEventsUtil
         $arrItems = [];
 
         foreach ($arrInstructors as $userId) {
-            $objUser = $this->getAdapter(UserModel::class)->findByPk($userId);
+            $objUser = $this->getAdapter(UserModel::class)->findById($userId);
 
             $contentUrlGenerator = $this->getContainer()->get('contao.routing.content_url_generator');
 
@@ -509,7 +507,8 @@ readonly class CalendarEventsUtil
             return 'event_status_6';
         }
 
-        // Event is fully booked/instructor has explicitly set the "is fully booked" label in the backend
+        // Event is fully booked/instructor has explicitly set the "is fully booked"
+        // label in the backend
         if (EventState::STATE_FULLY_BOOKED === $objEvent->eventState) {
             return 'event_status_3';
         }
@@ -549,7 +548,7 @@ readonly class CalendarEventsUtil
         /** @var Packages $packages */
         $packages = $this->getContainer()->get('assets.packages');
 
-        return sprintf(
+        return \sprintf(
             '<img src="%s" title="%s">',
             $packages->getUrl("icons/event_states/$strState.svg", 'markocupic_sac_event_tool'),
             $strLabel,
@@ -596,7 +595,7 @@ readonly class CalendarEventsUtil
             [
                 Types::INTEGER,
                 Types::INTEGER,
-            ]
+            ],
         );
 
         if (false === $id) {
@@ -636,25 +635,25 @@ readonly class CalendarEventsUtil
         $options = $resolver->resolve($options);
 
         $arrInstructors = $this->getInstructorsAsArray($objEvent, $options);
-        $objUser = $this->getAdapter(UserModel::class)->findByPk($arrInstructors[0]);
+        $objUser = $this->getAdapter(UserModel::class)->findById($arrInstructors[0]);
 
         if (null === $objUser) {
             return '';
         }
 
         $arrContact = [];
-        $arrContact[] = sprintf('<strong>%s %s</strong>', $objUser->lastname, $objUser->firstname);
+        $arrContact[] = \sprintf('<strong>%s %s</strong>', $objUser->lastname, $objUser->firstname);
 
         if ('' !== $objUser->phone) {
-            $arrContact[] = sprintf('Tel.: %s', $objUser->phone);
+            $arrContact[] = \sprintf('Tel.: %s', $objUser->phone);
         }
 
         if ('' !== $objUser->mobile) {
-            $arrContact[] = sprintf('Mobile.: %s', $objUser->mobile);
+            $arrContact[] = \sprintf('Mobile.: %s', $objUser->mobile);
         }
 
         if ('' !== $objUser->email) {
-            $arrContact[] = sprintf('E-Mail: %s', $objUser->email);
+            $arrContact[] = \sprintf('E-Mail: %s', $objUser->email);
         }
 
         $arrContact = array_filter($arrContact);
@@ -696,7 +695,7 @@ readonly class CalendarEventsUtil
         $userAdapter = $this->getAdapter(UserModel::class);
 
         foreach ($userIds as $userId) {
-            $objUser = $userAdapter->findByPk($userId);
+            $objUser = $userAdapter->findById($userId);
 
             if (null === $objUser) {
                 continue;
@@ -744,16 +743,13 @@ readonly class CalendarEventsUtil
 
         $arrInstructors = [];
 
-        $arrUsers = $this->getInstructorsAsArray(
-            $objEvent,
-            [
-                'includeDisabled' => $options['includeDisabled'],
-                'includeHidden' => $options['includeHidden'],
-            ],
-        );
+        $arrUsers = $this->getInstructorsAsArray($objEvent, [
+            'includeDisabled' => $options['includeDisabled'],
+            'includeHidden' => $options['includeHidden'],
+        ]);
 
         foreach ($arrUsers as $userId) {
-            $objUser = $this->getAdapter(UserModel::class)->findByPk($userId);
+            $objUser = $this->getAdapter(UserModel::class)->findById($userId);
 
             if (null === $objUser) {
                 continue;
@@ -878,9 +874,9 @@ readonly class CalendarEventsUtil
         $dateString = '';
 
         foreach ($this->getEventTimestamps($objEvent) as $tstamp) {
-            $dateString .= sprintf('<time datetime="%s">%s</time>', StringUtil::specialchars($this->getAdapter(Date::class)->parse('Y-m-d', (int) $tstamp)), $this->getAdapter(Date::class)->parse('D, d.m.Y', (int) $tstamp));
+            $dateString .= \sprintf('<time datetime="%s">%s</time>', StringUtil::specialchars($this->getAdapter(Date::class)->parse('Y-m-d', (int) $tstamp)), $this->getAdapter(Date::class)->parse('D, d.m.Y', (int) $tstamp));
         }
-        $dateString .= $blnAppendEventDuration ? sprintf('<time>(%s)</time>', $this->getEventDuration($objEvent)) : '';
+        $dateString .= $blnAppendEventDuration ? \sprintf('<time>(%s)</time>', $this->getEventDuration($objEvent)) : '';
 
         return $dateString;
     }
@@ -889,7 +885,7 @@ readonly class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $objEvent = $this->getAdapter(CalendarEventsModel::class)->findByPk($id);
+        $objEvent = $this->getAdapter(CalendarEventsModel::class)->findById($id);
 
         if (null === $objEvent) {
             return '';
@@ -964,7 +960,7 @@ readonly class CalendarEventsUtil
         }
 
         if (!empty($arrDates) && \is_array($arrDates)) {
-            return sprintf('%s Tage', \count($arrDates));
+            return \sprintf('%s Tage', \count($arrDates));
         }
 
         return '';
@@ -992,14 +988,14 @@ readonly class CalendarEventsUtil
             $strDiffTitle = '';
 
             if (\strlen($difficulty['tourTechDifficultyMin']) && \strlen($difficulty['tourTechDifficultyMax'])) {
-                $objDiff = $this->getAdapter(TourDifficultyModel::class)->findByPk((int) $difficulty['tourTechDifficultyMin']);
+                $objDiff = $this->getAdapter(TourDifficultyModel::class)->findById((int) $difficulty['tourTechDifficultyMin']);
 
                 if (null !== $objDiff) {
                     $strDiff = $objDiff->shortcut;
                     $strDiffTitle = $objDiff->title;
                 }
 
-                $objDiff = $this->getAdapter(TourDifficultyModel::class)->findByPk((int) $difficulty['tourTechDifficultyMax']);
+                $objDiff = $this->getAdapter(TourDifficultyModel::class)->findById((int) $difficulty['tourTechDifficultyMax']);
 
                 if (null !== $objDiff) {
                     $max = $objDiff->shortcut;
@@ -1007,7 +1003,7 @@ readonly class CalendarEventsUtil
                     $strDiffTitle .= ' - '.$objDiff->title;
                 }
             } elseif (\strlen($difficulty['tourTechDifficultyMin'])) {
-                $objDiff = $this->getAdapter(TourDifficultyModel::class)->findByPk((int) $difficulty['tourTechDifficultyMin']);
+                $objDiff = $this->getAdapter(TourDifficultyModel::class)->findById((int) $difficulty['tourTechDifficultyMin']);
 
                 if (null !== $objDiff) {
                     $strDiff = $objDiff->shortcut;
@@ -1021,7 +1017,7 @@ readonly class CalendarEventsUtil
 
             if ($tooltip) {
                 $html = '<span class="badge badge-sm badge-pill bg-primary" data-bs-toggle="tooltip" data-placement="top" data-title="Techn. Schwierigkeit: %s">%s</span>';
-                $arrReturn[] = sprintf($html, StringUtil::specialchars($strDiffTitle), $strDiff);
+                $arrReturn[] = \sprintf($html, StringUtil::specialchars($strDiffTitle), $strDiff);
             } elseif ($explanation) {
                 $arrReturn[] = $strDiff.' ('.$strDiffTitle.')';
             } else {
@@ -1045,7 +1041,7 @@ readonly class CalendarEventsUtil
         }
 
         foreach ($arrValues as $id) {
-            $objTourType = $this->getAdapter(TourTypeModel::class)->findByPk($id);
+            $objTourType = $this->getAdapter(TourTypeModel::class)->findById($id);
 
             if (null === $objTourType) {
                 continue;
@@ -1053,7 +1049,7 @@ readonly class CalendarEventsUtil
 
             if ($tooltip) {
                 $html = '<span class="badge badge-sm badge-pill bg-secondary" data-bs-toggle="tooltip" data-placement="top" data-title="Typ: %s">%s</span>';
-                $arrTourTypes[] = sprintf($html, StringUtil::specialchars($objTourType->title), $objTourType->{$field});
+                $arrTourTypes[] = \sprintf($html, StringUtil::specialchars($objTourType->title), $objTourType->{$field});
             } else {
                 $arrTourTypes[] = $objTourType->{$field};
             }
@@ -1094,15 +1090,15 @@ readonly class CalendarEventsUtil
         if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0) {
             if ($registrationCount >= $objEvent->maxMembers) {
                 // Event fully booked
-                return sprintf($strBadge, 'dark', 'ausgebucht', $registrationCount.'/'.$objEvent->maxMembers);
+                return \sprintf($strBadge, 'dark', 'ausgebucht', $registrationCount.'/'.$objEvent->maxMembers);
             }
 
             // Free places available
-            return sprintf($strBadge, 'dark', sprintf('noch %s freie Plätze', StringUtil::specialchars($objEvent->maxMembers - $registrationCount)), $registrationCount.'/'.$objEvent->maxMembers);
+            return \sprintf($strBadge, 'dark', \sprintf('noch %s freie Plätze', StringUtil::specialchars($objEvent->maxMembers - $registrationCount)), $registrationCount.'/'.$objEvent->maxMembers);
         }
 
         // There is no booking limit. Show registered members
-        return sprintf($strBadge, 'dark', $registrationCount.' bestätigte Plätze', $registrationCount.'/?');
+        return \sprintf($strBadge, 'dark', $registrationCount.' bestätigte Plätze', $registrationCount.'/?');
     }
 
     public function getSubscriptionStateBadges(CalendarEventsModel $objEvent): string
@@ -1155,23 +1151,23 @@ readonly class CalendarEventsUtil
             $href = StringUtil::specialcharsUrl($href);
 
             if ($intNotConfirmed > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge not-confirmed blink" data-title="%s unbeantwortete Anmeldeanfragen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
+                $strRegistrationsBadges .= \sprintf('<span class="subscription-badge not-confirmed blink" data-title="%s unbeantwortete Anmeldeanfragen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
             }
 
             if ($intAccepted > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge accepted" data-title="%s bestätigte Anmeldungen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intAccepted, $href, $intAccepted);
+                $strRegistrationsBadges .= \sprintf('<span class="subscription-badge accepted" data-title="%s bestätigte Anmeldungen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intAccepted, $href, $intAccepted);
             }
 
             if ($intRefused > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge refused" data-title="%s abgelehnte Anmeldungen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intRefused, $href, $intRefused);
+                $strRegistrationsBadges .= \sprintf('<span class="subscription-badge refused" data-title="%s abgelehnte Anmeldungen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intRefused, $href, $intRefused);
             }
 
             if ($intWaitlisted > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge on-waiting-list" data-title="%s Anmeldungen auf Warteliste" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intWaitlisted, $href, $intWaitlisted);
+                $strRegistrationsBadges .= \sprintf('<span class="subscription-badge on-waiting-list" data-title="%s Anmeldungen auf Warteliste" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intWaitlisted, $href, $intWaitlisted);
             }
 
             if ($intUnsubscribedUser > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge unsubscribed-user" data-title="%s stornierte Anmeldungen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intUnsubscribedUser, $href, $intUnsubscribedUser);
+                $strRegistrationsBadges .= \sprintf('<span class="subscription-badge unsubscribed-user" data-title="%s stornierte Anmeldungen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intUnsubscribedUser, $href, $intUnsubscribedUser);
             }
         }
 
@@ -1191,7 +1187,7 @@ readonly class CalendarEventsUtil
         }
 
         foreach ($arrValues as $id) {
-            $objModel = $this->getAdapter(EventOrganizerModel::class)->findByPk($id);
+            $objModel = $this->getAdapter(EventOrganizerModel::class)->findById($id);
 
             if (null === $objModel) {
                 continue;
@@ -1241,7 +1237,7 @@ readonly class CalendarEventsUtil
         );
 
         foreach ($arrRegistrations as $arrRegistration) {
-            $objEvent = $this->getAdapter(CalendarEventsModel::class)->findByPk($arrRegistration['eventId']);
+            $objEvent = $this->getAdapter(CalendarEventsModel::class)->findById($arrRegistration['eventId']);
 
             if (null === $objEvent) {
                 continue;
@@ -1290,13 +1286,13 @@ readonly class CalendarEventsUtil
             return $eventPreviewUrl;
         }
 
-        $objPage = $this->getAdapter(PageModel::class)->findByPk($objEventType->previewPage);
+        $objPage = $this->getAdapter(PageModel::class)->findById($objEventType->previewPage);
 
         if (!$objPage instanceof PageModel) {
             return $eventPreviewUrl;
         }
 
-        $params = sprintf('/%s', !empty($objEvent->alias) ? $objEvent->alias : $objEvent->id);
+        $params = \sprintf('/%s', !empty($objEvent->alias) ? $objEvent->alias : $objEvent->id);
 
         $eventPreviewUrl = $urlParser->addQueryString('event_preview=true', $objPage->getAbsoluteUrl($params));
         $eventPreviewUrl = StringUtil::specialcharsUrl(StringUtil::ampersand($eventPreviewUrl));
@@ -1328,25 +1324,25 @@ readonly class CalendarEventsUtil
             $arrDesc = [];
 
             if (\count($arrTourProfile) > 1) {
-                $strProfile = sprintf('%s. Tag: ', $m);
+                $strProfile = \sprintf('%s. Tag: ', $m);
             } else {
                 $strProfile = '';
             }
 
             if ('' !== $profile['tourProfileAscentMeters']) {
-                $arrAsc[] = sprintf('%s Hm', $profile['tourProfileAscentMeters']);
+                $arrAsc[] = \sprintf('%s Hm', $profile['tourProfileAscentMeters']);
             }
 
             if ('' !== $profile['tourProfileAscentTime']) {
-                $arrAsc[] = sprintf('%s h', $profile['tourProfileAscentTime']);
+                $arrAsc[] = \sprintf('%s h', $profile['tourProfileAscentTime']);
             }
 
             if ('' !== $profile['tourProfileDescentMeters']) {
-                $arrDesc[] = sprintf('%s Hm', $profile['tourProfileDescentMeters']);
+                $arrDesc[] = \sprintf('%s Hm', $profile['tourProfileDescentMeters']);
             }
 
             if ('' !== $profile['tourProfileDescentTime']) {
-                $arrDesc[] = sprintf('%s h', $profile['tourProfileDescentTime']);
+                $arrDesc[] = \sprintf('%s h', $profile['tourProfileDescentTime']);
             }
 
             if (\count($arrAsc) > 0) {
@@ -1373,7 +1369,7 @@ readonly class CalendarEventsUtil
         $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
 
         foreach ($arrOrganizers as $orgId) {
-            $objOrganizer = $this->getAdapter(EventOrganizerModel::class)->findByPk($orgId);
+            $objOrganizer = $this->getAdapter(EventOrganizerModel::class)->findById($orgId);
 
             if (null === $objOrganizer) {
                 continue;
@@ -1392,7 +1388,7 @@ readonly class CalendarEventsUtil
             $arrUuids[] = $objOrganizer->singleSRC;
             $parser = $this->getContainer()->get('contao.insert_tag.parser');
 
-            $strLogo = $parser->replace(sprintf($strInsertTag, StringUtil::binToUuid($objOrganizer->singleSRC)));
+            $strLogo = $parser->replace(\sprintf($strInsertTag, StringUtil::binToUuid($objOrganizer->singleSRC)));
 
             if ('' !== $strLogo) {
                 $arrHtml[] = $strLogo;
@@ -1411,7 +1407,7 @@ readonly class CalendarEventsUtil
         $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
 
         foreach ($arrOrganizers as $orgId) {
-            $objOrganizer = $this->getAdapter(EventOrganizerModel::class)->findByPk($orgId);
+            $objOrganizer = $this->getAdapter(EventOrganizerModel::class)->findById($orgId);
 
             if (null === $objOrganizer) {
                 continue;
@@ -1450,7 +1446,7 @@ readonly class CalendarEventsUtil
         SymlinkUtil::symlink($objFolder->path, Path::join($relWebDir, $objFolder->path), $this->getProjectDir());
 
         // Generate path
-        $filepath = sprintf($objFolder->path.'/'.'eventQRcode_%s.png', $objEvent->id);
+        $filepath = \sprintf($objFolder->path.'/eventQRcode_%s.png', $objEvent->id);
 
         // Defaults
         $opt = [
@@ -1523,7 +1519,7 @@ readonly class CalendarEventsUtil
         if (!empty($arrCoord)) {
             $strGeoLink = $this->getContainer()->getParameter('sacevt.event.geo_link');
 
-            return sprintf($strGeoLink, $arrCoord[0], $arrCoord[1]);
+            return \sprintf($strGeoLink, $arrCoord[0], $arrCoord[1]);
         }
 
         return null;
@@ -1566,12 +1562,12 @@ readonly class CalendarEventsUtil
         }
 
         $strLevel = null;
-        $eventReleaseLevelModel = $this->getAdapter(EventReleaseLevelPolicyModel::class)->findByPk($objEvent->eventReleaseLevel);
+        $eventReleaseLevelModel = $this->getAdapter(EventReleaseLevelPolicyModel::class)->findById($objEvent->eventReleaseLevel);
 
         if (null !== $eventReleaseLevelModel) {
-            $strLevel = sprintf(
+            $strLevel = \sprintf(
                 'FS: %s',
-                $eventReleaseLevelModel->level
+                $eventReleaseLevelModel->level,
             );
 
             if ($eventReleaseLevelModel->level <= 1) {

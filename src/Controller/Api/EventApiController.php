@@ -45,8 +45,8 @@ class EventApiController extends AbstractController
     }
 
     /**
-     * Get event list filtered by params delivered from a filter board
-     * This route is used for the vue.js event list module.
+     * Get event list filtered by params delivered from a filter board This route is
+     * used for the vue.js event list module.
      *
      * @throws Exception
      * @throws \Exception
@@ -112,7 +112,7 @@ class EventApiController extends AbstractController
                 $oData = null;
 
                 /** @var CalendarEventsModel $objEvent */
-                $objEvent = $calendarEventsModel->findByPk($arrEvent['id']);
+                $objEvent = $calendarEventsModel->findById($arrEvent['id']);
 
                 if (null !== $objEvent) {
                     $arrJSON['meta']['arrEventIds'][] = $arrEvent['id'];
@@ -153,8 +153,9 @@ class EventApiController extends AbstractController
     }
 
     /**
-     * This route is used for the "pilatus" export, where events are loaded by xhr when the modal window opens
-     * $_POST['id'], $_POST['fields'] as comma separated string is optional.
+     * This route is used for the "pilatus" export, where events are loaded by xhr
+     * when the modal window opens $_POST['id'], $_POST['fields'] as comma separated
+     * string is optional.
      *
      * @throws \Exception
      */
@@ -175,7 +176,7 @@ class EventApiController extends AbstractController
             'arrFields' => $arrFields,
         ];
 
-        if (null !== ($objEvent = $calendarEventsModel->findByPk($eventId))) {
+        if (null !== ($objEvent = $calendarEventsModel->findById($eventId))) {
             $arrJSON['status'] = 'success';
             $arrEvent = [];
 
@@ -342,10 +343,11 @@ class EventApiController extends AbstractController
             }
         }
 
-        // Search term (search for expression in tl_calendar_events.title and tl_calendar_events.teaser)
+        // Search term (search for expression in tl_calendar_events.title and
+        // tl_calendar_events.teaser)
         if (!empty($params['textSearch'])) {
-            // Support multiple search terms
-            // Only return these events in which each search term (needle) was found.
+            // Support multiple search terms Only return these events in which each search
+            // term (needle) was found.
             foreach (explode(' ', $params['textSearch']) as $strNeedle) {
                 $arrOrExpr = [];
 
@@ -376,7 +378,7 @@ class EventApiController extends AbstractController
                             ->select('pid')
                             ->from('tl_calendar_events_instructor', 't2')
                             ->where('t2.userId = :qbStInstructorId'.$instrId)
-                            ->getSQL()
+                            ->getSQL(),
                     );
                     $qb->setParameter('qbStInstructorId'.$instrId, $instrId, Types::INTEGER);
                 }

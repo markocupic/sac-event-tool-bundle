@@ -42,7 +42,9 @@ use Twig\Error\SyntaxError;
 class DashboardController
 {
     private Adapter $calendarEventsModelAdapter;
+
     private Adapter $configAdapter;
+
     private Adapter $stringUtilAdapter;
 
     public function __construct(
@@ -88,19 +90,16 @@ class DashboardController
                 [['separator' => 'upcoming-events']],
                 $this->prepareForTwig($upcomingEvents, 'upcoming-event'),
                 [['separator' => 'past-events']],
-                $this->prepareForTwig($pastEvents, 'past-event')
+                $this->prepareForTwig($pastEvents, 'past-event'),
             );
 
-            $html = $this->twig->render(
-                '@MarkocupicSacEventTool/Backend/BackendHomeScreen/dashboard.html.twig',
-                [
-                    'events' => $events,
-                    'has_upcoming_events' => !empty($upcomingEvents),
-                    'has_past_events' => !empty($pastEvents),
-                    'has_load_more_past_events_button' => $pastEventsCount > $limit,
-                    'load_more_past_events_url' => $pastEventsCount > $limit ? $this->urlParser->addQueryString('pastEventsLimit='.$limit + 10) : null,
-                ]
-            );
+            $html = $this->twig->render('@MarkocupicSacEventTool/Backend/BackendHomeScreen/dashboard.html.twig', [
+                'events' => $events,
+                'has_upcoming_events' => !empty($upcomingEvents),
+                'has_past_events' => !empty($pastEvents),
+                'has_load_more_past_events_button' => $pastEventsCount > $limit,
+                'load_more_past_events_url' => $pastEventsCount > $limit ? $this->urlParser->addQueryString('pastEventsLimit='.$limit + 10) : null,
+            ]);
         }
 
         return new Response($html);
@@ -122,7 +121,7 @@ class DashboardController
                 $user->id,
                 $user->id,
                 $timeCut,
-            ]
+            ],
         );
 
         return $result->fetchAllAssociative();
@@ -149,7 +148,7 @@ class DashboardController
                 Types::INTEGER,
                 Types::INTEGER,
                 Types::INTEGER,
-            ]
+            ],
         );
 
         return $result->fetchAllAssociative();
@@ -166,7 +165,7 @@ class DashboardController
         $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
 
         foreach ($arrEvents as $row) {
-            $eventModel = $this->calendarEventsModelAdapter->findByPk($row['id']);
+            $eventModel = $this->calendarEventsModelAdapter->findById($row['id']);
             $title = $this->stringUtilAdapter->decodeEntities($eventModel->title);
             $title = $this->stringUtilAdapter->restoreBasicEntities($title);
 
@@ -276,9 +275,9 @@ class DashboardController
     }
 
     /**
-     * @throws Exception
-     *
      * @return array<int>
+     *
+     * @throws Exception
      */
     private function getAllowedCalendarContainerIds(): array
     {
@@ -299,9 +298,9 @@ class DashboardController
     }
 
     /**
-     * @throws Exception
-     *
      * @return array<int>
+     *
+     * @throws Exception
      */
     private function getAllowedCalendarIds(): array
     {

@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-#[AsContentElement(PurgeEventFavoritesLinkController::TYPE, category:'sac_event_tool_content_elements', template:'ce_purge_event_favorites_link')]
+#[AsContentElement(PurgeEventFavoritesLinkController::TYPE, category: 'sac_event_tool_content_elements', template: 'ce_purge_event_favorites_link')]
 class PurgeEventFavoritesLinkController extends AbstractContentElementController
 {
     public const TYPE = 'purge_event_favorites_link';

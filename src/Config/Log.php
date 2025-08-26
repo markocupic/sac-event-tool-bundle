@@ -87,17 +87,20 @@ class Log
     public const DOWNLOAD_TOUR_LIST_BOOKLET = 'DOWNLOAD_TOUR_LIST_BOOKLET';
 
     /**
-     * MEMBER_DASHBOARD_UPDATE_PROFILE: Log type when a frontend user has updated its profile.
+     * MEMBER_DASHBOARD_UPDATE_PROFILE: Log type when a frontend user has
+     * updated its profile.
      */
     public const MEMBER_DASHBOARD_UPDATE_PROFILE = 'MEMBER_DASHBOARD_UPDATE_PROFILE';
 
     /**
-     * CREATE_USER_HOME_DIRECTORY: Log type when home directory for a backend user has been created.
+     * CREATE_USER_HOME_DIRECTORY: Log type when home directory for a backend user has
+     * been created.
      */
     public const CREATE_USER_HOME_DIRECTORY = 'CREATE_USER_HOME_DIRECTORY';
 
     /**
-     * ANONYMIZE_EVENT_REGISTRATION: Log type when an event registration has been anonymized, because it could not be assigned to a user.
+     * ANONYMIZE_EVENT_REGISTRATION: Log type when an event registration has been
+     * anonymized, because it could not be assigned to a user.
      */
     public const ANONYMIZE_EVENT_REGISTRATION = 'ANONYMIZE_EVENT_REGISTRATION';
 
@@ -112,7 +115,8 @@ class Log
     public const DELETE_FRONTEND_USER = 'DELETE_FRONTEND_USER';
 
     /**
-     * DELETE_FRONTEND_USER_AVATAR_DIRECTORY: Log type when a frontend users avatar directory has been deleted.
+     * DELETE_FRONTEND_USER_AVATAR_DIRECTORY: Log type when a frontend users avatar
+     * directory has been deleted.
      */
     public const DELETE_FRONTEND_USER_AVATAR_DIRECTORY = 'DELETE_FRONTEND_USER_AVATAR_DIRECTORY';
 }

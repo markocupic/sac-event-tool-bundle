@@ -38,13 +38,15 @@ use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(CsvEventMemberExportController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_csv_event_member_export')]
+#[AsFrontendModule(CsvEventMemberExportController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_csv_event_member_export')]
 class CsvEventMemberExportController extends AbstractFrontendModuleController
 {
     public const TYPE = 'csv_event_member_export';
 
     private string $strDelimiter = ';';
+
     private string $strEnclosure = '"';
+
     private array $arrLines = [];
 
     public function __construct(
@@ -148,7 +150,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                     }
                 }
 
-                $this->printCsv(sprintf('Event-Member-Export_%s.csv', date('Y-m-d')));
+                $this->printCsv(\sprintf('Event-Member-Export_%s.csv', date('Y-m-d')));
             }
         }
 
@@ -221,7 +223,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                 }
                 break;
             case 'organizers':
-                $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+                $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
 
                 if (null !== $objEvent) {
                     $arrOrganizer = $this->calendarEventsUtil->getEventOrganizersAsArray($objEvent, 'title');
@@ -231,13 +233,13 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                 $value = $GLOBALS['TL_LANG']['MSC'][$arrEventMember[$field]] ?? $arrEventMember[$field];
                 break;
             case 'startDate':
-                $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+                $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
 
                 if (null !== $objEvent) {
                     $value = $date->parse('Y-m-d', $objEvent->startDate);
                 } break;
             case 'endDate':
-                $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+                $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
 
                 if (null !== $objEvent) {
                     $value = $date->parse('Y-m-d', $objEvent->endDate);
@@ -246,21 +248,21 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
             case 'executionState':
             case 'eventState':
                 $controller->loadLanguageFile('tl_calendar_events');
-                $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+                $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
 
                 if (null !== $objEvent) {
                     $value = $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] ?? $objEvent->$field;
                 }
                 break;
             case 'mainInstructor':
-                $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+                $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
 
                 if (null !== $objEvent) {
                     $value = $this->calendarEventsUtil->getMainInstructorName($objEvent);
                 }
                 break;
             case 'mountainguide':
-                $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
+                $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
 
                 if (null !== $objEvent) {
                     $value = $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][$objEvent->$field];
@@ -297,7 +299,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         foreach ($arrData as $arrRow) {
             $arrLine = array_map(
                 static fn ($v) => html_entity_decode(htmlspecialchars_decode((string) $v)),
-                $arrRow
+                $arrRow,
             );
             $arrFinal[] = $arrLine;
         }

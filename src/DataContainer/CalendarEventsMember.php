@@ -63,7 +63,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Terminal42\NotificationCenterBundle\NotificationCenter;
 
 /**
- * Represents the Calendar Events Member handling component with various data manipulation functionalities.
+ * Represents the Calendar Events Member handling component with various data
+ * manipulation functionalities.
  */
 class CalendarEventsMember
 {
@@ -71,11 +72,17 @@ class CalendarEventsMember
 
     // Adapters
     private Adapter $calendarEvents;
+
     private Adapter $calendarEventsMember;
+
     private Adapter $controller;
+
     private Adapter $member;
+
     private Adapter $message;
+
     private Adapter $stringUtil;
+
     private Adapter $validator;
 
     public function __construct(
@@ -124,8 +131,8 @@ class CalendarEventsMember
     }
 
     /**
-     * This will redirect the user to the NotifyEventRegistrationStateController
-     * if a change subscription state button has been clicked.
+     * This will redirect the user to the NotifyEventRegistrationStateController if a
+     * change subscription state button has been clicked.
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onsubmit', priority: -999999)]
     public function handleChangeSubscriptionStateButtonClicks(DataContainer $dc): void
@@ -137,7 +144,7 @@ class CalendarEventsMember
         }
 
         if ($request->request->has('changeSubscriptionStateWithEmail')) {
-            $strQuery = sprintf('key=notify_event_registration_state&action=%s', $request->request->get('changeSubscriptionStateWithEmail'));
+            $strQuery = \sprintf('key=notify_event_registration_state&action=%s', $request->request->get('changeSubscriptionStateWithEmail'));
 
             $url = $this->urlParser->addQueryString($strQuery);
 
@@ -165,7 +172,8 @@ class CalendarEventsMember
             return;
         }
 
-        // Do only show email buttons in the global operation's section if there are registrations
+        // Do only show email buttons in the global operation's section if there
+        // are registrations
         $regId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$eventId], [Types::INTEGER]);
 
         if (!$regId) {
@@ -175,8 +183,6 @@ class CalendarEventsMember
 
     /**
      * Download registration list as a DOCX or CSV file.
-     *
-     * @param DataContainer $dc
      *
      * @throws CannotInsertRecord
      * @throws Exception
@@ -195,10 +201,10 @@ class CalendarEventsMember
         }
 
         $eventId = $request->query->get('id', 0);
-        $objEvent = $this->calendarEvents->findByPk($eventId);
+        $objEvent = $this->calendarEvents->findById($eventId);
 
         if (null === $objEvent) {
-            throw new \InvalidArgumentException(sprintf('Could not find event with ID "%s".', $eventId));
+            throw new \InvalidArgumentException(\sprintf('Could not find event with ID "%s".', $eventId));
         }
 
         if (!$this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $objEvent->id)) {
@@ -238,7 +244,7 @@ class CalendarEventsMember
         $ids = $this->connection
             ->fetchFirstColumn(
                 'SELECT id FROM tl_calendar_events_member AS m WHERE (m.sacMemberId < ? OR m.sacMemberId = ?) AND tstamp > ? AND NOT EXISTS (SELECT * FROM tl_calendar_events AS e WHERE m.eventId = e.id)',
-                [1, '', 0]
+                [1, '', 0],
             )
         ;
 
@@ -290,7 +296,7 @@ class CalendarEventsMember
     #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onbeforesubmit', priority: 100)]
     public function checkStateOfSubscriptionChange($updatedFields, DataContainer $dc): mixed
     {
-        $objReg = $this->calendarEventsMember->findByPk($dc->id);
+        $objReg = $this->calendarEventsMember->findById($dc->id);
 
         if (null === $objReg) {
             return $updatedFields;
@@ -299,10 +305,10 @@ class CalendarEventsMember
         // Temporary apply changes on the registration model
         $objReg->mergeRow($updatedFields);
 
-        $objEvent = $this->calendarEvents->findByPk($objReg->eventId);
+        $objEvent = $this->calendarEvents->findById($objReg->eventId);
 
         if (null === $objEvent) {
-            throw new \Exception(sprintf('The event ID %d that is associated with the registration does not exist.', $objReg->eventId));
+            throw new \Exception(\sprintf('The event ID %d that is associated with the registration does not exist.', $objReg->eventId));
         }
 
         // Do not allow the maximum number of participants to be exceeded.
@@ -352,10 +358,10 @@ class CalendarEventsMember
 
         $arrReg = $event->getPostUpdateRecord();
 
-        $objEvent = $this->calendarEvents->findByPk($arrReg['eventId']);
+        $objEvent = $this->calendarEvents->findById($arrReg['eventId']);
 
         if (null === $objEvent) {
-            throw new \Exception(sprintf('The event ID %d that is associated with the registration does not exist.', $arrReg['id']));
+            throw new \Exception(\sprintf('The event ID %d that is associated with the registration does not exist.', $arrReg['id']));
         }
 
         if (!$this->validator->isEmail($arrReg['email'])) {
@@ -412,16 +418,16 @@ class CalendarEventsMember
             return;
         }
 
-        $objReg = $this->calendarEventsMember->findByPk($event->getRecordId());
+        $objReg = $this->calendarEventsMember->findById($event->getRecordId());
 
         if (null === $objReg) {
-            throw new \Exception(sprintf('Registration with ID %d not found.', $event->getRecordId()));
+            throw new \Exception(\sprintf('Registration with ID %d not found.', $event->getRecordId()));
         }
 
-        $objEvent = $this->calendarEvents->findByPk($objReg->eventId);
+        $objEvent = $this->calendarEvents->findById($objReg->eventId);
 
         if (null === $objEvent) {
-            throw new \Exception(sprintf('The event ID %d that is associated with the registration does not exist.', $objReg->id));
+            throw new \Exception(\sprintf('The event ID %d that is associated with the registration does not exist.', $objReg->id));
         }
 
         if (true === (bool) $arrDiff['hasParticipated']) {
@@ -435,14 +441,14 @@ class CalendarEventsMember
         $sacMemberId = $objReg->sacMemberId ?? '0';
 
         $this->contaoGeneralLogger?->info(
-            sprintf($logText, $objReg->firstname, $objReg->lastname, $sacMemberId, $objEvent->title, $objEvent->id),
+            \sprintf($logText, $objReg->firstname, $objReg->lastname, $sacMemberId, $objEvent->title, $objEvent->id),
             ['contao' => new ContaoContext(__METHOD__, $context)],
         );
     }
 
     /**
-     * Add the event id, uuid and the date added timestamp to the record,
-     * if a backend user manually adds a new registration.
+     * Add the event id, uuid and the date added timestamp to the record, if a backend
+     * user manually adds a new registration.
      *
      * @throws Exception
      */
@@ -463,8 +469,7 @@ class CalendarEventsMember
     }
 
     /**
-     * Add more data to the registration,
-     * if the user manually adds a new registration.
+     * Add more data to the registration, if the user manually adds a new registration.
      *
      * @throws Exception
      */
@@ -526,8 +531,8 @@ class CalendarEventsMember
     }
 
     /**
-     * Display the section name instead of the section id
-     * 4250,4252 becomes SAC PILATUS, SAC PILATUS NAPF.
+     * Display the section name instead of the section id 4250,4252 becomes SAC
+     * PILATUS, SAC PILATUS NAPF.
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onshow', priority: 100)]
     public function decryptSectionIds(array $data, array $row, DataContainer $dc): array
@@ -541,9 +546,9 @@ class CalendarEventsMember
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.label.label', priority: 100)]
     public function addIcon(array $row, string $label, DataContainer $dc, array $args): array
     {
-        $objReg = $this->calendarEventsMember->findByPk($row['id']);
+        $objReg = $this->calendarEventsMember->findById($row['id']);
         $icon = $this->eventRegistrationUtil->getSubscriptionStateIcon($objReg);
-        $args[0] = sprintf('<div>%s</div>', $icon);
+        $args[0] = \sprintf('<div>%s</div>', $icon);
 
         return $args;
     }
@@ -551,13 +556,13 @@ class CalendarEventsMember
     #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.dashboard.input_field', priority: 100)]
     public function parseNotificationButtonDashboard(DataContainer $dc): string
     {
-        $objReg = $this->calendarEventsMember->findByPk($dc->id);
+        $objReg = $this->calendarEventsMember->findById($dc->id);
 
         if (null === $objReg) {
             return '';
         }
 
-        $objEvent = $this->calendarEvents->findByPk($objReg->eventId);
+        $objEvent = $this->calendarEvents->findById($objReg->eventId);
 
         if (null === $objEvent) {
             return '';
@@ -602,7 +607,7 @@ class CalendarEventsMember
         ]);
         $href = $this->stringUtil->ampersand($href);
 
-        return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->specialcharsUrl($href), $this->stringUtil->specialchars($class), $this->stringUtil->specialchars($title), $attributes, $label);
+        return \sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->specialcharsUrl($href), $this->stringUtil->specialchars($class), $this->stringUtil->specialchars($title), $attributes, $label);
     }
 
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.global_operations.sendEmail.button', priority: 100)]
@@ -617,7 +622,7 @@ class CalendarEventsMember
         $href = $this->uriSigner->sign($href);
         $href = $this->stringUtil->ampersand($href);
 
-        return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->specialcharsUrl($href), $this->stringUtil->specialchars($class), $this->stringUtil->specialchars($title), $attributes, $label);
+        return \sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->specialcharsUrl($href), $this->stringUtil->specialchars($class), $this->stringUtil->specialchars($title), $attributes, $label);
     }
 
     #[AsCallback(table: 'tl_calendar_events_member', target: 'edit.buttons', priority: 100)]
