@@ -1,13 +1,13 @@
 {
-  "backend.js": "/bundles/markocupicsaceventtool/backend.e264ae2b.js",
-  "js/avatar_uploader.js": "/bundles/markocupicsaceventtool/js/avatar_uploader.0887c31c.js",
+  "backend.js": "/bundles/markocupicsaceventtool/backend.d9105a8d.js",
+  "js/avatar_uploader.js": "/bundles/markocupicsaceventtool/js/avatar_uploader.5fa3ef58.js",
   "images/events/course/booklet/fallback.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/fallback.jpg",
   "images/events/course/booklet/toc.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/toc.jpg",
   "images/events/course/booklet/logo_sac.png": "/bundles/markocupicsaceventtool/images/events/course/booklet/logo_sac.png",
   "images/events/course/booklet/cover.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/cover.jpg",
   "images/events/course/fallback_image.svg": "/bundles/markocupicsaceventtool/images/events/course/fallback_image.svg",
-  "vue/dist/vue.global.prod.js": "/bundles/markocupicsaceventtool/vue/dist/vue.global.prod.bc461cca.js",
-  "dexie/dist/dexie.js": "/bundles/markocupicsaceventtool/dexie/dist/dexie.3a2b685c.js",
+  "vue/dist/vue.global.prod.js": "/bundles/markocupicsaceventtool/vue/dist/vue.global.prod.0fd961ab.js",
+  "dexie/dist/dexie.js": "/bundles/markocupicsaceventtool/dexie/dist/dexie.fbad19e6.js",
   "choices.js/scripts/choices.min.js": "/bundles/markocupicsaceventtool/choices.js/scripts/choices.min.ed0a2e71.js",
   "icons/tour_booklet/oev-tour-badge.png": "/bundles/markocupicsaceventtool/icons/tour_booklet/oev-tour-badge.png",
   "images/avatars/avatar-default-other.png": "/bundles/markocupicsaceventtool/images/avatars/avatar-default-other.png",
@@ -69,6 +69,6 @@
   "icons/event_states/event_status_3.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_3.svg",
   "icons/event_states/event_status_5.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_5.svg",
   "../assets/ts/avatar_uploader.d.ts": "/bundles/markocupicsaceventtool/../assets/ts/avatar_uploader.d.ts",
-  "backend.e264ae2b.js.map": "/bundles/markocupicsaceventtool/backend.e264ae2b.js.map",
-  "avatar_uploader.0887c31c.js.map": "/bundles/markocupicsaceventtool/js/avatar_uploader.0887c31c.js.map"
+  "backend.d9105a8d.js.map": "/bundles/markocupicsaceventtool/backend.d9105a8d.js.map",
+  "avatar_uploader.5fa3ef58.js.map": "/bundles/markocupicsaceventtool/js/avatar_uploader.5fa3ef58.js.map"
 }
