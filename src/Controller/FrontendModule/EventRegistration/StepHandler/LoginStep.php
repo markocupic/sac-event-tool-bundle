@@ -20,15 +20,14 @@ use Contao\ModuleModel;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
 #[AutoconfigureTag('sacevt.event_registration.step_handler')]
 class LoginStep implements StepHandlerInterface, ValidationStepInterface
 {
-	public const string STEP = 'login';
+    private const string STEP = 'login';
 
-    private const string TEMPLATE = '@MarkocupicSacEventTool/EventRegistration/step_login.html.twig';
+    private const string TEMPLATE = '@MarkocupicSacEventTool/EventRegistration/Step/login.html.twig';
 
     private const int PRIORITY = 300;
 
@@ -38,7 +37,7 @@ class LoginStep implements StepHandlerInterface, ValidationStepInterface
     ) {
     }
 
-    public static function getType(): string
+    public static function getName(): string
     {
         return self::STEP;
     }
@@ -46,6 +45,11 @@ class LoginStep implements StepHandlerInterface, ValidationStepInterface
     public static function getPriority(): int
     {
         return self::PRIORITY;
+    }
+
+    public function getTemplateName(): string
+    {
+        return self::TEMPLATE;
     }
 
     public function doAutoForward(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): bool
@@ -63,11 +67,11 @@ class LoginStep implements StepHandlerInterface, ValidationStepInterface
         return false;
     }
 
-    public function getResponse(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): Response
+    public function prepareStep(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): array
     {
-        return new Response($this->twig->render(self::TEMPLATE, [
+        return [
             'eventModel' => $eventModel,
             'moduleModel' => $moduleModel,
-        ]));
+        ];
     }
 }

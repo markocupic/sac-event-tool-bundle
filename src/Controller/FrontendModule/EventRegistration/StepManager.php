@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 readonly class StepManager
 {
     public function __construct(
-        #[AutowireLocator('sacevt.event_registration.step_handler', defaultIndexMethod: 'getType', defaultPriorityMethod: 'getPriority')]
+        #[AutowireLocator('sacevt.event_registration.step_handler', defaultIndexMethod: 'getName', defaultPriorityMethod: 'getPriority')]
         private ContainerInterface $stepHandlers,
     ) {
     }
@@ -49,7 +49,7 @@ readonly class StepManager
                 return $this->stepHandlers->get($stepType);
             }
 
-            if ($step::getType() === $stepType) {
+            if ($step::getName() === $stepType) {
                 $stop = true;
             }
         }
@@ -62,7 +62,7 @@ readonly class StepManager
         $previousSteps = [];
 
         foreach (array_keys($this->getSteps()) as $stepType) {
-            if ($step::getType() === $stepType) {
+            if ($step::getName() === $stepType) {
                 break;
             }
 

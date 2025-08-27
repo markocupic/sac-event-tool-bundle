@@ -17,15 +17,16 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrat
 use Contao\CalendarEventsModel;
 use Contao\ModuleModel;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 interface StepHandlerInterface
 {
-    public static function getType(): string;
+    public static function getName(): string;
 
-    public static function getPriority(): int;
+	public static function getPriority(): int;
 
-    public function doAutoForward(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): bool;
+	public function getTemplateName(): string;
 
-    public function getResponse(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): Response;
+	public function doAutoForward(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): bool;
+
+    public function prepareStep(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): array;
 }

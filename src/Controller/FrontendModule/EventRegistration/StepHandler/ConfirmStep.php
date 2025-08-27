@@ -24,16 +24,15 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 #[AutoconfigureTag('sacevt.event_registration.step_handler')]
 class ConfirmStep implements StepHandlerInterface
 {
-    public const string STEP = 'confirm';
+    private const string STEP = 'confirm';
 
-    private const string TEMPLATE = '@MarkocupicSacEventTool/EventRegistration/step_confirm.html.twig';
+    private const string TEMPLATE = '@MarkocupicSacEventTool/EventRegistration/Step/confirm.html.twig';
 
     private const int PRIORITY = 100;
 
@@ -46,7 +45,7 @@ class ConfirmStep implements StepHandlerInterface
     ) {
     }
 
-    public static function getType(): string
+    public static function getName(): string
     {
         return self::STEP;
     }
@@ -56,12 +55,17 @@ class ConfirmStep implements StepHandlerInterface
         return self::PRIORITY;
     }
 
+    public function getTemplateName(): string
+    {
+        return self::TEMPLATE;
+    }
+
     public function doAutoForward(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): bool
     {
         return false;
     }
 
-    public function getResponse(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): Response
+    public function prepareStep(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): array
     {
         $user = $this->security->getUser();
 
@@ -88,12 +92,10 @@ class ConfirmStep implements StepHandlerInterface
 
         $arrMember = $memberModel->row();
 
-        $template = [
+        return [
             'event_model' => array_map('html_entity_decode', $arrEvent),
             'event_member_model' => array_map('html_entity_decode', $arrEventsMember),
             'member_model' => array_map('html_entity_decode', $arrMember),
         ];
-
-        return new Response($this->twig->render(self::TEMPLATE, $template));
     }
 }

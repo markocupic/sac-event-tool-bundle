@@ -38,18 +38,16 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\Environment;
 
 #[AutoconfigureTag('sacevt.event_registration.step_handler')]
 class RegisterStep implements StepHandlerInterface, ValidationStepInterface
 {
-	public const string STEP = 'register';
+    private const string STEP = 'register';
 
-    private const string TEMPLATE = '@MarkocupicSacEventTool/EventRegistration/step_register.html.twig';
+    private const string TEMPLATE = '@MarkocupicSacEventTool/EventRegistration/Step/register.html.twig';
 
     private const int PRIORITY = 200;
 
@@ -58,7 +56,6 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         private readonly CarSeatInfo $carSeatInfo,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
-        private readonly Environment $twig,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly LockFactory $lockFactory,
         private readonly Security $security,
@@ -72,7 +69,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
     ) {
     }
 
-    public static function getType(): string
+    public static function getName(): string
     {
         return self::STEP;
     }
@@ -80,6 +77,11 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
     public static function getPriority(): int
     {
         return self::PRIORITY;
+    }
+
+    public function getTemplateName(): string
+    {
+        return self::TEMPLATE;
     }
 
     public function doAutoForward(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): bool
@@ -104,7 +106,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         return false;
     }
 
-    public function getResponse(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): Response
+    public function prepareStep(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): array
     {
         $template = [];
         $user = $this->security->getUser();
@@ -169,7 +171,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
 
         $template['eventModel'] = $eventModel;
 
-        return new Response($this->twig->render(self::TEMPLATE, $template));
+        return $template;
     }
 
     private function validateEventRegistrationEligibility(CalendarEventsModel $eventModel, MemberModel $memberModel, UserModel|null $mainInstructorModel = null, $options = []): void
@@ -301,18 +303,16 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             $registrationModel = $this->createNewEventRegistration($eventModel, $memberModel, $arrDataForm);
 
             // Contao system log
-            if ($this->contaoGeneralLogger) {
-                $strText = \sprintf(
-                    'New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").',
-                    $memberModel->firstname,
-                    $memberModel->lastname,
-                    $memberModel->id,
-                    $eventModel->id,
-                    $eventModel->title,
-                );
+            $strText = \sprintf(
+                'New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").',
+                $memberModel->firstname,
+                $memberModel->lastname,
+                $memberModel->id,
+                $eventModel->id,
+                $eventModel->title,
+            );
 
-                $this->contaoGeneralLogger->info($strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION)]);
-            }
+            $this->contaoGeneralLogger?->info($strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION)]);
 
             $event = new EventRegistrationEvent(
                 $request,

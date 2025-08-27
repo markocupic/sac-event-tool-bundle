@@ -91,22 +91,22 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         if ($isValid && $step->doAutoForward($eventModel, $request, $model)) {
             $nextStep = $this->stepManager->getNextStep($step);
-            if ($nextStep::getType() !== $step::getType()) {
+            if ($nextStep::getName() !== $step::getName()) {
                 return $this->redirectToStep($nextStep, $request);
             }
         }
 
         // Get the compiled HTML of the current step.
-        $template->set('step', $step->getResponse($eventModel, $request, $model)->getContent());
-        $template->set('stepType', $step::getType());
-        $template->set('stepIndicator', $this->renderStepIndicatorTemplate($step::getType()));
+        $template->set('stepType', $step::getName());
+		$template->set('stepIndicator', $this->renderStepIndicatorResponse($step, $eventModel, $request, $model)->getContent());
+		$template->set('step', $this->renderStepResponse($step, $eventModel, $request, $model)->getContent());
 
-        return $template->getResponse();
+		return $template->getResponse();
     }
 
     private function redirectToStep(StepHandlerInterface $step, Request $request): RedirectResponse
     {
-        $url = $this->urlParser->addQueryString('action='.$step::getType(), $request->getUri());
+        $url = $this->urlParser->addQueryString('action='.$step::getName(), $request->getUri());
 
         return $this->redirect($url);
     }
@@ -122,19 +122,50 @@ class EventRegistrationController extends AbstractFrontendModuleController
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ($request->query->get('action') !== $stepHandler::getType()) {
-            return $this->urlParser->addQueryString('action='.$stepHandler::getType(), $request->getUri());
+        if ($request->query->get('action') !== $stepHandler::getName()) {
+            return $this->urlParser->addQueryString('action='.$stepHandler::getName(), $request->getUri());
         }
 
         return null;
     }
 
-    private function renderStepIndicatorTemplate(string $strStep): string
+    private function renderStepResponse(StepHandlerInterface $step, CalendarEventsModel $eventModel, Request $request, ModuleModel $model): Response
     {
-        return $this->twig->render('@MarkocupicSacEventTool/EventRegistration/step_indicator.html.twig', [
-            'controller' => $this,
-            'current_step' => $strStep,
-            'actionEnum' => array_keys($this->stepManager->getSteps()),
-        ]);
+        return new Response(
+            $this->twig->render(
+                $step->getTemplateName(),
+                $step->prepareStep($eventModel, $request, $model),
+            ),
+        );
+    }
+
+    private function renderStepIndicatorResponse(StepHandlerInterface $currentStep, CalendarEventsModel $eventModel, Request $request, ModuleModel $model): Response
+    {
+        $items = [];
+
+        foreach (array_keys($this->stepManager->getSteps()) as $stepName) {
+            $step = $this->stepManager->getStep($stepName);
+
+            $item = [];
+            $item['name'] = $step::getName();
+            $item['current'] = $step::getName() === $currentStep::getName();
+
+            if ($step instanceof ValidationStepInterface && !$step->validate($eventModel, $request, $model)) {
+                $item['processed'] = false;
+            } else {
+                $item['processed'] = true;
+            }
+
+            $items[] = $item;
+        }
+
+        return new Response(
+            $this->twig->render(
+                '@MarkocupicSacEventTool/EventRegistration/step_indicator.html.twig',
+                [
+                    'items' => $items,
+                ],
+            ),
+        );
     }
 }
