@@ -1,6 +1,6 @@
 {% trans_default_domain 'contao_default' %}
 <h4 class="content-headline text-danger mt-0 mb-0">Anmelden für {{ ('MSC.'~eventModel.eventType~'_short')|trans }}:</h4>
-<h2 class="content-headline mt-0 mb-4 text-black">{{ eventModel.title }}</h2>
+<h2 class="content-headline mt-0 mb-4 text-black">{{ eventModel.title|decode_entities }}</h2>
 
 {% if errorMessage|default %}
     {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-danger', add_icon: true, icon_class: 'fa-solid fa-exclamation-circle', text: errorMessage} %}
@@ -22,7 +22,7 @@
         <br>
         {{ 'FORM.evt_reg_ibanBeneficiary'|trans }}:
         <br>
-        {{ eventModel.ibanBeneficiary|nl2br }}
+        {{ eventModel.ibanBeneficiary|decode_entities|nl2br }}
     {% endset %}
     {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: iban_info} %}
 {% endif %}

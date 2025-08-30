@@ -1,6 +1,6 @@
 {% trans_default_domain 'contao_default' %}
 <h4 class="content-headline text-danger mt-0 mb-0">Anmelden für {{ ('MSC.'~eventModel.eventType~'_short')|trans }}:</h4>
-<h2 class="content-headline mt-0 mb-4 text-black">{{ eventModel.title }}</h2>
+<h2 class="content-headline mt-0 mb-4 text-black">{{ eventModel.title|decode_entities }}</h2>
 
 {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: 'Bitte logge dich ein, um dich zu einem Event anzumelden.'} %}
 
