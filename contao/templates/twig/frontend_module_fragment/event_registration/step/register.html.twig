@@ -1,13 +1,13 @@
 {% trans_default_domain 'contao_default' %}
 <h4 class="content-headline text-danger mt-0 mb-0">Anmelden für {{ ('MSC.'~eventModel.eventType~'_short')|trans }}:</h4>
-<h2 class="content-headline mt-0 mb-4 text-black">{{ eventModel.title|decode_entities }}</h2>
+<h2 class="content-headline mt-0 mb-4 text-black">{{ eventModel.title }}</h2>
 
 {% if errorMessage|default %}
-    {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-danger', add_icon: true, icon_class: 'fa-solid fa-exclamation-circle', text: errorMessage} %}
+    {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-danger', add_icon: true, icon_class: 'fa-solid fa-exclamation-circle', text: errorMessage} %}
 {% endif %}
 
 {% if infoMessage|default %}
-    {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: infoMessage} %}
+    {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: infoMessage} %}
 {% endif %}
 
 {% if eventModel.addIban %}
@@ -22,13 +22,13 @@
         <br>
         {{ 'FORM.evt_reg_ibanBeneficiary'|trans }}:
         <br>
-        {{ eventModel.ibanBeneficiary|decode_entities|nl2br }}
+        {{ eventModel.ibanBeneficiary|nl2br }}
     {% endset %}
-    {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: iban_info} %}
+    {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: iban_info} %}
 {% endif %}
 {% if form|default %}
     {% if eventFullyBooked|default %}
-        {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: 'ERR.evt_reg_bookingLimitReaches'|trans} %}
+        {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: 'ERR.evt_reg_bookingLimitReaches'|trans} %}
     {% endif %}
     {# start form #}
     <div id="eventRegistrationForm" class="hasteform_form-event-registration block">
@@ -46,64 +46,64 @@
                             {% endif %}
 
                             {% if form.hasFormField('carInfo') %}
-                                <div class="mt-0 mb-2" data-reg-widget="carInfo">
+                                <div class="mt-4 mb-2" data-reg-widget="carInfo">
                                     {{ form.getWidget('carInfo').parse()|raw }}
                                 </div>
                             {% endif %}
 
                             {% if form.hasFormField('ticketInfo') %}
-                                <div class="mt-0 mb-2" data-reg-widget="ticketInfo">
+                                <div class="mt-4 mb-2" data-reg-widget="ticketInfo">
                                     {{ form.getWidget('ticketInfo').parse()|raw }}
                                 </div>
                             {% endif %}
 
                             {% if form.hasFormField('mobile') %}
-                                <div class="mt-0 mb-2" data-reg-widget="mobile">
+                                <div class="mt-4 mb-2" data-reg-widget="mobile">
                                     {{ form.getWidget('mobile').parse()|raw }}
                                     <div data-ffield-explanation="mobile">
-                                        {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: 'FORM.evt_reg_ffield_expl_mobile'|trans } %}
+                                        {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: 'FORM.evt_reg_ffield_expl_mobile'|trans } %}
                                     </div>
                                 </div>
                             {% endif %}
 
                             {% if form.hasFormField('emergencyPhone') %}
-                                <div class="mt-0 mb-2" data-reg-widget="emergencyPhone">
+                                <div class="mt-4 mb-2" data-reg-widget="emergencyPhone">
                                     {{ form.getWidget('emergencyPhone').parse()|raw }}
                                 </div>
                             {% endif %}
 
                             {% if form.hasFormField('emergencyPhoneName') %}
-                                <div class="mt-0 mb-2" data-reg-widget="emergencyPhoneName">
+                                <div class="mt-4 mb-2" data-reg-widget="emergencyPhoneName">
                                     {{ form.getWidget('emergencyPhoneName').parse()|raw }}
                                 </div>
                             {% endif %}
 
                             {% if form.hasFormField('notes') %}
-                                <div class="mt-0 mb-2" data-reg-widget="notes">
+                                <div class="mt-4 mb-2" data-reg-widget="notes">
                                     {{ form.getWidget('notes').parse()|raw }}
                                     <div data-ffield-explanation="notes">
-                                        {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: 'FORM.evt_reg_ffield_expl_notes'|trans } %}
+                                        {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: 'FORM.evt_reg_ffield_expl_notes'|trans } %}
                                     </div>
                                 </div>
                             {% endif %}
 
                             {% if form.hasFormField('ahvNumber') %}
-                                <div class="mt-0 mb-2" data-reg-widget="ahvNumber">
+                                <div class="mt-4 mb-2" data-reg-widget="ahvNumber">
                                     {{ form.getWidget('ahvNumber').parse()|raw }}
                                     <div data-ffield-explanation="ahvNumber">
-                                        {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: 'FORM.evt_reg_ffield_expl_ahvNumber'|trans } %}
+                                        {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: 'FORM.evt_reg_ffield_expl_ahvNumber'|trans } %}
                                     </div>
                                 </div>
                             {% endif %}
 
                             {% if form.hasFormField('foodHabits') %}
-                                <div class="mt-0 mb-3" data-reg-widget="foodHabits">
+                                <div class="mt-4 mb-3" data-reg-widget="foodHabits">
                                     {{ form.getWidget('foodHabits').parse()|raw }}
                                 </div>
                             {% endif %}
 
                             {% if form.hasFormField('agb') %}
-                                <div class="mt-0 mb-3" data-reg-widget="agb">
+                                <div class="mt-4 mb-0" data-reg-widget="agb">
                                     {{ form.getWidget('agb').parse()|raw }}
                                 </div>
                             {% endif %}

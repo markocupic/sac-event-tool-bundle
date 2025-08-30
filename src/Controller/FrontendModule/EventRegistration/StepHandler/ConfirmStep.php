@@ -31,7 +31,7 @@ class ConfirmStep implements StepHandlerInterface
 {
     private const string STEP = 'confirm';
 
-    private const string TEMPLATE = '@MarkocupicSacEventTool/EventRegistration/Step/confirm.html.twig';
+    private const string TEMPLATE = '@Contao_MarkocupicSacEventToolBundle/frontend_module_fragment/event_registration/step/confirm.html.twig';
 
     private const int PRIORITY = 100;
 
@@ -91,9 +91,9 @@ class ConfirmStep implements StepHandlerInterface
         $arrMember = $memberModel->row();
 
         return [
-            'event_model' => array_map('html_entity_decode', $arrEvent),
-            'event_member_model' => array_map('html_entity_decode', $arrEventsMember),
-            'member_model' => array_map('html_entity_decode', $arrMember),
+            'event_model' =>  $arrEvent,
+            'event_member_model' => $arrEventsMember,
+            'member_model' => $arrMember,
         ];
     }
 }

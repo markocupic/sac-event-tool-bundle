@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment as TwigEnvironment;
 
-#[AsFrontendModule(EventRegistrationController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_event_registration')]
+#[AsFrontendModule(EventRegistrationController::TYPE, category: 'sac_event_tool_frontend_modules')]
 class EventRegistrationController extends AbstractFrontendModuleController
 {
     public const string TYPE = 'event_registration';
@@ -161,7 +161,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         return new Response(
             $this->twig->render(
-                '@MarkocupicSacEventTool/EventRegistration/step_indicator.html.twig',
+                '@Contao_MarkocupicSacEventToolBundle/frontend_module_fragment/event_registration/step_indicator.html.twig',
                 [
                     'items' => $items,
                 ],

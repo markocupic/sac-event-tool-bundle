@@ -6,7 +6,7 @@
     <br>
     Status: {{ event_member_model.stateOfSubscriptionTrans }}
 {% endset %}
-{% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: alert_type, add_icon: true, icon_class: 'fa-solid fa-check-circle', text: message } %}
+{% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: alert_type, add_icon: true, icon_class: 'fa-solid fa-check-circle', text: message } %}
 
 <table class="table">
     <tr>
@@ -83,7 +83,7 @@
     {% set messages = get_frontend_user_notifications('event_registration_controller::update_contact_data', true) %}
     {% for message in messages %}
         <div class="mt-5">
-            {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: message.messageText|nl2br } %}
+            {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: message.messageText|nl2br } %}
         </div>
     {% endfor %}
 {% endif %}
@@ -92,5 +92,5 @@
     {% set message %}
         <p class="my-0">In deinem <strong>Mitgliederprofil</strong> kannst du den Status deiner Anmeldung einsehen und deine Buchungen gegebenenfalls <strong>stornieren</strong>.</p>
     {% endset %}
-    {% include '@MarkocupicSacEventTool/Alert/alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: message } %}
+    {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: message } %}
 </div>
