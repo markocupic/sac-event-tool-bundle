@@ -230,12 +230,12 @@ class SyncEventRegistrationDatabase extends AbstractController
         $this->syncLog['with_error'] = true;
         $this->syncLog['exceptions'][] = $e->getMessage();
 
-            $this->contaoErrorLogger->error(
-                \sprintf(
-                    'There has been an error while trying to update event registration contact data. Error: %s',
-                    $e->getMessage(),
-                ),
-            );
+        $this->contaoErrorLogger->error(
+            \sprintf(
+                'There has been an error while trying to update event registration contact data. Error: %s',
+                $e->getMessage(),
+            ),
+        );
     }
 
     private function fetchMemberData(int $memberId): array|false
