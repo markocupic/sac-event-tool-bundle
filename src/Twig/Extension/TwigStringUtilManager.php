@@ -31,6 +31,8 @@ class TwigStringUtilManager extends AbstractExtension
     public function getFilters(): array
     {
         return [
+            new TwigFilter('convert_basic_entities', [$this, 'convertBasicEntities']),
+            new TwigFilter('decode_entities', [$this, 'decodeEntities']),
             new TwigFilter('revert_input_encoding', [$this, 'revertInputEncoding']),
         ];
     }
@@ -40,6 +42,16 @@ class TwigStringUtilManager extends AbstractExtension
         return [
             new TwigFunction('substr', [$this, 'substr']),
         ];
+    }
+
+    public function convertBasicEntities(string $str): string
+    {
+        return $this->getStringUtil()->convertBasicEntities($str);
+    }
+
+    public function decodeEntities(string $str): string
+    {
+        return $this->getStringUtil()->decodeEntities($str);
     }
 
     public function revertInputEncoding(string $str): string
