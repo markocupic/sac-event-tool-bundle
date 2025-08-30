@@ -20,7 +20,6 @@ use Contao\ModuleModel;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
-use Twig\Environment;
 
 #[AutoconfigureTag('sacevt.event_registration.step_handler')]
 class LoginStep implements StepHandlerInterface, ValidationStepInterface
@@ -32,7 +31,6 @@ class LoginStep implements StepHandlerInterface, ValidationStepInterface
     private const int PRIORITY = 300;
 
     public function __construct(
-        private readonly Environment $twig,
         private readonly Security $security,
     ) {
     }

@@ -22,11 +22,11 @@ interface StepHandlerInterface
 {
     public static function getName(): string;
 
-	public static function getPriority(): int;
+    public static function getPriority(): int;
 
-	public function getTemplateName(): string;
+    public function getTemplateName(): string;
 
-	public function doAutoForward(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): bool;
+    public function doAutoForward(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): bool;
 
     public function prepareStep(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): array;
 }

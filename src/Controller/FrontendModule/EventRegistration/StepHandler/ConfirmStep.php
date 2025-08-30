@@ -25,7 +25,6 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\Environment;
 
 #[AutoconfigureTag('sacevt.event_registration.step_handler')]
 class ConfirmStep implements StepHandlerInterface
@@ -39,7 +38,6 @@ class ConfirmStep implements StepHandlerInterface
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly ContentUrlGenerator $contentUrlGenerator,
-        private readonly Environment $twig,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
     ) {

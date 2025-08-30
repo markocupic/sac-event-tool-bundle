@@ -446,8 +446,10 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         // Update contactData & emergencyPhone, emergencyPhoneName and foodHabits in all
         // event registrations of the user
         if ($this->syncEventRegistrationDatabase->syncMember($memberModel->id)) {
+            /** @var FrontendUser $user */
+            $user = $this->security->getUser();
             new DefaultFrontendUserNotification(
-                $this->security->getUser(),
+                $user,
                 'event_registration_controller::update_contact_data',
                 'Mitteilung',
                 'All deine persönlichen Daten (Adresse, Tel.-Nr., Notfallangaben, Essgewohnheiten etc.) wurden anhand deiner Eingaben bei deinen laufenden Anmeldungen aktualisiert.',

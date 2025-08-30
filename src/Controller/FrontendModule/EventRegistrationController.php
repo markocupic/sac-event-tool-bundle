@@ -81,6 +81,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         // Check all previous steps if they are valid, if not, redirect to the first
         // invalid step
+        /** @var StepHandlerInterface $previousStep */
         foreach ($this->stepManager->getPreviousSteps($step) as $previousStep) {
             if ($previousStep instanceof ValidationStepInterface && !$previousStep->validate($eventModel, $request, $model)) {
                 return $this->redirectToStep($previousStep, $request);
@@ -96,12 +97,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
             }
         }
 
-        // Get the compiled HTML of the current step.
         $template->set('stepType', $step::getName());
-		$template->set('stepIndicator', $this->renderStepIndicatorResponse($step, $eventModel, $request, $model)->getContent());
-		$template->set('step', $this->renderStepResponse($step, $eventModel, $request, $model)->getContent());
+        $template->set('stepIndicator', $this->renderStepIndicatorResponse($step, $eventModel, $request, $model)->getContent());
+        $template->set('step', $this->renderStepResponse($step, $eventModel, $request, $model)->getContent());
 
-		return $template->getResponse();
+        return $template->getResponse();
     }
 
     private function redirectToStep(StepHandlerInterface $step, Request $request): RedirectResponse
