@@ -509,17 +509,23 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
 
     private function getFirstErrorMessage(Request $request): string|null
     {
-        $session = $request->getSession();
-        $flash = $session->getFlashBag();
-
-        return $flash->get('contao.FE.error')[0] ?? null;
-    }
+		return $this->getFirstMessage('error', $request);
+	}
 
     private function getFirstInfoMessage(Request $request): string|null
     {
-        $session = $request->getSession();
-        $flash = $session->getFlashBag();
-
-        return $flash->get('contao.FE.info')[0] ?? null;
+       return $this->getFirstMessage('info', $request);
     }
+
+	private function getFirstMessage(string $type, Request $request): string|null
+	{
+		if(!in_array($type, ['error', 'info'])) {
+			throw new \InvalidArgumentException('Invalid message type. Allowed message types: "error", "info"');
+		}
+
+		$session = $request->getSession();
+		$flash = $session->getFlashBag();
+
+		return $flash->get('contao.FE.'.$type)[0] ?? null;
+	}
 }
