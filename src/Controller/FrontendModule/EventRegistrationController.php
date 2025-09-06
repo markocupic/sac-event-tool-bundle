@@ -40,7 +40,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
     public const string TYPE = 'event_registration';
 
     public function __construct(
-        private readonly ContaoFramework $framework,
         private readonly RequestStack $requestStack,
         private readonly ScopeMatcher $scopeMatcher,
         private readonly StepManager $stepManager,
@@ -75,7 +74,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         $step = $this->stepManager->getStep($request->query->get('action', ''));
 
-        if ($url = $this->getStepUrlIfMiss($step)) {
+        if ($url = $this->getStepUrlIfMiss($step, $request)) {
             return $this->redirect($url);
         }
 
@@ -113,15 +112,13 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     private function getEventModel(): CalendarEventsModel
     {
-        $eventIdOrAlias = (string) $this->framework->getAdapter(Input::class)->get('auto_item');
+        $eventIdOrAlias = (string) $this->getContaoAdapter(Input::class)->get('auto_item');
 
-        return $this->framework->getAdapter(CalendarEventsModel::class)->findByIdOrAlias($eventIdOrAlias);
+        return $this->getContaoAdapter(CalendarEventsModel::class)->findByIdOrAlias($eventIdOrAlias);
     }
 
-    private function getStepUrlIfMiss(StepHandlerInterface $stepHandler): string|null
+    private function getStepUrlIfMiss(StepHandlerInterface $stepHandler, Request $request): string|null
     {
-        $request = $this->requestStack->getCurrentRequest();
-
         if ($request->query->get('action') !== $stepHandler::getName()) {
             return $this->urlParser->addQueryString('action='.$stepHandler::getName(), $request->getUri());
         }
