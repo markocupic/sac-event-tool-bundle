@@ -22,6 +22,7 @@ $GLOBALS['TL_DCA']['tl_calendar_container'] = [
 		'ctable'           => ['tl_calendar'],
 		'switchToEdit'     => true,
 		'enableVersioning' => true,
+		'markAsCopy'       => 'title',
 		'sql'              => [
 			'keys' => [
 				'id' => 'primary',
@@ -42,6 +43,17 @@ $GLOBALS['TL_DCA']['tl_calendar_container'] = [
 		],
 		'global_operations' => [
 			'all',
+		],
+		'operations'        => [
+			'edit',
+			'children',
+			'copy' => [
+				'href'       => 'act=copy',
+				'icon'       => 'copy.svg',
+				'attributes' => 'data-action="contao--scroll-offset#store" onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['tl_calendar_container']['copyConfirm'] ?? null) . '\'))return false"',
+			],
+			'delete',
+			'show',
 		],
 	],
 	'palettes' => [

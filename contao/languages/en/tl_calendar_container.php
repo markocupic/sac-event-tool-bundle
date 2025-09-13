@@ -15,6 +15,9 @@ declare(strict_types=1);
 // Global operations
 $GLOBALS['TL_LANG']['tl_calendar_container']['new'] = ['Neuen SAC-Event-Jahrescontainer erstellen', 'Neues Jahr hinzufügen'];
 
+// Confirm
+$GLOBALS['TL_LANG']['tl_calendar_container']['copyConfirm'] = 'Möchten Sie wirklich den Jahrescontainer ID %s mit all seinen Kindkalendern und Kindevents duplizieren?';
+
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar_container']['title_legend'] = 'Titel Einstellungen';
 

@@ -14,23 +14,19 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Contao\BackendUser;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\Database;
 use Contao\StringUtil;
-use Doctrine\DBAL\Connection;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 
-class CalendarContainer
+readonly class CalendarContainer
 {
-    /**
-     * Import the back end user object.
-     */
     public function __construct(
-        private readonly RequestStack $requestStack,
-        private readonly Connection $connection,
-        private readonly Security $security,
+        private RequestStack $requestStack,
+        private Security $security,
     ) {
     }
 
@@ -40,7 +36,7 @@ class CalendarContainer
     #[AsCallback(table: 'tl_calendar_container', target: 'config.onload')]
     public function adjustPermissions(): void
     {
-        // The oncreate_callback passes $insertId as second argument
+        // The oncreate_callback passes $insertId as the second argument
         if (4 === \func_num_args()) {
             $insertId = func_get_arg(1);
         }
@@ -49,6 +45,7 @@ class CalendarContainer
             return;
         }
 
+        /** @var BackendUser $user */
         $user = $this->security->getUser();
 
         // Set root IDs
@@ -70,7 +67,7 @@ class CalendarContainer
         if (isset($insertId) && !empty($arrNew['tl_calendar_container']) && \is_array($arrNew['tl_calendar_container']) && \in_array($insertId, $arrNew['tl_calendar_container'], true)) {
             $db = Database::getInstance();
 
-            // Add the permissions on group level
+            // Add the permissions on group-level
             if ('custom' !== $user->inherit) {
                 $objGroup = $db->execute('SELECT id, calendar_containers, calendar_containerp FROM tl_user_group WHERE id IN('.implode(',', array_map('\intval', $user->groups)).')');
 
@@ -86,7 +83,7 @@ class CalendarContainer
                 }
             }
 
-            // Add the permissions on user level
+            // Add the permissions on user-level
             if ('group' !== $user->inherit) {
                 $objUser = $db
                     ->prepare('SELECT calendar_containers, calendar_containerp FROM tl_user WHERE id=?')
