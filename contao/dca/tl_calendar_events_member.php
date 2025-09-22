@@ -54,7 +54,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'backToEventSettings'               => [
 				'label'                  => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
 				'href'                   => System::getContainer()->get('router')->generate('contao_backend', ['do' => 'calendar', 'table' => 'tl_calendar_events', 'id' => '%s', 'act' => 'edit', 'rt' => '%s', 'ref' => '%s']),
-				'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/left-regular.svg',
+				'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/left-regular.svg',
 				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 100],
@@ -62,7 +62,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sendEmail'                         => [
 				// use a button_callback for generating the url
 				'class'                  => 'send_email',
-				'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/at-regular.svg',
+				'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/at-regular.svg',
 				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 90],
@@ -70,7 +70,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'downloadEventRegistrationListCsv'  => [
 				'href'                   => 'action=downloadEventRegistrationListCsv&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
 				'class'                  => 'header_icon',
-				'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/file-excel-regular.svg',
+				'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/file-excel-regular.svg',
 				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 80],
@@ -78,7 +78,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'downloadEventRegistrationListDocx' => [
 				'href'                   => 'action=downloadEventRegistrationListDocx&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
 				'class'                  => 'download_event_registration_list',
-				'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/file-word-regular.svg',
+				'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/file-word-regular.svg',
 				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 70],
@@ -86,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'writeTourReport'                   => [
 				'href'                   => 'table=tl_calendar_events&act=edit&call=writeTourReport&id=%d',
 				'class'                  => 'writeTourRapport',
-				'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/pencil-regular.svg',
+				'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/pencil-regular.svg',
 				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'tour_report', 'sorting' => 100],
@@ -94,7 +94,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'printInstructorInvoice'            => [
 				'href'                   => 'table=tl_calendar_events_instructor_invoice&id=%d',
 				'class'                  => 'printInstructorInvoice',
-				'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/print-regular.svg',
+				'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/print-regular.svg',
 				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'tour_report', 'sorting' => 90],
@@ -106,7 +106,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'show',
 			'toggleParticipationState' => [
 				'href' => 'act=toggle&amp;field=hasParticipated',
-				'icon' => Bundle::ASSET_DIR.'/icons/fontawesome/default/square-check-regular.svg',
+				'icon' => Bundle::ASSET_DIR . '/icons/fontawesome/default/square-check-regular.svg',
 			],
 		],
 	],
@@ -178,7 +178,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'inputType' => 'select',
 			'reference' => &$GLOBALS['TL_LANG']['MSC'],
 			'eval'      => ['doNotShow' => false, 'readonly' => false, 'includeBlankOption' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-			'sql'       => "varchar(255) NOT NULL default '".EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED."'",
+			'sql'       => "varchar(255) NOT NULL default '" . EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED . "'",
 		],
 		'gender'                      => [
 			'exclude'   => true,
@@ -192,12 +192,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		'firstname'                   => [
 			'exclude'   => true,
 			'inputType' => 'text',
+			'sorting'   => true,
 			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'lastname'                    => [
 			'exclude'   => true,
 			'inputType' => 'text',
+			'sorting'   => true,
 			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
@@ -363,7 +365,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
 			'options'   => BookingType::ALL,
 			'eval'      => ['readonly' => true, 'doNotShow' => true, 'includeBlankOption' => false, 'doNotCopy' => true],
-			'sql'       => "varchar(255) NOT NULL default '".BookingType::MANUALLY."'",
+			'sql'       => "varchar(255) NOT NULL default '" . BookingType::MANUALLY . "'",
 		],
 		'deregistrationCause'         => [
 			'exclude'   => true,
