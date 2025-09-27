@@ -106,7 +106,7 @@ $arrRemove = [
 ];
 
 foreach ($arrRemove as $field) {
-	$GLOBALS['TL_DCA']['tl_user']['palettes']['login'] = str_replace(','.$field, '', $GLOBALS['TL_DCA']['tl_user']['palettes']['login']);
+	$GLOBALS['TL_DCA']['tl_user']['palettes']['login'] = str_replace(',' . $field, '', $GLOBALS['TL_DCA']['tl_user']['palettes']['login']);
 }
 
 PaletteManipulator::create()
@@ -143,7 +143,8 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['calendar_containers'] = [
 	'inputType'  => 'checkbox',
 	'foreignKey' => 'tl_calendar_container.title',
 	'eval'       => ['multiple' => true],
-	'sql'        => 'blob NULL',
+	'sql'        => "blob NULL",
+	'relation'   => ['type' => 'hasMany', 'load' => 'lazy']
 ];
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['calendar_containerp'] = [

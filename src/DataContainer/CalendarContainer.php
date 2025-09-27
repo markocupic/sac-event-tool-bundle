@@ -15,39 +15,43 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\BackendUser;
+use Contao\CoreBundle\DataContainer\DataContainerOperation;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Security\DataContainer\CreateAction;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 readonly class CalendarContainer
 {
     public function __construct(
+        private AuthorizationCheckerInterface $authorizationChecker,
         private Connection $connection,
         private RequestStack $requestStack,
         private Security $security,
     ) {
     }
 
-	/**
-	 * Adjusts permissions for calendar container records.
-	 *
-	 * This method ensures that the correct permissions are set when calendar container
-	 * records are created. It checks if the user is an admin, retrieves the user's
-	 * calendar container permissions, and determines whether adjustments are necessary.
-	 *
-	 * For non-admin users:
-	 * - If the `oncreate_callback` passes an `$insertId` of a new record, the method ensures
-	 *   that the ID is properly validated and added to the user's or group's list of
-	 *   accessible calendar containers, provided they have appropriate permissions (`create`).
-	 * - Modifications are applied at both group-level and individual user-level.
-	 *
-	 * Updates the session's newly created records and reflects changes on the user object.
-	 * Ensures consistency of permissions for custom and group inheritance levels.
-	 */
+    /**
+     * Adjusts permissions for calendar container records.
+     *
+     * This method ensures that the correct permissions are set when calendar container
+     * records are created. It checks if the user is an admin, retrieves the user's calendar
+     * container permissions, and determines whether adjustments are necessary.
+     *
+     * For non-admin users:
+     * - If the `oncreate_callback` passes an `$insertId` of a new record, the method ensures
+     *   that the ID is properly validated and added to the user's or group's list of
+     *   accessible calendar containers, provided they have appropriate permissions (`create`).
+     * - Modifications are applied at both group-level and individual user-level.
+     *
+     * Updates the session's newly created records and reflects changes on the user object.
+     * Ensures consistency of permissions for custom and group inheritance levels.
+     */
     #[AsCallback(table: 'tl_calendar_container', target: 'config.onload')]
     public function adjustPermissions(): void
     {
@@ -132,5 +136,26 @@ readonly class CalendarContainer
         // Add the new element to the user object
         $root[] = $insertId;
         $user->calendar_containers = $root;
+    }
+
+    /**
+     * Important: To create a new record, the user must have write-access to at least
+     * one field in the related table.
+     */
+    #[AsCallback(table: 'tl_calendar_container', target: 'list.operations.copy.button')]
+    public function copyButtonCallback(DataContainerOperation $operation): void
+    {
+        if (!$this->authorizationChecker->isGranted('contao_dc.tl_calendar_container', new CreateAction('tl_calendar_container', $operation->getRecord()))) {
+            $operation->disable();
+        }
+    }
+
+    /**
+     * Do not display the "show" button if the user cannot create new records.
+     */
+    #[AsCallback(table: 'tl_calendar_container', target: 'list.operations.show.button')]
+    public function showButtonCallback(DataContainerOperation $operation): void
+    {
+        $this->copyButtonCallback($operation);
     }
 }
