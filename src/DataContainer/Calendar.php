@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\CoreBundle\DataContainer\DataContainerOperation;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\CoreBundle\Security\DataContainer\CreateAction;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -32,13 +33,14 @@ class Calendar
         return $arrRow['title'];
     }
 
-    /**
-     * Do not display the "show" button if the user cannot create new records.
-     */
+	/**
+	 * Do not display the "show" button if the user has not the permission to create
+	 * new records.
+	 */
     #[AsCallback(table: 'tl_calendar', target: 'list.operations.show.button')]
     public function copyButtonCallback(DataContainerOperation $operation): void
     {
-        if (!$this->authorizationChecker->isGranted('contao_dc.tl_calendar', new CreateAction('tl_calendar', $operation->getRecord()))) {
+        if (!$this->authorizationChecker->isGranted(ContaoCorePermissions::DC_PREFIX.'tl_calendar', new CreateAction('tl_calendar', $operation->getRecord()))) {
             $operation->disable();
         }
     }
