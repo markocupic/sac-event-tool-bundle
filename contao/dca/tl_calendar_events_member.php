@@ -191,6 +191,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		],
 		'firstname'                   => [
 			'exclude'   => true,
+			'search'    => true,
 			'inputType' => 'text',
 			'sorting'   => true,
 			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
@@ -198,6 +199,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		],
 		'lastname'                    => [
 			'exclude'   => true,
+			'search'    => true,
 			'inputType' => 'text',
 			'sorting'   => true,
 			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
