@@ -16,8 +16,9 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\BackendUser;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
-use Contao\Database;
 use Contao\StringUtil;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
@@ -25,14 +26,28 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 readonly class CalendarContainer
 {
     public function __construct(
+        private Connection $connection,
         private RequestStack $requestStack,
         private Security $security,
     ) {
     }
 
-    /**
-     * Check permissions to edit table tl_calendar_container.
-     */
+	/**
+	 * Adjusts permissions for calendar container records.
+	 *
+	 * This method ensures that the correct permissions are set when calendar container
+	 * records are created. It checks if the user is an admin, retrieves the user's
+	 * calendar container permissions, and determines whether adjustments are necessary.
+	 *
+	 * For non-admin users:
+	 * - If the `oncreate_callback` passes an `$insertId` of a new record, the method ensures
+	 *   that the ID is properly validated and added to the user's or group's list of
+	 *   accessible calendar containers, provided they have appropriate permissions (`create`).
+	 * - Modifications are applied at both group-level and individual user-level.
+	 *
+	 * Updates the session's newly created records and reflects changes on the user object.
+	 * Ensures consistency of permissions for custom and group inheritance levels.
+	 */
     #[AsCallback(table: 'tl_calendar_container', target: 'config.onload')]
     public function adjustPermissions(): void
     {
@@ -64,46 +79,58 @@ readonly class CalendarContainer
         $objSessionBag = $this->requestStack->getSession()->getBag('contao_backend');
         $arrNew = $objSessionBag->get('new_records');
 
-        if (isset($insertId) && !empty($arrNew['tl_calendar_container']) && \is_array($arrNew['tl_calendar_container']) && \in_array($insertId, $arrNew['tl_calendar_container'], true)) {
-            $db = Database::getInstance();
+        if (empty($insertId)) {
+            return;
+        }
 
-            // Add the permissions on group-level
-            if ('custom' !== $user->inherit) {
-                $objGroup = $db->execute('SELECT id, calendar_containers, calendar_containerp FROM tl_user_group WHERE id IN('.implode(',', array_map('\intval', $user->groups)).')');
+        if (empty($arrNew['tl_calendar_container']) || !\is_array($arrNew['tl_calendar_container'])) {
+            return;
+        }
 
-                while ($objGroup->next()) {
-                    $arrCalendarContainerp = StringUtil::deserialize($objGroup->calendar_containerp);
+        if (!\in_array($insertId, $arrNew['tl_calendar_container'], true)) {
+            return;
+        }
 
-                    if (\is_array($arrCalendarContainerp) && \in_array('create', $arrCalendarContainerp, true)) {
-                        $arrCalendarContainers = StringUtil::deserialize($objGroup->calendar_containers, true);
-                        $arrCalendarContainers[] = $insertId;
+        // Add the permissions on group-level
+        if ('custom' !== $user->inherit) {
+            $arrGroups = $this->connection->fetchAllAssociative('SELECT id, calendar_containers, calendar_containerp FROM tl_user_group WHERE id IN('.implode(',', array_map('\intval', $user->groups)).')');
 
-                        $db->prepare('UPDATE tl_user_group SET calendar_containers=? WHERE id=?')->execute(serialize($arrCalendarContainers), $objGroup->id);
-                    }
-                }
-            }
-
-            // Add the permissions on user-level
-            if ('group' !== $user->inherit) {
-                $objUser = $db
-                    ->prepare('SELECT calendar_containers, calendar_containerp FROM tl_user WHERE id=?')
-                    ->limit(1)
-                    ->execute($user->id)
-                ;
-
-                $arrCalendarContainerp = StringUtil::deserialize($objUser->calendar_containerp);
+            foreach ($arrGroups as $arrGroup) {
+                $arrCalendarContainerp = StringUtil::deserialize($arrGroup['calendar_containerp']);
 
                 if (\is_array($arrCalendarContainerp) && \in_array('create', $arrCalendarContainerp, true)) {
-                    $arrCalendarContainers = StringUtil::deserialize($objUser->calendar_containers, true);
+                    $arrCalendarContainers = StringUtil::deserialize($arrGroup['calendar_containers'], true);
                     $arrCalendarContainers[] = $insertId;
 
-                    $db->prepare('UPDATE tl_user SET calendar_containers=? WHERE id=?')->execute(serialize($arrCalendarContainers), $user->id);
+                    $set = [
+                        'calendar_containers' => serialize($arrCalendarContainers),
+                    ];
+
+                    $this->connection->update('tl_user_group', $set, ['id' => $arrGroup['id']], ['id' => Types::INTEGER]);
                 }
             }
-
-            // Add the new element to the user object
-            $root[] = $insertId;
-            $user->calendar_containers = $root;
         }
+
+        // Add the permissions on user-level
+        if ('group' !== $user->inherit) {
+            $arrUser = $this->connection->fetchAssociative('SELECT calendar_containerp,calendar_containers FROM tl_user WHERE id = ?', [$user->id], [Types::INTEGER]);
+
+            $arrCalendarContainerp = StringUtil::deserialize($arrUser['calendar_containerp']);
+
+            if (\is_array($arrCalendarContainerp) && \in_array('create', $arrCalendarContainerp, true)) {
+                $arrCalendarContainers = StringUtil::deserialize($arrUser['calendar_containers'], true);
+                $arrCalendarContainers[] = $insertId;
+
+                $set = [
+                    'calendar_containers' => serialize($arrCalendarContainers),
+                ];
+
+                $this->connection->update('tl_user', $set, ['id' => $user->id], ['id' => Types::INTEGER]);
+            }
+        }
+
+        // Add the new element to the user object
+        $root[] = $insertId;
+        $user->calendar_containers = $root;
     }
 }
