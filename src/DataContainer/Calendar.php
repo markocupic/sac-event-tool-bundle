@@ -14,13 +14,32 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Contao\CoreBundle\DataContainer\DataContainerOperation;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Security\DataContainer\CreateAction;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class Calendar
 {
+    public function __construct(
+        private AuthorizationCheckerInterface $authorizationChecker,
+    ) {
+    }
+
     #[AsCallback(table: 'tl_calendar', target: 'list.sorting.child_record')]
     public function listCalendars(array $arrRow): string
     {
         return $arrRow['title'];
+    }
+
+    /**
+     * Do not display the "show" button if the user cannot create new records.
+     */
+    #[AsCallback(table: 'tl_calendar', target: 'list.operations.show.button')]
+    public function copyButtonCallback(DataContainerOperation $operation): void
+    {
+        if (!$this->authorizationChecker->isGranted('contao_dc.tl_calendar', new CreateAction('tl_calendar', $operation->getRecord()))) {
+            $operation->disable();
+        }
     }
 }
