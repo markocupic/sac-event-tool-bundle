@@ -112,6 +112,7 @@ readonly class EventMember
                     $objPhpWord->addToClone('i', 'email', $this->prepareString($objUserModel->email), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'transportInfo', $this->prepareString($transportInfo), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'dateOfBirth', '' !== $objUserModel->dateOfBirth ? $dateAdapter->parse('Y', $objUserModel->dateOfBirth) : '', ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'remarks', '', ['multiline' => false]);
                 }
             }
         }
@@ -156,6 +157,12 @@ readonly class EventMember
                 // Clone row
                 $objPhpWord->createClone('i');
 
+                $remarks = [];
+
+                if (!empty($objEventMember->foodHabits)) {
+                    $remarks[] = 'Essgewohnheiten: '.$objEventMember->foodHabits;
+                }
+
                 // Push data to clone
                 $objPhpWord->addToClone('i', 'i', $i, ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'role', 'TN', ['multiline' => false]);
@@ -173,6 +180,7 @@ readonly class EventMember
                 $objPhpWord->addToClone('i', 'email', $this->prepareString((string) $objEventMember->email), ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'transportInfo', $this->prepareString($transportInfo), ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'dateOfBirth', '' !== $objEventMember->dateOfBirth ? $dateAdapter->parse('Y', $objEventMember->dateOfBirth) : '', ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'remarks', implode("\r\n\r\n", array_filter($remarks)), ['multiline' => false]);
             }
         }
 
