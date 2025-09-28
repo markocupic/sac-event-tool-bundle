@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Code4Nix\UriSigner\UriSigner;
 use Contao\Backend;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
@@ -41,6 +42,7 @@ use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class CalendarEventsInstructorInvoice
@@ -53,7 +55,9 @@ readonly class CalendarEventsInstructorInvoice
         private Connection $connection,
         private ContaoCsrfTokenManager $contaoCsrfTokenManager,
         private EventMember $eventMember,
+        private UriSigner $uriSigner,
         private RequestStack $requestStack,
+        private RouterInterface $router,
         private Security $security,
         private TourRapportGenerator $tourRapportGenerator,
         private TranslatorInterface $translator,
@@ -136,71 +140,91 @@ readonly class CalendarEventsInstructorInvoice
 
         $id = $request->query->get('id');
 
+        if (!$id) {
+            return;
+        }
+
         $objEventInvoice = CalendarEventsInstructorInvoiceModel::findById($id);
 
-        if (null !== $objEventInvoice) {
-            $action = $request->query->get('action');
+        if (null === $objEventInvoice) {
+            return;
+        }
 
-            if ($action) {
-                try {
-                    if ('generateInvoicePdf' === $request->query->get('action')) {
-                        throw new ResponseException($this->tourRapportGenerator->download(DocumentType::INVOICE, $objEventInvoice, OutputType::PDF, $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern));
-                    }
+        $action = $request->query->get('action');
 
-                    if ('generateTourRapportPdf' === $request->query->get('action')) {
-                        throw new ResponseException($this->tourRapportGenerator->download(DocumentType::RAPPORT, $objEventInvoice, OutputType::PDF, $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern));
-                    }
-                } catch (ResponseException|TourRapportGeneratorException|\Exception $e) {
-                    $errMsg = match (true) {
-                        $e instanceof ResponseException => throw $e,
-                        $e instanceof TourRapportGeneratorException => $e->getTranslatableText(),
-                        default => throw $e,
-                    };
+        if (!$action) {
+            return;
+        }
 
-                    Message::addError($errMsg);
-                    Controller::redirect(System::getReferer());
-                }
+        try {
+            if ('generateInvoicePdf' === $request->query->get('action')) {
+                throw new ResponseException($this->tourRapportGenerator->download(DocumentType::INVOICE, $objEventInvoice, OutputType::PDF, $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern));
             }
+
+            if ('generateTourRapportPdf' === $request->query->get('action')) {
+                throw new ResponseException($this->tourRapportGenerator->download(DocumentType::RAPPORT, $objEventInvoice, OutputType::PDF, $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern));
+            }
+        } catch (ResponseException|TourRapportGeneratorException|\Exception $e) {
+            $errMsg = match (true) {
+                $e instanceof ResponseException => throw $e,
+                $e instanceof TourRapportGeneratorException => $e->getTranslatableText(),
+                default => throw $e,
+            };
+
+            Message::addError($errMsg);
+            Controller::redirect(System::getReferer());
         }
     }
 
     /**
-     * Display a warning if report form hasn't been filled out.
+     * Display a warning if the report form hasn't been filled out.
      */
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 70)]
-    public function warnIfReportFormHasNotFilledIn(DataContainer $dc): void
+    public function validateEventReportForm(DataContainer $dc): void
     {
-        if ($dc->currentPid) {
-            $objEvent = CalendarEventsModel::findById($dc->currentPid);
+        if (!$dc->currentPid > 0) {
+            return;
+        }
 
-            if (null !== $objEvent) {
-                if (!$objEvent->filledInEventReportForm) {
-                    Message::addError($this->translator->trans('ERR.evt_strn_eventRapportMustFilledOutCorrectly', [], 'contao_default'));
-                    Controller::redirect(System::getReferer());
-                }
-            }
+        $objEvent = CalendarEventsModel::findById($dc->currentPid);
+
+        if (null === $objEvent) {
+            return;
+        }
+
+        if (!$objEvent->filledInEventReportForm) {
+            Message::addError($this->translator->trans('ERR.evt_strn_eventRapportMustFilledOutCorrectly', [], 'contao_default'));
+            Controller::redirect(System::getReferer());
         }
     }
 
     /**
-     * Display a warning if report form hasn't been filled out.
+     * Display a warning if the report form hasn't been filled out.
      */
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 70)]
     public function checkBeforeSendTourRapport(DataContainer $dc): void
     {
+        if (!$dc->currentPid) {
+            return;
+        }
+
         $request = $this->requestStack->getCurrentRequest();
 
         $action = $request->query->get('action', '');
 
-        if ($dc->currentPid && 'sendRapport' === $action) {
-            $objEvent = CalendarEventsModel::findById($dc->currentPid);
+        if ('sendRapport' !== $action) {
+            return;
+        }
 
-            if (null !== $objEvent) {
-                if (!$objEvent->filledInEventReportForm) {
-                    Message::addError($this->translator->trans('ERR.evt_strn_eventRapportMustFilledOutCorrectly', [], 'contao_default'));
-                    Controller::redirect(System::getReferer());
-                }
-            }
+        $objEvent = CalendarEventsModel::findById($dc->currentPid);
+
+        if (null === $objEvent) {
+            return;
+        }
+
+        if (!$objEvent->filledInEventReportForm) {
+            Message::addError($this->translator->trans('ERR.evt_strn_eventRapportMustFilledOutCorrectly', [], 'contao_default'));
+            Controller::redirect(System::getReferer());
         }
     }
 
@@ -208,9 +232,14 @@ readonly class CalendarEventsInstructorInvoice
      * @throws Exception
      */
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 60)]
-    public function reviseTable(): void
+    public function purgeInvalidInvoices(): void
     {
-        $count = $this->connection->executeStatement('DELETE FROM tl_calendar_events_instructor_invoice WHERE NOT EXISTS (SELECT * FROM tl_user WHERE tl_calendar_events_instructor_invoice.userPid = tl_user.id)');
+        $count = $this->connection->executeStatement('
+			DELETE FROM tl_calendar_events_instructor_invoice
+		   	WHERE NOT EXISTS (
+		   		SELECT id FROM tl_user u WHERE u.id = tl_calendar_events_instructor_invoice.userPid
+		  	)
+	  	');
 
         if ($count > 0) {
             Controller::reload();
@@ -259,7 +288,7 @@ readonly class CalendarEventsInstructorInvoice
         if (null !== $organizers) {
             while ($organizers->next()) {
                 if ($organizers->enableRapportNotification) {
-                    // Only show the icon without a link, if rapport notification is disabled in the
+                    // Only show the icon without a link if rapport notification is disabled in the
                     // organizer model.
                     $blnRapportNotificationEnabled = true;
                 }
@@ -272,7 +301,8 @@ readonly class CalendarEventsInstructorInvoice
 
         if (true === $blnAllow) {
             $user = $this->security->getUser();
-            // A common user should not be allowed to send another user's report
+
+			// A common user should not be allowed to send another user's report
             if ($this->security->isGranted('ROLE_ADMIN')) {
                 $blnAllow = true;
             } elseif ((int) $row['userPid'] !== (int) $user->id) {
@@ -285,7 +315,7 @@ readonly class CalendarEventsInstructorInvoice
         }
 
         // Generate a signed url
-        $href = System::getContainer()->get('code4nix_uri_signer.uri_signer')->sign(System::getContainer()->get('router')->generate(SendTourRapportNotificationController::class, [
+        $href = $this->uriSigner->sign($this->router->generate(SendTourRapportNotificationController::class, [
             'rapport_id' => $row['id'],
             'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
             'sid' => uniqid(),
@@ -315,19 +345,31 @@ readonly class CalendarEventsInstructorInvoice
         // Override value from database
         $value = '';
 
-        if (null !== ($objInvoice = CalendarEventsInstructorInvoiceModel::findById($dc->id))) {
-            if ($objInvoice->userPid > 0 && null !== ($objUser = UserModel::findById($objInvoice->userPid))) {
-                $value = $objUser->iban;
-                $objInvoice->iban = $value;
-                $objInvoice->save();
+        $objInvoice = CalendarEventsInstructorInvoiceModel::findById($dc->id);
 
-                if (!empty($value)) {
-                    $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice']['fields']['iban']['eval']['readonly'] = true;
-                    Message::addInfo($this->translator->trans('MSC.evt_strn_ibanWasTakenFromUserDb', [$objUser->name], 'contao_default'));
-                } else {
-                    Message::addInfo($this->translator->trans('ERR.evt_strn_ibanNotFound', [], 'contao_default'));
-                }
-            }
+        if (null === $objInvoice) {
+            return $value;
+        }
+
+        if (!$objInvoice->userPid) {
+            return $value;
+        }
+
+        $objUser = UserModel::findById($objInvoice->userPid);
+
+        if (null === $objUser) {
+            return $value;
+        }
+
+        $value = $objUser->iban;
+        $objInvoice->iban = $value;
+        $objInvoice->save();
+
+        if (!empty($value)) {
+            $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice']['fields']['iban']['eval']['readonly'] = true;
+            Message::addInfo($this->translator->trans('MSC.evt_strn_ibanWasTakenFromUserDb', [$objUser->name], 'contao_default'));
+        } else {
+            Message::addInfo($this->translator->trans('ERR.evt_strn_ibanNotFound', [], 'contao_default'));
         }
 
         return $value;
