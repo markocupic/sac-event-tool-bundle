@@ -1,4 +1,7 @@
-{% extends '@Contao/block_unsearchable' %}
+{% trans_default_domain 'contao_default' %}
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% set searchable = false %}
 
 {% block content %}
     {# Use this button to trigger the modal window #}
@@ -15,20 +18,18 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
                 </div>
                 <div class="modal-body">
-                    <div>
+                    <div class="row">
                         {% for difficulty in difficulties %}
-                            {% if difficulty.isCatStart|default %}
-                                <div class="row">
-                                    <div class="col-12"><h3 class="mt-3 mb-3">{{ difficulty.catTitle }}</h3></div>
+                            {% if difficulty.isCatStart %}
+                                <div class="col-12">
+                                    <h3 class="mt-3 mb-3">{{ difficulty.catTitle }}</h3>
                                 </div>
                             {% endif %}
-                            <div class="row">
-                                <div class="col-2 border-top border-light-subtle pt-2 pb-2">{{ difficulty.shortcut }}</div>
-                                <div class="col-10 border-top border-light-subtle pt-2 pb-2">
-                                    <strong>{{ difficulty.title }}</strong>
-                                    <br>
-                                    {{ difficulty.description }}
-                                </div>
+                            <div class="col-2 border-top border-light-subtle pt-2 pb-2">{{ difficulty.shortcut }}</div>
+                            <div class="col-10 border-top border-light-subtle pt-2 pb-2 text-wrap">
+                                <strong>{{ difficulty.title }}</strong>
+                                <br>
+                                {{ difficulty.description }}
                             </div>
                         {% endfor %}
                     </div>
@@ -40,5 +41,4 @@
         </div>
     </div>
     {# modal window end #}
-
 {% endblock %}

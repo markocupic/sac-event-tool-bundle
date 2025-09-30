@@ -91,7 +91,7 @@ class ConfirmStep implements StepHandlerInterface
         $arrMember = $memberModel->row();
 
         return [
-            'event_model' =>  $arrEvent,
+            'event_model' => $arrEvent,
             'event_member_model' => $arrEventsMember,
             'member_model' => $arrMember,
         ];

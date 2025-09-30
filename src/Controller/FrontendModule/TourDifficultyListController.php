@@ -16,7 +16,6 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\ModuleModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
@@ -24,42 +23,52 @@ use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(TourDifficultyListController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_tour_difficulty_list')]
+#[AsFrontendModule(TourDifficultyListController::TYPE, category: 'sac_event_tool_frontend_modules')]
 class TourDifficultyListController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'tour_difficulty_list';
-
-    public function __construct(
-        private readonly ContaoFramework $framework,
-    ) {
-    }
+    public const string TYPE = 'tour_difficulty_list';
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $arrDifficulty = [];
-        $pid = 0;
-        $tourDifficultyAdapter = $this->framework->getAdapter(TourDifficultyModel::class);
-        $objDifficulty = $tourDifficultyAdapter->findAll(['order' => 'code ASC']);
-
-        if (null !== $objDifficulty) {
-            while ($objDifficulty->next()) {
-                if ($pid !== $objDifficulty->pid) {
-                    $objDifficulty->isCatStart = true;
-                    $tourDifficultyCategoryAdapter = $this->framework->getAdapter(TourDifficultyCategoryModel::class);
-                    $objDifficultyCategory = $tourDifficultyCategoryAdapter->findById($objDifficulty->pid);
-
-                    if (null !== $objDifficultyCategory) {
-                        $objDifficulty->catTitle = $objDifficultyCategory->title;
-                    }
-                }
-
-                $pid = $objDifficulty->pid;
-                $arrDifficulty[] = $objDifficulty->row();
-            }
-        }
-
-        $template->set('difficulties', $arrDifficulty);
+        $template->set('difficulties', $this->getTourDifficulties(['order' => 'code ASC']));
 
         return $template->getResponse();
+    }
+
+    private function getTourDifficulties(array $options = []): array
+    {
+        $items = [];
+        $currentPid = 0;
+
+        $adapter = $this->getContaoAdapter(TourDifficultyModel::class);
+        $objDifficulty = $adapter->findAll($options);
+
+        if (null === $objDifficulty) {
+            return $items;
+        }
+
+        while ($objDifficulty->next()) {
+            $item = $objDifficulty->row();
+            $item['isCatStart'] = false;
+            if ($currentPid !== $objDifficulty->pid) {
+                $item['isCatStart'] = true;
+
+                $objDifficultyCategory = $this->getCategory($objDifficulty->current());
+
+                if (null !== $objDifficultyCategory) {
+                    $item['catTitle'] = $objDifficultyCategory->title;
+                }
+            }
+
+            $currentPid = $objDifficulty->pid;
+            $items[] = $item;
+        }
+
+        return $items;
+    }
+
+    private function getCategory(TourDifficultyModel $objDifficulty): TourDifficultyCategoryModel|null
+    {
+        return $this->getContaoAdapter(TourDifficultyCategoryModel::class)->findById($objDifficulty->pid);
     }
 }

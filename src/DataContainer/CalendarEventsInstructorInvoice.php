@@ -302,7 +302,7 @@ readonly class CalendarEventsInstructorInvoice
         if (true === $blnAllow) {
             $user = $this->security->getUser();
 
-			// A common user should not be allowed to send another user's report
+            // A common user should not be allowed to send another user's report
             if ($this->security->isGranted('ROLE_ADMIN')) {
                 $blnAllow = true;
             } elseif ((int) $row['userPid'] !== (int) $user->id) {

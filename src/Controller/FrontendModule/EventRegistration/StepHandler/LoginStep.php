@@ -26,7 +26,7 @@ class LoginStep implements StepHandlerInterface, ValidationStepInterface
 {
     private const string STEP = 'login';
 
-	private const string TEMPLATE = '@Contao_MarkocupicSacEventToolBundle/frontend_module_fragment/event_registration/step/login.html.twig';
+    private const string TEMPLATE = '@Contao_MarkocupicSacEventToolBundle/frontend_module_fragment/event_registration/step/login.html.twig';
 
     private const int PRIORITY = 300;
 

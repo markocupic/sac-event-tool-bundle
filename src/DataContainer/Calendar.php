@@ -33,10 +33,10 @@ class Calendar
         return $arrRow['title'];
     }
 
-	/**
-	 * Do not display the "show" button if the user has not the permission to create
-	 * new records.
-	 */
+    /**
+     * Do not display the "show" button if the user has not the permission to create
+     * new records.
+     */
     #[AsCallback(table: 'tl_calendar', target: 'list.operations.show.button')]
     public function copyButtonCallback(DataContainerOperation $operation): void
     {
