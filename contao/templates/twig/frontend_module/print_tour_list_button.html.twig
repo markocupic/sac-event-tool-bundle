@@ -1,27 +1,31 @@
-{% extends '@Contao/block_unsearchable' %}
+{% trans_default_domain 'contao_default' %}
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% set searchable = false %}
+
 {% block content %}
     {% if watch_event_list_module|default %}
-        {% set button_id = 'button_'~ id %}
-            {% if not has_logged_in_frontend_user() %}
-                {# Trigger the login modal window for not logged in users #}
-                <button class="btn btn-sm btn-primary text-nowrap" data-sac-login-toggle="modal" data-sac-login-target="same-site" title="Tourliste drucken">
-                    <i class="ready fa-solid fa-fw fa-cloud-arrow-down"></i> Tour-Liste drucken
-                </button>
-            {% else %}
-                <button id="{{ button_id }}" class="btn btn-sm btn-primary text-nowrap" disabled data-url title="Tourliste drucken">
-                    <i class="ready fa-solid fa-fw fa-cloud-arrow-down"></i>
-                    <i class="busy fa-solid fa-fw fa-sync fa-spin"></i> Tour-Liste drucken
-                </button>
-            {% endif %}
+        {% set button_id = 'button_'~ data.id %}
+        {% if not has_logged_in_frontend_user() %}
+            {# Trigger the login modal window for not logged in users #}
+            <button class="btn btn-sm btn-primary text-nowrap" data-sac-login-toggle="modal" data-sac-login-target="same-site" title="Tourliste drucken">
+                <i class="ready fa-solid fa-fw fa-cloud-arrow-down"></i> Tour-Liste drucken
+            </button>
+        {% else %}
+            <button id="{{ button_id }}" class="btn btn-sm btn-primary text-nowrap" disabled data-url title="Tourliste drucken">
+                <i class="ready fa-solid fa-fw fa-cloud-arrow-down"></i>
+                <i class="busy fa-solid fa-fw fa-sync fa-spin"></i> Tour-Liste drucken
+            </button>
+        {% endif %}
         <div class="toast-container position-fixed top-0 start-0 p-3">
             <div id="download-info-toast" class="toast" role="alert" data-bs-autohide="false" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
-                    <span class="me-auto text-danger small">
+                    <span class="me-auto text-danger small text-wrap">
                         <i class="fa-solid fa-circle-info"></i> <strong>Hallo {{ insert_tag('user::firstname') }}!</strong>
                     </span>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-                <div class="toast-body bg-white">
+                <div class="toast-body bg-white text-wrap">
                     <small>
                         Deine Tour-Liste wird jetzt im Hintergrund für dich zusammengestellt. Das kann je nach Anzahl gewählter Touren einige Minuten Zeit beanspruchen.<br>
                         Du darfst aber in dieser Zeit gerne auf {{ app.request.getSchemeAndHttpHost() }} weitersurfen, dich aber nicht abmelden.
@@ -33,16 +37,16 @@
 
         {% do addHtmlToHead('
             <style>
-            .mod_print_tour_list_button button .ready {
+            .module-print-tour-list-button button .ready {
                 display:inline;
             }
-            .mod_print_tour_list_button button .busy {
+            .module-print-tour-list-button button .busy {
                 display:none;
             }
-            .mod_print_tour_list_button button[disabled] .ready {
+            .module-print-tour-list-button button[disabled] .ready {
                 display:none;
             }
-            .mod_print_tour_list_button button[disabled] .busy {
+            .module-print-tour-list-button button[disabled] .busy {
                 display:inline;
             }
             </style>
@@ -54,8 +58,7 @@
             const buttonId = '{{ button_id }}';
 
             document.addEventListener('DOMContentLoaded', () => {
-
-                TourListUtil = {
+                const TourListUtil = {
                     removeParam: function (strUrl, arrParams) {
                         const url = new URL(strUrl);
                         const params = new URLSearchParams(url.search);
@@ -78,7 +81,7 @@
                             const url = decodeURI(atob(e.currentTarget.dataset.url));
 
                             // Remove offset, limit and fields from param string
-                            strParams = TourListUtil.removeParam(url, ['offset', 'limit', 'fields', 'fields[]']);
+                            const strParams = TourListUtil.removeParam(url, ['offset', 'limit', 'fields', 'fields[]']);
                             const href1 = window.location.protocol + '//' + window.location.hostname + '/eventApi/events?' + strParams;
 
                             // Get the event IDS without limit and offset from the server!
@@ -110,12 +113,11 @@
                                     const toastInstance = new bootstrap.Toast(toast);
                                     toastInstance.show();
 
-                                    function play() {
-                                        var audio = new Audio("https://res.cloudinary.com/dxfq3iotg/video/upload/v1557233294/info.mp3");
+                                    (() => {
+                                        {# Play a short sound to alert the user to the message #}
+                                        const audio = new Audio("{{ asset('sounds/bell.mp3', 'markocupic_sac_event_tool') }}");
                                         audio.play();
-                                    }
-
-                                    play();
+                                    })();
                                 }
                             } catch (e) {
                                 button.removeAttribute('disabled');
@@ -132,7 +134,7 @@
                         return;
                     }
 
-                    let button = document.getElementById(buttonId);
+                    const button = document.getElementById(buttonId);
 
                     if (typeof button === 'undefined') {
                         return;
@@ -161,7 +163,7 @@
                         return;
                     }
 
-                    let button = document.getElementById(buttonId);
+                    const button = document.getElementById(buttonId);
 
                     if (button && e.detail.url) {
                         button.removeAttribute('disabled');

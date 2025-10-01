@@ -21,14 +21,10 @@ use Contao\ModuleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(PrintTourListButtonController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_print_tour_list_button')]
+#[AsFrontendModule(PrintTourListButtonController::TYPE, category: 'sac_event_tool_frontend_modules')]
 class PrintTourListButtonController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'print_tour_list_button';
-
-    public function __construct()
-    {
-    }
+    public const string TYPE = 'print_tour_list_button';
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {

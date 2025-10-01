@@ -12,6 +12,10 @@ Encore
         to: 'css/[path][name].[hash:8].[ext]',
     })
     .copyFiles({
+        from: './assets/sounds',
+        to: 'sounds/[path][name].[hash:8].[ext]',
+    })
+    .copyFiles({
         from: './assets/eventfilter',
         to: 'eventfilter/[path][name].[hash:8].[ext]',
     })
