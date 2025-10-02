@@ -47,7 +47,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		],
 		'label'             => [
 			// The field J+S/Jugend does not exist and is only used to show the age group of the member
-			'fields'      => ['stateOfSubscription', 'J+S/Jugend', 'firstname', 'lastname', 'street', 'city'],
+			'fields'      => ['stateOfSubscription', 'firstname', 'lastname', 'J+S/Jugend', 'street', 'city'],
 			'showColumns' => true,
 		],
 		'global_operations' => [

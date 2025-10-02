@@ -573,7 +573,7 @@ class CalendarEventsMember
         $args[0] = \sprintf('<div>%s</div>', $icon);
 
         // Add the age group (Jugend or J+S)
-        $args[1] = $this->eventRegistrationUtil->getAgeGroup($objReg);
+        $args[3] = $this->eventRegistrationUtil->getAgeGroup($objReg);
 
         return $args;
     }
