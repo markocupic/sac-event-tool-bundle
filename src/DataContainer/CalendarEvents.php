@@ -57,6 +57,7 @@ use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -286,7 +287,7 @@ class CalendarEvents
             $csv->setDelimiter(';');
 
             // Selected fields
-            $arrFields = array_unique(['id', 'title', 'location', 'eventDates', 'eventDurationInDays', 'published', 'organizers', 'mountainguide', 'mainInstructor', 'instructor', 'minMembers', 'maxMembers', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey', 'teaser', 'tourDetailText', 'requirements']);
+            $arrFields = array_unique(['id', 'title', 'location', 'eventDates', 'eventDurationInDays', 'published', 'organizers', 'mountainguide', 'mainInstructor', 'instructor', 'minMembers', 'maxMembers', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey', 'teaser', 'tourDetailText', 'requirements', 'leistungen']);
 
             // Insert headline first
             $this->controller->loadLanguageFile('tl_calendar_events');
@@ -385,8 +386,8 @@ class CalendarEvents
                                 break;
 
                             default:
-                                if (\in_array($field, ['teaser', 'tourDetailText', 'requirements'], true)) {
-                                    $arrRow[] = str_replace(['<br>', '<br/>'], [' ', ' '], nl2br((string) $objEvent->{$field}));
+                                if (\in_array($field, ['teaser', 'tourDetailText', 'requirements', 'leistungen'], true)) {
+                                    $arrRow[] = str_replace(['<br>', '<br/>', '<br />', '{{br}}'], [' ', ' ', ' ', ' '], nl2br((string) $objEvent->{$field}));
                                 } else {
                                     $arrRow[] = $objEvent->{$field};
                                 }
@@ -404,7 +405,13 @@ class CalendarEvents
             $fileName = $this->stringUtil->revertInputEncoding($objCalendar->title).'.csv';
             $fileName = $this->stringUtil->sanitizeFileName($fileName);
 
-            $response = new Response((string) $csv->output($fileName));
+            // Serve content as a file download
+            $response = new Response($csv->toString());
+            $disposition = HeaderUtils::makeDisposition(
+                HeaderUtils::DISPOSITION_ATTACHMENT,
+                $fileName,
+            );
+            $response->headers->set('Content-Disposition', $disposition);
 
             throw new ResponseException($response);
         }
