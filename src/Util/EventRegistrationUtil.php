@@ -14,8 +14,10 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Util;
 
+use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Date;
 use Contao\Image;
 use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\Config\Bundle;
@@ -24,6 +26,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventRegistrationUtil
 {
+    private Adapter $dateAdapter;
+
     private Adapter $stringUtilAdapter;
 
     private Adapter $imageAdapter;
@@ -32,6 +36,7 @@ class EventRegistrationUtil
         private readonly ContaoFramework $framework,
         private readonly TranslatorInterface $translator,
     ) {
+        $this->dateAdapter = $this->framework->getAdapter(Date::class);
         $this->stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
         $this->imageAdapter = $this->framework->getAdapter(Image::class);
     }
@@ -47,23 +52,22 @@ class EventRegistrationUtil
         return $this->imageAdapter->getHtml($icon, $strAlt, $strAttributes);
     }
 
-    public function getAgeAtEndOfYear(CalendarEventsMemberModel $registrationModel, int|null $year = null): int
-    {
-        $year = $year ?? (int) date('Y');
-
-        $birthTimestamp = (int) $registrationModel->dateOfBirth;
-        $birthDate = (new \DateTimeImmutable())->setTimestamp($birthTimestamp);
-        $endOfYear = new \DateTimeImmutable("$year-12-31");
-
-        return $endOfYear->diff($birthDate)->y;
-    }
-
+    /**
+     * @param int|null $year if null, the year of the event will be used
+     */
     public function getAgeGroup(CalendarEventsMemberModel $registrationModel, int|null $year = null): string
     {
-        $year = $year ?? (int) date('Y');
-
         if ('' === $registrationModel->dateOfBirth) {
             return '';
+        }
+
+        $event = CalendarEventsModel::findById($registrationModel->eventId);
+
+        if (null === $year) {
+            if (null === $event || null === $event->startDate) {
+                return '';
+            }
+            $year = (int) $this->dateAdapter->parse('Y', (int) $event->startDate);
         }
 
         $age = $this->getAgeAtEndOfYear($registrationModel, $year);
@@ -73,5 +77,14 @@ class EventRegistrationUtil
             $age <= 22 => 'Jugend',
             default => '',
         };
+    }
+
+    private function getAgeAtEndOfYear(CalendarEventsMemberModel $registrationModel, int $year): int
+    {
+        $birthTimestamp = (int) $registrationModel->dateOfBirth;
+        $birthDate = (new \DateTimeImmutable())->setTimestamp($birthTimestamp);
+        $endOfYear = new \DateTimeImmutable("$year-12-31");
+
+        return $endOfYear->diff($birthDate)->y;
     }
 }
