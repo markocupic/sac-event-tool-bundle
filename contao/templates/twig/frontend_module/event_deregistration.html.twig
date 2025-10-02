@@ -1,5 +1,7 @@
 {% trans_default_domain 'contao_default' %}
-{% extends '@Contao/block_unsearchable' %}
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% set searchable = false %}
 
 {% block content %}
     {% if errorMessage|default %}
