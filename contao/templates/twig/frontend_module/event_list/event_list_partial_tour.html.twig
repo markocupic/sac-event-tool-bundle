@@ -131,7 +131,7 @@
 <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
     window.addEventListener("DOMContentLoaded", (event) => {
         new VueEventList('#tour-list', {
-            'modId': {{ id }},
+            'modId': {{ data.id }},
             'csrfToken': '{{ csrfToken }}',
             'apiParams': {
                 'arrIds': [{{ apiParam.arrIds }}],
@@ -182,4 +182,4 @@
 </script>
 
 {# re-initialize AOS, Bootstrap/Popper.js and handle the forward/backend cache implemented with IndexedDB #}
-{% include '@Contao_MarkocupicSacEventToolBundle/_insert_listener.html.twig' with {'elId': '#tour-list'} only %}
+{% include '@Contao_MarkocupicSacEventToolBundle/frontend_module/event_list/_insert_listener.html.twig' with {'elId': '#tour-list'} only %}

@@ -18,7 +18,6 @@ use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Exception\ResponseException;
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\FrontendUser;
 use Contao\ModuleModel;
@@ -26,23 +25,22 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-#[AsFrontendModule(EventListController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_event_list')]
+#[AsFrontendModule(EventListController::TYPE, category: 'sac_event_tool_frontend_modules')]
 class EventListController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'event_list';
+    public const string TYPE = 'event_list';
 
     protected ModuleModel|null $model = null;
 
     public function __construct(
-        private readonly ContaoFramework $framework,
         private readonly Connection $connection,
         private readonly ContaoCsrfTokenManager $csrfTokenManager,
-        private readonly Security $security,
+        private readonly TokenStorageInterface $tokenStorage,
     ) {
     }
 
@@ -55,44 +53,48 @@ class EventListController extends AbstractFrontendModuleController
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $user = $this->security->getUser();
+        // Add or remove the event from the like-list
+        $this->processFavoriteEventToggle($request);
 
-        if ($user instanceof FrontendUser && $request->isMethod('POST') && $request->request->has('eventId')) {
-            $eventId = (int) $request->request->get('eventId');
-            $id = $this->connection->fetchOne(
-                'SELECT id FROM tl_favored_events WHERE eventId = ? AND memberId = ?',
-                [$eventId, $user->id],
-                [Types::INTEGER, Types::INTEGER],
-            );
+        // 	Extract the API parameters from the request
+        $apiParam = $this->extractApiParameters($request);
 
-            if (false !== $id) {
-                $this->connection->delete('tl_favored_events', ['id' => $id], [Types::INTEGER]);
-                $json = ['status' => 'success', 'isFavoredEvent' => false];
+        // 	Extract the picture ID from the module model
+        $pictureId = $this->extractPictureId($model);
 
-                throw new ResponseException(new JsonResponse($json));
-            }
-            $set = [
-                'memberId' => $user->id,
-                'eventId' => $eventId,
-                'tstamp' => time(),
-            ];
-            $types = [
-                Types::INTEGER,
-                Types::INTEGER,
-                Types::INTEGER,
-            ];
+        $template->set('arrPartialOpt', [
+            'pictureId' => $pictureId,
+            'moduleId' => $model->id,
+            'apiParam' => $apiParam,
+        ]);
 
-            $this->connection->insert('tl_favored_events', $set, $types);
-            $json = ['status' => 'success', 'isFavoredEvent' => true];
+        $template->set('csrfToken', $this->csrfTokenManager->getDefaultTokenValue());
 
-            throw new ResponseException(new JsonResponse($json));
+        return $template->getResponse();
+    }
+
+    private function processFavoriteEventToggle(Request $request): void
+    {
+        $user = $this->tokenStorage->getToken()?->getUser();
+
+        if (!$user instanceof FrontendUser) {
+            return;
         }
 
-        /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+        if (!$request->isMethod('POST')) {
+            return;
+        }
 
-        // Get filter params from request
-        $arrKeys = [
+        if (!$request->request->has('eventId')) {
+            return;
+        }
+
+        $this->handleFavoriteEventToggle($user, $request);
+    }
+
+    private function extractApiParameters(Request $request): array
+    {
+        $parameterKeys = [
             'limit',
             'calendarIds',
             'eventType',
@@ -108,41 +110,40 @@ class EventListController extends AbstractFrontendModuleController
             'dateEnd',
             'textSearch',
             'eventId',
-            'courseId',
             'arrIds',
             'username',
         ];
 
+        $queryParams = $request->query->all();
         $apiParam = [];
 
-        $requestQueryAll = $request->query->all();
-
-        foreach ($arrKeys as $key) {
-            $apiParam[$key] = $this->getApiParam($key, $requestQueryAll[$key] ?? null);
+        foreach ($parameterKeys as $key) {
+            $apiParam[$key] = $this->getApiParam($key, $queryParams[$key] ?? null);
         }
 
-        // Get picture id
-        $arrPicture = $stringUtilAdapter->deserialize($model->imgSize, true);
-        $pictureId = isset($arrPicture[2]) && is_numeric($arrPicture[2]) ? $arrPicture[2] : '0';
-
-        $template->set('arrPartialOpt', [
-            'pictureId' => $pictureId,
-            'moduleId' => $model->id,
-            'apiParam' => $apiParam,
-        ]);
-
-        // Add CSRF token to the template
-        $template->set('csrfToken', $this->csrfTokenManager->getDefaultTokenValue());
-
-        return $template->getResponse();
+        return $apiParam;
     }
 
-    private function getApiParam(string $strKey, mixed $value)
+    private function extractPictureId(ModuleModel $model): string
     {
         /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+        $stringUtilAdapter = $this->getContaoAdapter(StringUtil::class);
 
-        switch ($strKey) {
+        $picture = $stringUtilAdapter->deserialize($model->imgSize, true);
+
+        if (isset($picture[2]) && is_numeric($picture[2])) {
+            return (string) $picture[2];
+        }
+
+        return '0';
+    }
+
+    private function getApiParam(string $key, mixed $value)
+    {
+        /** @var StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->getContaoAdapter(StringUtil::class);
+
+        switch ($key) {
             case 'organizers':
             case 'tourType':
             case 'courseType':
@@ -171,8 +172,8 @@ class EventListController extends AbstractFrontendModuleController
 
             case 'calendarIds':
                 if ($this->model->applyCalFilter) {
-                    $arrCalIds = $stringUtilAdapter->deserialize($this->model->cal_calendar, true);
-                    $value = !empty($arrCalIds) ? $arrCalIds : [0];
+                    $calendarIds = $stringUtilAdapter->deserialize($this->model->cal_calendar, true);
+                    $value = !empty($calendarIds) ? $calendarIds : [0];
                 } else {
                     if (!\is_array($value)) {
                         // It can be transmitted like this: calendarIds=5,7 or
@@ -195,5 +196,41 @@ class EventListController extends AbstractFrontendModuleController
         }
 
         return $value;
+    }
+
+    private function handleFavoriteEventToggle(FrontendUser $user, Request $request): void
+    {
+        $eventId = (int) $request->request->get('eventId');
+        $id = $this->connection->fetchOne(
+            'SELECT id FROM tl_favored_events WHERE eventId = ? AND memberId = ?',
+            [$eventId, $user->id],
+            [Types::INTEGER, Types::INTEGER],
+        );
+
+        // Remove the event from the like-list
+        if (false !== $id) {
+            $this->connection->delete('tl_favored_events', ['id' => $id], [Types::INTEGER]);
+            $json = ['status' => 'success', 'isFavoredEvent' => false];
+
+            throw new ResponseException(new JsonResponse($json));
+        }
+
+        // Add the event to the like-list
+        $set = [
+            'memberId' => $user->id,
+            'eventId' => $eventId,
+            'tstamp' => time(),
+        ];
+
+        $types = [
+            Types::INTEGER,
+            Types::INTEGER,
+            Types::INTEGER,
+        ];
+
+        $this->connection->insert('tl_favored_events', $set, $types);
+        $json = ['status' => 'success', 'isFavoredEvent' => true];
+
+        throw new ResponseException(new JsonResponse($json));
     }
 }

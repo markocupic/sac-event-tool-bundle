@@ -1,0 +1,8 @@
+{% trans_default_domain 'contao_default' %}
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% set searchable = false %}
+
+{% block content %}
+    {% include '@Contao_MarkocupicSacEventToolBundle/frontend_module/event_list/' ~ data.eventListPartialTpl ~ '.html.twig' with arrPartialOpt %}
+{% endblock %}
