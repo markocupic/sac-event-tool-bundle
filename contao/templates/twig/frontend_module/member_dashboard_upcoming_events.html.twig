@@ -1,4 +1,7 @@
-{% extends '@Contao/block_unsearchable' %}
+{% trans_default_domain 'contao_default' %}
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% set searchable = false %}
 
 {% block content %}
     {% if hasInfoMessage|default %}
@@ -22,7 +25,7 @@
                 <th>&nbsp;</th>
             </tr>
             {% for event in arrUpcomingEvents|default([]) %}
-                {% set stateOfSubscription = ('MSC.' ~ event.eventRegistrationModel.stateOfSubscription)|trans({}, 'contao_default') %}
+                {% set stateOfSubscription = ('MSC.' ~ event.eventRegistrationModel.stateOfSubscription)|trans %}
                 <tr>
                     <td>{{ event.dateSpan|raw }}</td>
                     <td>
