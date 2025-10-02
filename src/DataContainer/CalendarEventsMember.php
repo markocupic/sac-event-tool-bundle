@@ -573,7 +573,11 @@ class CalendarEventsMember
         $args[0] = \sprintf('<div>%s</div>', $icon);
 
         // Add the age group (Jugend or J+S)
-        $args[3] = $this->eventRegistrationUtil->getAgeGroup($objReg);
+        $index = array_search('J+S/Jugend', $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['label']['fields'], true);
+        if (false === $index) {
+            throw new \Exception('The entry "J+S/Jugend" does not exist in the tl_calendar_events_member.list.label.fields (DCA).');
+        }
+        $args[$index] = $this->eventRegistrationUtil->getAgeGroup($objReg);
 
         return $args;
     }
