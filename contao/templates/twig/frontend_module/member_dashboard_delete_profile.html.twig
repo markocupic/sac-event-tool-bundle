@@ -1,5 +1,7 @@
-{% extends '@Contao/block_unsearchable' %}
+{% trans_default_domain 'contao_default' %}
+{% extends "@Contao/frontend_module/_base.html.twig" %}
 
+{% set searchable = false %}
 {% block content %}
     {% if hasInfoMessages is same as true %}
         {% for msg in infoMessages %}

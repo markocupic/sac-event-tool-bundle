@@ -18,7 +18,6 @@ use Codefog\HasteBundle\Form\Form;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Exception\RedirectResponseException;
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Environment;
 use Contao\FrontendUser;
@@ -26,33 +25,27 @@ use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-#[AsFrontendModule(MemberDashboardDeleteProfileController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_member_dashboard_delete_profile')]
+#[AsFrontendModule(MemberDashboardDeleteProfileController::TYPE, category: 'sac_event_tool_frontend_modules')]
 class MemberDashboardDeleteProfileController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'member_dashboard_delete_profile';
+    public const string TYPE = 'member_dashboard_delete_profile';
 
     private FrontendUser|null $user;
 
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly Security $security,
+        private readonly TokenStorageInterface $tokenStorage,
         private readonly ClearFrontendUserData $clearFrontendUserData,
     ) {
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array|null $classes = null, PageModel|null $page = null): Response
     {
-        // Get logged in member object
-        $user = $this->security->getUser();
-
-        if ($user instanceof FrontendUser) {
-            $this->user = $user;
-        }
+        $this->user = $this->getUserFromToken();
 
         if (null !== $page) {
             // Neither cache nor search page
@@ -82,7 +75,7 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
             $template->set('passedConfirmation', true);
         }
 
-        // Add messages to template
+        // Add messages to the template
         $this->addMessagesToTemplate($request, $template);
 
         return $template->getResponse();
@@ -93,50 +86,50 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
      */
     protected function generateDeleteProfileForm(Request $request): string
     {
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
+        $environmentAdapter = $this->getContaoAdapter(Environment::class);
 
-        $objForm = new Form(
+        $form = new Form(
             'form-clear-profile',
             'POST',
         );
 
-        $objForm->setAction($environmentAdapter->get('uri'));
+        $form->setAction($environmentAdapter->get('uri'));
 
-        $objForm->addFormField('deleteProfile', [
+        $form->addFormField('deleteProfile', [
             'label' => ['Profil löschen', ''],
             'inputType' => 'select',
             'options' => ['false' => 'Nein', 'true' => 'Ja'],
         ]);
 
-        $objForm->addFormField('sacMemberId', [
+        $form->addFormField('sacMemberId', [
             'label' => ['SAC-Mitgliedernummer', ''],
             'inputType' => 'text',
         ]);
 
-        // Let's add a submit button
-        $objForm->addFormField('submit', [
+        // Add a submit-button
+        $form->addFormField('submit', [
             'label' => 'Profil unwiderruflich löschen',
             'inputType' => 'submit',
         ]);
 
-        if ($objForm->validate()) {
+        if ($form->validate()) {
             if ('form-clear-profile' === $request->request->get('FORM_SUBMIT')) {
                 $blnHasError = false;
 
                 if ('true' !== $request->request->get('deleteProfile')) {
                     $blnHasError = true;
-                    $objFormField1 = $objForm->getWidget('deleteProfile');
-                    $objFormField1->addError('Falsche Eingabe. Das Profil konnte nicht gelöscht werden.');
+                    $formField1 = $form->getWidget('deleteProfile');
+                    $formField1->addError('Falsche Eingabe. Das Profil konnte nicht gelöscht werden.');
                 }
 
                 if ($request->request->get('sacMemberId') !== (string) $this->user->sacMemberId) {
                     $blnHasError = true;
-                    $objFormField2 = $objForm->getWidget('sacMemberId');
-                    $objFormField2->addError('Das Profil konnte nicht gelöscht werden. Die Mitgliedernummer ist falsch.');
+                    $formField2 = $form->getWidget('sacMemberId');
+                    $formField2->addError('Das Profil konnte nicht gelöscht werden. Die Mitgliedernummer ist falsch.');
                 }
 
                 if (!$blnHasError) {
-                    // Clear account and redirect to start page
+                    // Clear the account and redirect to the start page
                     if (true === $this->clearFrontendUserData->clearMemberProfile((int) $this->user->id)) {
                         $this->clearFrontendUserData->disableLogin((int) $this->user->id);
                         $this->clearFrontendUserData->deleteFrontendAccount((int) $this->user->id);
@@ -147,7 +140,7 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
             }
         }
 
-        return $objForm->generate();
+        return $form->generate();
     }
 
     /**
@@ -155,7 +148,7 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
      */
     protected function addMessagesToTemplate(Request $request, FragmentTemplate $template): void
     {
-        $messageAdapter = $this->framework->getAdapter(Message::class);
+        $messageAdapter = $this->getContaoAdapter(Message::class);
 
         $session = $request->getSession();
         $template->set('hasInfoMessages', false);
@@ -176,5 +169,19 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
         }
 
         $messageAdapter->reset();
+    }
+
+    private function getUserFromToken(): FrontendUser|null
+    {
+        $user = $this->tokenStorage
+            ->getToken()
+            ?->getUser()
+        ;
+
+        if ($user instanceof FrontendUser) {
+            return $user;
+        }
+
+        return null;
     }
 }
