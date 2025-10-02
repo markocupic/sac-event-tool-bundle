@@ -23,12 +23,14 @@ use Contao\UserModel;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
+use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
 
 readonly class EventMember
 {
     public function __construct(
         private CalendarEventsUtil $calendarEventsUtil,
         private ContaoFramework $framework,
+        private EventRegistrationUtil $eventRegistrationUtil,
     ) {
         $this->framework->initialize();
     }
@@ -86,6 +88,7 @@ readonly class EventMember
                     $objPhpWord->addToClone('i', 'role', 'TL', ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'firstname', $this->prepareString((string) $objUserModel->firstname), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'lastname', $this->prepareString((string) $objUserModel->lastname), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'ageInfo', '', ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. '.$objUserModel->sacMemberId, ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'memberInSection', $strMemberInSection, ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'isNotSacMember', $isMember ? ' ' : '!inaktiv/kein Mitglied', ['multiline' => false]);
@@ -168,6 +171,7 @@ readonly class EventMember
                 $objPhpWord->addToClone('i', 'role', 'TN', ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'firstname', $this->prepareString((string) $objEventMember->firstname), ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'lastname', $this->prepareString((string) $objEventMember->lastname), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'ageInfo', $this->prepareString((string) $this->getAgeInfo($objEventMember->current())), ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. '.$objEventMember->sacMemberId, ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'memberInSection', $strMemberInSection, ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'isNotSacMember', $strIsActiveMember, ['multiline' => false]);
@@ -223,5 +227,12 @@ readonly class EventMember
         }
 
         return htmlspecialchars(html_entity_decode($string));
+    }
+
+    protected function getAgeInfo(CalendarEventsMemberModel $objEventMember): string
+    {
+        $ageGroup = $this->eventRegistrationUtil->getAgeGroup($objEventMember);
+
+        return '' === $ageGroup ? '' : '('.$ageGroup.')';
     }
 }

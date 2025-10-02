@@ -46,4 +46,32 @@ class EventRegistrationUtil
 
         return $this->imageAdapter->getHtml($icon, $strAlt, $strAttributes);
     }
+
+    public function getAgeAtEndOfYear(CalendarEventsMemberModel $registrationModel, int|null $year = null): int
+    {
+        $year = $year ?? (int) date('Y');
+
+        $birthTimestamp = (int) $registrationModel->dateOfBirth;
+        $birthDate = (new \DateTimeImmutable())->setTimestamp($birthTimestamp);
+        $endOfYear = new \DateTimeImmutable("$year-12-31");
+
+        return $endOfYear->diff($birthDate)->y;
+    }
+
+    public function getAgeGroup(CalendarEventsMemberModel $registrationModel, int|null $year = null): string
+    {
+        $year = $year ?? (int) date('Y');
+
+        if ('' === $registrationModel->dateOfBirth) {
+            return '';
+        }
+
+        $age = $this->getAgeAtEndOfYear($registrationModel, $year);
+
+        return match (true) {
+            $age <= 20 => 'J+S',
+            $age <= 22 => 'Jugend',
+            default => '',
+        };
+    }
 }

@@ -27,7 +27,7 @@ use Contao\Environment;
 use Contao\MemberModel;
 use Contao\ModuleModel;
 use Doctrine\DBAL\Connection;
-use League\Csv\ByteSequence;
+use League\Csv\Bom;
 use League\Csv\CannotInsertRecord;
 use League\Csv\Exception;
 use League\Csv\InvalidArgument;
@@ -306,7 +306,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
         // Load the CSV document from a string
         $csv = Writer::createFromString('');
-        $csv->setOutputBOM(ByteSequence::BOM_UTF8);
+        $csv->setOutputBOM(Bom::Utf8);
 
         $csv->setDelimiter($this->strDelimiter);
         $csv->setEnclosure($this->strEnclosure);

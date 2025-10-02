@@ -31,10 +31,10 @@ use Contao\UserGroupModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\Types;
+use League\Csv\Bom;
 use League\Csv\CannotInsertRecord;
 use League\Csv\Exception;
 use League\Csv\InvalidArgument;
-use League\Csv\Reader;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\SacEventToolBundle\Model\UserRoleModel;
@@ -382,12 +382,12 @@ class CsvUserExportController extends AbstractFrontendModuleController
 
         // Load the CSV document from an empty string
         $csv = $writerAdapter->createFromString();
-        $csv->setOutputBOM(Reader::BOM_UTF8);
+        $csv->setOutputBOM(Bom::Utf8);
         $csv->setDelimiter(static::FIELD_DELIMITER);
         $csv->setEnclosure(static::FIELD_ENCLOSURE);
         $csv->insertAll($arrFinal);
 
-        // Save data to temporary file
+        // Save data to a temporary file
         $objFile = new File($this->sacevtTempDir.'/'.$filename);
         $objFile->write($csv->toString());
         $objFile->close();

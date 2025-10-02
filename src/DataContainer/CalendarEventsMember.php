@@ -541,14 +541,39 @@ class CalendarEventsMember
     }
 
     /**
+     * Add the age group to the info list. See:
+     * https://github.com/jonasmueller1/sac-pilatus-website/issues/202
+     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onshow', priority: 100)]
+    public function addAgeGroup(array $data, array $row, DataContainer $dc): array
+    {
+        $registration = $this->calendarEventsMember->findById($row['id']);
+
+        if (null === $registration || !isset($data['tl_calendar_events_member'][0])) {
+            return $data;
+        }
+
+        $this->eventRegistrationUtil->getAgeGroup($registration);
+        $ageGroup = $this->eventRegistrationUtil->getAgeGroup($registration);
+        $data['tl_calendar_events_member'][0]['J+S/Jugend'] = '' === $ageGroup ? '-' : $ageGroup;
+
+        return $data;
+    }
+
+    /**
      * Add an icon to each record.
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.label.label', priority: 100)]
     public function addIcon(array $row, string $label, DataContainer $dc, array $args): array
     {
         $objReg = $this->calendarEventsMember->findById($row['id']);
+
+        // Add the subscription state icon
         $icon = $this->eventRegistrationUtil->getSubscriptionStateIcon($objReg);
         $args[0] = \sprintf('<div>%s</div>', $icon);
+
+        // Add the age group (Jugend or J+S)
+        $args[1] = $this->eventRegistrationUtil->getAgeGroup($objReg);
 
         return $args;
     }

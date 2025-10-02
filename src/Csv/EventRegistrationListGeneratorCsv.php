@@ -21,9 +21,11 @@ use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Doctrine\DBAL\Connection;
-use League\Csv\Reader;
+use League\Csv\Bom;
 use League\Csv\Writer;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
+use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -56,9 +58,12 @@ class EventRegistrationListGeneratorCsv
         'emergencyPhone',
         'emergencyPhoneName',
         'hasParticipated',
+        'J+S/Jugend',
     ];
 
     // Adapters
+    private Adapter $calendarEventsMemberAdapter;
+
     private Adapter $configAdapter;
 
     private Adapter $controllerAdapter;
@@ -69,9 +74,11 @@ class EventRegistrationListGeneratorCsv
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
         private readonly Connection $connection,
+        private readonly EventRegistrationUtil $eventRegistrationUtil,
         private readonly string $sacevtEventMemberListFileNamePattern,
     ) {
         // Adapters
+        $this->calendarEventsMemberAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->configAdapter = $this->framework->getAdapter(Config::class);
         $this->controllerAdapter = $this->framework->getAdapter(Controller::class);
         $this->dateAdapter = $this->framework->getAdapter(Date::class);
@@ -98,7 +105,7 @@ class EventRegistrationListGeneratorCsv
     private function createCsvWriter(): Writer
     {
         $csv = Writer::createFromString();
-        $csv->setOutputBOM(Reader::BOM_UTF8);
+        $csv->setOutputBOM(Bom::Utf8);
         $csv->setDelimiter(self::DELIMITER);
 
         return $csv;
@@ -130,12 +137,14 @@ class EventRegistrationListGeneratorCsv
         );
     }
 
-    private function buildRegistrationRow(array $registration, array $eventTimestamps): array
+    private function buildRegistrationRow(array $dataRegistration, array $eventTimestamps): array
     {
         $row = [];
 
+        $registration = $this->calendarEventsMemberAdapter->findById($dataRegistration['id']);
+
         foreach (self::FIELDS as $field) {
-            $row[] = $this->formatFieldValue($field, $registration[$field] ?? '');
+            $row[] = $this->formatFieldValue($field, $dataRegistration[$field] ?? '', $registration);
         }
 
         // Add event dates! See:
@@ -143,7 +152,7 @@ class EventRegistrationListGeneratorCsv
         return array_merge($row, array_fill(0, \count($eventTimestamps), ''));
     }
 
-    private function formatFieldValue(string $field, mixed $value): string
+    private function formatFieldValue(string $field, mixed $value, CalendarEventsMemberModel $registration): string
     {
         $value = html_entity_decode((string) $value);
 
@@ -151,6 +160,7 @@ class EventRegistrationListGeneratorCsv
             'stateOfSubscription', 'gender' => $GLOBALS['TL_LANG']['MSC'][$value] ?? $value,
             'dateAdded' => date($this->configAdapter->get('datimFormat'), (int) $value),
             'dateOfBirth' => date($this->configAdapter->get('dateFormat'), (int) $value),
+            'J+S/Jugend' => null === $registration ? '' : $this->eventRegistrationUtil->getAgeGroup($registration),
             default => $value,
         };
     }
