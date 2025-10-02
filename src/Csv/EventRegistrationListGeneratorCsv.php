@@ -24,6 +24,7 @@ use Doctrine\DBAL\Connection;
 use League\Csv\Bom;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
+use Markocupic\SacEventToolBundle\String\PhoneNumber;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
 use Symfony\Component\HttpFoundation\HeaderUtils;
@@ -75,6 +76,7 @@ class EventRegistrationListGeneratorCsv
         private readonly ContaoFramework $framework,
         private readonly Connection $connection,
         private readonly EventRegistrationUtil $eventRegistrationUtil,
+        private readonly PhoneNumber $phoneNumber,
         private readonly string $sacevtEventMemberListFileNamePattern,
     ) {
         // Adapters
@@ -157,6 +159,7 @@ class EventRegistrationListGeneratorCsv
         $value = html_entity_decode((string) $value);
 
         return match ($field) {
+            'phone', 'mobile', 'emergencyPhone' => '' === $value ? '' : 'T: '.$this->phoneNumber->beautify($value),
             'stateOfSubscription', 'gender' => $GLOBALS['TL_LANG']['MSC'][$value] ?? $value,
             'dateAdded' => date($this->configAdapter->get('datimFormat'), (int) $value),
             'dateOfBirth' => date($this->configAdapter->get('dateFormat'), (int) $value),
