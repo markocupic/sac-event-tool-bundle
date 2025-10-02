@@ -35,7 +35,6 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\SacEventToolBundle\Image\RotateImage;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
@@ -43,8 +42,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-#[AsFrontendModule(MemberDashboardAvatarUploadController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_member_dashboard_avatar_upload')]
+#[AsFrontendModule(MemberDashboardAvatarUploadController::TYPE, category: 'sac_event_tool_frontend_modules')]
 class MemberDashboardAvatarUploadController extends AbstractFrontendModuleController
 {
     public const string TYPE = 'member_dashboard_avatar_upload';
@@ -57,7 +57,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         private readonly BinaryFileDownload $binaryFileDownload,
         private readonly ContaoFramework $framework,
         private readonly RotateImage $rotateImage,
-        private readonly Security $security,
+        private readonly TokenStorageInterface $tokenStorage,
         private readonly UriSigner $uriSigner,
         private readonly UrlParser $urlParser,
         private readonly string $projectDir,
@@ -69,9 +69,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array|null $classes = null, PageModel|null $page = null): Response
     {
-        if (($user = $this->security->getUser()) instanceof FrontendUser) {
-            $this->user = $user;
-        }
+        $this->user = $this->getUserFromToken();
 
         if (null !== $page) {
             // Neither cache nor search page
@@ -137,13 +135,27 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             $this->template->form = $this->generateAvatarForm($request);
         }
 
-        // Add messages to template
+        // Add messages to the template
         $this->addMessagesToTemplate($request);
 
         return $this->template->getResponse();
     }
 
-    protected function deleteAvatar(): void
+    private function getUserFromToken(): FrontendUser|null
+    {
+        $user = $this->tokenStorage
+            ->getToken()
+            ?->getUser()
+        ;
+
+        if ($user instanceof FrontendUser) {
+            return $user;
+        }
+
+        return null;
+    }
+
+    private function deleteAvatar(): void
     {
         if (!$this->hasValidAvatar()) {
             return;
@@ -186,14 +198,14 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
         $this->user->avatar = '';
         $this->user->save();
-        $objUploadFolder = new Folder($this->getUserAvatarUploadDir());
-        $objUploadFolder->purge();
-        $objUploadFolder->delete();
+        $uploadFolder = new Folder($this->getUserAvatarUploadDir());
+        $uploadFolder->purge();
+        $uploadFolder->delete();
     }
 
     private function hasValidAvatar(): bool
     {
-        // Check for valid avatar
+        // Validate avatar
         if (null === $this->user) {
             return false;
         }
@@ -234,42 +246,42 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
         $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
 
-        $objForm = new Form(
+        $form = new Form(
             'form-avatar-upload',
             'POST',
         );
 
-        $objForm->setAction($environmentAdapter->get('uri'));
+        $form->setAction($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
-        $objForm->addFormField('avatar', [
+        $form->addFormField('avatar', [
             'label' => 'Profilbild hochladen',
             'inputType' => 'upload',
             'eval' => ['class' => 'd-none custom-input-file', 'mandatory' => false],
         ]);
 
-        // Let's add  a submit button
-        $objForm->addFormField('submitButton', [
+        // Add the submit-button
+        $form->addFormField('submitButton', [
             'label' => 'Speichern',
             'inputType' => 'submit',
             'eval' => ['class' => 'd-none'],
         ]);
 
         // Create the folder if it not exists
-        $objUploadFolder = new Folder($this->getUserAvatarUploadDir());
-        $dbafsAdapter->addResource($objUploadFolder->path);
+        $uploadFolder = new Folder($this->getUserAvatarUploadDir());
+        $dbafsAdapter->addResource($uploadFolder->path);
 
-        $objWidget = $objForm->getWidget('avatar');
-        $objWidget->addAttribute('accept', '.jpg,.jpeg,.png');
-        $objWidget->extensions = 'jpg,jpeg,png';
+        $widget = $form->getWidget('avatar');
+        $widget->addAttribute('accept', '.jpg,.jpeg,.png');
+        $widget->extensions = 'jpg,jpeg,png';
 
-        if ($objForm->validate()) {
+        if ($form->validate()) {
             // Delete avatar
             if ($request->request->get('deleteAvatar')) {
                 $this->deleteAvatar();
             }
 
-            $widget = $objForm->getWidget('avatar');
+            $widget = $form->getWidget('avatar');
             $arrFile = $widget->value;
 
             if (empty($arrFile['tmp_name'])) {
@@ -279,10 +291,10 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
             $this->deleteAvatar();
 
-            // Generate target path
+            // Generate the target path
             $strAvatarRelativePath = Path::canonicalize(\sprintf(
                 '%s/avatar-%s.%s',
-                $objUploadFolder->path,
+                $uploadFolder->path,
                 $this->user->id,
                 strtolower(Path::getExtension($arrFile['name'])),
             ));
@@ -291,7 +303,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
             $fs = new Filesystem();
 
-            // Move picture from system temp dir to the target path.
+            // Move picture from the system temp dir to the destination path.
             $fs->rename($arrFile['tmp_name'], $strAvatarAbsolutePath);
 
             // Assign the new avatar to the user
@@ -303,11 +315,11 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
                 $oMember->save();
             }
 
-            // Reload page
+            // Reload the page
             $controllerAdapter->reload();
         }
 
-        return $objForm->generate();
+        return $form->generate();
     }
 
     private function download(FilesModel $files): Response
