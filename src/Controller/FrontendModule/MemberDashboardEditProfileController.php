@@ -18,39 +18,33 @@ use Codefog\HasteBundle\Form\Form;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Twig\FragmentTemplate;
-use Contao\Environment;
 use Contao\FrontendUser;
 use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Contao\User;
 use Markocupic\ContaoFrontendUserNotification\Notification\DefaultFrontendUserNotification;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Database\SyncEventRegistrationDatabase;
 use Markocupic\SacEventToolBundle\Model\SacSectionModel;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsFrontendModule(MemberDashboardEditProfileController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_member_dashboard_edit_profile')]
+#[AsFrontendModule(MemberDashboardEditProfileController::TYPE, category: 'sac_event_tool_frontend_modules')]
 class MemberDashboardEditProfileController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'member_dashboard_edit_profile';
+    public const string TYPE = 'member_dashboard_edit_profile';
 
     private FrontendUser|null $user;
 
-    private FragmentTemplate|null $template;
-
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly Security $security,
         private readonly SyncEventRegistrationDatabase $syncEventRegistrationDatabase,
+        private readonly TokenStorageInterface $tokenStorage,
         private readonly TranslatorInterface $translator,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
@@ -58,14 +52,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array|null $classes = null, PageModel|null $page = null): Response
     {
-        // Get logged in member object
-        $user = $this->security->getUser();
-
-        if (!$user instanceof FrontendUser) {
-            return parent::__invoke($request, $model, $section, $classes);
-        }
-
-        $this->user = $user;
+        $this->user = $this->getUserFromToken();
 
         if (null !== $page) {
             // Neither cache nor search page
@@ -78,24 +65,41 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $this->template = $template;
-        $this->template->set('user', $this->user);
-        $this->template->set('sac_sections', $this->getSacSections($this->user));
-        $this->template->set('form', $this->getForm());
+        if (null === $this->user) {
+            throw new \Exception('No logged in Contao frontend user found.');
+        }
 
-        return $this->template->getResponse();
+        $template->set('user', $this->user);
+        $template->set('sac_sections', $this->getSacSections($this->user));
+        $template->set('form', $this->getForm($request));
+
+        return $template->getResponse();
     }
 
-    private function getForm(): Form
+    private function getUserFromToken(): FrontendUser|null
+    {
+        $user = $this->tokenStorage
+            ->getToken()
+            ?->getUser()
+        ;
+
+        if ($user instanceof FrontendUser) {
+            return $user;
+        }
+
+        return null;
+    }
+
+    private function getForm(Request $request): Form
     {
         $form = new Form(
             'form-user-profile',
-            'POST',
+            Request::METHOD_POST,
         );
 
         $form->addContaoHiddenFields();
 
-        $form->setAction($this->framework->getAdapter(Environment::class)->get('uri'));
+        $form->setAction($request->getUri());
 
         // Now let's add form fields:
         $form->addFormField('emergencyPhone', [
@@ -123,19 +127,19 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         ]);
 
         // Get form presets from tl_member
-        $arrFields = ['emergencyPhone', 'emergencyPhoneName', 'foodHabits'];
+        $fields = ['emergencyPhone', 'emergencyPhoneName', 'foodHabits'];
 
-        foreach ($arrFields as $field) {
-            $objWidget = $form->getWidget($field);
+        foreach ($fields as $field) {
+            $widget = $form->getWidget($field);
 
-            if (empty($objWidget->value)) {
-                $objWidget = $form->getWidget($field);
-                $objWidget->value = $this->user->{$field};
+            if (empty($widget->value)) {
+                $widget = $form->getWidget($field);
+                $widget->value = $this->user->{$field};
             }
         }
 
-        // Bind form to the MemberModel
-        $model = $this->framework->getAdapter(MemberModel::class)->findById($this->user->id);
+        // Bind the form to the MemberModel
+        $model = $this->getContaoAdapter(MemberModel::class)->findById($this->user->id);
         $form->setBoundModel($model);
 
         if ($form->validate()) {
@@ -145,7 +149,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
 
                 if ($this->syncEventRegistrationDatabase->syncMember($model->id)) {
                     new DefaultFrontendUserNotification(
-                        $this->security->getUser(),
+                        $this->user,
                         'member_dashboard_edit_profile_controller::update_contact_data',
                         'Mitteilung',
                         'All deine persönlichen Daten (Adresse, Tel.-Nr., Notfallangaben, Essgewohnheiten etc.) wurden anhand deiner Eingaben bei deinen laufenden Anmeldungen aktualisiert.',
@@ -164,33 +168,29 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
                 ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DASHBOARD_UPDATE_PROFILE)],
             );
 
-            Controller::reload();
+            $this->getContaoAdapter(Controller::class)->reload();
         }
 
         return $form;
     }
 
-    private function getSacSections(User|null $user = null): array
+    private function getSacSections(FrontendUser $user): array
     {
-        if (null === $user) {
-            return ['-'];
-        }
-
-        $model = $this->framework->getAdapter(MemberModel::class)->findById($user->id);
+        $model = $this->getContaoAdapter(MemberModel::class)->findById($user->id);
 
         // SAC sections user belongs to
-        $arrSectionNames = ['-'];
-        $arrSectionIds = $this->framework->getAdapter(StringUtil::class)->deserialize($model->sectionId, true);
+        $sacSectionNames = ['-'];
+        $sacSectionIds = $this->getContaoAdapter(StringUtil::class)->deserialize($model->sectionId, true);
 
-        if (null !== ($sections = $this->framework->getAdapter(SacSectionModel::class)->findMultipleBySectionIds($arrSectionIds))) {
+        if (null !== ($sections = $this->getContaoAdapter(SacSectionModel::class)->findMultipleBySectionIds($sacSectionIds))) {
             // Override default
-            $arrSectionNames = [];
+            $sacSectionNames = [];
 
             foreach ($sections as $section) {
-                $arrSectionNames[] = $section->name;
+                $sacSectionNames[] = $section->name;
             }
         }
 
-        return $arrSectionNames;
+        return $sacSectionNames;
     }
 }
