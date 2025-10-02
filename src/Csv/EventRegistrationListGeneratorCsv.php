@@ -29,6 +29,7 @@ use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class EventRegistrationListGeneratorCsv
 {
@@ -154,7 +155,7 @@ class EventRegistrationListGeneratorCsv
         return array_merge($row, array_fill(0, \count($eventTimestamps), ''));
     }
 
-    private function formatFieldValue(string $field, mixed $value, CalendarEventsMemberModel $registration): string
+    private function formatFieldValue(string $field, mixed $value, CalendarEventsMemberModel|null $registration = null): string
     {
         $value = html_entity_decode((string) $value);
 
@@ -173,13 +174,19 @@ class EventRegistrationListGeneratorCsv
         // Sanitize event title
         $eventTitle = preg_replace('/[^a-zA-Z0-9_-]+/', '_', strtolower($eventTitle));
         $filename = \sprintf($this->sacevtEventMemberListFileNamePattern, $eventTitle, 'csv');
+        $response = new StreamedResponse(
+            static function () use ($csv, $filename): void {
+                $csv->download($filename);
+            },
+        );
 
-        $response = new Response($csv->toString());
         $disposition = HeaderUtils::makeDisposition(
             HeaderUtils::DISPOSITION_ATTACHMENT,
             $filename,
         );
+        $response->headers->set('Content-Type', 'application/vnd.ms-excel');
         $response->headers->set('Content-Disposition', $disposition);
+        $response->headers->set('Cache-Control', 'max-age=0');
 
         return $response;
     }

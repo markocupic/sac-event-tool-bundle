@@ -59,7 +59,7 @@ use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -273,7 +273,7 @@ class CalendarEvents
         $request = $this->requestStack->getCurrentRequest();
 
         if ('onloadCallbackExportCalendar' === $request->query->get('action') && $request->query->get('id') > 0) {
-            // Create empty document
+            // Create an empty document
             $csv = Writer::createFromString();
 
             // Set encoding from utf-8 to is0-8859-15 (windows)
@@ -406,12 +406,19 @@ class CalendarEvents
             $fileName = $this->stringUtil->sanitizeFileName($fileName);
 
             // Serve content as a file download
-            $response = new Response($csv->toString());
+            $response = new StreamedResponse(
+                static function () use ($csv, $fileName): void {
+                    $csv->download($fileName);
+                },
+            );
+
             $disposition = HeaderUtils::makeDisposition(
                 HeaderUtils::DISPOSITION_ATTACHMENT,
                 $fileName,
             );
+            $response->headers->set('Content-Type', 'application/vnd.ms-excel');
             $response->headers->set('Content-Disposition', $disposition);
+            $response->headers->set('Cache-Control', 'max-age=0');
 
             throw new ResponseException($response);
         }
