@@ -18,7 +18,6 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Exception\ResponseException;
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Date;
@@ -39,27 +38,24 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-#[AsFrontendModule(MemberDashboardPastEventsController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_member_dashboard_past_events')]
+#[AsFrontendModule(MemberDashboardPastEventsController::TYPE, category: 'sac_event_tool_frontend_modules')]
 class MemberDashboardPastEventsController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'member_dashboard_past_events';
+    public const string TYPE = 'member_dashboard_past_events';
 
-    private FrontendUser|null $objUser;
-
-    private FragmentTemplate|null $template;
+    private FrontendUser|null $user;
 
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
-        private readonly ContaoFramework $framework,
         private readonly ConvertFile $convertFile,
-        private readonly Security $security,
+        private readonly TokenStorageInterface $tokenStorage,
         private readonly string $projectDir,
         private readonly string $sacevtTempDir,
         private readonly string $sacevtEventTemplateCourseConfirmation,
@@ -71,12 +67,9 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
     public function __invoke(Request $request, ModuleModel $model, string $section, array|null $classes = null, PageModel|null $page = null): Response
     {
         // Set adapters
-        $inputAdapter = $this->framework->getAdapter(Input::class);
+        $inputAdapter = $this->getContaoAdapter(Input::class);
 
-        // Get logged in member object
-        if (($objUser = $this->security->getUser()) instanceof FrontendUser) {
-            $this->objUser = $objUser;
-        }
+        $this->user = $this->getUserFromToken();
 
         if (null !== $page) {
             // Neither cache nor search page
@@ -85,7 +78,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         }
 
         // Print course certificate
-        if ('download_course_certificate' === $inputAdapter->get('do') && \strlen($inputAdapter->get('id')) && null !== $this->objUser) {
+        if ('download_course_certificate' === $inputAdapter->get('do') && \strlen($inputAdapter->get('id')) && null !== $this->user) {
             throw new ResponseException($this->downloadCourseCertificate());
         }
 
@@ -96,40 +89,38 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         // Do not allow for not authorized users
-        if (null === $this->objUser) {
+        if (null === $this->user) {
             throw new UnauthorizedHttpException('Not authorized. Please log in as frontend user.');
         }
 
-        $this->template = $template;
-
         // Set adapters
-        $messageAdapter = $this->framework->getAdapter(Message::class);
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
-        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-        $frontendAdapter = $this->framework->getAdapter(Frontend::class);
+        $messageAdapter = $this->getContaoAdapter(Message::class);
+        $validatorAdapter = $this->getContaoAdapter(Validator::class);
+        $calendarEventsMemberModelAdapter = $this->getContaoAdapter(CalendarEventsMemberModel::class);
+        $controllerAdapter = $this->getContaoAdapter(Controller::class);
+        $stringUtilAdapter = $this->getContaoAdapter(StringUtil::class);
+        $frontendAdapter = $this->getContaoAdapter(Frontend::class);
 
         // Handle messages
-        if (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email)) {
+        if (empty($this->user->email) || !$validatorAdapter->isEmail($this->user->email)) {
             $messageAdapter->addInfo('Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
         }
 
-        // Add messages to template
-        $this->addMessagesToTemplate($request);
+        // Add messages to the template
+        $this->addMessagesToTemplate($template, $request);
 
         // Load language
         $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
-        // Get event type filter from module model
+        // Get the event type filter from the module model
         $arrEventTypeFilter = $stringUtilAdapter->deserialize($model->eventType, true);
 
         // Past events
-        $arrPastEvents = $calendarEventsMemberModelAdapter->findPastEventsByMemberId($this->objUser->id, $arrEventTypeFilter);
+        $arrPastEvents = $calendarEventsMemberModelAdapter->findPastEventsByMemberId($this->user->id, $arrEventTypeFilter);
         $arrEvents = [];
 
         foreach ($arrPastEvents as $event) {
-            // Do only list if member has participated
+            // Do only list the event if the user has participated
             if ('member' === $event['role']) {
                 if (null !== $event['eventRegistrationModel']) {
                     if (!$event['eventRegistrationModel']->hasParticipated) {
@@ -144,9 +135,23 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
             $arrEvents[] = $event;
         }
 
-        $this->template->set('arrPastEvents', $arrEvents);
+        $template->set('arrPastEvents', $arrEvents);
 
-        return $this->template->getResponse();
+        return $template->getResponse();
+    }
+
+    private function getUserFromToken(): FrontendUser|null
+    {
+        $user = $this->tokenStorage
+            ->getToken()
+            ?->getUser()
+        ;
+
+        if ($user instanceof FrontendUser) {
+            return $user;
+        }
+
+        return null;
     }
 
     /**
@@ -155,82 +160,82 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
     private function downloadCourseCertificate(): BinaryFileResponse
     {
         // Set adapters
-        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-        $inputAdapter = $this->framework->getAdapter(Input::class);
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-        $dateAdapter = $this->framework->getAdapter(Date::class);
+        $calendarEventsMemberModelAdapter = $this->getContaoAdapter(CalendarEventsMemberModel::class);
+        $inputAdapter = $this->getContaoAdapter(Input::class);
+        $memberModelAdapter = $this->getContaoAdapter(MemberModel::class);
+        $dateAdapter = $this->getContaoAdapter(Date::class);
 
-        if (null !== $this->objUser) {
-            $objRegistration = $calendarEventsMemberModelAdapter->findById($inputAdapter->get('id'));
+        if (null !== $this->user) {
+            $registration = $calendarEventsMemberModelAdapter->findById($inputAdapter->get('id'));
 
-            if (null !== $objRegistration) {
-                if ((int) $this->objUser->sacMemberId === (int) $objRegistration->sacMemberId) {
-                    $objMember = $memberModelAdapter->findOneBySacMemberId($this->objUser->sacMemberId);
+            if (null !== $registration) {
+                if ((int) $this->user->sacMemberId === (int) $registration->sacMemberId) {
+                    $member = $memberModelAdapter->findOneBySacMemberId($this->user->sacMemberId);
                     $startDate = '';
-                    $arrDates = [];
+                    $dates = [];
                     $courseId = '';
-                    $eventTitle = $objRegistration->eventName;
+                    $eventTitle = $registration->eventName;
 
-                    $objEvent = $objRegistration->getRelated('eventId');
+                    $calendarEvent = $registration->getRelated('eventId');
 
-                    if (null !== $objEvent) {
-                        $startDate = $dateAdapter->parse('Y', $objEvent->startDate);
+                    if (null !== $calendarEvent) {
+                        $startDate = $dateAdapter->parse('Y', $calendarEvent->startDate);
 
-                        // Build up $arrData; Get event dates from event object
-                        $arrDates = array_map(
-                            function ($tstmp) {
-                                $dateAdapter = $this->framework->getAdapter(Date::class);
+                        // Build the date array from the event object
+                        $dates = array_map(
+                            function ($tstamp) {
+                                $dateAdapter = $this->getContaoAdapter(Date::class);
 
-                                return $dateAdapter->parse('d.m.Y', $tstmp);
+                                return $dateAdapter->parse('d.m.Y', $tstamp);
                             },
-                            $this->calendarEventsUtil->getEventTimestamps($objEvent),
+                            $this->calendarEventsUtil->getEventTimestamps($calendarEvent),
                         );
 
                         // Course id
-                        $courseId = htmlspecialchars(html_entity_decode((string) $objEvent->courseId));
+                        $courseId = htmlspecialchars(html_entity_decode((string) $calendarEvent->courseId));
 
                         // Event title
-                        $eventTitle = htmlspecialchars(html_entity_decode((string) $objEvent->title));
+                        $eventTitle = htmlspecialchars(html_entity_decode((string) $calendarEvent->title));
                     }
 
                     // Log
                     $this->logger?->log(
                         LogLevel::INFO,
-                        \sprintf('New event confirmation download. SAC-User-ID: %d. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id),
+                        \sprintf('New event confirmation download. SAC-User-ID: %d. Event-ID: %s.', $member->sacMemberId, $calendarEvent->id),
                         ['contao' => new ContaoContext(__METHOD__, Log::DOWNLOAD_CERTIFICATE_OF_ATTENDANCE)],
                     );
 
                     $filenamePattern = str_replace('%%d', '%d', $this->sacevtEventCourseConfirmationFileNamePattern);
-                    $filename = \sprintf($filenamePattern, $objMember->sacMemberId, $objRegistration->id, 'docx');
+                    $filename = \sprintf($filenamePattern, $member->sacMemberId, $registration->id, 'docx');
                     $destFilename = Path::makeAbsolute($this->sacevtTempDir.'/'.$filename, $this->projectDir);
 
                     $docxTemplateSrc = Path::makeAbsolute($this->sacevtEventTemplateCourseConfirmation, $this->projectDir);
 
-                    // Create PhpWord instance
-                    $objPhpWord = new MsWordTemplateProcessor($docxTemplateSrc, $destFilename);
+                    // Create the PhpWord instance
+                    $phpWord = new MsWordTemplateProcessor($docxTemplateSrc, $destFilename);
 
                     // Replace template vars
-                    $objPhpWord->replace('eventDates', implode(', ', $arrDates));
-                    $objPhpWord->replace('firstname', htmlspecialchars(html_entity_decode((string) $objMember->firstname)));
-                    $objPhpWord->replace('lastname', htmlspecialchars(html_entity_decode((string) $objMember->lastname)));
-                    $objPhpWord->replace('memberId', $objMember->sacMemberId);
-                    $objPhpWord->replace('eventYear', $startDate);
-                    $objPhpWord->replace('eventId', htmlspecialchars(html_entity_decode((string) $objRegistration->eventId)));
-                    $objPhpWord->replace('eventName', $eventTitle);
-                    $objPhpWord->replace('regId', $objRegistration->id);
-                    $objPhpWord->replace('courseId', $courseId);
+                    $phpWord->replace('eventDates', implode(', ', $dates));
+                    $phpWord->replace('firstname', htmlspecialchars(html_entity_decode((string) $member->firstname)));
+                    $phpWord->replace('lastname', htmlspecialchars(html_entity_decode((string) $member->lastname)));
+                    $phpWord->replace('memberId', $member->sacMemberId);
+                    $phpWord->replace('eventYear', $startDate);
+                    $phpWord->replace('eventId', htmlspecialchars(html_entity_decode((string) $registration->eventId)));
+                    $phpWord->replace('eventName', $eventTitle);
+                    $phpWord->replace('regId', $registration->id);
+                    $phpWord->replace('courseId', $courseId);
 
-                    // Generate MS Word file and send it to the browser
-                    $objSplFileDocx = $objPhpWord->generate();
+                    // Generate the MS Word file and send it to the browser
+                    $splFileDocx = $phpWord->generate();
 
                     // Generate pdf
-                    $objSplFilePdf = $this->convertFile
-                        ->file($objSplFileDocx->getRealPath())
+                    $splFilePdf = $this->convertFile
+                        ->file($splFileDocx->getRealPath())
                         ->uncached(false)
                         ->convertTo('pdf')
                     ;
 
-                    return $this->file($objSplFilePdf->getRealPath());
+                    return $this->file($splFilePdf->getRealPath());
                 }
 
                 throw new \Exception('There was an error while trying to generate the course confirmation.');
@@ -243,22 +248,22 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
     /**
      * Add messages from session to template.
      */
-    private function addMessagesToTemplate(Request $request): void
+    private function addMessagesToTemplate(FragmentTemplate $template, Request $request): void
     {
-        $messageAdapter = $this->framework->getAdapter(Message::class);
+        $messageAdapter = $this->getContaoAdapter(Message::class);
         $session = $request->getSession();
 
         if ($messageAdapter->hasInfo()) {
-            $this->template->set('hasInfoMessage', true);
+            $template->set('hasInfoMessage', true);
             $message = $session->getFlashBag()->get('contao.FE.info');
-            $this->template->set('infoMessage', $message[0]);
+            $template->set('infoMessage', $message[0]);
         }
 
         if ($messageAdapter->hasError()) {
-            $this->template->set('hasErrorMessage', true);
+            $template->set('hasErrorMessage', true);
             $message = $session->getFlashBag()->get('contao.FE.error');
-            $this->template->set('errorMessage', $message[0]);
-            $this->template->set('errorMessages', $message);
+            $template->set('errorMessage', $message[0]);
+            $template->set('errorMessages', $message);
         }
 
         $messageAdapter->reset();
