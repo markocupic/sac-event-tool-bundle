@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Download;
 
+use League\Csv\Bom;
 use League\Csv\CharsetConverter;
 use League\Csv\Writer;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
@@ -21,40 +22,36 @@ use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Handles CSV file creation and response generation for download purposes.
+ * Represents a utility class for generating and downloading CSV files. Provides
+ * functionality to configure CSV writer settings, manage records, and create HTTP
+ * responses for CSV download.
  */
 #[Exclude]
 class CsvDownload
 {
+    public const string BOM_UTF8 = Bom::Utf8->value;
+
+    public const string ENCODING_UTF8 = 'UTF-8';
+
+    public const string ENCODING_ISO_8859_1 = 'ISO-8859-1'; // Latin
+
     private array $headline = [];
 
     private array $records = [];
 
-    private string $delimiter;
-
-    private string $enclosure;
-
-    private string $newline;
-
-    private bool $convertOutput = false;
-
-    /**
-     * @var string Can be utf-8, iso-8859-15, ...
-     */
-    private string $outputEncoding = 'UTF-8';
-
-    private string|null $bom = "\xEF\xBB\xBF"; // UTF-8 BOM
+    private Writer $writer;
 
     private array $headers = [
         'Content-Type' => 'application/vnd.ms-excel',
         'Cache-Control' => 'max-age=0',
     ];
 
-    public function __construct(string $delimiter = ';', string $enclosure = '"', string $newline = "\r\n")
+    public function __construct(string $delimiter = ';', string $enclosure = '"', string $endOfLine = "\r\n")
     {
-        $this->delimiter = $delimiter;
-        $this->enclosure = $enclosure;
-        $this->newline = $newline;
+        $this->createWriter();
+        $this->writer->setEndOfLine($endOfLine);
+        $this->writer->setEnclosure($enclosure);
+        $this->writer->setDelimiter($delimiter);
     }
 
     public function setHeadline(array $headline): self
@@ -71,6 +68,15 @@ class CsvDownload
         return $this;
     }
 
+    public function getRecords(bool $includeHeadline): array
+    {
+        if ($includeHeadline) {
+            return array_merge($this->headline, $this->records);
+        }
+
+        return $this->records;
+    }
+
     public function setRecords(array $records): self
     {
         $this->records = $records;
@@ -78,49 +84,88 @@ class CsvDownload
         return $this;
     }
 
-    public function setOutputEncoding(string $outputEncoding): self
+    public function forceEnclosure(): self
     {
-        $this->outputEncoding = $outputEncoding;
+        $this->writer->forceEnclosure();
 
         return $this;
     }
 
-    public function setBom(string $bom): self
+    public function necessaryEnclosure(): self
     {
-        $this->bom = $bom;
+        $this->writer->necessaryEnclosure();
 
         return $this;
     }
 
-    public function removeBom(): self
+    public function noEnclosure(): self
     {
-        $this->bom = null;
+        $this->writer->noEnclosure();
 
         return $this;
     }
 
-    public function convertOutput(string $outputEncoding): self
+    public function configureWriter(callable $callback): self
     {
-        $this->convertOutput = true;
-        $this->outputEncoding = $outputEncoding;
+        $callback($this->writer);
+
+        return $this;
+    }
+
+    public function convertOutputEncoding(string $outputEncoding): self
+    {
+        if (!$this->isValidOutputEncoding($outputEncoding)) {
+            throw new \InvalidArgumentException(\sprintf('Invalid output encoding "%s". Use one of these: %s', $outputEncoding, implode(', ', mb_list_encodings())));
+        }
+
+        $encoder = (new CharsetConverter())
+            ->outputEncoding($outputEncoding)
+        ;
+
+        $this->writer->addFormatter($encoder);
+
+        return $this;
+    }
+
+    public function setOutputBOM(string $bom): self
+    {
+        $this->writer->setOutputBOM($bom);
 
         return $this;
     }
 
     public function createResponse(string $filename, int $status = 200, $headers = []): StreamedResponse
     {
-        $csv = $this->createCsvWriter();
-
-        $csv->insertAll(array_merge($this->headline, $this->records));
+        $this->writer->insertAll($this->getRecords(true));
 
         $response = new StreamedResponse(
-            static function () use ($csv, $filename): void {
-                $csv->download($filename);
-            },
+            fn () => $this->outputCsvContent($filename),
             $status,
             $headers,
         );
 
+        $this->configureResponseHeaders($response, $filename, $headers);
+
+        return $response;
+    }
+
+    private function outputCsvContent(string $filename): void
+    {
+        $this->writer->download($filename);
+    }
+
+    private function createWriter(): void
+    {
+        $this->writer = Writer::createFromString();
+    }
+
+    private function isValidOutputEncoding(string $encoding): bool
+    {
+        return \in_array($encoding, mb_list_encodings(), true);
+    }
+
+    private function configureResponseHeaders(StreamedResponse $response, string $filename, array $customHeaders): void
+    {
         $disposition = HeaderUtils::makeDisposition(
             HeaderUtils::DISPOSITION_ATTACHMENT,
             $filename,
@@ -132,33 +177,8 @@ class CsvDownload
 
         $response->headers->set('Content-Disposition', $disposition);
 
-        foreach ($headers as $key => $value) {
+        foreach ($customHeaders as $key => $value) {
             $response->headers->set($key, $value);
         }
-
-        return $response;
-    }
-
-    private function createCsvWriter(): Writer
-    {
-        $csv = Writer::createFromString();
-
-        if ($this->convertOutput) {
-            $encoder = (new CharsetConverter())
-                ->outputEncoding($this->outputEncoding)
-            ;
-
-            $csv->addFormatter($encoder);
-        }
-
-        if ($this->bom) {
-            $csv->setOutputBOM($this->bom);
-        }
-
-        $csv->setDelimiter($this->delimiter);
-        $csv->setEnclosure($this->enclosure);
-        $csv->setEndOfLine($this->newline);
-
-        return $csv;
     }
 }

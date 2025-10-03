@@ -223,6 +223,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
                 if (null !== $objEvent) {
                     $value = $date->parse('Y-m-d', $objEvent->startDate);
+                    $value = $date->parse('Y-m-d', $objEvent->startDate);
                 } break;
             case 'endDate':
                 $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
@@ -286,7 +287,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         }
 
         $csv = new CsvDownload();
-
+        $csv->setOutputBOM(CsvDownload::BOM_UTF8);
         $csv->setRecords($arrFinal);
 
         return $csv->createResponse($filename);

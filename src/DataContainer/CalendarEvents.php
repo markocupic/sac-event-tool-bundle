@@ -265,10 +265,8 @@ class CalendarEvents
         $request = $this->requestStack->getCurrentRequest();
 
         if ('onloadCallbackExportCalendar' === $request->query->get('action') && $request->query->get('id') > 0) {
-            // Create an empty document
             $csv = new CsvDownload();
-            $csv->convertOutput('iso-8859-15');
-            $csv->removeBom();
+            $csv->convertOutputEncoding(CsvDownload::ENCODING_ISO_8859_1);
 
             // Selected fields
             $arrFields = array_unique(['id', 'title', 'location', 'eventDates', 'eventDurationInDays', 'published', 'organizers', 'mountainguide', 'mainInstructor', 'instructor', 'minMembers', 'maxMembers', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey', 'teaser', 'tourDetailText', 'requirements', 'leistungen']);

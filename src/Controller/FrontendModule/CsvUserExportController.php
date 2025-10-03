@@ -345,6 +345,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
         }
 
         $csv = new CsvDownload();
+        $csv->setOutputBOM(CsvDownload::BOM_UTF8);
         $csv->setRecords($arrFinal);
 
         return $csv->createResponse($filename);

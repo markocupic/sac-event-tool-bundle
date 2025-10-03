@@ -85,6 +85,7 @@ class EventRegistrationListGeneratorCsv
     public function generate(CalendarEventsModel $event): StreamedResponse
     {
         $csv = new CsvDownload();
+        $csv->setOutputBOM(CsvDownload::BOM_UTF8);
 
         $eventTimestamps = $this->calendarEventsUtil->getEventTimestamps($event);
 
