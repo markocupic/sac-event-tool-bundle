@@ -23,7 +23,6 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Date;
 use Contao\Environment;
-use Contao\File;
 use Contao\MemberGroupModel;
 use Contao\ModuleModel;
 use Contao\StringUtil;
@@ -31,44 +30,27 @@ use Contao\UserGroupModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\Types;
-use League\Csv\Bom;
-use League\Csv\CannotInsertRecord;
-use League\Csv\Exception;
-use League\Csv\InvalidArgument;
-use League\Csv\Writer;
-use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
+use Markocupic\SacEventToolBundle\Download\CsvDownload;
 use Markocupic\SacEventToolBundle\Model\UserRoleModel;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsFrontendModule(CsvUserExportController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_csv_user_export')]
 class CsvUserExportController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'csv_user_export';
-
-    private const FIELD_DELIMITER = ';';
-
-    private const FIELD_ENCLOSURE = '"';
+    public const string TYPE = 'csv_user_export';
 
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly RequestStack $requestStack,
         private readonly Connection $connection,
         private readonly TranslatorInterface $translator,
-        private readonly BinaryFileDownload $binaryFileDownload,
-        private readonly string $sacevtTempDir,
-        private readonly string $projectDir,
     ) {
     }
 
-    /**
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
-     * @throws InvalidArgument
-     */
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $template->set('form', $this->getForm()->generate());
@@ -76,11 +58,6 @@ class CsvUserExportController extends AbstractFrontendModuleController
         return $template->getResponse();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidArgument
-     * @throws \Doctrine\DBAL\Exception
-     */
     private function getForm(): Form
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -126,7 +103,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
             'inputType' => 'checkbox',
         ]);
 
-        // Let's add  a submit button
+        // Add the submit-button
         $objForm->addFormField('submit', [
             'label' => 'Export starten',
             'inputType' => 'submit',
@@ -190,12 +167,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
         return $objForm;
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidArgument
-     * @throws \Doctrine\DBAL\Exception
-     */
-    private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $result, string $GroupModelClassName, bool $blnKeepGroupsInOneLine = false): BinaryFileResponse
+    private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $result, string $GroupModelClassName, bool $blnKeepGroupsInOneLine = false): StreamedResponse
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -308,7 +280,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
             }
         }
 
-        // Download data as CSV spreadsheet
+        // Download data as a CSV spreadsheet
         return $this->sendToBrowser($arrData, $filename);
     }
 
@@ -359,17 +331,9 @@ class CsvUserExportController extends AbstractFrontendModuleController
         return (string) $arrUser[$fieldName];
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidArgument
-     * @throws CannotInsertRecord
-     */
-    private function sendToBrowser(array $arrData, string $filename): BinaryFileResponse
+    private function sendToBrowser(array $arrData, string $filename): StreamedResponse
     {
-        /** @var Writer $writerAdapter */
-        $writerAdapter = $this->framework->getAdapter(Writer::class);
-
-        // Decode html entities and special chars
+        // Decode the HTML entities and special chars
         $arrFinal = [];
 
         foreach ($arrData as $arrRow) {
@@ -380,18 +344,9 @@ class CsvUserExportController extends AbstractFrontendModuleController
             $arrFinal[] = $arrLine;
         }
 
-        // Load the CSV document from an empty string
-        $csv = $writerAdapter->createFromString();
-        $csv->setOutputBOM(Bom::Utf8);
-        $csv->setDelimiter(static::FIELD_DELIMITER);
-        $csv->setEnclosure(static::FIELD_ENCLOSURE);
-        $csv->insertAll($arrFinal);
+        $csv = new CsvDownload();
+        $csv->setRecords($arrFinal);
 
-        // Save data to a temporary file
-        $objFile = new File($this->sacevtTempDir.'/'.$filename);
-        $objFile->write($csv->toString());
-        $objFile->close();
-
-        return $this->binaryFileDownload->sendFileToBrowser($this->projectDir.'/'.$objFile->path, '', false, true);
+        return $csv->createResponse($filename);
     }
 }

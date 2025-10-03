@@ -27,25 +27,18 @@ use Contao\Environment;
 use Contao\MemberModel;
 use Contao\ModuleModel;
 use Doctrine\DBAL\Connection;
-use League\Csv\Bom;
-use League\Csv\CannotInsertRecord;
-use League\Csv\Exception;
-use League\Csv\InvalidArgument;
-use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventType;
+use Markocupic\SacEventToolBundle\Download\CsvDownload;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[AsFrontendModule(CsvEventMemberExportController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_csv_event_member_export')]
 class CsvEventMemberExportController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'csv_event_member_export';
-
-    private string $strDelimiter = ';';
-
-    private string $strEnclosure = '"';
+    public const string TYPE = 'csv_event_member_export';
 
     private array $arrLines = [];
 
@@ -56,28 +49,21 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     ) {
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidArgument
-     * @throws \Doctrine\DBAL\Exception
-     * @throws CannotInsertRecord
-     */
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         $form = $this->getForm($request);
+
+        if ($form instanceof StreamedResponse) {
+            return $form;
+        }
+
         $template->set('form', $form->generate());
         $template->set('dateFormat', $this->framework->getAdapter(Config::class)->get('dateFormat'));
 
         return $template->getResponse();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidArgument
-     * @throws \Doctrine\DBAL\Exception
-     * @throws CannotInsertRecord
-     */
-    private function getForm(Request $request): Form
+    private function getForm(Request $request): Form|StreamedResponse
     {
         $objForm = new Form(
             'form-event-member-export',
@@ -112,7 +98,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
             'eval' => [],
         ]);
 
-        // Let's add  a submit button
+        // Add the submit-button
         $objForm->addFormField('submit', [
             'label' => 'Export starten',
             'inputType' => 'submit',
@@ -150,7 +136,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                     }
                 }
 
-                $this->printCsv(\sprintf('Event-Member-Export_%s.csv', date('Y-m-d')));
+                return $this->printCsv(\sprintf('Event-Member-Export_%s.csv', date('Y-m-d')));
             }
         }
 
@@ -284,12 +270,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         return (string) $value;
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidArgument
-     * @throws CannotInsertRecord
-     */
-    private function printCsv(string $filename): void
+    private function printCsv(string $filename): StreamedResponse
     {
         $arrData = $this->arrLines;
 
@@ -304,18 +285,10 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
             $arrFinal[] = $arrLine;
         }
 
-        // Load the CSV document from a string
-        $csv = Writer::createFromString('');
-        $csv->setOutputBOM(Bom::Utf8);
+        $csv = new CsvDownload();
 
-        $csv->setDelimiter($this->strDelimiter);
-        $csv->setEnclosure($this->strEnclosure);
+        $csv->setRecords($arrFinal);
 
-        // Insert all the records
-        $csv->insertAll($arrFinal);
-
-        // Send file to browser
-        $csv->output($filename);
-        exit;
+        return $csv->createResponse($filename);
     }
 }

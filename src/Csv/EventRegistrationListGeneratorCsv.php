@@ -21,20 +21,15 @@ use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Doctrine\DBAL\Connection;
-use League\Csv\Bom;
-use League\Csv\Writer;
+use Markocupic\SacEventToolBundle\Download\CsvDownload;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\String\PhoneNumber;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
-use Symfony\Component\HttpFoundation\HeaderUtils;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class EventRegistrationListGeneratorCsv
 {
-    private const string DELIMITER = ';';
-
     private const array FIELDS = [
         'id',
         'stateOfSubscription',
@@ -87,31 +82,27 @@ class EventRegistrationListGeneratorCsv
         $this->dateAdapter = $this->framework->getAdapter(Date::class);
     }
 
-    public function generate(CalendarEventsModel $event): Response
+    public function generate(CalendarEventsModel $event): StreamedResponse
     {
-        $csv = $this->createCsvWriter();
+        $csv = new CsvDownload();
+
         $eventTimestamps = $this->calendarEventsUtil->getEventTimestamps($event);
 
         // Insert headline
-        $csv->insertOne($this->buildHeadlineRow($eventTimestamps));
+        $csv->setHeadline($this->buildHeadlineRow($eventTimestamps));
 
         // Insert registration rows
         $registrations = $this->fetchRegistrations($event->id);
 
         foreach ($registrations as $registration) {
-            $csv->insertOne($this->buildRegistrationRow($registration, $eventTimestamps));
+            $csv->addRecord($this->buildRegistrationRow($registration, $eventTimestamps));
         }
 
-        return $this->createCsvResponse($csv, $event->title);
-    }
+        // Sanitize event title
+        $eventTitle = preg_replace('/[^a-zA-Z0-9_-]+/', '_', strtolower($event->title));
+        $filename = \sprintf($this->sacevtEventMemberListFileNamePattern, $eventTitle, 'csv');
 
-    private function createCsvWriter(): Writer
-    {
-        $csv = Writer::createFromString();
-        $csv->setOutputBOM(Bom::Utf8);
-        $csv->setDelimiter(self::DELIMITER);
-
-        return $csv;
+        return $csv->createResponse($filename);
     }
 
     private function buildHeadlineRow(array $eventTimestamps): array
@@ -167,27 +158,5 @@ class EventRegistrationListGeneratorCsv
             'J+S/Jugend' => null === $registration ? '' : $this->eventRegistrationUtil->getAgeGroup($registration),
             default => $value,
         };
-    }
-
-    private function createCsvResponse(Writer $csv, string $eventTitle): Response
-    {
-        // Sanitize event title
-        $eventTitle = preg_replace('/[^a-zA-Z0-9_-]+/', '_', strtolower($eventTitle));
-        $filename = \sprintf($this->sacevtEventMemberListFileNamePattern, $eventTitle, 'csv');
-        $response = new StreamedResponse(
-            static function () use ($csv, $filename): void {
-                $csv->download($filename);
-            },
-        );
-
-        $disposition = HeaderUtils::makeDisposition(
-            HeaderUtils::DISPOSITION_ATTACHMENT,
-            $filename,
-        );
-        $response->headers->set('Content-Type', 'application/vnd.ms-excel');
-        $response->headers->set('Content-Disposition', $disposition);
-        $response->headers->set('Cache-Control', 'max-age=0');
-
-        return $response;
     }
 }

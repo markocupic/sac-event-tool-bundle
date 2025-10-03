@@ -41,15 +41,12 @@ use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
-use League\Csv\CannotInsertRecord;
-use League\Csv\CharsetConverter;
-use League\Csv\InvalidArgument;
-use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\EventReleaseLevelUtil;
+use Markocupic\SacEventToolBundle\Download\CsvDownload;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyPackageModel;
@@ -57,9 +54,7 @@ use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -174,7 +169,7 @@ class CalendarEvents
             }
         }
 
-        // Adjust filters depending on event type
+        // Adjust filters depending on the event type
         if ($dc->currentPid) {
             $objCalendar = $this->calendarModel->findById($dc->currentPid);
 
@@ -263,9 +258,6 @@ class CalendarEvents
 
     /**
      * Make a CSV-export of every event of a certain calendar.
-     *
-     * @throws CannotInsertRecord
-     * @throws InvalidArgument
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 40)]
     public function exportCalendar(DataContainer $dc): void
@@ -274,17 +266,9 @@ class CalendarEvents
 
         if ('onloadCallbackExportCalendar' === $request->query->get('action') && $request->query->get('id') > 0) {
             // Create an empty document
-            $csv = Writer::createFromString();
-
-            // Set encoding from utf-8 to is0-8859-15 (windows)
-            $encoder = (new CharsetConverter())
-                ->outputEncoding('iso-8859-15')
-            ;
-
-            $csv->addFormatter($encoder);
-
-            // Set delimiter
-            $csv->setDelimiter(';');
+            $csv = new CsvDownload();
+            $csv->convertOutput('iso-8859-15');
+            $csv->removeBom();
 
             // Selected fields
             $arrFields = array_unique(['id', 'title', 'location', 'eventDates', 'eventDurationInDays', 'published', 'organizers', 'mountainguide', 'mainInstructor', 'instructor', 'minMembers', 'maxMembers', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey', 'teaser', 'tourDetailText', 'requirements', 'leistungen']);
@@ -297,7 +281,7 @@ class CalendarEvents
                 $arrFields,
             );
 
-            $csv->insertOne($arrHeadline);
+            $csv->setHeadline($arrHeadline);
 
             $objEvent = $this->calendarEventsModel->findBy(
                 ['tl_calendar_events.pid = ?'],
@@ -396,7 +380,7 @@ class CalendarEvents
 
                     $arrRow = array_map(fn ($strValue) => $this->stringUtil->revertInputEncoding((string) $strValue), $arrRow);
 
-                    $csv->insertOne($arrRow);
+                    $csv->addRecord($arrRow);
                 }
             }
 
@@ -405,22 +389,7 @@ class CalendarEvents
             $fileName = $this->stringUtil->revertInputEncoding($objCalendar->title).'.csv';
             $fileName = $this->stringUtil->sanitizeFileName($fileName);
 
-            // Serve content as a file download
-            $response = new StreamedResponse(
-                static function () use ($csv, $fileName): void {
-                    $csv->download($fileName);
-                },
-            );
-
-            $disposition = HeaderUtils::makeDisposition(
-                HeaderUtils::DISPOSITION_ATTACHMENT,
-                $fileName,
-            );
-            $response->headers->set('Content-Type', 'application/vnd.ms-excel');
-            $response->headers->set('Content-Disposition', $disposition);
-            $response->headers->set('Cache-Control', 'max-age=0');
-
-            throw new ResponseException($response);
+            throw new ResponseException($csv->createResponse($fileName));
         }
     }
 
@@ -506,7 +475,7 @@ class CalendarEvents
     {
         $user = $this->security->getUser();
 
-        // Set source, add author, set first release level and & set
+        // Set source, add author, set to the first release level and & set
         // customEventRegistrationConfirmationEmailText on creating new events
         $objEventsModel = $this->calendarEventsModel->findById($insertId);
 
@@ -519,7 +488,7 @@ class CalendarEvents
             $objEventsModel->mainInstructor = $user->id;
             $objEventsModel->instructor = serialize([['instructorId' => $user->id]]);
 
-            // Set customEventRegistrationConfirmationEmailText
+            // Set the customEventRegistrationConfirmationEmailText
             $objEventsModel->customEventRegistrationConfirmationEmailText = file_get_contents($this->sacevtEventRegistrationConfigEmailAcceptCustomTemplPath);
 
             $objEventsModel->save();
@@ -534,11 +503,11 @@ class CalendarEvents
     {
         $user = $this->security->getUser();
 
-        // Add author and set first release level on creating new events
+        // Add author and set to the first release level on creating new events
         $objEventsModel = $this->calendarEventsModel->findById($insertId);
 
         if (null !== $objEventsModel) {
-            // Set logged-in user as author
+            // Set the currently logged-in user as the author of the event
             $objEventsModel->author = $user->id;
             $objEventsModel->save();
 
@@ -709,7 +678,7 @@ class CalendarEvents
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: 20)]
     public function setValidEventReleaseLevel(DataContainer $dc): void
     {
-        // Set correct eventReleaseLevel
+        // Set the correct event release level
         $objEvent = $this->calendarEventsModel->findById($dc->activeRecord->id);
 
         if (null !== $objEvent) {
@@ -747,7 +716,7 @@ class CalendarEvents
 
     /**
      * Only shows the content/value of the field, and not the form widget. Is used if
-     * the field can not be edited because the release level (FS) is too high.
+     * the field cannot be edited because the release level (FS) is too high.
      *
      * @throws Exception
      */
@@ -983,7 +952,7 @@ class CalendarEvents
 
         if (isset($arrValues[0])) {
             if ($arrValues[0]['new_repeat'] <= 0) {
-                // Replace invalid date with empty array
+                // Replace the invalid date with an empty array
                 $arrValues = [];
             }
         } else {
@@ -1177,7 +1146,7 @@ class CalendarEvents
     {
         // Use
         // $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel']['foreignKey']
-        // for the filter panel instead of the options callback
+        // for the filter panel instead of the options-callback
         $referringMethod = debug_backtrace()[2]['function'];
 
         if ('panel' === $referringMethod) {
@@ -1271,7 +1240,7 @@ class CalendarEvents
             $icon = $this->image->getHtml('invisible.svg', $GLOBALS['TL_LANG']['MSC']['unpublished'], 'title="'.$GLOBALS['TL_LANG']['MSC']['unpublished'].'"');
         }
 
-        // Add main instructor
+        // Add the main instructor
         $strAuthor = '';
         $objUser = $this->userModel->findById($arrRow['mainInstructor']);
 
@@ -1310,14 +1279,12 @@ class CalendarEvents
     }
 
     /**
-     * - Event date fields can not be empty,
+     * - Event date fields cannot be empty,
      * - must contain one or more valid dates
      * - and must be correctly sorted.
-     *
-     * @throws Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventDates.save', priority: 100)]
-    public function validateEventDates(string $varValue, DataContainer $dc)
+    public function validateEventDates(string $varValue, DataContainer $dc): string
     {
         $arrDates = $this->stringUtil->deserialize($varValue, true);
 
@@ -1331,7 +1298,7 @@ class CalendarEvents
             }
         }
 
-        // Check correct date order.
+        // Check the correct date order.
         $tstampPrev = 0;
 
         foreach ($arrDates as $arrDate) {
@@ -1345,7 +1312,7 @@ class CalendarEvents
     }
 
     /**
-     * Update main instructor (the first instructor in the list is the main instructor).
+     * Update the main instructor (the first instructor in the list is the main instructor).
      *
      * @throws Exception
      */
@@ -1398,7 +1365,7 @@ class CalendarEvents
     }
 
     /**
-     * Publish or un-publish events if eventReleaseLevel has reached the
+     * Publish or unpublish events if eventReleaseLevel has reached the
      * highest/lowest level.
      *
      * @throws \Exception
