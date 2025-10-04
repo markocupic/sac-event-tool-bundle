@@ -1,16 +1,6 @@
 {% extends "@Contao/be_main" %}
 
-{% block error %}{% if error|default %}
-    {{ error|raw }}
-{% endif %}{% endblock %}
-
 {% block main_content %}
-    {% if info|default %}
-        <div class="tl_message">
-            <p class="tl_info">{{ info }}</p>
-        </div>
-    {% endif %}
-
     <div id="tl_buttons">
         <a href="{{ back }}" class="header_back" title="" accesskey="b" onclick="Backend.getScrollOffset()">{{ 'MSC.backBTTitle'|trans({}, 'contao_default') }}</a>
     </div>
@@ -25,8 +15,8 @@
         <br>
         <h3>Dateianhänge:</h3>
         <ul>
-            <li><a href="{{ download_tour_rapport_uri }}">> Tourrapport</a></li>
-            <li><a href="{{ download_invoice_uri }}">> Vergütungsformular</a></li>
+            <li><a href="{{ download_tour_rapport_uri }}">Tourrapport</a></li>
+            <li><a href="{{ download_invoice_uri }}">Vergütungsformular</a></li>
         </ul>
     </div>
 
@@ -34,7 +24,7 @@
         <p>Sie erhalten automatisch eine Kopie dieser Nachricht.</p>
     </div>
 
-    <style type='text/css'>
+    <style>
         .send_tour_rapport_notification_form {
             border-top: 1px solid var(--border);
         }
@@ -85,7 +75,6 @@
         .email-attachment-list li a {
             color: #006494 !important;
         }
-
     </style>
 
     <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>

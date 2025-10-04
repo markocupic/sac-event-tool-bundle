@@ -35,14 +35,14 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class Event
+readonly class Event
 {
     public function __construct(
-        private readonly CalendarEventsUtil $calendarEventsUtil,
-        private readonly ContaoFramework $framework,
-        private readonly TranslatorInterface $translator,
-        private readonly Connection $connection,
-        private readonly EventMember $eventMemberHelper,
+        private CalendarEventsUtil $calendarEventsUtil,
+        private ContaoFramework $framework,
+        private TranslatorInterface $translator,
+        private Connection $connection,
+        private EventMember $eventMemberHelper,
     ) {
     }
 
@@ -253,29 +253,6 @@ class Event
 
         // Printing date
         $objPhpWord->replace('printingDate', Date::parse('d.m.Y'));
-    }
-
-    public function checkEventRapportHasFilledInCorrectly(CalendarEventsInstructorInvoiceModel $objEventInvoice): bool
-    {
-        /** @var CalendarEventsModel $calendarEventsModelAdapter */
-        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-
-        /** @var UserModel $userModelAdapter */
-        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-
-        $objEvent = $calendarEventsModelAdapter->findById($objEventInvoice->pid);
-
-        // $objBiller "Der Rechnungssteller"
-        $objBiller = $userModelAdapter->findById($objEventInvoice->userPid);
-
-        if (null !== $objEvent && null !== $objBiller) {
-            // Check if tour report has filled in
-            if ($objEvent->filledInEventReportForm && '' !== $objEvent->tourAvalancheConditions) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     protected function prepareString(mixed $string = ''): string
