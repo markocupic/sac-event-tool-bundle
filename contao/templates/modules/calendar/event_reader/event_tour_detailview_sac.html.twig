@@ -217,7 +217,20 @@
                 {% if get_event_data(model, 'eventType') == 'tour' or get_event_data(model, 'eventType') == 'lastMinuteTour' %}
                     <div class="tour-difficulties event-detail event-info-box icon-box-small">
                         <h5>Schwierigkeit</h5>
-                        <p>{{ get_event_data(model, 'tourTechDifficultiesAsArrayWithExplanation')|join('<br>')|raw }}</p>
+                        {% set diffs = get_event_data(model, 'tourTechDifficultiesAsGenericArray') %}
+                        <ul class="list-unstyled">
+                            {% for diff in diffs %}
+                                <li>
+                                    {% if diff.isEqual %}
+                                        <span class="d-block text-decoration-underline" data-bs-toggle="tooltip" data-placement="top" data-bs-trigger="click" data-bs-title="{{ diff.min.title|e }}: {{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
+                                    {% else %}
+                                        <span class="text-decoration-underline" data-bs-toggle="tooltip" data-placement="top" data-bs-trigger="click" data-bs-title="{{ diff.min.title|e }}: {{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
+                                        <span>&nbsp;-&nbsp;</span>
+                                        <span class="text-decoration-underline" data-bs-toggle="tooltip" data-placement="top" data-bs-trigger="click" data-bs-title="{{ diff.max.title|e }}: {{ diff.max.description|e }}">{{ diff.max.shortcut }}</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
                     </div>
                 {% endif %}
 

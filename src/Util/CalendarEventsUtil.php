@@ -247,13 +247,12 @@ readonly class CalendarEventsUtil
             case 'minMembers':
                 $value = $objEvent->minMembers;
                 break;
+            case 'tourTechDifficultiesAsGenericArray':
+                $value = $this->getTourTechDifficultiesAsGenericArray($objEvent);
+                break;
 
             case 'tourTechDifficultiesAsArray':
                 $value = $this->getTourTechDifficultiesAsArray($objEvent, false, false);
-                break;
-
-            case 'tourTechDifficultiesAsArrayWithExplanation':
-                $value = $this->getTourTechDifficultiesAsArray($objEvent, false, true);
                 break;
 
             case 'tourTechDifficulties':
@@ -971,7 +970,7 @@ readonly class CalendarEventsUtil
         return '<span class="badge badge-sm badge-pill bg-success" data-bs-toggle="tooltip" data-placement="top" data-title="Anreise mit ÖV">ÖV</span>';
     }
 
-    public function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, bool $tooltip = false, bool $explanation = false): array
+    public function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, bool $tooltip = false, bool $withTitle = false): array
     {
         $this->framework->initialize();
 
@@ -1018,11 +1017,66 @@ readonly class CalendarEventsUtil
             if ($tooltip) {
                 $html = '<span class="badge badge-sm badge-pill bg-primary" data-bs-toggle="tooltip" data-placement="top" data-title="Techn. Schwierigkeit: %s">%s</span>';
                 $arrReturn[] = \sprintf($html, StringUtil::specialchars($strDiffTitle), $strDiff);
-            } elseif ($explanation) {
+            } elseif ($withTitle) {
                 $arrReturn[] = $strDiff.' ('.$strDiffTitle.')';
             } else {
                 $arrReturn[] = $strDiff;
             }
+        }
+
+        return $arrReturn;
+    }
+
+    public function getTourTechDifficultiesAsGenericArray(CalendarEventsModel $objEvent): array
+    {
+        $this->framework->initialize();
+
+        $arrReturn = [];
+
+        $arrValues = StringUtil::deserialize($objEvent->tourTechDifficulty, true);
+
+        if (empty($arrValues)) {
+            return $arrReturn;
+        }
+
+        foreach ($arrValues as $difficulty) {
+            $min = [];
+            $max = [];
+            $isEqual = false;
+
+            if (\strlen($difficulty['tourTechDifficultyMin'])) {
+                $objDiffMin = $this->getAdapter(TourDifficultyModel::class)->findById((int) $difficulty['tourTechDifficultyMin']);
+
+                if (null !== $objDiffMin) {
+                    $min['id'] = $objDiffMin->id;
+                    $min['shortcut'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMin->shortcut);
+                    $min['title'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMin->title);
+                    $min['description'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMin->description);
+                    $min['category']['id'] = $objDiffMin->getRelated('pid')?->id;
+                    $min['category']['title'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMin->getRelated('pid')?->title);
+                }
+
+                $objDiffMax = $this->getAdapter(TourDifficultyModel::class)->findById((int) $difficulty['tourTechDifficultyMax']);
+
+                if (null !== $objDiffMax) {
+                    $max['id'] = $objDiffMax->id;
+                    $max['shortcut'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMax->shortcut);
+                    $max['title'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMax->title);
+                    $max['description'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMax->description);
+                    $max['category']['id'] = $objDiffMax->getRelated('pid')?->id;
+                    $max['category']['title'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMax->getRelated('pid')?->title);
+                }
+
+                if ($objDiffMin === $objDiffMax) {
+                    $isEqual = true;
+                }
+            }
+
+            $arrReturn[] = [
+                'min' => $min,
+                'max' => $max,
+                'isEqual' => $isEqual,
+            ];
         }
 
         return $arrReturn;
