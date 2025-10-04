@@ -126,7 +126,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
         $this->checkIsSignedUrlValid($request);
 
         $invoice = $this->getInvoice($rapport_id);
-        $event = $this->prevalidateDocumentGeneration($invoice);
+        $event = $this->prevalidateDocumentGenerationAndGetEvent($invoice);
 
         if (null === $event) {
             return $this->redirectToRefererPage($request);
@@ -147,7 +147,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
         return $this->renderFormView($request, $form, $event, $invoice, $rapport_id, $sid, $rt);
     }
 
-    private function prevalidateDocumentGeneration(CalendarEventsInstructorInvoiceModel $invoice): CalendarEventsModel|null
+    private function prevalidateDocumentGenerationAndGetEvent(CalendarEventsInstructorInvoiceModel $invoice): CalendarEventsModel|null
     {
         try {
             return $this->tourRapportGenerator->validateAndGetEvent($invoice);
