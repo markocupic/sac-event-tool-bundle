@@ -15,8 +15,10 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\Download;
 
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
+use Contao\FrontendUser;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx;
 use Markocupic\SacEventToolBundle\ICal\EventICal;
@@ -25,14 +27,16 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class DownloadController extends AbstractController
 {
     public function __construct(
+        private readonly TokenStorageInterface $tokenStorage,
         private readonly ContaoFramework $framework,
-        private readonly WorkshopBookletGenerator $workshopBookletGenerator,
-        private readonly ExportEvents2Docx $exportEvents2Docx,
         private readonly EventICal $eventICal,
+        private readonly ExportEvents2Docx $exportEvents2Docx,
+        private readonly WorkshopBookletGenerator $workshopBookletGenerator,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
         $this->framework->initialize();
@@ -46,6 +50,13 @@ class DownloadController extends AbstractController
     #[Route('/_download/print_workshop_booklet_as_pdf/{year}', name: 'sac_event_tool_download_print_workshop_booklet_as_pdf', defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function printWorkshopBookletAsPdfAction(int $year = 0): Response
     {
+        $user = $this->tokenStorage->getToken()?->getUser();
+
+        // Do not make the service available to non-logged-in users.
+        if (!$user instanceof FrontendUser) {
+            throw new PageNotFoundException('Page not found!');
+        }
+
         if (!$year) {
             $year = (int) date('Y');
         }
@@ -71,12 +82,16 @@ class DownloadController extends AbstractController
     #[Route('/_download/print_workshop_details_as_docx/{year}/{eventId}', name: 'sac_event_tool_download_print_workshop_details_as_docx', defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function printWorkshopDetailsAsDocxAction(int $year = 0, int|null $eventId = null): Response
     {
-        /** @var CalendarEventsModel $calendarEventsModelAdapter */
-        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+        $user = $this->tokenStorage->getToken()?->getUser();
 
-        $objEvent = $calendarEventsModelAdapter->findById($eventId);
+        // Do not make the service available to non-logged-in users.
+        if (!$user instanceof FrontendUser) {
+            throw new PageNotFoundException('Page not found!');
+        }
 
-        if (null !== $eventId && null === $objEvent) {
+        $event = $this->framework->getAdapter(CalendarEventsModel::class)->findById($eventId);
+
+        if (null !== $eventId && null === $event) {
             return new Response('Download failed. Please check if the event id is valid.', Response::HTTP_BAD_REQUEST);
         }
 
@@ -94,12 +109,16 @@ class DownloadController extends AbstractController
     #[Route('/_download/print_workshop_details_as_pdf/{eventId}', name: 'sac_event_tool_download_print_workshop_details_as_pdf', defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function printWorkshopDetailsAsPdfAction(int $eventId): Response
     {
-        /** @var CalendarEventsModel $calendarEventsModelAdapter */
-        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+        $user = $this->tokenStorage->getToken()?->getUser();
 
-        $objEvent = $calendarEventsModelAdapter->findById($eventId);
+        // Do not make the service available to non-logged-in users.
+        if (!$user instanceof FrontendUser) {
+            throw new PageNotFoundException('Page not found!');
+        }
 
-        if (null !== $objEvent) {
+        $event = $this->framework->getAdapter(CalendarEventsModel::class)->findById($eventId);
+
+        if (null !== $event) {
             $this->workshopBookletGenerator->setEventId($eventId);
             $this->workshopBookletGenerator->setDownload(true);
 
@@ -115,13 +134,10 @@ class DownloadController extends AbstractController
     #[Route('/_download/download_event_ical/{eventId}', name: 'sac_event_tool_download_event_ical', defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function downloadEventICalAction(int $eventId): Response
     {
-        /** @var CalendarEventsModel $calendarEventsModelAdapter */
-        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+        $event = $this->framework->getAdapter(CalendarEventsModel::class)->findById($eventId);
 
-        $objEvent = $calendarEventsModelAdapter->findById($eventId);
-
-        if (null !== $objEvent) {
-            return $this->eventICal->download($objEvent);
+        if (null !== $event) {
+            return $this->eventICal->download($event);
         }
 
         return new Response('ICal download failed. Please check if the event id is valid.', Response::HTTP_BAD_REQUEST);
