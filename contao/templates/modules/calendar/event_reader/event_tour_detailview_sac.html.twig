@@ -221,7 +221,7 @@
                         <ul class="list-unstyled">
                             {% for diff in diffs %}
                                 <li>
-                                    {% if diff.isEqual %}
+                                    {% if diff.isEqual or diff.max is empty %}
                                         <span class="d-block text-decoration-underline" data-bs-toggle="tooltip" data-placement="top" data-bs-trigger="click" data-bs-title="{{ diff.min.title|e }}: {{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
                                     {% else %}
                                         <span class="text-decoration-underline" data-bs-toggle="tooltip" data-placement="top" data-bs-trigger="click" data-bs-title="{{ diff.min.title|e }}: {{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
