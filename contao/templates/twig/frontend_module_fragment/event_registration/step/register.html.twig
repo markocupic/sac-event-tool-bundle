@@ -78,6 +78,26 @@
                                 </div>
                             {% endif %}
 
+                            {% if eventModel.bookingEvent is not empty %}
+                                {% set user = get_logged_in_frontend_user() %}
+                                {% set salutation = user.gender == 'female' ? 'Liebe' : 'Lieber' %}
+                                <div class="mt-4">
+                                    <div class="fst-italic mb-3">Auszug aus der Touren-/Kurs-Ausschreibung:</div>
+                                    <div class="booking-text event-detail event-info-box icon-box-small">
+                                        <h5>Anmeldung</h5>
+                                        {{ eventModel.bookingEvent|nl2br }}
+                                    </div>
+                                    <div class="fst-italic mt-4 highlight-warning-ff-notes p-3">
+                                        <span>{{ salutation }} {{ user.firstname }}<br>Besten Dank, dass du dir die nötige Zeit nimmst, im nachfolgenden Eingabefeld auf alle oben genannten Punkte einzugehen. Bei fehlenden oder unzureichenden Angaben kann deine Anmeldung u.U. abgelehnt werden.</span>
+                                    </div>
+                                </div>
+                                <style>
+                                    .highlight-warning-ff-notes {
+                                        background-color: #ffff00;
+                                    }
+                                </style>
+                            {% endif %}
+
                             {% if form.hasFormField('notes') %}
                                 <div class="mt-4 mb-2" data-reg-widget="notes">
                                     {{ form.getWidget('notes').parse()|raw }}
