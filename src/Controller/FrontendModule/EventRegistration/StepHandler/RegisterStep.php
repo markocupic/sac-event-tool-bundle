@@ -47,7 +47,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
 {
     private const string STEP = 'register';
 
-    private const string TEMPLATE = '@Contao_MarkocupicSacEventToolBundle/frontend_module_fragment/event_registration/step/register.html.twig';
+    private const string TEMPLATE = '@Contao_MarkocupicSacEventToolBundle/frontend_module/partials/event_registration/step/register.html.twig';
 
     private const int PRIORITY = 200;
 

@@ -157,7 +157,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         return new Response(
             $this->twig->render(
-                '@Contao_MarkocupicSacEventToolBundle/frontend_module_fragment/event_registration/step_indicator.html.twig',
+                '@Contao_MarkocupicSacEventToolBundle/frontend_module/partials/event_registration/step_indicator.html.twig',
                 [
                     'items' => $items,
                 ],
