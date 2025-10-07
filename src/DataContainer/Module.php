@@ -16,10 +16,16 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Twig\Finder\FinderFactory;
 use Contao\System;
 
 class Module
 {
+    public function __construct(
+        private readonly FinderFactory $finderFactory,
+    ) {
+    }
+
     #[AsCallback(table: 'tl_module', target: 'fields.eventFilterBoardFields.options', priority: 100)]
     public function getEventFilterBoardFields()
     {
@@ -41,6 +47,12 @@ class Module
     #[AsCallback(table: 'tl_module', target: 'fields.eventListPartialTpl.options', priority: 100)]
     public function getEventListTemplates()
     {
-        return Controller::getTemplateGroup('event_list_partial_');
+        $finder = $this->finderFactory->create();
+
+		// Find all templates
+        $opt = $finder->asTemplateOptions();
+
+		// Filter templates
+        return array_filter($opt, static fn ($key) => preg_match('/^frontend_module_partials\/event_list\/(tour|course)(.*)$/', $key), ARRAY_FILTER_USE_KEY);
     }
 }

@@ -4,5 +4,5 @@
 {% set searchable = false %}
 
 {% block content %}
-    {% include '@Contao_MarkocupicSacEventToolBundle/frontend_module/event_list/' ~ data.eventListPartialTpl ~ '.html.twig' with arrPartialOpt %}
+    {% include '@Contao_MarkocupicSacEventToolBundle/'~data.eventListPartialTpl ~ '.html.twig' with arrPartialOpt %}
 {% endblock %}
