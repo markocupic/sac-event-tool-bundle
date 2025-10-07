@@ -49,10 +49,10 @@ class Module
     {
         $finder = $this->finderFactory->create();
 
-		// Find all templates
+        // Find all templates
         $opt = $finder->asTemplateOptions();
 
-		// Filter templates
+        // Filter templates
         return array_filter($opt, static fn ($key) => preg_match('/^frontend_module_partials\/event_list\/(tour|course)(.*)$/', $key), ARRAY_FILTER_USE_KEY);
     }
 }
