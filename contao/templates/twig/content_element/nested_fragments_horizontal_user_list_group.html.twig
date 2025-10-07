@@ -2,9 +2,18 @@
 {% extends "@Contao/content_element/_base.html.twig" %}
 
 {% block content %}
-    <div class="d-flex justify-content-start flex-wrap">
+    <div class="content-nested-fragments-horizontal-user-list-group--container d-flex justify-content-start flex-wrap">
         {% for fragment in nested_fragments %}
             {{ content_element(fragment) }}
         {% endfor %}
     </div>
+    {% add to head %}
+        <style>
+            {# language=CSS #}
+            .content-nested-fragments-horizontal-user-list-group--container {
+                column-gap: 1rem;
+                row-gap: 2rem;
+            }
+        </style>
+    {% endadd %}
 {% endblock %}

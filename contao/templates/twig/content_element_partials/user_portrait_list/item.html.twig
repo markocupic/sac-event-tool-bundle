@@ -26,7 +26,9 @@
             </div>
         {% else %}
             {% if email|default and 'email' in showFieldsToGuests %}
-                {% if email|default %}{{ insert_tag('email_open::'~email)|raw }}{{ email }}</a>{% endif %}
+                <div class="d-block content-user-portrait-list--user-detail-box-email small">
+                    {% if email|default %}{{ insert_tag('email_open::'~email)|raw }}{{ email }}</a>{% endif %}
+                </div>
             {% endif %}
         {% endif %}
         <!-- indexer::stop -->
@@ -83,7 +85,7 @@
             .content-user-portrait-list--user-detail-box {
                 .content-user-portrait-list--user-detail-box-name {
                     display: flex;
-                    font-size: clamp(1rem, 2.5vw, 1.25rem) !important;
+                    font-size: clamp(0.875rem, 2.5vw, 1.125rem) !important;
                 }
 
                 .content-user-portrait-list--user-detail-box-email {
