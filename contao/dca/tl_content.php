@@ -16,11 +16,16 @@ use Contao\System;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\PurgeEventFavoritesLinkController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentsHorizontalUserListGroupController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\HorizontalButtonGroupController;
 
 // Palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes'][PurgeEventFavoritesLinkController::TYPE] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][UserPortraitController::TYPE] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][UserPortraitListController::TYPE] = 'name,type,headline;{config_legend},userList_selectMode,userList_queryType,userList_users,userList_userRoles,userList_replacePrivateAdressWithRoleAdress,userList_showFieldsToGuests;{image_legend:hide},imgSize;{jumpTo_legend},jumpTo;{template_legend},userList_template,userList_partial_template;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes'][UserPortraitListController::TYPE] = 'name,type,headline;{config_legend},userList_selectMode,userList_queryType,userList_users,userList_userRoles,userList_replacePrivateAdressWithRoleAdress,userList_showFieldsToGuests;{image_legend:hide},imgSize;{jumpTo_legend},jumpTo;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentsHorizontalUserListGroupController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes'][HorizontalButtonGroupController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
 	'exclude'    => true,
@@ -86,20 +91,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_queryType'] = [
 	'options'   => ['AND', 'OR'],
 	'eval'      => ['tl_class' => 'clr'],
 	'sql'       => "varchar(10) NOT NULL default ''",
-];
-
-$GLOBALS['TL_DCA']['tl_content']['fields']['userList_template'] = [
-	'exclude'   => true,
-	'inputType' => 'select',
-	'eval'      => ['tl_class' => 'w50'],
-	'sql'       => "varchar(64) NOT NULL default ''",
-];
-
-$GLOBALS['TL_DCA']['tl_content']['fields']['userList_partial_template'] = [
-	'exclude'   => true,
-	'inputType' => 'select',
-	'eval'      => ['tl_class' => 'w50'],
-	'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['imgSize'] = [

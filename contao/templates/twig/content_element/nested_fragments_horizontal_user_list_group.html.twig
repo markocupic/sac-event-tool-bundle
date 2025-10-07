@@ -1,0 +1,10 @@
+{# templates/content_element/example.html.twig #}
+{% extends "@Contao/content_element/_base.html.twig" %}
+
+{% block content %}
+    <div class="d-flex justify-content-start flex-wrap">
+        {% for fragment in nested_fragments %}
+            {{ content_element(fragment) }}
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -17,18 +17,19 @@ use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\HorizontalButtonGroupController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\PurgeEventFavoritesLinkController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentsHorizontalUserListGroupController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\HorizontalButtonGroupController;
 
 // Content elements
-
 $GLOBALS['TL_LANG']['CTE']['sac_event_tool_content_elements'] = ['SAC Pilatus Inhalts-Elemente'];
-$GLOBALS['TL_LANG']['CTE'][HorizontalButtonGroupController::TYPE] = ['Horizontal Button Bar'];
 $GLOBALS['TL_LANG']['CTE'][UserPortraitController::TYPE] = ['SAC-User-Portrait'];
 $GLOBALS['TL_LANG']['CTE'][UserPortraitListController::TYPE] = ['SAC-User-Portrait-Liste'];
 $GLOBALS['TL_LANG']['CTE'][PurgeEventFavoritesLinkController::TYPE] = ['Vorgemerkte Events löschen Link'];
+$GLOBALS['TL_LANG']['CTE'][NestedFragmentsHorizontalUserListGroupController::TYPE] = ['Nested Fragments - User List Inhaltselemente Horizonal aufgereiht'];
+$GLOBALS['TL_LANG']['CTE'][HorizontalButtonGroupController::TYPE] = ['Nested Fragments - Buttons horizontal aufgereiht'];
 
 // Override defaults
 $request = System::getContainer()->get('request_stack')->getCurrentRequest();

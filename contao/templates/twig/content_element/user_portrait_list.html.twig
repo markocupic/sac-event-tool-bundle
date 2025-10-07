@@ -1,0 +1,24 @@
+{% trans_default_domain 'contao_default' %}
+{% extends "@Contao/content_element/_base.html.twig" %}
+
+{% block headline %}
+    {% if headline|default %}
+        <{{ hl }} class="content-headline">{{ headline }}</{{ hl }}>
+    {% endif %}
+{% endblock %}
+{% block content %}
+    {% if items|default %}
+        <div class="d-flex justify-content-start flex-wrap content-user-portrait-list--container">
+            {{ items|raw }}
+        </div>
+    {% endif %}
+    {% add to head %}
+        <style>
+            {# language=CSS #}
+            .content-user-portrait-list--container {
+                column-gap: 1rem;
+                row-gap: 2rem;
+            }
+        </style>
+    {% endadd %}
+{% endblock %}

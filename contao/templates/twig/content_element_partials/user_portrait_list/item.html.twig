@@ -1,0 +1,102 @@
+{% set user = get_logged_in_frontend_user() %}
+<div class="content-user-portrait-list--item">
+    <div class="d-block content-user-portrait-list--image-box">
+        {% if addImage|default %}
+            <!-- indexer::stop -->
+            {% if jumpTo|default %}
+                <a href="{{ insert_tag('link_url::' ~ jumpTo) }}?username={{ username }}" title="{{ lastname ~ ' ' ~ firstname|trim }}">
+            {% endif %}
+            {{ contao_figure(singleSRC, 22, {
+                metadata: { alt: lastname~' '~firstname|trim },
+                options: { attr: {class: 'rounded-circle' } },
+            }) }}
+            {% if jumpTo|default %}
+                </a>
+            {% endif %}
+            <!-- indexer::continue -->
+        {% endif %}
+    </div>
+    <div class="d-block content-user-portrait-list--user-detail-box">
+        <div class="content-user-portrait-list--user-detail-box-name">
+            <strong>{{ lastname ~ ' ' ~ firstname }}</strong>
+        </div>
+        {% if has_logged_in_frontend_user() %}
+            <div class="d-block content-user-portrait-list--user-detail-box-email small">
+                {% if email|default %}{{ insert_tag('email_open::'~email)|raw }}{{ email }}</a>{% endif %}
+            </div>
+        {% else %}
+            {% if email|default and 'email' in showFieldsToGuests %}
+                {% if email|default %}{{ insert_tag('email_open::'~email)|raw }}{{ email }}</a>{% endif %}
+            {% endif %}
+        {% endif %}
+        <!-- indexer::stop -->
+        <div class="mt-2">
+            {% if has_logged_in_frontend_user() %}
+                {#  Show personal data to logged in users only #}
+                {% if street|default %}
+                    <div class="content-user-portrait-list--user-detail-box-detail small">{{ street }}</div>
+                {% endif %}
+                {% if city|default %}
+                    <div class="content-user-portrait-list--user-detail-box-detail small">{{ postal }} {{ city }}</div>
+                {% endif %}
+                {% if phone|default %}
+                    <div class="content-user-portrait-list--user-detail-box-detail small">P: {{ phone }}</div>
+                {% endif %}
+                {% if mobile|default %}
+                    <div class="content-user-portrait-list--user-detail-box-detail small">M: {{ mobile }}</div>
+                {% endif %}
+            {% else %}
+                {% if street|default and 'street' in showFieldsToGuests %}
+                    <div class="content-user-portrait-list--user-detail-box-detail small">{{ street }}</div>
+                {% endif %}
+                {% if postal|default and 'postal' in showFieldsToGuests %}
+                    <div class="content-user-portrait-list--user-detail-box-detail small">{{ postal }} {{ city }}</div>
+                {% endif %}
+                {% if phone|default and 'phone' in showFieldsToGuests %}
+                    <div class="content-user-portrait-list--user-detail-box-detail small">P: {{ phone }}</div>
+                {% endif %}
+                {% if mobile|default and 'mobile' in showFieldsToGuests %}
+                    <div class="content-user-portrait-list--user-detail-box-detail small">M: {{ mobile }}</div>
+                {% endif %}
+            {% endif %}
+        </div>
+        <!-- indexer::continue -->
+    </div>
+</div>
+{% add to head %}
+    <style>
+        {# language=SCSS #}
+        {% apply scss %}
+        .content-user-portrait-list--item {
+            width: 280px;
+            max-width: 100%;
+
+            .content-user-portrait-list--image-box {
+                margin-bottom: 1rem;
+
+                figure {
+                    width: clamp(100px, 20vw, 140px);
+                    height: clamp(100px, 20vw, 140px);
+                }
+            }
+
+            .content-user-portrait-list--user-detail-box {
+                .content-user-portrait-list--user-detail-box-name {
+                    display: flex;
+                    font-size: clamp(1rem, 2.5vw, 1.25rem) !important;
+                }
+
+                .content-user-portrait-list--user-detail-box-email {
+                    display: flex;
+                    padding-bottom: 0.625rem;
+
+                    a {
+                        text-decoration: none !important;
+                    }
+                }
+            }
+        }
+
+        {% endapply %}
+    </style>
+{% endadd %}

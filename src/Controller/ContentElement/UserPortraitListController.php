@@ -19,27 +19,29 @@ use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController
 use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Twig\FragmentTemplate;
-use Contao\FrontendTemplate;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Model\UserRoleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
-#[AsContentElement(UserPortraitListController::TYPE, category: 'sac_event_tool_content_elements', template: 'ce_user_portrait_list')]
+#[AsContentElement(UserPortraitListController::TYPE, category: 'sac_event_tool_content_elements')]
 class UserPortraitListController extends AbstractContentElementController
 {
-    public const TYPE = 'user_portrait_list';
+    public const string TYPE = 'user_portrait_list';
+
+    public const string PARTIAL_TEMPLATE = '@Contao_MarkocupicSacEventToolBundle/content_element_partials/user_portrait_list/item.html.twig';
 
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly Connection $connection,
         private readonly Avatar $avatar,
+        private readonly Connection $connection,
+        private readonly ContaoFramework $framework,
+        private readonly Environment $twig,
         private readonly string $projectDir,
     ) {
     }
@@ -49,19 +51,11 @@ class UserPortraitListController extends AbstractContentElementController
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    /**
-     * @throws Exception
-     */
     protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
         $userRoleModelAdapter = $this->framework->getAdapter(UserRoleModel::class);
-
-        // Get template
-        if (!empty($model->userList_template)) {
-            $template->set('strTemplate', $model->userList_template);
-        }
 
         $arrIDS = [];
         $arrSelectedRoles = $stringUtilAdapter->deserialize($model->userList_userRoles, true);
@@ -100,94 +94,87 @@ class UserPortraitListController extends AbstractContentElementController
             }
         } elseif ('selectUsers' === $model->userList_selectMode) {
             $ids = $stringUtilAdapter->deserialize($model->userList_users, true);
-            $objUser = $userModelAdapter->findMultipleByIds($ids);
+            $user = $userModelAdapter->findMultipleByIds($ids);
 
-            if (null !== $objUser) {
-                while ($objUser->next()) {
-                    if ('' !== $objUser->stop && $objUser->stop < time()) {
+            if (null !== $user) {
+                while ($user->next()) {
+                    if ('' !== $user->stop && $user->stop < time()) {
                         continue;
                     }
 
-                    if ($objUser->disable) {
+                    if ($user->disable) {
                         continue;
                     }
 
-                    $arrIDS[] = $objUser->id;
+                    $arrIDS[] = $user->id;
                 }
             }
         }
 
-        $objUser = $userModelAdapter->findMultipleByIds($arrIDS);
+        $user = $userModelAdapter->findMultipleByIds($arrIDS);
 
-        $itemCount = 0;
+        if (null !== $user) {
+            $items = [];
 
-        if (null !== $objUser) {
-            $strItems = '';
-
-            while ($objUser->next()) {
-                ++$itemCount;
-
-                // Get partial template
-                $strTemplatePartial = $model->userList_partial_template;
-
-                $objTemplate = new FrontendTemplate($strTemplatePartial);
-                $objTemplate->setData($objUser->row());
-                $objTemplate->jumpTo = $model->jumpTo;
-                $objTemplate->showFieldsToGuests = $stringUtilAdapter->deserialize($model->userList_showFieldsToGuests, true);
+            while ($user->next()) {
+                // Build the partial template
+                $partialTemplate = $user->row();
+                $partialTemplate['jumpTo'] = $model->jumpTo;
+                $partialTemplate['showFieldsToGuests'] = $stringUtilAdapter->deserialize($model->userList_showFieldsToGuests, true);
 
                 // Roles
-                $arrIDS = $stringUtilAdapter->deserialize($objUser->userRole, true);
-                $objRoles = $userRoleModelAdapter->findMultipleByIds($arrIDS);
+                $arrIDS = $stringUtilAdapter->deserialize($user->userRole, true);
+                $roleCollection = $userRoleModelAdapter->findMultipleByIds($arrIDS);
                 $arrRoleEmails = [];
-                $arrRoles = [];
+                $roles = [];
 
-                if (null !== $objRoles) {
-                    while ($objRoles->next()) {
-                        if (!\in_array($objRoles->id, $arrSelectedRoles, false)) {
+                if (null !== $roleCollection) {
+                    while ($roleCollection->next()) {
+                        $role = $roleCollection->current();
+                        if (!\in_array($role->id, $arrSelectedRoles, false)) {
                             continue;
                         }
 
-                        $objTemplate->hasRole = true;
-                        $arrRoles[] = $objRoles->title;
+                        $partialTemplate['hasRole'] = true;
+                        $roles[] = $role->title;
 
-                        if ('' !== $objRoles->email) {
-                            $arrRoleEmails[$objRoles->title] = $objRoles->email;
-                            $objTemplate->hasRoleEmail = true;
+                        if ('' !== $role->email) {
+                            $arrRoleEmails[$role->title] = $role->email;
+                            $partialTemplate['hasRoleEmail'] = true;
                         }
 
-                        // Overwrite private address with role address Be careful to only apply this
-                        // setting once per user
+                        // Override the private address with the role address. Be careful to only apply
+                        // this setting once per user.
                         $arrAddress = $stringUtilAdapter->deserialize($model->userList_replacePrivateAdressWithRoleAdress, true);
 
                         foreach ($arrAddress as $field) {
-                            if ('' !== $objRoles->{$field}) {
-                                $objTemplate->{$field} = $objRoles->{$field};
+                            if ('' !== $role->{$field}) {
+                                $partialTemplate[$field] = $role->{$field};
                             }
                         }
                     }
                 }
 
-                $objTemplate->roleEmails = $arrRoleEmails;
-                $objTemplate->roles = $arrRoles;
+                $partialTemplate['roleEmails'] = $arrRoleEmails;
+                $partialTemplate['roles'] = $roles;
 
-                // Get user profile picture
-                $strAvatarSRC = $this->avatar->getAvatarResourcePath($objUser->current());
+                // Get the user profile picture
+                $avatarSourcePath = $this->avatar->getAvatarResourcePath($user->current());
 
                 // Add the user profile picture
-                if (\strlen($strAvatarSRC)) {
-                    if (is_file($this->projectDir.'/'.$strAvatarSRC)) {
-                        $objTemplate->addImage = true;
-                        $objTemplate->imgSize = $model->imgSize;
-                        $objTemplate->singleSRC = $strAvatarSRC;
+                if (\strlen($avatarSourcePath)) {
+                    if (is_file($this->projectDir.'/'.$avatarSourcePath)) {
+                        $partialTemplate['addImage'] = true;
+                        $partialTemplate['imgSize'] = $model->imgSize;
+                        $partialTemplate['singleSRC'] = $avatarSourcePath;
                     }
                 }
-                $strItems .= $objTemplate->parse();
-            }
-            $template->set('items', $strItems);
-        }
 
-        $template->set('hasMultiple', $itemCount > 1);
-        $template->set('itemCount', $itemCount);
+                $items[] = $this->twig->render(self::PARTIAL_TEMPLATE, $partialTemplate);
+            }
+
+            $template->set('items', implode('', $items));
+        }
 
         return $template->getResponse();
     }
