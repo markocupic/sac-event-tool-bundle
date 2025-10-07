@@ -18,6 +18,7 @@ use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitControll
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentsHorizontalUserListGroupController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\HorizontalButtonGroupController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentsWrapperDivController;
 
 // Palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes'][PurgeEventFavoritesLinkController::TYPE] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
@@ -26,6 +27,7 @@ $GLOBALS['TL_DCA']['tl_content']['palettes'][UserPortraitListController::TYPE] =
 $GLOBALS['TL_DCA']['tl_content']['palettes'][UserPortraitListController::TYPE] = 'name,type,headline;{config_legend},userList_selectMode,userList_queryType,userList_users,userList_userRoles,userList_replacePrivateAdressWithRoleAdress,userList_showFieldsToGuests;{image_legend:hide},imgSize;{jumpTo_legend},jumpTo;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentsHorizontalUserListGroupController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][HorizontalButtonGroupController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentsWrapperDivController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
 	'exclude'    => true,
