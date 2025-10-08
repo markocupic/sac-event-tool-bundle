@@ -222,14 +222,44 @@
                             {% for diff in diffs %}
                                 <li>
                                     {% if diff.isEqual or diff.max is empty %}
-                                        <span class="d-block text-decoration-underline" data-bs-toggle="tooltip" data-placement="top" data-bs-trigger="click" data-bs-title="{{ diff.min.title|e }}: {{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
+                                        <span id="popper{{ random() }}" class="popper-trigger link-primary text-decoration-underline" role="button" data-bs-title="{{ diff.min.category.title|e }}: {{ diff.min.title|e }} [{{ diff.min.shortcut|e }}]" data-bs-content="{{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
                                     {% else %}
-                                        <span class="text-decoration-underline" data-bs-toggle="tooltip" data-placement="top" data-bs-trigger="click" data-bs-title="{{ diff.min.title|e }}: {{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
+                                        <span id="popper{{ random() }}" class="popper-trigger link-primary text-decoration-underline" role="button" data-bs-title="{{ diff.min.category.title|e }}: {{ diff.min.title|e }} [{{ diff.min.shortcut|e }}]" data-bs-content="{{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
                                         <span>&nbsp;-&nbsp;</span>
-                                        <span class="text-decoration-underline" data-bs-toggle="tooltip" data-placement="top" data-bs-trigger="click" data-bs-title="{{ diff.max.title|e }}: {{ diff.max.description|e }}">{{ diff.max.shortcut }}</span>
+                                        <span id="popper{{ random() }}" class="popper-trigger link-primary text-decoration-underline" role="button" data-bs-title="{{ diff.max.category.title|e }}: {{ diff.max.title|e }} [{{ diff.max.shortcut|e }}]" data-bs-content="{{ diff.max.description|e }}">{{ diff.max.shortcut }}</span>
                                     {% endif %}
                                 </li>
                             {% endfor %}
+                            {% add to head %}
+                                {# Programmaticaly bootstrap popover initialization. #}
+                                {# We want the current popover to be closed before opening a new one. #}
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', () => {
+                                        let currentPopover = null;
+
+                                        const elements = document.querySelectorAll('.popper-trigger');
+
+                                        for (const element of elements) {
+                                            element.addEventListener('show.bs.popover', (event) => {
+                                                const instance = bootstrap.Popover.getOrCreateInstance('#' + element.id);
+
+                                                if (null !== currentPopover && currentPopover !== instance) {
+                                                    currentPopover.hide();
+                                                }
+
+                                                currentPopover = instance;
+                                            })
+                                            const popover = new bootstrap.Popover(element, {
+                                                container: '.tour-difficulties',
+                                                title: element.dataset.bsTitle,
+                                                content: element.dataset.bsContent,
+                                                placement: 'top',
+                                                trigger: 'click',
+                                            });
+                                        }
+                                    })
+                                </script>
+                            {% endadd %}
                         </ul>
                     </div>
                 {% endif %}
