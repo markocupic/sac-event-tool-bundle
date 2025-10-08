@@ -20,18 +20,18 @@ use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\PurgeEventFavoritesLinkController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentsHorizontalUserListGroupController;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\HorizontalButtonGroupController;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentsWrapperDivController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentUserPortraitListGroupController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentButtonGroupController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentWrapperDivController;
 
 // Content elements
 $GLOBALS['TL_LANG']['CTE']['sac_event_tool_content_elements'] = ['SAC Pilatus Inhalts-Elemente'];
 $GLOBALS['TL_LANG']['CTE'][UserPortraitController::TYPE] = ['SAC-User-Portrait'];
 $GLOBALS['TL_LANG']['CTE'][UserPortraitListController::TYPE] = ['SAC-User-Portrait-Liste'];
 $GLOBALS['TL_LANG']['CTE'][PurgeEventFavoritesLinkController::TYPE] = ['Vorgemerkte Events löschen Link'];
-$GLOBALS['TL_LANG']['CTE'][NestedFragmentsHorizontalUserListGroupController::TYPE] = ['Nested Fragments - User-Portrait-Liste Inhaltselemente Horizonal aufgereiht'];
-$GLOBALS['TL_LANG']['CTE'][HorizontalButtonGroupController::TYPE] = ['Nested Fragments - Buttons horizontal aufgereiht'];
-$GLOBALS['TL_LANG']['CTE'][NestedFragmentsWrapperDivController::TYPE] = ['Nested Fragments - Wrapper DIV-Element'];
+$GLOBALS['TL_LANG']['CTE'][NestedFragmentUserPortraitListGroupController::TYPE] = ['Nested Fragment - User-Portrait-Liste Inhaltselemente horizonal aufreihen'];
+$GLOBALS['TL_LANG']['CTE'][NestedFragmentButtonGroupController::TYPE] = ['Nested Fragment - Buttons horizontal aufreihen'];
+$GLOBALS['TL_LANG']['CTE'][NestedFragmentWrapperDivController::TYPE] = ['Nested Fragment - Wrapper DIV-Element'];
 
 // Override defaults
 $request = System::getContainer()->get('request_stack')->getCurrentRequest();

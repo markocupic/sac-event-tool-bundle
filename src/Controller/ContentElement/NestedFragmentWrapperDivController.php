@@ -21,10 +21,10 @@ use Contao\CoreBundle\Twig\FragmentTemplate;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsContentElement(NestedFragmentsHorizontalUserListGroupController::TYPE, nestedFragments: true, category: 'sac_event_tool_content_elements')]
-class NestedFragmentsHorizontalUserListGroupController extends AbstractContentElementController
+#[AsContentElement(NestedFragmentWrapperDivController::TYPE, nestedFragments: true, category: 'sac_event_tool_content_elements')]
+class NestedFragmentWrapperDivController extends AbstractContentElementController
 {
-    public const TYPE = 'nested_fragments_horizontal_user_list_group';
+    public const TYPE = 'nested_fragment_wrapper_div';
 
     protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {

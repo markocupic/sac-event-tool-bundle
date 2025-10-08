@@ -21,10 +21,10 @@ use Contao\CoreBundle\Twig\FragmentTemplate;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsContentElement(HorizontalButtonGroupController::TYPE, nestedFragments: true, category: 'sac_event_tool_content_elements')]
-class HorizontalButtonGroupController extends AbstractContentElementController
+#[AsContentElement(NestedFragmentButtonGroupController::TYPE, nestedFragments: true, category: 'sac_event_tool_content_elements')]
+class NestedFragmentButtonGroupController extends AbstractContentElementController
 {
-    public const TYPE = 'horizontal_button_group';
+    public const TYPE = 'nested_fragment_button_group';
 
     protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {
