@@ -53,7 +53,11 @@
         </div>
     </div>
     {% add to head %}
-        <script src="{{ asset('js/avatar_uploader.js', 'markocupic_sac_event_tool') }}"></script>
+        {% set attributes = attrs()
+            .setIfExists('nonce', csp_nonce('script-src'))
+            .set('src', asset('js/avatar_uploader.js', 'markocupic_sac_event_tool'))
+        %}
+        <script{{ attributes }}></script>
     {% endadd %}
     {% add to body %}
         <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>

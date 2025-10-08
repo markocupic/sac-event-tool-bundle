@@ -58,8 +58,12 @@
                 </div>
             </div>
         </div>
-        <script src="{{ asset('vue/dist/vue.global.prod.js', 'markocupic_sac_event_tool') }}"></script>
-        <script>
+        {% set attributes = attrs()
+            .setIfExists('nonce', csp_nonce('script-src'))
+            .set('src', asset('vue/dist/vue.global.prod.js', 'markocupic_sac_event_tool'))
+        %}
+        <script{{ attributes }}></script>
+        <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
             document.addEventListener('DOMContentLoaded', () => {
                 new MemberDatabaseSyncMaintenance('#memberDatabaseSyncApp');
             });

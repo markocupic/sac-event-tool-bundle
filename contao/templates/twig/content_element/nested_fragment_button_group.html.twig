@@ -3,7 +3,7 @@
 
 {% block content %}
     {% add to head %}
-        <style>
+        <style{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
             .button-list-horizontal-scroll .button-list-horizontal-scroll--wrapper {
                 overflow-x: auto;
             }

@@ -24,7 +24,7 @@
         <p>Sie erhalten automatisch eine Kopie dieser Nachricht.</p>
     </div>
 
-    <style>
+    <style{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
         .send_tour_rapport_notification_form {
             border-top: 1px solid var(--border);
         }

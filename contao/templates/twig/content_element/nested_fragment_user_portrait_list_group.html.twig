@@ -8,7 +8,7 @@
         {% endfor %}
     </div>
     {% add to head %}
-        <style>
+        <style{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
             {# language=CSS #}
             .content-nested-fragments-horizontal-user-list-group--container {
                 column-gap: 1rem;

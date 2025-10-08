@@ -93,7 +93,7 @@
                                         <span>{{ salutation }} {{ user.firstname }}<br>Besten Dank, dass du dir die nötige Zeit nimmst, im nachfolgenden Eingabefeld auf alle oben genannten Punkte einzugehen. Bei fehlenden oder unzureichenden Angaben kann deine Anmeldung u.U. abgelehnt werden.</span>
                                     </div>
                                 </div>
-                                <style>
+                                <style{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
                                     .highlight-warning-ff-notes {
                                         background-color: #ffff00;
                                     }
@@ -159,7 +159,7 @@
             </script>
         </div>
         {% add to head %}
-            <style>
+            <style{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
                 #eventRegistrationForm {
                     overflow: hidden;
                 }

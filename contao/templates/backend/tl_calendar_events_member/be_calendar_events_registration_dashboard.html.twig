@@ -37,7 +37,7 @@
     <div class="alert alert-primary">Dieser Teilnehmer/diese Teilnehmerin hat am Event teilgenommen.</div>
 {% endif %}
 
-<style>
+<style{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
     .change-state-of-subscription-with-email-box {
         padding-bottom: 1.5rem;
     }

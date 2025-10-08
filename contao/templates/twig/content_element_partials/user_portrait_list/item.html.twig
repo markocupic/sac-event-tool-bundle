@@ -65,7 +65,7 @@
     </div>
 </div>
 {% add to head %}
-    <style>
+    <style{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
         {# language=SCSS #}
         {% apply scss %}
         .content-user-portrait-list--item {

@@ -230,36 +230,34 @@
                                     {% endif %}
                                 </li>
                             {% endfor %}
-                            {% add to head %}
-                                {# Programmaticaly bootstrap popover initialization. #}
-                                {# We want the current popover to be closed before opening a new one. #}
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', () => {
-                                        let currentPopover = null;
+                            {# Programmaticaly bootstrap popover initialization. #}
+                            {# We want the current popover to be closed before opening a new one. #}
+                            <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    let currentPopover = null;
 
-                                        const elements = document.querySelectorAll('.popper-trigger');
+                                    const elements = document.querySelectorAll('.popper-trigger');
 
-                                        for (const element of elements) {
-                                            element.addEventListener('show.bs.popover', (event) => {
-                                                const instance = bootstrap.Popover.getOrCreateInstance('#' + element.id);
+                                    for (const element of elements) {
+                                        element.addEventListener('show.bs.popover', (event) => {
+                                            const instance = bootstrap.Popover.getOrCreateInstance('#' + element.id);
 
-                                                if (null !== currentPopover && currentPopover !== instance) {
-                                                    currentPopover.hide();
-                                                }
+                                            if (null !== currentPopover && currentPopover !== instance) {
+                                                currentPopover.hide();
+                                            }
 
-                                                currentPopover = instance;
-                                            })
-                                            const popover = new bootstrap.Popover(element, {
-                                                container: '.tour-difficulties',
-                                                title: element.dataset.bsTitle,
-                                                content: element.dataset.bsContent,
-                                                placement: 'top',
-                                                trigger: 'click',
-                                            });
-                                        }
-                                    })
-                                </script>
-                            {% endadd %}
+                                            currentPopover = instance;
+                                        })
+                                        const popover = new bootstrap.Popover(element, {
+                                            container: '.tour-difficulties',
+                                            title: element.dataset.bsTitle,
+                                            content: element.dataset.bsContent,
+                                            placement: 'top',
+                                            trigger: 'click',
+                                        });
+                                    }
+                                })
+                            </script>
                         </ul>
                     </div>
                 {% endif %}

@@ -39,7 +39,7 @@
                 </div>
             </form>
 
-            <script>
+            <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
                 document.querySelector('form#tl_sync_event_registration_database').addEventListener('submit', (e) => {
                     const btn = e.currentTarget.querySelector('.tl_submit');
                     btn.setAttribute('disabled', 'true');

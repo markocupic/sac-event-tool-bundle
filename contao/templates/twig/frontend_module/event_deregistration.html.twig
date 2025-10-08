@@ -66,7 +66,7 @@
             <h4>{{ 'MSC.evt_dereg_title'|trans([event.title])|raw }}</h4>
             {{ form|raw }}
             {% add to body %}
-                <script>
+                <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
                     document.querySelector(".module-deregistration--form-container form").addEventListener("submit", function (event) {
                         const userConfirmed = confirm('{{ 'MSC.evt_dereg_submitConfirm'|trans([event.title])|raw }}');
                         if (!userConfirmed) {

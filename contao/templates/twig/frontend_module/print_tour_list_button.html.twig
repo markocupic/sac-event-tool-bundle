@@ -35,23 +35,25 @@
             </div>
         </div>
 
-        {% do addHtmlToHead('
-            <style>
-            .module-print-tour-list-button button .ready {
-                display:inline;
-            }
-            .module-print-tour-list-button button .busy {
-                display:none;
-            }
-            .module-print-tour-list-button button[disabled] .ready {
-                display:none;
-            }
-            .module-print-tour-list-button button[disabled] .busy {
-                display:inline;
-            }
-            </style>
-        ') %}
+        {% add to head %}
+            <style{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
+                .module-print-tour-list-button button .ready {
+                    display: inline;
+                }
 
+                .module-print-tour-list-button button .busy {
+                    display: none;
+                }
+
+                .module-print-tour-list-button button[disabled] .ready {
+                    display: none;
+                }
+
+                .module-print-tour-list-button button[disabled] .busy {
+                    display: inline;
+                }
+            </style>
+        {% endadd %}
         <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
 
             const eventListId = '{{ watch_event_list_module }}';

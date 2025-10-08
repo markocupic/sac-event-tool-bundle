@@ -46,8 +46,11 @@
         <div class="cc-info">{{ 'MSC.evt_epe_youWillReceiveACopyOfThisMessage'|trans({}, 'contao_default') }}</div>
 
     </div>
-
-    <script type="text/javascript" src="{{ insert_tag('asset::vue/dist/vue.global.prod.js::markocupic_sac_event_tool') }}"></script>
+    {% set attributes = attrs()
+        .setIfExists('nonce', csp_nonce('script-src'))
+        .set('src', asset('vue/dist/vue.global.prod.js', 'markocupic_sac_event_tool'))
+    %}
+    <script{{ attributes }}></script>
     <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
         window.addEventListener('DOMContentLoaded', (event) => {
 

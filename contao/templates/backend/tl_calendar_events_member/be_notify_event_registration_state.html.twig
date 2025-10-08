@@ -7,7 +7,7 @@
     {{ form|raw }}
 </div>
 
-<style type='text/css'>
+<style{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
     .notify-event_participant_form {
         border-top: 1px solid #e6e6e8;
     }

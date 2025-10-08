@@ -15,7 +15,7 @@
     {% endif %}
 
     {% add to head %}
-        <style>
+        <style{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
             .content-user-portrait-list > .content-headline {
                 width: 280px;
                 max-width: 100%;

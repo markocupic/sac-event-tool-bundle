@@ -2,7 +2,11 @@
 
 {% block content %}
     {% add to head %}
-        <script type="text/javascript" src="{{ asset('choices.js/scripts/choices.min.js', 'markocupic_sac_event_tool') }}"></script>
+        {% set attributes = attrs()
+            .setIfExists('nonce', csp_nonce('script-src'))
+            .set('src', asset('choices.js/scripts/choices.min.js', 'markocupic_sac_event_tool'))
+        %}
+        <script{{ attributes }}></script>
         <link rel="stylesheet" href="{{ asset('choices.js/styles/choices.min.css', 'markocupic_sac_event_tool') }}">
     {% endadd %}
     <div class="filter-board {{ form.getFormId() }} block" id="{{ form.getFormId() }}">
@@ -58,8 +62,11 @@
             {# end formbody #}
         </form>
     </div>
-
-    <script src="{{ insert_tag('asset::eventfilter/eventfilter.js::markocupic_sac_event_tool') }}"></script>
+    {% set attributes = attrs()
+        .setIfExists('nonce', csp_nonce('script-src'))
+        .set('src', asset('eventfilter/eventfilter.js', 'markocupic_sac_event_tool'))
+    %}
+    <script{{ attributes }}></script>
     <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
 
         document.addEventListener("DOMContentLoaded", function () {
