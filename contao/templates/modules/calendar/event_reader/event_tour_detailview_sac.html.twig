@@ -222,11 +222,11 @@
                             {% for diff in diffs %}
                                 <li>
                                     {% if diff.isEqual or diff.max is empty %}
-                                        <span id="popper{{ random() }}" class="popper-trigger link-primary text-decoration-underline" role="button" data-bs-title="{{ diff.min.category.title|e }}: {{ diff.min.title|e }} [{{ diff.min.shortcut|e }}]" data-bs-content="{{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
+                                        <span class="bs-popover-trigger link-primary text-decoration-underline" role="button" data-bs-title="{{ diff.min.category.title|e }}:[br]{{ diff.min.title|e }} [{{ diff.min.shortcut|e }}]" data-bs-content="{{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
                                     {% else %}
-                                        <span id="popper{{ random() }}" class="popper-trigger link-primary text-decoration-underline" role="button" data-bs-title="{{ diff.min.category.title|e }}: {{ diff.min.title|e }} [{{ diff.min.shortcut|e }}]" data-bs-content="{{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
+                                        <span class="bs-popover-trigger link-primary text-decoration-underline" role="button" data-bs-title="{{ diff.min.category.title|e }}:[br]{{ diff.min.title|e }} [{{ diff.min.shortcut|e }}]" data-bs-content="{{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
                                         <span>&nbsp;-&nbsp;</span>
-                                        <span id="popper{{ random() }}" class="popper-trigger link-primary text-decoration-underline" role="button" data-bs-title="{{ diff.max.category.title|e }}: {{ diff.max.title|e }} [{{ diff.max.shortcut|e }}]" data-bs-content="{{ diff.max.description|e }}">{{ diff.max.shortcut }}</span>
+                                        <span class="bs-popover-trigger link-primary text-decoration-underline" role="button" data-bs-title="{{ diff.max.category.title|e }}:[br]{{ diff.max.title|e }} [{{ diff.max.shortcut|e }}]" data-bs-content="{{ diff.max.description|e }}">{{ diff.max.shortcut }}</span>
                                     {% endif %}
                                 </li>
                             {% endfor %}
@@ -236,24 +236,40 @@
                                 document.addEventListener('DOMContentLoaded', () => {
                                     let currentPopover = null;
 
-                                    const elements = document.querySelectorAll('.popper-trigger');
+                                    const elements = document.querySelectorAll('.bs-popover-trigger');
 
                                     for (const element of elements) {
                                         element.addEventListener('show.bs.popover', (event) => {
-                                            const instance = bootstrap.Popover.getOrCreateInstance('#' + element.id);
+                                            const instance = bootstrap.Popover.getOrCreateInstance(element);
 
                                             if (null !== currentPopover && currentPopover !== instance) {
                                                 currentPopover.hide();
                                             }
 
                                             currentPopover = instance;
-                                        })
+                                        });
+
                                         const popover = new bootstrap.Popover(element, {
                                             container: '.tour-difficulties',
-                                            title: element.dataset.bsTitle,
+                                            html: true,
+                                            sanitize: false,
+                                            title: function () {
+                                                // Replace [br] with <br> and append a close button to the title.
+                                                return element.dataset.bsTitle.replace('[br]', '<br>') + '<button type="button" class="btn-close position-absolute top-0 end-0 mt-1 me-1" aria-label="Close"></button>';
+                                            },
                                             content: element.dataset.bsContent,
                                             placement: 'top',
                                             trigger: 'click',
+                                        });
+
+                                        // Handle close button click after popover is shown
+                                        element.addEventListener('shown.bs.popover', () => {
+                                            const closeBtn = document.querySelector('.popover .btn-close');
+                                            if (closeBtn) {
+                                                closeBtn.addEventListener('click', () => {
+                                                    popover.hide();
+                                                }, {once: true});
+                                            }
                                         });
                                     }
                                 })
