@@ -1,5 +1,5 @@
 {% for instructor in instructors %}
-    <div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4 contact-box">
+    <div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4 contact-box overflow-x-auto">
         <div class="image_container contact-box--picture">
             {% set figure = insert_tag('figure::'~instructor.avatar_path~'?size=18&metadata[title]='~instructor.name~'&enableLightbox=0&options[attr][class]=avatar-large&template=image') %}
             <a href="{{ instructor.href }}" data-title="Leiter Portrait ansehen">
