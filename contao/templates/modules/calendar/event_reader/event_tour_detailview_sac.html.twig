@@ -232,48 +232,16 @@
                             {% endfor %}
                             {# Programmaticaly bootstrap popover initialization. #}
                             {# We want the current popover to be closed before opening a new one. #}
-                            <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-                                document.addEventListener('DOMContentLoaded', () => {
-                                    let currentPopover = null;
-
-                                    const elements = document.querySelectorAll('.bs-popover-trigger');
-
-                                    for (const element of elements) {
-                                        element.addEventListener('show.bs.popover', (event) => {
-                                            const instance = bootstrap.Popover.getOrCreateInstance(element);
-
-                                            if (null !== currentPopover && currentPopover !== instance) {
-                                                currentPopover.hide();
-                                            }
-
-                                            currentPopover = instance;
-                                        });
-
-                                        const popover = new bootstrap.Popover(element, {
-                                            container: '.tour-difficulties',
-                                            html: true,
-                                            sanitize: false,
-                                            title: function () {
-                                                // Replace [br] with <br> and append a close button to the title.
-                                                return element.dataset.bsTitle.replace('[br]', '<br>') + '<button type="button" class="btn-close position-absolute top-0 end-0 mt-1 me-1" aria-label="Close"></button>';
-                                            },
-                                            content: element.dataset.bsContent,
-                                            placement: 'top',
-                                            trigger: 'click',
-                                        });
-
-                                        // Handle close button click after popover is shown
-                                        element.addEventListener('shown.bs.popover', () => {
-                                            const closeBtn = document.querySelector('.popover .btn-close');
-                                            if (closeBtn) {
-                                                closeBtn.addEventListener('click', () => {
-                                                    popover.hide();
-                                                }, {once: true});
-                                            }
-                                        });
-                                    }
-                                })
-                            </script>
+                            {% add to body %}
+                                {% set attributes = attrs()
+                                    .setIfExists('nonce', csp_nonce('script-src'))
+                                    .set('src', asset('js/BootstrapPopoverManager.js','markocupic_sac_event_tool')) %}
+                                <script{{ attributes }}></script>
+                                <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
+                                    const popover = new BootstrapPopoverManager();
+                                    popover.init();
+                                </script>
+                            {% endadd %}
                         </ul>
                     </div>
                 {% endif %}
