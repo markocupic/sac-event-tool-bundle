@@ -355,10 +355,11 @@
 
     {# gallery start #}
     {% if get_event_data(model, 'addGallery') %}
-        {{ get_event_data(model, 'gallery')|raw }}
+        <div class="gallery event-detail event-info-box mt-4">
+            {{ get_event_data(model, 'gallery')|raw }}
+        </div>
     {% endif %}
     {# gallery end #}
-
 </div>
 <!-- indexer::continue -->
 

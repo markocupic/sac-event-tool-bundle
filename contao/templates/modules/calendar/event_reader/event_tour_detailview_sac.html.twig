@@ -363,7 +363,6 @@
                         {% endif %}
 
                         <div class="me-2 mt-3 mb-3">
-
                             <a href="{{ insert_tag('link_url::ausruestungslisten') }}" rel="noopener" target="_blank" title="Hier geht es zur Ausrüstungsempfehlung unserer SAC-Tourenleitenden" class="btn btn-block text-nowrap btn-outline-primary">
                                 <i class="fa-regular fa-gear"></i> Ausrüstungsempfehlung
                             </a>
@@ -398,7 +397,9 @@
 
     {# gallery start #}
     {% if get_event_data(model, 'addGallery') %}
-        {{ get_event_data(model, 'gallery')|raw }}
+        <div class="gallery event-detail event-info-box mt-4">
+            {{ get_event_data(model, 'gallery')|raw }}
+        </div>
     {% endif %}
     {# gallery end #}
 
