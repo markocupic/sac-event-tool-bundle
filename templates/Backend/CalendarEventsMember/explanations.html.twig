@@ -11,7 +11,7 @@
         <h3>Status der Event-Anmeldung</h3>
         <ul>
             {% for state in registration.states %}
-                <li><img src="{{ sacevt_asset_dir() }}/icons/subscription-states/{{ state }}.svg" width="16" height="16"> {{ ('MSC.'~state)|trans({}, 'contao_default') }}</li>
+                <li><img src="{{ asset('icons/subscription-states/'~state~'.svg', 'markocupic_sac_event_tool') }}" width="16" height="16"> {{ ('MSC.'~state)|trans({}, 'contao_default') }}</li>
             {% endfor %}
         </ul>
     </div>
@@ -19,8 +19,8 @@
     <div class="participation-state-legend">
         <h3>Teilnahmestatus <span class="notice">Hinweis: Darf erst nach der Event-Durchführung ausgefüllt werden!</span></h3>
         <ul>
-            <li><img src="{{ sacevt_asset_dir() }}/icons/fontawesome/default/square-check-regular_.svg" width="16" height="16"> Hat am Event nicht/noch nicht teilgenommen</li>
-            <li><img src="{{ sacevt_asset_dir() }}/icons/fontawesome/default/square-check-regular.svg" width="16" height="16"> Hat am Event teilgenommen</li>
+            <li><img src="{{ asset('icons/fontawesome/default/square-check-regular_.svg','markocupic_sac_event_tool') }}" width="16" height="16"> Hat am Event nicht/noch nicht teilgenommen</li>
+            <li><img src="{{ asset('icons/fontawesome/default/square-check-regular.svg','markocupic_sac_event_tool') }}" width="16" height="16"> Hat am Event teilgenommen</li>
         </ul>
     </div>
 

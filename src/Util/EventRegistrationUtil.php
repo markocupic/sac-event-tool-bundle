@@ -22,6 +22,7 @@ use Contao\Image;
 use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
+use Symfony\Component\Asset\Packages;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventRegistrationUtil
@@ -34,6 +35,7 @@ class EventRegistrationUtil
 
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly Packages $packages,
         private readonly TranslatorInterface $translator,
     ) {
         $this->dateAdapter = $this->framework->getAdapter(Date::class);
@@ -43,7 +45,8 @@ class EventRegistrationUtil
 
     public function getSubscriptionStateIcon(CalendarEventsMemberModel $registrationModel): string
     {
-        $icon = \sprintf('%s/icons/subscription-states/%s.svg', Bundle::ASSET_DIR, $registrationModel->stateOfSubscription);
+        $iconPath = \sprintf('icons/subscription-states/%s.svg', $registrationModel->stateOfSubscription);
+        $icon = $this->packages->getPackage(Bundle::PACKAGE_NAME)->getUrl($iconPath);
         $state = $this->translator->trans('MSC.'.$registrationModel->stateOfSubscription, [], 'contao_default');
 
         $strAlt = $this->stringUtilAdapter->specialchars($registrationModel->stateOfSubscription);

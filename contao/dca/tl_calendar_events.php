@@ -172,7 +172,7 @@ PaletteManipulator::create()
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year'] = [
 	'href'                   => 'transformDates=+52weeks',
 	'class'                  => 'global_op_icon_class',
-	'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/calendar-plus-regular.svg',
+	'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/calendar-plus-regular.svg', 'markocupic_sac_event_tool'),
 	'attributes'             => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
 	'custom_glob_op'         => true,
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => 10],
@@ -181,7 +181,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1year'] = [
 	'href'                   => 'transformDates=-52weeks',
 	'class'                  => 'global_op_icon_class',
-	'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/calendar-minus-regular.svg',
+	'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/calendar-minus-regular.svg', 'markocupic_sac_event_tool'),
 	'attributes'             => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
 	'custom_glob_op'         => true,
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => 8],
@@ -190,7 +190,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1yea
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = [
 	'href'                   => 'action=onloadCallbackExportCalendar',
 	'class'                  => 'header_icon',
-	'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/file-excel-regular.svg',
+	'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/file-excel-regular.svg', 'markocupic_sac_event_tool'),
 	'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 	'custom_glob_op'         => true,
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => -10],
@@ -199,7 +199,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCal
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = [
 	'href'                   => 'action=onloadCallbackExportCalendar',
 	'class'                  => 'header_icon',
-	'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/file-excel-regular.svg',
+	'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/file-excel-regular.svg', 'markocupic_sac_event_tool'),
 	'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 	'custom_glob_op'         => true,
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => -10],
@@ -211,22 +211,23 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle']['showIn
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['preview'] = [
 	'href'       => 'action=preview', // use a button callback to generate the url
 	'attributes' => 'target="_blank" rel="noopener"',
-	'icon'       => Bundle::ASSET_DIR . '/icons/fontawesome/default/presentation-screen-solid.svg',
+	'icon'       => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/presentation-screen-solid.svg', 'markocupic_sac_event_tool'),
+
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] = [
 	'href' => 'table=tl_calendar_events_member',
-	'icon' => Bundle::ASSET_DIR . '/icons/fontawesome/default/people-group-solid.svg',
+	'icon' => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/people-group-solid.svg', 'markocupic_sac_event_tool'),
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['downgradeEventReleaseLevel'] = [
 	'href' => 'act=edit&action=downgradeEventReleaseLevel', // use a button callback to generate the url
-	'icon' => Bundle::ASSET_DIR . '/icons/fontawesome/default/square-arrow-down-solid.svg',
+	'icon' => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/square-arrow-down-solid.svg', 'markocupic_sac_event_tool'),
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['upgradeEventReleaseLevel'] = [
 	'href' => 'act=edit&action=upgradeEventReleaseLevel', // use a button callback to generate the url
-	'icon' => Bundle::ASSET_DIR . '/icons/fontawesome/default/square-arrow-up-solid.svg',
+	'icon' => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/square-arrow-up-solid.svg', 'markocupic_sac_event_tool'),
 ];
 
 // Override DCA: tl_class
