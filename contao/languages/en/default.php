@@ -149,9 +149,9 @@ $GLOBALS['TL_LANG']['MSC']['bhs_dashb_printReportDisabled'] = 'Rapporte drucken 
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_registrationList'] = 'Event Registrierungen';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_sendEmail'] = 'E-Mail versenden';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_sendEmailDisabled'] = 'E-Mail versenden nicht verfügbar';
-$GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReport'] = 'Tourrapport erfassen';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_createReport'] = 'Tourrapport erfassen';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_editReport'] = 'Tourrapport bearbeiten';
-$GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReportDisabled'] = 'Tourrapport erfassen nicht verfügbar';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_createReportDisabled'] = 'Tourrapport erfassen nicht verfügbar';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorials'] = 'Anleitungen und Tutorials';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorialsText'] = 'Die Seite "<a href="/service/anleitungen-und-tutorials.html" rel="noopener" target="_blank" style="text-decoration:underline" title="Anleitungen und Tutorials"><strong>Anleitungen und Tutorials</strong></a>" beim Menüpunkt "Service" im Frontend/Website unterstützt Sie bei der Verwendung des SAC Event-Tools (Backend/Contao).';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_noUpcomingEventsDetected'] = 'In nächster Zeit stehen bei Ihnen keine Events an, wo Sie eine Leitungsfunktion ausüben.';

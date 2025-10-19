@@ -2,7 +2,7 @@
   "entrypoints": {
     "backend": {
       "js": [
-        "/bundles/markocupicsaceventtool/backend.d9105a8d.js"
+        "/bundles/markocupicsaceventtool/backend.a8a315f3.js"
       ]
     },
     "js/avatar_uploader": {

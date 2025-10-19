@@ -38,25 +38,25 @@
                         <td class="my-events-title-col text-align-left">
                             <a href="{{ event.href_event }}" style="text-decoration:underline" title="{{ 'MSC.bhs_dashb_editEvent'|trans({}, 'contao_default') }}"><strong>{{ event.title }}</strong></a>
                             {% if event.release_level is not empty %}
-                                &nbsp;<small>(<a href="{{ event.href_eventListing }}" style="text-decoration:underline" title="{{ 'MSC.bhs_dashb_editReleaseLevel'|trans({}, 'contao_default') }}">{{ event.release_level }}</a>)</small>
+                                &nbsp;<small>(<a href="{{ event['operations']['be-dashb-op--event-listing']['href'] }}" style="text-decoration:underline" title="{{ 'MSC.bhs_dashb_editReleaseLevel'|trans({}, 'contao_default') }}">{{ event.release_level }}</a>)</small>
                             {% endif %}
                         </td>
-                        <td class="my-events-icon-col text-align-center">
+                        <td class="my-events-operation-col text-align-center">
                             <a href="{{ event.href_preview }}" rel="noopener" target="_blank" title="{{ 'MSC.bhs_dashb_livePreview'|trans({}, 'contao_default') }}">
                                 <i class="fa-solid fa-fw fa-presentation-screen"></i>
                             </a>
                         </td>
-                        <td class="my-events-icon-col text-align-center">
+                        <td class="my-events-operation-col text-align-center">
                             <a href="{{ event.href_eventListing }}" title="{{ 'MSC.bhs_dashb_eventListing'|trans({}, 'contao_default') }}">
                                 <i class="fa-solid fa-list-tree"></i>
                             </a>
                         </td>
-                        <td class="my-events-icon-col text-align-center">
+                        <td class="my-events-operation-col text-align-center">
                             <a href="{{ event.href_registrations }}" title="{{ 'MSC.bhs_dashb_registrationList'|trans({}, 'contao_default') }}">
                                 <i class="fa-solid fa-fw fa-people-group"></i>
                             </a>
                         </td>
-                        <td class="my-events-icon-col text-align-center">
+                        <td class="my-events-operation-col text-align-center">
                             {% if event.href_email is not empty %}
                                 <a href="{{ event.href_email }}" title="{{ 'MSC.bhs_dashb_sendEmail'|trans({}, 'contao_default') }}">
                                     <i class="fa-solid fa-fw fa-at"></i>
@@ -65,16 +65,16 @@
                                 <i class="fa-solid fa-fw fa-at filter-brightened" title="{{ 'MSC.bhs_dashb_sendEmailDisabled'|trans({}, 'contao_default') }}"></i>
                             {% endif %}
                         </td>
-                        <td class="my-events-icon-col text-align-center">
+                        <td class="my-events-operation-col text-align-center">
                             {% if event.href_report is not empty %}
-                                <a href="{{ event.href_report }}" title="{% if event.has_filled_in_tour_report|default %}{{ 'MSC.bhs_dashb_writeReport'|trans({}, 'contao_default') }}{% else %}{{ 'MSC.bhs_dashb_editReport'|trans({}, 'contao_default') }}{% endif %}">
+                                <a href="{{ event.href_report }}" title="{% if event.has_filled_in_tour_report|default %}{{ 'MSC.bhs_dashb_createReport'|trans({}, 'contao_default') }}{% else %}{{ 'MSC.bhs_dashb_editReport'|trans({}, 'contao_default') }}{% endif %}">
                                     <i class="fa-solid fa-fw fa-comment-pen{% if event.has_filled_in_tour_report|default %} filter-green{% else %} filter-red{% endif %}"></i>
                                 </a>
                             {% else %}
-                                <i class="fa-solid fa-fw fa-comment-pen filter-brightened" title="{{ 'MSC.bhs_dashb_writeReportDisabled'|trans({}, 'contao_default') }}"></i>
+                                <i class="fa-solid fa-fw fa-comment-pen filter-brightened" title="{{ 'MSC.bhs_dashb_createReportDisabled'|trans({}, 'contao_default') }}"></i>
                             {% endif %}
                         </td>
-                        <td class="my-events-icon-col text-align-center">
+                        <td class="my-events-operation-col text-align-center">
                             {% if event.href_print_report is not empty %}
                                 <a href="{{ event.href_print_report }}" title="{{ 'MSC.bhs_dashb_printReport'|trans({}, 'contao_default') }}">
                                     <i class="fa-solid fa-fw fa-print"></i>
