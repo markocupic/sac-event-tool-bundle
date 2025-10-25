@@ -371,19 +371,19 @@ class EventParticipantEmailController extends AbstractBackendController
 
         foreach ($bag['attachments'] as $index => $attachment) {
             if ($attachment['file_id'] === $fileId) {
-				$storagePath = \dirname($attachment['temp_storage_path']);
-				unset($bag['attachments'][$index]);
-				$json['deleted_source'] = $storagePath;
+                $storagePath = \dirname($attachment['temp_storage_path']);
+                unset($bag['attachments'][$index]);
+                $json['deleted_source'] = $storagePath;
 
-				if (is_dir($storagePath)) {
-					$fs = new Filesystem();
-					$fs->remove($storagePath);
-				}
+                if (is_dir($storagePath)) {
+                    $fs = new Filesystem();
+                    $fs->remove($storagePath);
+                }
 
-				$json['status'] = 'success';
+                $json['status'] = 'success';
 
-				break;
-			}
+                break;
+            }
         }
 
         $bag['attachments'] = array_values($bag['attachments']);

@@ -26,8 +26,8 @@ class ParseTemplateListener
 {
     public function __construct(
         private readonly MyEventsDashboardController $dashboard,
-        private readonly Security                    $security,
-        private readonly RequestStack                $requestStack,
+        private readonly Security $security,
+        private readonly RequestStack $requestStack,
     ) {
     }
 

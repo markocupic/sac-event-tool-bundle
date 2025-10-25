@@ -21,8 +21,17 @@
       padding-top: 2rem;
     }
 
+    // https://isotropic.co/tool/hex-color-to-css-filter/
     & li .filter-brightened {
-      color: #6f7685;
+      color: #6f7685 !important;
+    }
+
+    & li .filter-green {
+      color: #589B0F !important;
+    }
+
+    & li .filter-red {
+      color: #D80128 !important;
     }
 
     // The first column contains the event subscription badges
