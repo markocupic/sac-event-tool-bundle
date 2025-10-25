@@ -18,16 +18,16 @@ use Contao\CoreBundle\Controller\BackendController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\Template;
-use Markocupic\SacEventToolBundle\Controller\BackendHomeScreen\DashboardController;
+use Markocupic\SacEventToolBundle\Controller\Backend\MyEventsDashboardController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ParseTemplateListener
 {
     public function __construct(
-        private readonly DashboardController $dashboard,
-        private readonly Security $security,
-        private readonly RequestStack $requestStack,
+        private readonly MyEventsDashboardController $dashboard,
+        private readonly Security                    $security,
+        private readonly RequestStack                $requestStack,
     ) {
     }
 

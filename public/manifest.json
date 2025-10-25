@@ -1,7 +1,7 @@
 {
-  "backend.js": "/bundles/markocupicsaceventtool/backend.6edc7ae2.js",
+  "backend.js": "/bundles/markocupicsaceventtool/backend.7b7beab4.js",
   "js/avatar_uploader.js": "/bundles/markocupicsaceventtool/js/avatar_uploader.5fa3ef58.js",
-  "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.f7a89dab.css",
+  "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.8825b9e7.css",
   "images/events/course/booklet/fallback.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/fallback.jpg",
   "images/events/course/booklet/toc.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/toc.jpg",
   "images/events/course/booklet/logo_sac.png": "/bundles/markocupicsaceventtool/images/events/course/booklet/logo_sac.png",
@@ -72,8 +72,10 @@
   "icons/event_states/event_status_1.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_1.svg",
   "icons/event_states/event_status_3.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_3.svg",
   "icons/event_states/event_status_5.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_5.svg",
+  "icons/my_events_dashboard/more--dark.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more--dark.svg",
+  "icons/my_events_dashboard/more.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more.svg",
   "../assets/ts/avatar_uploader.d.ts": "/bundles/markocupicsaceventtool/../assets/ts/avatar_uploader.d.ts",
-  "backend.6edc7ae2.js.map": "/bundles/markocupicsaceventtool/backend.6edc7ae2.js.map",
+  "backend.7b7beab4.js.map": "/bundles/markocupicsaceventtool/backend.7b7beab4.js.map",
   "avatar_uploader.5fa3ef58.js.map": "/bundles/markocupicsaceventtool/js/avatar_uploader.5fa3ef58.js.map",
-  "be_stylesheet.f7a89dab.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.f7a89dab.css.map"
+  "be_stylesheet.8825b9e7.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.8825b9e7.css.map"
 }

@@ -12,22 +12,23 @@ export default class extends Controller {
     }
 
     toggle(event) {
+
         event.stopPropagation();
-        const isOpen = this.menuTarget.classList.contains("show");
+        const isOpen = this.#getDropdownMenuPortal().querySelector('.dropdown-menu--dropdown.show') ? true : false;
 
         // Close other dropdowns
-        document.querySelectorAll(".dropdown-menu.show").forEach(openMenu => {
+        document.querySelectorAll(".dropdown-menu--dropdown").forEach(openMenu => {
             if (openMenu !== this.menuTarget) {
                 openMenu.classList.remove("show");
-                openMenu.closest(".dropdown")
-                    .querySelector(".dropdown-toggle")
-                    .setAttribute("aria-expanded", "false");
+                openMenu.closest(".dropdown-menu")
+                    ?.querySelector(".dropdown-menu--toggle")
+                    ?.setAttribute("aria-expanded", "false");
             }
         });
 
         if (!isOpen) {
             const rect = this.toggleTarget.getBoundingClientRect();
-            const portal = this.menuTarget.closest('.my-events--item').querySelector('.dropdown-portal');
+            const portal = this.#getDropdownMenuPortal();
 
             // Clone the menu and inject into the portal to avoid overflow-hidden issues
             const clonedMenu = this.menuTarget.cloneNode(true);
@@ -52,26 +53,30 @@ export default class extends Controller {
             this.toggleTarget.setAttribute("aria-expanded", "true");
 
             // Optional: handle selection inside cloned menu
-            //clonedMenu.addEventListener("click", this.selectItem.bind(this));
+            clonedMenu.addEventListener("click", this.selectItem.bind(this));
         } else {
-            document.getElementById("dropdown-portal").innerHTML = "";
+            this.#getDropdownMenuPortal().innerHTML = "";
             this.toggleTarget.setAttribute("aria-expanded", "false");
         }
     }
 
     selectItem(event) {
-        if (event.target.matches(".dropdown-item")) {
+        if (event.target.matches(".dropdown-menu--item")) {
             this.menuTarget.classList.remove("show");
             this.toggleTarget.setAttribute("aria-expanded", "false");
         }
     }
 
     closeAll() {
-        document.querySelectorAll(".dropdown-menu.show").forEach(menu => {
+        document.querySelectorAll(".dropdown-menu--dropdown").forEach(menu => {
             menu.classList.remove("show");
-            menu.closest(".dropdown")
-                .querySelector(".dropdown-toggle")
-                .setAttribute("aria-expanded", "false");
+            menu.closest(".dropdown-menu")
+                ?.querySelector(".dropdown-menu--toggle")
+                ?.setAttribute("aria-expanded", "false");
         });
+    }
+
+    #getDropdownMenuPortal() {
+        return this.menuTarget.closest('.my-events-dashb--item').querySelector('.dropdown-portal');
     }
 }

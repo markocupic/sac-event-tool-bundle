@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Controller\BackendHomeScreen;
+namespace Markocupic\SacEventToolBundle\Controller\Backend;
 
 use Codefog\HasteBundle\UrlParser;
 use Contao\BackendUser;
@@ -40,7 +40,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
-class DashboardController
+class MyEventsDashboardController
 {
 	private Adapter $calendarEventsModelAdapter;
 
@@ -96,7 +96,7 @@ class DashboardController
 				$this->prepareForTwig($pastEvents, 'past-event'),
 			);
 
-			$html = $this->twig->render('@MarkocupicSacEventTool/Backend/BackendHomeScreen/dashboard2.html.twig', [
+			$html = $this->twig->render('@MarkocupicSacEventTool/Backend/MyEventsDashboard/my_events_dashboard.html.twig', [
 				'events'                           => $events,
 				'has_upcoming_events'              => !empty($upcomingEvents),
 				'has_past_events'                  => !empty($pastEvents),
@@ -214,7 +214,6 @@ class DashboardController
 		$operation = [];
 		$operation['icon_class'] = 'fa-solid fa-fw fa-presentation-screen';
 
-
 		$operation['href'] = $this->router->generate('contao_backend', [
 			'do'    => 'calendar',
 			'table' => 'tl_calendar_events',
@@ -222,9 +221,9 @@ class DashboardController
 			'rt'    => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
 			'ref'   => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
 		]);
-
 		$operation['title'] = $this->translator->trans('MSC.bhs_dashb_livePreview', [], 'contao_default');
 		$operation['link_attributes'] = [
+			'data-turbo' => 'false',
 			'rel'    => 'noopener',
 			'target' => '_blank',
 		];
@@ -246,8 +245,10 @@ class DashboardController
 			'rt'    => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
 			'ref'   => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
 		]);
-
 		$operation['title'] = $this->translator->trans('MSC.bhs_dashb_registrationList', [], 'contao_default');
+		$operation['link_attributes'] = [
+			'data-turbo' => 'false',
+		];
 		$operation['label'] = 'Event Liste';
 		$operation['primary'] = false;
 
@@ -267,8 +268,10 @@ class DashboardController
 			'rt'    => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
 			'ref'   => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
 		]);
-
 		$operation['title'] = $this->translator->trans('MSC.bhs_dashb_registrationList', [], 'contao_default');
+		$operation['link_attributes'] = [
+			'data-turbo' => 'false',
+		];
 		$operation['label'] = 'Anmeldungen';
 		$operation['primary'] = false;
 
@@ -295,6 +298,9 @@ class DashboardController
 			$url = $this->urlParser->addQueryString('sid=' . uniqid(), $url);
 
 			$operation['href'] = $this->uriSigner->sign($url);
+			$operation['link_attributes'] = [
+				'data-turbo' => 'false',
+			];
 		}
 
 		$operation['title'] = !empty($operation['href']) ? $this->translator->trans('MSC.bhs_dashb_sendEmail', [], 'contao_default') : $this->translator->trans('MSC.bhs_dashb_sendEmailDisabled', [], 'contao_default');
@@ -320,6 +326,9 @@ class DashboardController
 				'rt'    => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
 				'ref'   => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
 			]);
+			$operation['link_attributes'] = [
+				'data-turbo' => 'false',
+			];
 		}
 
 		if (!empty($operation['href'])) {
@@ -333,7 +342,7 @@ class DashboardController
 		}
 
 		$operation['label'] = $event->filledInEventReportForm ? 'Tourrapport bearbeiten' : 'Tour-Rapport erfassen';
-		$operation['primary'] = false;
+		$operation['primary'] = true;
 
 		return $operation;
 	}
@@ -351,6 +360,9 @@ class DashboardController
 				'rt'    => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
 				'ref'   => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
 			]);
+			$operation['link_attributes'] = [
+				'data-turbo' => 'false',
+			];
 		}
 
 		$operation['title'] = !empty($operation['href']) ? $this->translator->trans('MSC.bhs_dashb_printReport', [], 'contao_default') : $this->translator->trans('MSC.bhs_dashb_printReportDisabled', [], 'contao_default');
