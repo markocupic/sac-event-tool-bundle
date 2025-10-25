@@ -64,7 +64,7 @@
                                                             .set('title', op.title)
                                                             .mergeWith(op.link_attributes|default({})) %}
                                                         <a{{ attributes }}>
-                                                            <i class="{{ op.icon_class }}"></i>
+                                                            <i{{ attrs().addClass(op.icon_class) }}"></i>
                                                         </a>
                                                     {% else %}
                                                         <span class="--d-flex">
@@ -95,7 +95,7 @@
                                                         </a>
                                                     {% else %}
                                                         <div class="dropdown-menu--item --d-flex --flex-row --flex-nowrap --column-gap-2 --text-nowrap">
-                                                            <i class="{{ op.icon_class }} filter-brightened" title="{{ op.title }}"></i><span class="dropdown-menu--item-label">{{ op.label }}</span>
+                                                            <i{{ attrs().addClass([op.icon_class, 'filter-brightened']).set('title', op.title) }}></i><span class="dropdown-menu--item-label">{{ op.label }}</span>
                                                         </div>
                                                     {% endif %}
                                                 </li>

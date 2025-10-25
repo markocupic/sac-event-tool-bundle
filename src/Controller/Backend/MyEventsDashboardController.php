@@ -287,9 +287,10 @@ class MyEventsDashboardController
     {
         $operation = [];
         $class = 'fa-solid fa-fw fa-comment-pen';
-        $operation['icon_class'] = $class.($event->filledInEventReportForm ? ' filter-green' : ' filter-red');
 
         if (EventType::TOUR === $event->eventType || EventType::LAST_MINUTE_TOUR === $event->eventType) {
+            $operation['icon_class'] = $class.($event->filledInEventReportForm ? ' filter-green' : ' filter-red');
+
             $operation['href'] = $this->router->generate('contao_backend', [
                 'do' => 'calendar',
                 'table' => 'tl_calendar_events',
@@ -302,6 +303,8 @@ class MyEventsDashboardController
             $operation['link_attributes'] = [
                 'data-turbo' => 'false',
             ];
+        } else {
+            $operation['icon_class'] = $class.' filter-brightened';
         }
 
         if (!empty($operation['href'])) {
