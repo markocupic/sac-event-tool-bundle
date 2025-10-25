@@ -1,6 +1,7 @@
 {
-  "backend.js": "/bundles/markocupicsaceventtool/backend.a8a315f3.js",
+  "backend.js": "/bundles/markocupicsaceventtool/backend.6edc7ae2.js",
   "js/avatar_uploader.js": "/bundles/markocupicsaceventtool/js/avatar_uploader.5fa3ef58.js",
+  "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.f7a89dab.css",
   "images/events/course/booklet/fallback.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/fallback.jpg",
   "images/events/course/booklet/toc.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/toc.jpg",
   "images/events/course/booklet/logo_sac.png": "/bundles/markocupicsaceventtool/images/events/course/booklet/logo_sac.png",
@@ -17,7 +18,7 @@
   "icons/maintenance/member_database_sync/db_sync.svg": "/bundles/markocupicsaceventtool/icons/maintenance/member_database_sync/db_sync.svg",
   "images/events/course/booklet/background.svg": "/bundles/markocupicsaceventtool/images/events/course/booklet/background.svg",
   "icons/sac-event-tool-backend-module-icon.svg": "/bundles/markocupicsaceventtool/icons/sac-event-tool-backend-module-icon.svg",
-  "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.c1932a88.css",
+  "images/sac-event-tool-backend-module-icon.svg": "/bundles/markocupicsaceventtool/images/sac-event-tool-backend-module-icon.cc5a7274.svg",
   "images/events/course/booklet/background.png": "/bundles/markocupicsaceventtool/images/events/course/booklet/background.png",
   "choices.js/styles/choices.min.css": "/bundles/markocupicsaceventtool/choices.js/styles/choices.min.8e5d5ee0.css",
   "eventlist/eventlist_vue.js": "/bundles/markocupicsaceventtool/eventlist/eventlist_vue.87a2fa7d.js",
@@ -72,6 +73,7 @@
   "icons/event_states/event_status_3.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_3.svg",
   "icons/event_states/event_status_5.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_5.svg",
   "../assets/ts/avatar_uploader.d.ts": "/bundles/markocupicsaceventtool/../assets/ts/avatar_uploader.d.ts",
-  "backend.a8a315f3.js.map": "/bundles/markocupicsaceventtool/backend.a8a315f3.js.map",
-  "avatar_uploader.5fa3ef58.js.map": "/bundles/markocupicsaceventtool/js/avatar_uploader.5fa3ef58.js.map"
+  "backend.6edc7ae2.js.map": "/bundles/markocupicsaceventtool/backend.6edc7ae2.js.map",
+  "avatar_uploader.5fa3ef58.js.map": "/bundles/markocupicsaceventtool/js/avatar_uploader.5fa3ef58.js.map",
+  "be_stylesheet.f7a89dab.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.f7a89dab.css.map"
 }
