@@ -1,4 +1,5 @@
 $icon-color: #1a6b99;
+$responsive-breakpoint: 576px;
 
 #tl_my_events_dashboard {
   border-bottom: 1px solid var(--border);
@@ -44,7 +45,7 @@ $icon-color: #1a6b99;
     & li.my-events-dashb--badge-col {
       width: 50px;
 
-      @media (min-width: 576px) {
+      @media (min-width: $responsive-breakpoint) {
         width: 120px;
       }
 
@@ -54,11 +55,11 @@ $icon-color: #1a6b99;
 
       & .subscription-badge {
         margin: 0 !important;
-        @media (max-width: 576px) {
+        @media (max-width: $responsive-breakpoint) {
           padding: 2px 5px;
         }
 
-        @media (max-width: 576px) {
+        @media (max-width: $responsive-breakpoint) {
           & * {
             font-size: 11px !important;
           }
@@ -70,7 +71,7 @@ $icon-color: #1a6b99;
     & li.my-events-dashb--title-col {
       & a, & i {
         line-height: 1.2;
-        @media (max-width: 576px) {
+        @media (max-width: $responsive-breakpoint) {
           font-size: 11px !important;
         }
       }
@@ -78,13 +79,13 @@ $icon-color: #1a6b99;
       img {
         height: 12px;
         width: 12px;
-        @media (min-width: 576px) {
+        @media (min-width: $responsive-breakpoint) {
           height: 16px;
           width: 16px;
         }
       }
 
-      @media (max-width: 576px) {
+      @media (max-width: $responsive-breakpoint) {
         & * {
           font-size: 11px !important;
         }
@@ -94,7 +95,7 @@ $icon-color: #1a6b99;
         display: flex;
         flex-direction: column;
         row-gap: .5rem;
-        @media (min-width: 992px) {
+        @media (min-width: $responsive-breakpoint) {
           flex-direction: row;
           flex-wrap: nowrap;
         }
@@ -144,7 +145,7 @@ $icon-color: #1a6b99;
       }
     }
 
-    @media (min-width: 576px) {
+    @media (min-width: $responsive-breakpoint) {
       .dropdown-menu--toggle {
         display: none;
       }
@@ -152,12 +153,12 @@ $icon-color: #1a6b99;
 
     .dropdown-menu--title {
       border-bottom: 1px solid var(--border);
-      @media (min-width: 576px) {
+      @media (min-width: $responsive-breakpoint) {
         display: none;
       }
     }
 
-    @media (min-width: 576px) {
+    @media (min-width: $responsive-breakpoint) {
       .dropdown-menu--toggle {
         display: none;
       }
@@ -165,8 +166,8 @@ $icon-color: #1a6b99;
 
     ul.dropdown-menu--dropdown {
       position: absolute;
-      width: 250px;
-      @media (min-width: 576px) {
+      width: 220px;
+      @media (min-width: $responsive-breakpoint) {
         width: auto;
       }
       padding: 0.5rem;
@@ -183,7 +184,7 @@ $icon-color: #1a6b99;
       display: flex;
       flex-direction: column;
       row-gap: 1rem;
-      @media (min-width: 576px) {
+      @media (min-width: $responsive-breakpoint) {
         row-gap: 0;
         flex-direction: row;
       }
@@ -193,7 +194,7 @@ $icon-color: #1a6b99;
       color: var(--contao) !important;
     }
 
-    @media (min-width: 576px) {
+    @media (min-width: $responsive-breakpoint) {
       ul.primary-operations, .dropdown-portal {
         display: none;
       }
@@ -225,7 +226,7 @@ $icon-color: #1a6b99;
       line-height: 1.25;
     }
 
-    @media (min-width: 576px) {
+    @media (min-width: $responsive-breakpoint) {
       li.dropdown-menu--item {
         display: block;
         color: var(--text);
@@ -235,7 +236,7 @@ $icon-color: #1a6b99;
       }
     }
 
-    @media (min-width: 576px) {
+    @media (min-width: $responsive-breakpoint) {
       .dropdown-menu--item-label {
         display: none;
       }
