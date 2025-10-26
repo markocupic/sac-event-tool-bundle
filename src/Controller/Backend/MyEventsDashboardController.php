@@ -190,13 +190,7 @@ class MyEventsDashboardController
         $operation = [];
         $operation['icon_class'] = 'fa-solid fa-fw fa-presentation-screen';
 
-        $operation['href'] = $this->router->generate('contao_backend', [
-            'do' => 'calendar',
-            'table' => 'tl_calendar_events',
-            'id' => $event->pid,
-            'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
-            'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-        ]);
+        $operation['href'] =$this->calendarEventsUtil->generateEventPreviewUrl($event);
         $operation['title'] = $this->translator->trans('MSC.bhs_dashb_livePreview', [], 'contao_default');
         $operation['link_attributes'] = [
             'data-turbo' => 'false',
