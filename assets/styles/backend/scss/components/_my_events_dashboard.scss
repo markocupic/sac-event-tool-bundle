@@ -1,0 +1,246 @@
+$icon-color: #1a6b99;
+
+#tl_my_events_dashboard {
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  padding: 0 15px 4px;
+
+  #tl_my_events_dashboard_inner {
+    width: 100%;
+
+    h2 {
+      margin: 18px 0 12px;
+    }
+
+    & ul.tl_listing > li {
+      border-bottom: 1px solid var(--border);
+      padding: 10px 6px;
+    }
+
+    & ul.tl_listing > li.separator {
+      color: var(--text);
+      font-weight: 600;
+      padding-top: 2rem;
+    }
+
+    & .op-icon {
+      color: $icon-color !important;
+    }
+
+    // https://isotropic.co/tool/hex-color-to-css-filter/
+    & .op-icon.filter-brightened {
+      color: #6f7685 !important;
+    }
+
+    & .op-icon.filter-green {
+      color: #589B0F !important;
+    }
+
+    & .op-icon.filter-red {
+      color: #D80128 !important;
+    }
+
+    // The first column contains the event subscription badges
+    & li.my-events-dashb--badge-col {
+      width: 50px;
+
+      @media (min-width: 576px) {
+        width: 120px;
+      }
+
+      @media (min-width: 768px) {
+        width: 180px;
+      }
+
+      & .subscription-badge {
+        margin: 0 !important;
+        @media (max-width: 576px) {
+          padding: 2px 5px;
+        }
+
+        @media (max-width: 576px) {
+          & * {
+            font-size: 11px !important;
+          }
+        }
+      }
+    }
+
+    // The second column contains the date, the event title and the FS info
+    & li.my-events-dashb--title-col {
+      & a, & i {
+        line-height: 1.2;
+        @media (max-width: 576px) {
+          font-size: 11px !important;
+        }
+      }
+
+      img {
+        height: 12px;
+        width: 12px;
+        @media (min-width: 576px) {
+          height: 16px;
+          width: 16px;
+        }
+      }
+
+      @media (max-width: 576px) {
+        & * {
+          font-size: 11px !important;
+        }
+      }
+
+      & > div.my-events-dashb--title-col--inner {
+        display: flex;
+        flex-direction: column;
+        row-gap: .5rem;
+        @media (min-width: 992px) {
+          flex-direction: row;
+          flex-wrap: nowrap;
+        }
+
+        & > div.my-events-dashb--title-col--date {
+          min-width: 65px;
+        }
+
+        & .my-events-dashb--title-col--icon-and-title > a, & .my-events-dashb--title-col--icon-and-title {
+          box-sizing: border-box;
+          line-height: normal;
+          min-height: 18px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          word-break: break-word;
+        }
+      }
+    }
+
+    // Dropdown menu operations
+    // Dropdown menu operations
+    .dropdown-menu {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-menu--toggle {
+      padding: 0 .375rem;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      color: gray;
+    }
+
+    html .dropdown-menu--toggle img.color-scheme--dark {
+      display: none;
+    }
+
+    html[data-color-scheme="dark"] .dropdown-menu--toggle {
+      & img.color-scheme--light {
+        display: none;
+      }
+
+      & img.color-scheme--dark {
+        display: block;
+      }
+    }
+
+    @media (min-width: 576px) {
+      .dropdown-menu--toggle {
+        display: none;
+      }
+    }
+
+    .dropdown-menu--title {
+      border-bottom: 1px solid var(--border);
+      @media (min-width: 576px) {
+        display: none;
+      }
+    }
+
+    @media (min-width: 576px) {
+      .dropdown-menu--toggle {
+        display: none;
+      }
+    }
+
+    ul.dropdown-menu--dropdown {
+      position: absolute;
+      width: 250px;
+      @media (min-width: 576px) {
+        width: auto;
+      }
+      padding: 0.5rem;
+      background-color: var(--content-bg);
+      border: 1px solid var(--content-border);
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      column-gap: .25rem;
+    }
+
+    ul.dropdown-menu--dropdown.show {
+      display: flex;
+      flex-direction: column;
+      row-gap: 1rem;
+      @media (min-width: 576px) {
+        row-gap: 0;
+        flex-direction: row;
+      }
+    }
+
+    ul.dropdown-menu--dropdown a:hover * {
+      color: var(--contao) !important;
+    }
+
+    @media (min-width: 576px) {
+      ul.primary-operations, .dropdown-portal {
+        display: none;
+      }
+
+      ul.dropdown-menu--dropdown {
+        display: flex;
+        flex-direction: row;
+        column-gap: .25rem;
+        row-gap: 0;
+        min-width: initial;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        position: initial;
+        background-color: transparent;
+        z-index: initial;
+      }
+
+      ul.dropdown-menu--dropdown.show {
+        display: flex;
+      }
+    }
+
+    li.dropdown-menu--item * {
+      color: var(--text);
+      text-decoration: none;
+      text-align: left;
+      line-height: 1.25;
+    }
+
+    @media (min-width: 576px) {
+      li.dropdown-menu--item {
+        display: block;
+        color: var(--text);
+        text-decoration: none;
+        text-align: left;
+        line-height: 1;
+      }
+    }
+
+    @media (min-width: 576px) {
+      .dropdown-menu--item-label {
+        display: none;
+      }
+    }
+    // End Dropdown menu operations
+    // End Dropdown menu operations
+  }
+}

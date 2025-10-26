@@ -6,7 +6,12 @@ const application = Application.start();
 application.debug = process.env.NODE_ENV === 'development';
 
 // Register all controllers with `sacevt--` prefix
-const context = require.context('./controllers', true, /\.js$/);
+const context = require.context(
+    '@symfony/stimulus-bridge/lazy-controller-loader!./controllers',
+    true,
+    /\.[jt]sx?$/
+);
+
 application.load(context.keys()
     .map((key) => {
         const identifier = identifierForContextKey(key);

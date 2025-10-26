@@ -1,3 +1,4 @@
+{% trans_default_domain "contao_default" %}
 {% extends "@Contao/be_main" %}
 
 {% block error %}
@@ -9,7 +10,7 @@
 {% block main_content %}
     <div id="eventParticipantEmail">
         <div id="tl_buttons">
-            <a href="{{ back }}" class="header_back" title="" accesskey="b" onclick="Backend.getScrollOffset()">{{ 'MSC.backBTTitle'|trans({}, 'contao_default') }}</a>
+            <a href="{{ back }}" class="header_back" title="" accesskey="b" onclick="Backend.getScrollOffset()">{{ 'MSC.backBTTitle'|trans }}</a>
         </div>
 
         <div class="notify-event_participant_form">
@@ -18,12 +19,12 @@
 
         <div id="fileUploader" v-cloak>
             <div>
-                <label v-if="attachments.length"><strong>{{ 'MSC.evt_epe_emailAttachments'|trans({}, 'contao_default') }}</strong></label>
+                <label v-if="attachments.length"><strong>{{ 'MSC.evt_epe_emailAttachments'|trans }}</strong></label>
 
                 <ul v-if="attachments.length" class="email-attachment-list">
                     <li v-for="attachment in attachments">
-                        <a class="delete-attachment-btn" v-bind:data-file-id="attachment.file_id" @click.stop="deleteAttachment" href="{{ app.request.getRequestUri() }}" :title="'{{ 'MSC.evt_epe_deleteAttachment'|trans({}, 'contao_default') }}'">
-                            <span v-bind:data-file-id="attachment.file_id" @click.stop="deleteAttachment"></span>
+                        <a class="delete-attachment-btn" data-turbo="false" v-bind:data-file-id="attachment.file_id" @click.stop="deleteAttachment" href="{{ app.request.getRequestUri() }}" :title="'{{ 'MSC.evt_epe_deleteAttachment'|trans }}'">
+                            <span v-bind:data-file-id="attachment.file_id" @click.stop="deleteAttachment">{{ backend_icon('delete.svg','MSC.evt_epe_deleteAttachment'|trans) }}</span>
                         </a>
                         <span>[[ attachment.name ]]</span>
                     </li>
@@ -43,7 +44,7 @@
             </div>
         </div>
 
-        <div class="cc-info">{{ 'MSC.evt_epe_youWillReceiveACopyOfThisMessage'|trans({}, 'contao_default') }}</div>
+        <div class="cc-info">{{ 'MSC.evt_epe_youWillReceiveACopyOfThisMessage'|trans }}</div>
 
     </div>
     {% set attributes = attrs()
@@ -57,7 +58,7 @@
             const requestToken = '{{ request_token }}';
             const allowedExtensions = ['{{ allowed_extensions|join("','")|raw }}'];
             const maxFileSize = {{ max_filesize }};
-            const generalAjaxErrorMessage = '{{ 'MSC.evt_epe_generalAjaxError'|trans({}, 'contao_default') }}';
+            const generalAjaxErrorMessage = '{{ 'MSC.evt_epe_generalAjaxError'|trans }}';
 
             const {createApp} = Vue
 
@@ -225,7 +226,7 @@
                         event.preventDefault();
                         const formData = new FormData();
                         formData.append('action', 'deleteAttachment');
-                        formData.append('fileId', event.target.getAttribute('data-file-id'));
+                        formData.append('fileId', event.currentTarget.getAttribute('data-file-id'));
                         formData.append('REQUEST_TOKEN', requestToken);
 
                         fetch(window.location.href, {
@@ -247,7 +248,6 @@
                                 this.hasAjaxError = false;
                                 this.ajaxErrorMessage = '';
                             } else {
-                                console.error(json);
                                 throw new Error(json['message'] ?? generalAjaxErrorMessage);
                             }
                         }).catch(error => {

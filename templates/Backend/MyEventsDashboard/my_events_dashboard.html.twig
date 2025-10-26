@@ -1,0 +1,129 @@
+{% trans_default_domain 'contao_default' %}
+<div id="tl_my_events_dashboard">
+    <div id="tl_my_events_dashboard_inner">
+        <h2><i class="fa-solid fa-mountain-sun"></i> {{ 'MSC.bhs_dashb_sacEvents'|trans }}</h2>
+        <ul class="tl_listing --display-flex --flex-column">
+            {% set col_span = 10 %}
+            {% for event in events %}
+                {% if event.separator|default %}
+                    {% if event.separator == 'upcoming-events' %}
+                        <li class="separator">
+                            {{ 'MSC.bhs_dashb_yourUpcomingEvents'|trans }}
+                        </li>
+                        {% if has_upcoming_events is same as(false) %}
+                            <li>
+                                {{ 'MSC.bhs_dashb_noUpcomingEventsDetected'|trans }}
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                    {% if event.separator == 'past-events' %}
+                        <li class="separator">
+                            {{ 'MSC.bhs_dashb_yourPastEvents'|trans }}
+                        </li>
+                        {% if has_past_events is same as(false) %}
+                            <li>
+                                {{ 'MSC.bhs_dashb_noPastEventsDetected'|trans }}
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    <li class="my-events-dashb--item --d-flex --flex-row --flex-nowrap --row-gap-1 --align-items-start hover-div">
+                        <div class="dropdown-portal">{# To prevent overflow-hidden issues we will place the operation navigation dropdown here. #}</div>
+                        <ul class="--d-flex --flex-row --flex-nowrap --flex-grow-1 --overflow-hidden">
+                            {# Column 1: Contains the event subscription badges. #}
+                            <li class="my-events-dashb--badge-col --flex-shrink-0 --text-align-left --align-items-start">
+                                <div class="--d-flex --flex-row --flex-wrap --row-gap-2 --column-gap-2">
+                                    {{ event.badge|raw }}
+                                </div>
+                            </li>
+                            {# Column 2: Contains the event date, the event state icon, the event title and the FS info. #}
+                            <li class="my-events-dashb--title-col --position-relative --flex-grow-1 --text-align-left --align-items-start --overflow-hidden">
+                                <div class="my-events-dashb--title-col--inner --w-100 --column-gap-2 --d-flex">
+                                    <div class="my-events-dashb--title-col--date --flex-shrink-0">
+                                        {{ event.date }}
+                                    </div>
+                                    <div class="my-events-dashb--title-col--icon-and-title --d-flex --flex-row --column-gap-1">
+                                        {{ event.state_icon|raw }}
+                                        <a href="{{ event.href_event }}" class="--text-underline" title="{{ 'MSC.bhs_dashb_editEvent'|trans }}"><strong>{{ event.title }}</strong></a>
+                                    </div>
+                                    {% if event.release_level is not empty %}
+                                        <div class="my-events-dashb--title-col--fs --flex-shrink-0 --me-2">
+                                            <a href="{{ event['operations']['be-dashb-op--event-listing']['href'] }}" class="--text-underline" title="{{ 'MSC.bhs_dashb_editReleaseLevel'|trans }}"><small>({{ event.release_level }})</small></a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </li>
+                            {# Column 3: Contains the operation icons and the dropdown navigation for the secondary operations. #}
+                            <li class="my-events-dashb--operation-col --d-flex --flex-shrink-0 --vertical-align-top">
+                                <div class="--d-flex --flex-row --column-gap-1 --align-items-start">
+                                    <ul class="primary-operations --d-flex --flex-row --column-gap-1">
+                                        {% for op_name,op in event.operations %}
+                                            {% if op.primary|default %}
+                                                <li{{ attrs().addClass([op_name, 'is-primary-op']) }}>
+                                                    {% if op.href|default %}
+                                                        {% set attributes = attrs()
+                                                            .set('href', op.href)
+                                                            .set('--d-flex')
+                                                            .set('title', op.title)
+                                                            .mergeWith(op.link_attributes|default({})) %}
+                                                        <a{{ attributes }}>
+                                                            <i{{ attrs().addClass(['op-icon', op.icon_class]) }}></i>
+                                                        </a>
+                                                    {% else %}
+                                                        <span class="--d-flex">
+                                                        <i{{ attrs().addClass(['op-icon', op.icon_class, 'filter-brightened']).set('title', op.title) }}></i>
+                                                    </span>
+                                                    {% endif %}
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                    {# Wrap the operation links in a dropdown #}
+                                    <div data-controller="sacevt--backend--operation-dropdown-menu" class="dropdown-menu">
+                                        <button data-sacevt--backend--operation-dropdown-menu-target="toggle" title="Operationen anzeigen" class="dropdown-menu--toggle" type="button" aria-expanded="false">
+                                            <img src="{{ asset('icons/my_events_dashboard/more.svg', 'markocupic_sac_event_tool') }}" width="16" height="16" alt="Operationen für Event anzeigen" class="color-scheme--light">
+                                            <img src="{{ asset('icons/my_events_dashboard/more--dark.svg', 'markocupic_sac_event_tool') }}" width="16" height="16" alt="Operationen für Event anzeigen" class="color-scheme--dark">
+                                        </button>
+                                        <ul data-sacevt--backend--operation-dropdown-menu-target="menu" class="dropdown-menu--dropdown">
+                                            <div class="dropdown-menu--title --overflow-hidden ">
+                                                <h6 class="--text-nowrap --mt-0 --mb-0 --pb-2 --lh-150">{{ event.title }}</h6>
+                                            </div>
+
+                                            {% for op_name,op in event.operations %}
+                                                <li{{ attrs().addClass([op_name, 'dropdown-menu--item', op.primary|default ? 'is-primary-op' : '']) }}>
+                                                    {% if op.href|default %}
+                                                        {% set attributes = attrs()
+                                                            .set('href', op.href)
+                                                            .set('class', 'dropdown-menu--item-link --d-flex --flex-row --flex-nowrap --column-gap-2 --text-nowrap')
+                                                            .set('title', op.title)
+                                                            .mergeWith(op.link_attributes|default({})) %}
+                                                        <a{{ attributes }}>
+                                                            <i{{ attrs().addClass(['op-icon', op.icon_class]) }}></i><span class="dropdown-menu--item-label">{{ op.label }}</span>
+                                                        </a>
+                                                    {% else %}
+                                                        <div class="dropdown-menu--item --d-flex --flex-row --flex-nowrap --column-gap-2 --text-nowrap">
+                                                            <i{{ attrs().addClass(['op-icon', op.icon_class, 'filter-brightened']).set('title', op.title) }}></i><span class="dropdown-menu--item-label --text-gray">{{ op.label }}</span>
+                                                        </div>
+                                                    {% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {# End dropdown #}
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            {% if load_more_past_events_url %}
+                <li class="--d-flex">
+                    <div class="tl_submit_container --flex-grow-1"><a class="tl_submit" data-action="contao--scroll-offset#store" href="{{ load_more_past_events_url }}">{{ 'MSC.bhs_dashb_loadMorePastEventsBtnLbl'|trans }}</a></div>
+                </li>
+            {% endif %}
+        </ul>
+
+        <h2>{{ 'MSC.bhs_dashb_guidesAndTutorials'|trans }}</h2>
+        <p>{{ 'MSC.bhs_dashb_guidesAndTutorialsText'|trans|raw }}</p>
+    </div>
+</div>

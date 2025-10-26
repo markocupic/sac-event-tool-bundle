@@ -192,7 +192,7 @@ class EventParticipantEmailController extends AbstractBackendController
             $this->controller->redirect($this->getBackUri());
         }
 
-        // Get the logged in Contao backend user
+        // Get the logged-in Contao backend user
         $this->user = $this->security->getUser();
 
         if (!$this->user instanceof BackendUser) {

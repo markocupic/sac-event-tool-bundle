@@ -51,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		'global_operations' => [
 			'all',
 			'backToEventSettings'               => [
-				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
+				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
 				'class'                  => 'back_to_event_settings',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 100],
@@ -61,39 +61,39 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			],
 			'sendEmail'                         => [
 				// use a button_callback for generating the url
-				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
+				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
 				'class'                  => 'send_email',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 90],
 				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/at-regular.svg', 'markocupic_sac_event_tool'),
 			],
 			'downloadEventRegistrationListCsv'  => [
-				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
-				'class'                  => 'header_icon',
+				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
+				'class'                  => 'download_event_registration_list_csv',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 80],
 				'href'                   => 'action=downloadEventRegistrationListCsv&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
 				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/file-excel-regular.svg', 'markocupic_sac_event_tool'),
 			],
 			'downloadEventRegistrationListDocx' => [
-				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
-				'class'                  => 'download_event_registration_list',
+				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
+				'class'                  => 'download_event_registration_list_docx',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 70],
 				'href'                   => 'action=downloadEventRegistrationListDocx&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
 				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/file-word-regular.svg', 'markocupic_sac_event_tool'),
 			],
 			'writeTourReport'                   => [
-				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
-				'class'                  => 'writeTourRapport',
+				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
+				'class'                  => 'write_tour_report',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'tour_report', 'sorting' => 100],
 				'href'                   => 'table=tl_calendar_events&act=edit&call=writeTourReport&id=%d',
 				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/pencil-regular.svg', 'markocupic_sac_event_tool'),
 			],
 			'printInstructorInvoice'            => [
-				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
-				'class'                  => 'printInstructorInvoice',
+				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
+				'class'                  => 'print_instructor_invoice',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'tour_report', 'sorting' => 90],
 				'href'                   => 'table=tl_calendar_events_instructor_invoice&id=%d',

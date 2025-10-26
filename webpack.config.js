@@ -8,10 +8,6 @@ Encore
     .addEntry('backend', './assets/backend.js') // Register Stimulus controllers
 
     .copyFiles({
-        from: './assets/css',
-        to: 'css/[path][name].[hash:8].[ext]',
-    })
-    .copyFiles({
         from: './assets/sounds',
         to: 'sounds/[path][name].[hash:8].[ext]',
     })
@@ -60,7 +56,6 @@ Encore
     .enableSourceMaps()
     .enableVersioning()
 
-
     // enables @babel/preset-env polyfills
     .configureBabelPresetEnv((config) => {
         config.useBuiltIns = 'usage';
@@ -68,6 +63,10 @@ Encore
     })
 
     .enablePostCssLoader()
+    // Preprocessing SCSS to CSS
+    .enableSassLoader()
+    .enablePostCssLoader()
+    .addStyleEntry('css/be_stylesheet', './assets/styles/backend/scss/backend_main.scss')
 ;
 
 module.exports = Encore.getWebpackConfig();
