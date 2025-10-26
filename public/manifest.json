@@ -1,7 +1,7 @@
 {
   "backend.js": "/bundles/markocupicsaceventtool/backend.7b7beab4.js",
   "js/avatar_uploader.js": "/bundles/markocupicsaceventtool/js/avatar_uploader.5fa3ef58.js",
-  "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.e139a880.css",
+  "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.fee78a64.css",
   "images/events/course/booklet/fallback.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/fallback.jpg",
   "images/events/course/booklet/toc.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/toc.jpg",
   "images/events/course/booklet/logo_sac.png": "/bundles/markocupicsaceventtool/images/events/course/booklet/logo_sac.png",
@@ -77,5 +77,5 @@
   "../assets/ts/avatar_uploader.d.ts": "/bundles/markocupicsaceventtool/../assets/ts/avatar_uploader.d.ts",
   "backend.7b7beab4.js.map": "/bundles/markocupicsaceventtool/backend.7b7beab4.js.map",
   "avatar_uploader.5fa3ef58.js.map": "/bundles/markocupicsaceventtool/js/avatar_uploader.5fa3ef58.js.map",
-  "be_stylesheet.e139a880.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.e139a880.css.map"
+  "be_stylesheet.fee78a64.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.fee78a64.css.map"
 }

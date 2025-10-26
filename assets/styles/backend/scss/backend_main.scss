@@ -291,21 +291,33 @@ div.tl_header_tour_rapport table td {
   font-weight: 700
 }
 
-.event-dashboard .tl_submit_container ul {
-  display: inline-flex !important;
-  flex-wrap: wrap !important;
-  list-style: none !important;
-  margin-bottom: 5px;
-  margin-top: 5px;
-  padding-left: 0 !important
+.event-dashboard .tl_submit_container {
+  @media (max-width: 576px) {
+    overflow-x: auto;
+  }
+
+  ul {
+    list-style: none !important;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    padding-left: 0 !important;
+    display: flex !important;
+    flex-direction: row;
+    row-gap: .5rem;
+    column-gap: .5rem;
+    flex-wrap: wrap !important;
+
+    @media (max-width: 576px) {
+      flex-wrap: nowrap !important;
+    }
+  }
 }
 
 .event-dashboard .tl_submit_container ul li {
-  margin: 2px 4px 2px 2px;
   white-space: nowrap !important
 }
 
-@media (min-width: 1240px) {
+@media (min-width: 1280px) {
   #main {
     padding-bottom: 80px
   }
