@@ -30,7 +30,7 @@ class TwigScssManager extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('scss', [$this, 'scssParser'], ['is_safe' => ['css']]),
+            new TwigFilter('scss', [$this, 'scssParser'], ['is_safe' => ['html']]),
         ];
     }
 
