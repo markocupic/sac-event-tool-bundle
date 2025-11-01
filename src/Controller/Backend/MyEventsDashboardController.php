@@ -190,7 +190,7 @@ class MyEventsDashboardController
         $operation = [];
         $operation['icon_class'] = 'fa-solid fa-fw fa-presentation-screen';
 
-        $operation['href'] =$this->calendarEventsUtil->generateEventPreviewUrl($event);
+        $operation['href'] = $this->calendarEventsUtil->generateEventPreviewUrl($event);
         $operation['title'] = $this->translator->trans('MSC.bhs_dashb_livePreview', [], 'contao_default');
         $operation['link_attributes'] = [
             'data-turbo' => 'false',
