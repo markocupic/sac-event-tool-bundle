@@ -4,8 +4,7 @@ cd..
 cd..
 cd..
 cd..
-cd..
-cd..
-cd..
-vendor\bin\ecs check vendor/markocupic/sac-event-tool-bundle/src --config vendor/markocupic/sac-event-tool-bundle/tools/ecs/config/default.php
-cd vendor/markocupic/sac-event-tool-bundle/tools/ecs/batch/check
+
+../../../vendor\bin\ecs check src --config tools/ecs/config/default.php
+
+cd tools/ecs/batch/fix
