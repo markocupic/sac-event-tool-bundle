@@ -2,7 +2,12 @@
     {% for instructor in instructors %}
         <li class="contact-box--list-item overflow-x-auto">
             <div class="image_container contact-box--col-1">
-                {% set figure = contao_figure(instructor.avatar_path, 18, {
+                {% set picture_size = picture_config({
+                    width: 115,
+                    height: 115,
+                    resizeMode: 'crop',
+                }) %}
+                {% set figure = contao_figure(instructor.avatar_path, picture_size, {
                     metadata: {
                         alt: instructor.name,
                     },
@@ -67,7 +72,7 @@
             .contact-box--col-1 {
                 flex-shrink: 0;
 
-                figure,img {
+                figure, img {
                     width: 100px !important;
                     height: auto !important;
                     @media (min-width: 1600px) {
