@@ -1,6 +1,13 @@
 # Auto detect text files and perform LF normalization
 * text eol=lf
 
+# Do not change line endings of binary files when cloning the repository
+*.png binary
+*.ttf binary
+*.docx binary
+*.jpg binary
+*.jpeg binary
+
 # Custom for Visual Studio
 *.cs     diff=csharp
 
