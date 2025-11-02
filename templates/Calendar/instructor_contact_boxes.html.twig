@@ -1,31 +1,87 @@
-{% for instructor in instructors %}
-    <div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4 contact-box overflow-x-auto">
-        <div class="image_container contact-box--picture">
-            {% set figure = insert_tag('figure::'~instructor.avatar_path~'?size=18&metadata[title]='~instructor.name~'&enableLightbox=0&options[attr][class]=avatar-large&template=image') %}
-            <a href="{{ instructor.href }}" data-title="Leiter Portrait ansehen">
-                {{ figure|raw }}
-            </a>
-        </div>
-        <div class="contact-box--instructor-name my-2">
-            <a href="{{ instructor.href }}" data-title="Leiter Portrait ansehen"><!-- indexer::continue -->{{ instructor.lastname }} {{ instructor.firstname }}<!-- indexer::stop --></a>
-        </div>
-        {% if instructor.main_qualification %}
-            <div class="contact-box--instructor-main-qualification my-2">
-                <small>{{ instructor.main_qualification }}</small>
+<ul class="contact-box--list list-unstyled">
+    {% for instructor in instructors %}
+        <li class="contact-box--list-item overflow-x-auto">
+            <div class="image_container contact-box--col-1">
+                {% set figure = contao_figure(instructor.avatar_path, 18, {
+                    metadata: {
+                        alt: instructor.name,
+                    },
+                    options: {
+                        attr: {
+                            class: 'rounded-circle w-100',
+                        },
+                    },
+                }) %}
+                <a href="{{ instructor.href }}" title="Leiter-Portrait ansehen">
+                    {{ figure|raw }}
+                </a>
             </div>
-        {% endif %}
-        {% if has_logged_in_frontend_user() %}
-            {% for key,value in instructor.contact_options %}
-                <div class="contact-box--{{ key }} mb-2">
-                    {% if 'phone' == key or 'mobile' == key %}
-                        <small><a href="tel:{{ value }}">{{ value }}</a></small>
-                    {% elseif 'email' == key %}
-                        <small><a href="mailto:{{ value }}">{{ value }}</a></small>
-                    {% else %}
-                        <small data-title="{{ value }}">{{ value }}</small>
-                    {% endif %}
+            <div class="contact-box--col-2">
+                <div class="contact-box--instructor-name mb-2 fw-bold">
+                    <a href="{{ instructor.href }}" title="Leiter Portrait ansehen"><!-- indexer::continue -->{{ instructor.lastname }} {{ instructor.firstname }}<!-- indexer::stop --></a>
                 </div>
-            {% endfor %}
-        {% endif %}
-    </div>
-{% endfor %}
+                {% if instructor.main_qualification %}
+                    <div class="contact-box--instructor-main-qualification my-2">
+                        <small>{{ instructor.main_qualification }}</small>
+                    </div>
+                {% endif %}
+                {% if has_logged_in_frontend_user() %}
+                    {% for key,value in instructor.contact_options %}
+                        <div class="contact-box--{{ key }}">
+                            {% if 'phone' == key or 'mobile' == key %}
+                                <small><a href="tel:{{ value }}">{{ value }}</a></small>
+                            {% elseif 'email' == key %}
+                                <small><a href="mailto:{{ value }}">{{ value }}</a></small>
+                            {% else %}
+                                <small data-title="{{ value }}">{{ value }}</small>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </li>
+    {% endfor %}
+</ul>
+{% add to head %}
+    <style>
+        {% apply scss %}
+        .contact-box--list {
+            display: flex;
+            flex-direction: column;
+            row-gap: 2rem;
+        }
+
+        .contact-box--list-item {
+            display: flex;
+            flex-direction: column;
+            row-gap: .5rem;
+            // Small devices
+            @media (min-width: 500px) {
+                flex-direction: row;
+                column-gap: 1rem;
+                row-gap: 0;
+            }
+            flex-wrap: nowrap;
+            overflow-x: hidden;
+
+            .contact-box--col-1 {
+                flex-shrink: 0;
+
+                figure,img {
+                    width: 100px !important;
+                    height: auto !important;
+                    @media (min-width: 1600px) {
+                        width: 115px !important;
+                        height: auto !important;
+                    }
+                }
+            }
+
+            .contact-box--col-2 {
+                flex-grow: 1;
+            }
+        }
+
+        {% endapply %}
+    </style>
+{% endadd %}
