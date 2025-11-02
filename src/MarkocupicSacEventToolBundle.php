@@ -17,18 +17,10 @@ namespace Markocupic\SacEventToolBundle;
 use Markocupic\SacEventToolBundle\DependencyInjection\Compiler\AddSessionBagsPass;
 use Markocupic\SacEventToolBundle\DependencyInjection\MarkocupicSacEventToolExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
-/**
- * Configures the sac event tool bundle.
- */
-class MarkocupicSacEventToolBundle extends Bundle
+class MarkocupicSacEventToolBundle extends AbstractBundle
 {
-    public function getPath(): string
-    {
-        return \dirname(__DIR__);
-    }
-
     public function getContainerExtension(): MarkocupicSacEventToolExtension
     {
         return new MarkocupicSacEventToolExtension();
