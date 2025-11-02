@@ -13,6 +13,11 @@ return ECSConfig::configure()
 		__DIR__ . '/../../src',
 	])
 	->withSkip([
+		'*.docx',
+		'*.jpg',
+		'*.jpeg',
+		'*.png',
+		'*.ttf',
 		\Contao\EasyCodingStandard\Fixer\CommentLengthFixer::class          => ['*.php'],
 		\PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer::class  => [
 			'*/DependencyInjection/Configuration.php',
