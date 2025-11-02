@@ -1,23 +1,21 @@
 {% extends "@Contao/content_element/_base.html.twig" %}
+{% use "@Contao/component/_figure.html.twig" %}
 
 {% block content %}
     <!-- indexer::stop -->
     {{ insert_tag('link::back')|raw }}
     <!-- indexer::continue -->
-
     <div class="row">
         <div class="image_container portrait col-sm-4 col-lg-3">
-            <!-- indexer::stop -->
-            {{ insert_tag('picture::'~getAvatarResourcePath(userModel)~'?size=18')|raw }}
-            <!-- indexer::continue -->
+            {% if figure|default %}
+                {% with {figure: figure} %}{{ block('figure_component') }}{% endwith %}
+            {% endif %}
         </div>
-
         <div class="col-sm-8 col-lg-9">
             <h5 class="content-headline mt-sm-0">{{ user.lastname }} {{ user.firstname }}</h5>
             <div class="ce_user_portrait_qualification">
                 {{ user.mainQualification }}
             </div>
-
             {% if not has_logged_in_frontend_user() %}
                 <!-- indexer::stop -->
                 <br>
@@ -27,43 +25,36 @@
                 <br>
                 <!-- indexer::continue -->
             {% endif %}
-
             {# Show personal data to logged users only #}
             {% if has_logged_in_frontend_user() %}
                 <!-- indexer::stop -->
                 <div class="ce_user_portrait_street">
                     {{ user.street }}
                 </div>
-
                 <div class="ce_user_portrait_city">
                     {{ user.postal }} {{ user.city }}
                 </div>
-
                 {% if not user.phone is empty %}
                     <div class="ce_user_portrait_phone">
                         {{ user.phone }}
                     </div>
                 {% endif %}
-
                 {% if not user.mobile is empty %}
                     <div class="ce_user_portrait_mobile">
                         {{ user.mobile }}
                     </div>
                 {% endif %}
-
                 {% if not user.email is empty %}
                     <div class="ce_user_portrait_email">
                         {{ insert_tag('email::'~user.email)|raw }}
                     </div>
                 {% endif %}
-
                 {% if not user.hobbies is empty %}
                     <div class="ce_user_portrait_hobbies">
                         <h5 class="content-headline">Hobbys</h5>
                         {{ user.hobbies|nl2br }}
                     </div>
                 {% endif %}
-
                 {% if not user.introducing is empty %}
                     <h5 class="content-headline">Selbstportrait</h5>
                     <div class="ce_user_portrait_introducing">

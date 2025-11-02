@@ -18,9 +18,12 @@ use Contao\ContentModel;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
 use Contao\CoreBundle\Exception\PageNotFoundException;
-use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\File\Metadata;
+use Contao\CoreBundle\Image\Studio\Figure;
+use Contao\CoreBundle\Image\Studio\Studio;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\UserModel;
+use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,11 +31,12 @@ use Symfony\Component\HttpFoundation\Response;
 #[AsContentElement(UserPortraitController::TYPE, category: 'sac_event_tool_content_elements')]
 class UserPortraitController extends AbstractContentElementController
 {
-    public const TYPE = 'user_portrait';
+    public const string TYPE = 'user_portrait';
 
     public function __construct(
+        private readonly Avatar $avatar,
         private readonly CalendarEventsUtil $calendarEventsUtil,
-        private readonly ContaoFramework $framework,
+        private readonly Studio $studio,
     ) {
     }
 
@@ -42,7 +46,7 @@ class UserPortraitController extends AbstractContentElementController
 
         if ($request->query->has('username')) {
             $username = $request->query->get('username');
-            $user = $this->framework->getAdapter(UserModel::class)->findByUsername($username);
+            $user = $this->getContaoAdapter(UserModel::class)->findByUsername($username);
         }
 
         // Do not display the profile of a disabled or deleted user.
@@ -58,7 +62,28 @@ class UserPortraitController extends AbstractContentElementController
         $arrUser['mainQualification'] = $this->calendarEventsUtil->getMainQualification($user);
         $template->set('user', $arrUser);
         $template->set('userModel', $user);
+        $template->set('figure', $this->createFigure($model, $this->avatar->getAvatarResourcePath($user), $this->createMetadata($user)));
 
         return $template->getResponse();
+    }
+
+    private function createFigure(ContentModel $model, string $sourcePath, Metadata $metadata): Figure|null
+    {
+        $figureBuilder = $this->studio
+            ->createFigureBuilder()
+            ->setSize($model->size)
+            ->setLightboxGroupIdentifier('lb'.$model->id)
+            ->enableLightbox($model->fullsize)
+            ->setOverwriteMetadata($metadata)
+        ;
+
+        return $figureBuilder->fromPath($sourcePath)->buildIfResourceExists();
+    }
+
+    private function createMetadata(UserModel $user): Metadata
+    {
+        return new Metadata([
+            Metadata::VALUE_ALT => $user->name,
+        ]);
     }
 }
