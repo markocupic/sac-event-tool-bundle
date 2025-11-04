@@ -22,17 +22,17 @@
                 </a>
             </div>
             <div class="contact-box--col-2">
-                <div class="contact-box--instructor-name mb-2 fw-bold">
+                <div class="contact-box--instructor-name mb-2 fw-bold text-break">
                     <a href="{{ instructor.href }}" title="Leiter Portrait ansehen"><!-- indexer::continue -->{{ instructor.lastname }} {{ instructor.firstname }}<!-- indexer::stop --></a>
                 </div>
                 {% if instructor.main_qualification %}
-                    <div class="contact-box--instructor-main-qualification my-2">
+                    <div class="contact-box--instructor-main-qualification text-break my-2">
                         <small>{{ instructor.main_qualification }}</small>
                     </div>
                 {% endif %}
                 {% if has_logged_in_frontend_user() %}
                     {% for key,value in instructor.contact_options %}
-                        <div class="contact-box--{{ key }}">
+                        <div class="contact-box--{{ key }} text-break">
                             {% if 'phone' == key or 'mobile' == key %}
                                 <small><a href="tel:{{ value }}">{{ value }}</a></small>
                             {% elseif 'email' == key %}
