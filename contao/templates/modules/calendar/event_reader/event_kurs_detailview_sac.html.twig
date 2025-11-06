@@ -19,8 +19,8 @@
     {# begin first row #}
     <div class="row gx-3">
         {# begin col left #}
-        <div class="col-md-6 col-lg-3 mt-3 mb-3">
-            <div class="box-layout-transparent">
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="box-layout-transparent p-y-0 p-md-0">
                 <div class="teaser-image-course-detail">
                     {% set image_src = get_event_data(model, 'eventImagePath')|raw ~ '?size=20&alt=' ~ get_event_data(model, 'title')|replace({'&': 'und','?': '','[&]': 'und','&amp;': 'und','=': '',})|escape %}
                     {{ insert_tag('picture::'~image_src)|raw }}
@@ -30,7 +30,7 @@
         {# end col left #}
 
         {# begin col right #}
-        <div class="col-md-6 col-lg-9 mt-3 mb-3">
+        <div class="col-md-6 col-lg-9 mt-3 mt-lg-0 mb-3">
             <div class="box-layout-transparent">
                 {% if not get_event_data(model, 'teaser') is empty %}
                     <!-- indexer::continue -->
@@ -52,8 +52,13 @@
 
                 <div class="organizers event-detail event-info-box icon-box-small">
                     <h5>Organisierende Gruppe</h5>
-                    <div class="organizer-logo m2-4 mb-2">
-                        {{ get_event_data(model, 'eventOrganizerLogos')|join('')|raw }}
+                    <div class="organizer-logo mb-2">
+                        {% set logos = get_event_data(model, 'eventOrganizerLogos') %}
+                        <ul class="row g-1 list-unstyled">
+                            {% for logo in logos %}
+                                <li class="col-auto">{{ logo|raw }}</li>
+                            {% endfor %}
+                        </ul>
                     </div>
                     {% if not get_event_data(model, 'eventOrganizers') is empty %}
                         <p>{{ get_event_data(model, 'eventOrganizers')|raw }}</p>
@@ -146,8 +151,8 @@
     {# begin second row #}
     <div class="row gx-3">
         {# begin col left #}
-        <div class="col-md-6">
-            <div class="box-layout-white">
+        <div class="col-lg-6">
+            <div class="box-layout-white my-0 mt-3">
                 <div class="instructor event-detail event-info-box icon-box-small">
                     <h5>Kursleitung</h5>
                     <div class="mt-3">
@@ -179,7 +184,7 @@
             </div>
 
             {# Start Anmeldung #}
-            <div class="box-layout-white">
+            <div class="box-layout-white my-0 mt-3">
                 <div class="booking-text event-detail event-info-box icon-box-small">
                     <h5>Anmeldung</h5>
                     <p>{% if get_event_data(model, 'disableOnlineRegistration') %}Keine {% endif %}Online-Anmeldung</p>
@@ -251,9 +256,9 @@
         {# end col left #}
 
         {# begin col right #}
-        <div class="col-md-6">
+        <div class="col-lg-6">
 
-            <div class="box-layout-white">
+            <div class="box-layout-white my-0 mt-3">
                 {% if not get_event_data(model, 'courseTypeLevel0Name') is empty and not get_event_data(model, 'courseTypeLevel1Name') is empty %}
                     <!-- indexer::continue -->
                     <div class="courseType event-detail event-info-box icon-box-small">
