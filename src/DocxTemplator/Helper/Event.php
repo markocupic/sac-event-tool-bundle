@@ -62,6 +62,17 @@ readonly class Event
         $objPhpWord->replace('eventTitle', $this->prepareString($objEvent->title));
         $controllerAdapter->loadLanguageFile('tl_calendar_events');
 
+        $minMembers = '---';
+        $maxMembers = '---';
+
+        if ($objEvent->addMinAndMaxMembers) {
+            $minMembers = $objEvent->minMembers ?? '0';
+            $maxMembers = $objEvent->maxMembers ?? '0';
+        }
+
+        $objPhpWord->replace('minMembers', $this->prepareString($minMembers));
+        $objPhpWord->replace('maxMembers', $this->prepareString($maxMembers));
+
         if (EventType::COURSE === $objEvent->eventType) {
             $objPhpWord->replace('courseId', $this->prepareString('Kurs-Nr: '.$objEvent->courseId));
         } else {
