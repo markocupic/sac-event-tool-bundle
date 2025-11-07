@@ -257,7 +257,7 @@ class CalendarEvents
     }
 
     /**
-     * Make a CSV-export of every event of a certain calendar.
+     * Make a CSV-export of the events of the current calendar.
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 40)]
     public function exportCalendar(DataContainer $dc): void
@@ -269,7 +269,7 @@ class CalendarEvents
             $csv->convertOutputEncoding(CsvDownload::ENCODING_ISO_8859_1);
 
             // Selected fields
-            $arrFields = array_unique(['id', 'title', 'location', 'eventDates', 'eventDurationInDays', 'published', 'organizers', 'mountainguide', 'mainInstructor', 'instructor', 'minMembers', 'maxMembers', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey', 'teaser', 'tourDetailText', 'requirements', 'leistungen']);
+            $arrFields = array_unique(['id', 'title', 'location', 'eventDates', 'eventDurationInDays', 'published', 'organizers', 'mountainguide', 'mainInstructor', 'instructor', 'instructorNotes', 'minMembers', 'maxMembers', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey', 'teaser', 'tourDetailText', 'requirements', 'leistungen']);
 
             // Insert headline first
             $this->controller->loadLanguageFile('tl_calendar_events');
@@ -368,7 +368,7 @@ class CalendarEvents
                                 break;
 
                             default:
-                                if (\in_array($field, ['teaser', 'tourDetailText', 'requirements', 'leistungen'], true)) {
+                                if (\in_array($field, ['teaser', 'instructorNotes', 'tourDetailText', 'requirements', 'leistungen'], true)) {
                                     $arrRow[] = str_replace(['<br>', '<br/>', '<br />', '{{br}}'], [' ', ' ', ' ', ' '], nl2br((string) $objEvent->{$field}));
                                 } else {
                                     $arrRow[] = $objEvent->{$field};
