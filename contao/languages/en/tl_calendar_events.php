@@ -45,7 +45,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['event_registration_confirmation_legen
 $GLOBALS['TL_LANG']['tl_calendar_events']['courseId'] = ['Kurs.Nr.', 'Geben Sie bitte die Kursnummer ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventType'] = ['Event-Art', 'Geben Sie bitte an, um welche Art von Event es sich handelt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['teaser'] = ['Event-Kurzbeschreibung', 'Geben Sie bitte eine Kurzbeschreibung für den Event ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['instructorNotes'] = ['Anmerkungen des Event-Leiters', 'Geben Sie hier allfällige Anmerkungen ein. Der Feldinhalt wird im Frontend nciht angezeigt und ist für die interne Verwendung gedacht.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['instructorNotes'] = ['Anmerkungen des Event-Leiters', 'Geben Sie hier allfällige Anmerkungen ein. Der Feldinhalt wird im Frontend nicht angezeigt und ist für die interne Verwendung gedacht.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['title'] = ['Event-/Touren-/Kursname', 'Geben Sie bitte einen Namen für den Event an.']; // TODO: Not working?
 $GLOBALS['TL_LANG']['tl_calendar_events']['suitableForBeginners'] = ['Für Anfänger geeignet', 'Der Event eignet sich für die Teilnahme von Anfängern in der entsprechenden Bergsport-Disziplin.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide'] = ['Event mit Bergführer', 'Geben Sie bitte an, ob der Event durch Bergführer und mit oder ohne Bergführerangebot geleitet wird'];
