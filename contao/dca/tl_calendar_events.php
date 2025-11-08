@@ -467,7 +467,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['minMembers'] = [
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',
-	'eval'      => ['rgxp' => 'custom', 'customRgxp' => '/^(?:[2-9]|[1-9][0-9]+)$/', 'errorMsg' => $GLOBALS['TL_LANG']['ERR']['invalidMinMemberValue'], 'mandatory' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['rgxp' => 'custom', 'customRgxp' => '/^(?:[2-9]|[1-9][0-9]|[1-9][0-9]{2})$/', 'errorMsg' => $GLOBALS['TL_LANG']['ERR']['invalidMinOrMaxMemberValue'], 'mandatory' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => 'int(3) unsigned NULL',
 ];
 
@@ -476,7 +476,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['maxMembers'] = [
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',
-	'eval'      => ['rgxp' => 'digit', 'mandatory' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['rgxp' => 'custom', 'customRgxp' => '/^(?:[2-9]|[1-9][0-9]|[1-9][0-9]{2})$/', 'errorMsg' => $GLOBALS['TL_LANG']['ERR']['invalidMinOrMaxMemberValue'], 'mandatory' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => 'int(3) unsigned NULL',
 ];
 
