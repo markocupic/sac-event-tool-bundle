@@ -134,6 +134,7 @@ $GLOBALS['TL_LANG']['ERR']['missingPermissionsToEditEvent'] = 'Sie haben nicht d
 $GLOBALS['TL_LANG']['ERR']['missingPermissionsToDeleteEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Event mit ID %s zu löschen.';
 $GLOBALS['TL_LANG']['ERR']['missingPermissionsToPublishOrUnpublishEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Event mit ID %s zu veröffentlichen.';
 $GLOBALS['TL_LANG']['ERR']['missingPermissionsToCutEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Event mit ID %d zu verschieben.';
+$GLOBALS['TL_LANG']['ERR']['maxMembersShouldNotBeLessThanMinMembers'] = 'Die maximale Teilnehmerzahl darf die minimale Teilnehmerzahl nicht unterschreiten.';
 
 // Backend home screen dashboard
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_sacEvents'] = 'SAC Events';
@@ -281,4 +282,4 @@ $GLOBALS['TL_LANG']['ERR']['memberWithSACMemberIdNotFound'] = 'Es wurde kein Sek
 $GLOBALS['TL_LANG']['ERR']['SACMemberIdShouldBeNumberOrEmptyString'] = 'Das ist keine gültige SAC Mitgliedernummer. Geben Sie eine mind. 6-stellige Zahl ein oder lassen Sie das Feld leer, falls der Teilnehmer kein Sektionsmitglied ist.';
 $GLOBALS['TL_LANG']['ERR']['SACMemberIdShouldBeNumberOrZero'] = 'Das ist keine gültige SAC Mitgliedernummer. Geben Sie eine mind. 6-stellige Zahl ein oder 0.';
 $GLOBALS['TL_LANG']['ERR']['userWithThisSACMemberIdAlreadyExists'] = 'Es existiert bereits ein Benutzer mit der SAC Mitgliedernummer %s.';
-$GLOBALS['TL_LANG']['ERR']['invalidMinMemberValue'] = 'Die minimale Teilnehmerzahl beträgt 2.';
+$GLOBALS['TL_LANG']['ERR']['invalidMinOrMaxMemberValue'] = 'Ungültige Eingabe! Geben Sie eine Zahl zwischen 2 und 999 ein.';

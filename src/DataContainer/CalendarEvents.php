@@ -1435,4 +1435,29 @@ class CalendarEvents
 
         return $strEventType;
     }
+
+    /**
+     * @throws \Exception
+     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.maxMembers.save', priority: 100)]
+    public function validateMaxMembers(string $value, DataContainer $dc, int|null $intId = null): string
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$request->request->get('addMinAndMaxMembers')) {
+            return $value;
+        }
+
+        if (!$request->request->has('minMembers')) {
+            return $value;
+        }
+
+        $minMembers = (int) $request->request->get('minMembers');
+
+        if ($value < $minMembers) {
+            throw new \Exception($this->translator->trans('ERR.maxMembersShouldNotBeLessThanMinMembers', [], 'contao_default'));
+        }
+
+        return $value;
+    }
 }
