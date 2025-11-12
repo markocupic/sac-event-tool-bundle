@@ -20,13 +20,14 @@ use Contao\Date;
 use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\AvalancheLevel;
-use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\DataContainer\CalendarEvents;
+
+System::loadLanguageFile('default');
 
 // Keys
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['mountainguide'] = 'index';
@@ -73,7 +74,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addIba
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'setRegistrationPeriod';
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'customizeEventRegistrationConfirmationEmailText';
 
-// Default palettes (define it for any case, f.ex edit all mode)
+// Default palettes (define it for any case, f.ex edit-all-mode)
 // Put here all defined fields in the dca
 PaletteManipulator::create()
 	->addField(['eventType'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
