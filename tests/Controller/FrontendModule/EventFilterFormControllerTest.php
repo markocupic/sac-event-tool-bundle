@@ -25,6 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EventFilterFormControllerTest extends TestCase
 {
     private EventFilterFormController $controller;
+
     private MockObject|null $urlParserMock;
 
     protected function setUp(): void
@@ -34,7 +35,7 @@ class EventFilterFormControllerTest extends TestCase
             $this->createMock(ContaoFramework::class),
             $this->createMock(TranslatorInterface::class),
             $this->urlParserMock,
-            'en'
+            'en',
         );
     }
 
@@ -105,7 +106,7 @@ class EventFilterFormControllerTest extends TestCase
                     }
 
                     throw new \LogicException('');
-                }
+                },
             )
         ;
 
@@ -215,7 +216,7 @@ class EventFilterFormControllerTest extends TestCase
                     }
 
                     throw new \LogicException('');
-                }
+                },
             )
         ;
 
@@ -255,7 +256,7 @@ class EventFilterFormControllerTest extends TestCase
                     }
 
                     throw new \LogicException('');
-                }
+                },
             )
         ;
 
@@ -295,7 +296,7 @@ class EventFilterFormControllerTest extends TestCase
                     }
 
                     throw new \LogicException('');
-                }
+                },
             )
         ;
 

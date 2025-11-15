@@ -91,6 +91,7 @@ class CalendarEventsUtilTest extends ContaoTestCase
 
         $objEventMock = $this->mockClassWithProperties(CalendarEventsModel::class);
         $objEventMock->pid = 1;
+
         $objEventMock
             ->method('getRelated')
             ->with('pid')
@@ -128,18 +129,18 @@ class CalendarEventsUtilTest extends ContaoTestCase
         $container->set('security.helper', $security);
 
         $backendUserModel = $this->mockClassWithProperties(UserModel::class, ['id' => 1, 'username' => 'johndoe', 'firstname' => 'John', 'lastname' => 'Doe', 'phone' => '041 999 99 99', 'mobile' => '041 999 99 99', 'email' => 'john.doe@foo.bar', 'gender' => 'male', 'disable' => false, 'hideUser' => false, 'start' => '', 'stop' => '']);
-        $userAdapter = $this->mockAdapter(['findByPk']);
+        $userAdapter = $this->mockAdapter(['findById']);
         $userAdapter
-            ->method('findByPk')
+            ->method('findById')
             ->willReturn($backendUserModel)
         ;
 
         $filesAdapter = $this->mockAdapter(['findByUuid']);
 
         $pageModel = $this->mockClassWithProperties(PageModel::class);
-        $pageAdapter = $this->mockAdapter(['findByPk']);
+        $pageAdapter = $this->mockAdapter(['findById']);
         $pageAdapter
-            ->method('findByPk')
+            ->method('findById')
             ->willReturn($pageModel)
         ;
 
@@ -198,7 +199,7 @@ class CalendarEventsUtilTest extends ContaoTestCase
                     $this->assertSame($expectedContext, $context);
 
                     return '';
-                }
+                },
             )
         ;
         $container->set('twig', $twig);
@@ -230,10 +231,10 @@ class CalendarEventsUtilTest extends ContaoTestCase
             ->willReturn($container)
         ;
 
-        $userAdapter = $this->mockAdapter(['findByPk']);
+        $userAdapter = $this->mockAdapter(['findById']);
         $userAdapter
             ->expects($this->exactly(18))
-            ->method('findByPk')
+            ->method('findById')
             ->willReturn(...$userModels, ...$userModels, ...$userModels)
         ;
 
