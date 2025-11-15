@@ -98,6 +98,7 @@ class CalendarEventsMemberModel extends Model
                 'startTstamp' => null,
                 'endTstamp' => null,
                 'blnInstructorRole' => false,
+                'blnShowPublishedEventsOnly' => true,
                 'blnShowEventsWithParticipationOnly' => false,
                 'sorting' => 'DESC',
             ])
@@ -106,6 +107,7 @@ class CalendarEventsMemberModel extends Model
             ->addAllowedTypes('startTstamp', ['null', 'int'])
             ->addAllowedTypes('endTstamp', ['null', 'int'])
             ->addAllowedTypes('blnInstructorRole', ['bool'])
+            ->addAllowedTypes('blnShowPublishedEventsOnly', ['bool'])
             ->addAllowedTypes('blnShowEventsWithParticipationOnly', ['bool'])
             ->resolve($options)
         ;
@@ -176,8 +178,12 @@ class CalendarEventsMemberModel extends Model
                 ->setParameter('ids', array_map('intval', $eventIDS), ArrayParameterType::INTEGER)
             ;
 
+            if ($options['blnShowPublishedEventsOnly']) {
+                $qb->andWhere('t.published = 1');
+            }
+
             if (null !== $options['startTstamp']) {
-                $qb->andWhere('t.startDate >= :startTstamp')
+                $qb->andWhere('t.startDate >= :startTstamp OR (t.startDate <= :startTstamp AND t.endDate >= :startTstamp)')
                     ->setParameter('startTstamp', $options['startTstamp'], Types::INTEGER)
                 ;
             }
@@ -239,7 +245,7 @@ class CalendarEventsMemberModel extends Model
     {
         $options = [
             'eventTypeFilter' => $eventTypeFilter,
-            'startTstamp' => time(),
+            'startTstamp' => strtotime('today midnight'),
             'endTstamp' => null,
             'blnInstructorRole' => $blnInstructorRole,
             'sorting' => $sorting,
@@ -253,7 +259,7 @@ class CalendarEventsMemberModel extends Model
         $options = [
             'eventTypeFilter' => $eventTypeFilter,
             'startTstamp' => null,
-            'endTstamp' => time(),
+            'endTstamp' => strtotime('tomorrow midnight'),
             'blnInstructorRole' => $blnInstructorRole,
             'blnShowEventsWithParticipationOnly' => $blnShowEventsWithParticipationOnly,
             'sorting' => $sorting,
