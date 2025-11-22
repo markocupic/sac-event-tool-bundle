@@ -58,7 +58,10 @@
         "composer-file-copier-plugin": [
             {
                 "source": "contao/languages/en",
-                "target": "vendor/markocupic/sac-event-tool-bundle/contao/languages/de"
+                "target": "vendor/markocupic/sac-event-tool-bundle/contao/languages/de",
+                "options": {
+                    "OVERRIDE": true
+                }
             }
         ]
     },
