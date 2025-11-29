@@ -41,57 +41,59 @@ class EventReleaseLevelPolicyUtil
      */
     public function getAccessibleReleaseLevels(CalendarEventsModel $eventModel, BackendUser $user): array
     {
-        $allowedIDS = [];
+        $currentPolicyModel = $this->eventReleaseLevelPolicyModel->findById($eventModel->eventReleaseLevel);
 
-        $currentEventReleaseLevelPolicyModel = $this->eventReleaseLevelPolicyModel->findById($eventModel->eventReleaseLevel);
-
-        if (null === $currentEventReleaseLevelPolicyModel) {
-            return $allowedIDS;
+        if (null === $currentPolicyModel) {
+            return [];
         }
 
-        // Test downwards
-        $prevLevel = $this->eventReleaseLevelPolicyModel->findById($currentEventReleaseLevelPolicyModel->id);
+        $downwardLevels = $this->collectAccessibleLevelsDownward($eventModel, $user, $currentPolicyModel);
+        $upwardLevels = $this->collectAccessibleLevelsUpward($eventModel, $user, $currentPolicyModel);
 
-        $stop = false;
+        return array_merge(
+            array_reverse($downwardLevels),
+            [$currentPolicyModel->id],
+            $upwardLevels,
+        );
+    }
 
-        do {
-            if (null === $prevLevel) {
-                $stop = true;
-                continue;
+    private function collectAccessibleLevelsDownward(CalendarEventsModel $eventModel, BackendUser $user, EventReleaseLevelPolicyModel $startLevel): array
+    {
+        $accessibleLevels = [];
+        $currentLevel = $this->eventReleaseLevelPolicyModel->findById($startLevel->id);
+
+        while (null !== $currentLevel) {
+            if (!$this->calendarEventsVoter->canChangeReleaseLevel($eventModel, $user, $currentLevel, 'down')) {
+                break;
             }
 
-            if ($this->calendarEventsVoter->canChangeReleaseLevel($eventModel, $user, $prevLevel, 'down')) {
-                $prevLevel = $this->eventReleaseLevelPolicyModel->findPrevLevel($prevLevel->id);
-                $allowedIDS[] = $prevLevel->id;
-            } else {
-                $stop = true;
+            $currentLevel = $this->eventReleaseLevelPolicyModel->findPrevLevel($currentLevel->id);
+
+            if (null !== $currentLevel) {
+                $accessibleLevels[] = $currentLevel->id;
             }
-        } while (true !== $stop);
+        }
 
-        $allowedIDS = array_reverse($allowedIDS);
+        return $accessibleLevels;
+    }
 
-        // Add the current release level
-        $allowedIDS[] = $currentEventReleaseLevelPolicyModel->id;
+    private function collectAccessibleLevelsUpward(CalendarEventsModel $eventModel, BackendUser $user, EventReleaseLevelPolicyModel $startLevel): array
+    {
+        $accessibleLevels = [];
+        $currentLevel = $this->eventReleaseLevelPolicyModel->findById($startLevel->id);
 
-        // Test upwards
-        $nextLevel = $this->eventReleaseLevelPolicyModel->findById($currentEventReleaseLevelPolicyModel->id);
-
-        $stop = false;
-
-        do {
-            if (null === $nextLevel) {
-                $stop = true;
-                continue;
+        while (null !== $currentLevel) {
+            if (!$this->calendarEventsVoter->canChangeReleaseLevel($eventModel, $user, $currentLevel, 'up')) {
+                break;
             }
 
-            if ($this->calendarEventsVoter->canChangeReleaseLevel($eventModel, $user, $nextLevel, 'up')) {
-                $nextLevel = $this->eventReleaseLevelPolicyModel->findNextLevel($nextLevel->id);
-                $allowedIDS[] = $nextLevel->id;
-            } else {
-                $stop = true;
-            }
-        } while (true !== $stop);
+            $currentLevel = $this->eventReleaseLevelPolicyModel->findNextLevel($currentLevel->id);
 
-        return $allowedIDS;
+            if (null !== $currentLevel) {
+                $accessibleLevels[] = $currentLevel->id;
+            }
+        }
+
+        return $accessibleLevels;
     }
 }
