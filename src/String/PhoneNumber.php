@@ -51,11 +51,10 @@ class PhoneNumber
                 $phoneNumber = '0'.$phoneNumber;
             }
 
-            // Search for 0799871234 and replace it with 079 987 12 34
-            $pattern = '/^([0]{1})([0-9]{2})([0-9]{3})([0-9]{2})([0-9]{2})$/';
-
             if (preg_match(self::SWISS_FORMAT_PATTERN, $phoneNumber)) {
                 $replace = '$1$2 $3 $4 $5';
+
+                // Search for 0799871234 and replace it with 079 987 12 34
                 $phoneNumber = preg_replace(self::SWISS_FORMAT_PATTERN, $replace, $phoneNumber);
             }
         }
