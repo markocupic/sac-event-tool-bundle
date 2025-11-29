@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Util;
 
 use Contao\CalendarEventsModel;
-use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Contao\Image;
@@ -27,20 +26,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventRegistrationUtil
 {
-    private Adapter $dateAdapter;
-
-    private Adapter $stringUtilAdapter;
-
-    private Adapter $imageAdapter;
-
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly Packages $packages,
         private readonly TranslatorInterface $translator,
     ) {
-        $this->dateAdapter = $this->framework->getAdapter(Date::class);
-        $this->stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-        $this->imageAdapter = $this->framework->getAdapter(Image::class);
     }
 
     public function getSubscriptionStateIcon(CalendarEventsMemberModel $registrationModel): string
@@ -49,10 +39,12 @@ class EventRegistrationUtil
         $icon = $this->packages->getPackage(Bundle::PACKAGE_NAME)->getUrl($iconPath);
         $state = $this->translator->trans('MSC.'.$registrationModel->stateOfSubscription, [], 'contao_default');
 
-        $strAlt = $this->stringUtilAdapter->specialchars($registrationModel->stateOfSubscription);
-        $strAttributes = \sprintf('title="%s"', $this->stringUtilAdapter->specialchars($state));
+        $stringUtil = $this->framework->getAdapter(StringUtil::class);
 
-        return $this->imageAdapter->getHtml($icon, $strAlt, $strAttributes);
+        $strAlt = $stringUtil->specialchars($registrationModel->stateOfSubscription);
+        $strAttributes = \sprintf('title="%s"', $stringUtil->specialchars($state));
+
+        return $this->framework->getAdapter(Image::class)->getHtml($icon, $strAlt, $strAttributes);
     }
 
     /**
@@ -64,30 +56,16 @@ class EventRegistrationUtil
             return '';
         }
 
-        $event = CalendarEventsModel::findById($registrationModel->eventId);
+        $event = $this->framework->getAdapter(CalendarEventsModel::class)->findById($registrationModel->eventId);
 
         if (null === $year) {
             if (null === $event || null === $event->startDate) {
                 return '';
             }
-            $year = (int) $this->dateAdapter->parse('Y', (int) $event->startDate);
+
+            $year = (int) $this->framework->getAdapter(Date::class)->parse('Y', (int) $event->startDate);
         }
 
-        $age = $this->getAgeAtEndOfYear($registrationModel, $year);
-
-        return match (true) {
-            $age <= 20 => 'J+S',
-            $age <= 22 => 'Jugend',
-            default => '',
-        };
-    }
-
-    private function getAgeAtEndOfYear(CalendarEventsMemberModel $registrationModel, int $year): int
-    {
-        $birthTimestamp = (int) $registrationModel->dateOfBirth;
-        $birthDate = (new \DateTimeImmutable())->setTimestamp($birthTimestamp);
-        $endOfYear = new \DateTimeImmutable("$year-12-31");
-
-        return $endOfYear->diff($birthDate)->y;
+        return AgeGroupUtil::getAgeGroup((int) $registrationModel->dateOfBirth, $year);
     }
 }
