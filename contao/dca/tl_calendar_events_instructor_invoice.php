@@ -74,21 +74,21 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
         {event_legend},eventDuration;
         {expenses_legend},sleepingTaxes,sleepingTaxesText,miscTaxes,miscTaxesText;
         {transport_legend},railwTaxes,railwTaxesText,cableCarTaxes,cableCarTaxesText,roadTaxes,carTaxesKm,countCars,privateArrival;
-        {phone_costs_legend},expenseReimbursement,organizationalFlatRate;
+        {phone_costs_legend},expenseReimbursement,organizationalFlatRate,revenueForSection,revenueForSectionInfoText;
         {iban_legend},iban;
         {notice_legend},notice
         ',
 	],
 	'fields'   => [
-		'id'                     => [
+		'id'                        => [
 			'sql' => 'int(10) unsigned NOT NULL auto_increment',
 		],
-		'pid'                    => [
+		'pid'                       => [
 			'foreignKey' => 'tl_calendar_events.title',
 			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 		],
-		'userPid'                => [
+		'userPid'                   => [
 			'default'    => BackendUser::getInstance()->id,
 			'foreignKey' => 'tl_user.name',
 			'inputType'  => 'select',
@@ -96,10 +96,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'eval'       => ['submitOnChange' => true, 'mandatory' => true, 'readonly' => true, 'multiple' => false, 'class' => 'clr'],
 			'sql'        => "int(10) unsigned NOT NULL default 0",
 		],
-		'tstamp'                 => [
+		'tstamp'                    => [
 			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
-		'eventDuration'          => [
+		'eventDuration'             => [
 			'exclude'   => true,
 			'default'   => '0',
 			'options'   => range(0, 30),
@@ -107,86 +107,86 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 2, 'tl_class' => 'clr'],
 			'sql'       => "varchar(6) NOT NULL default '0'",
 		],
-		'iban'                   => [
+		'iban'                      => [
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'maxlength' => 34, 'doNotCopy' => true, 'tl_class' => 'clr'],
 			'sql'       => "varchar(34) NOT NULL default ''",
 		],
-		'sleepingTaxes'          => [
+		'sleepingTaxes'             => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
 			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
-		'sleepingTaxesText'      => [
+		'sleepingTaxesText'         => [
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
-		'miscTaxes'              => [
+		'miscTaxes'                 => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
 			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
-		'miscTaxesText'          => [
+		'miscTaxesText'             => [
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
-		'privateArrival'         => [
+		'privateArrival'            => [
 			'exclude'   => true,
 			'inputType' => 'select',
 			'options'   => range(0, 20),
 			'eval'      => ['multiple' => false, 'mandatory' => true, 'doNotCopy' => true, 'tl_class' => 'clr m12'],
 			'sql'       => "int(10) unsigned NOT NULL default 0",
 		],
-		'railwTaxes'             => [
+		'railwTaxes'                => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
 			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
-		'railwTaxesText'         => [
+		'railwTaxesText'            => [
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
-		'cableCarTaxes'          => [
+		'cableCarTaxes'             => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
 			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
-		'cableCarTaxesText'      => [
+		'cableCarTaxesText'         => [
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
-		'roadTaxes'              => [
+		'roadTaxes'                 => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
 			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
-		'carTaxesKm'             => [
+		'carTaxesKm'                => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 6, 'doNotCopy' => true, 'tl_class' => 'clr'],
 			'sql'       => "int(6) unsigned NOT NULL default 0",
 		],
-		'countCars'              => [
+		'countCars'                 => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'select',
@@ -194,30 +194,43 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 1, 'tl_class' => 'clr'],
 			'sql'       => "int(10) unsigned NOT NULL default 0",
 		],
-		'expenseReimbursement'   => [
+		'expenseReimbursement'      => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'doNotCopy' => true, 'tl_class' => 'clr'],
 			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
-		'organizationalFlatRate' => [
+		'organizationalFlatRate'    => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'doNotCopy' => true, 'tl_class' => 'clr'],
 			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
-		'notice'                 => [
+		'notice'                    => [
 			'exclude'   => true,
 			'inputType' => 'textarea',
 			'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'clr'],
 			'sql'       => 'text NULL',
 		],
-		'countNotifications'     => [
+		'revenueForSection'         => [
+			'exclude'   => true,
+			'default'   => '0',
+			'inputType' => 'text',
+			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
+			'sql'       => "float(6) NOT NULL default '0.00'",
+		],
+		'revenueForSectionInfoText' => [
+			'exclude'   => true,
+			'inputType' => 'textarea',
+			'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'clr'],
+			'sql'       => 'text NULL',
+		],
+		'countNotifications'        => [
 			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
-		'notificationSentOn'     => [
+		'notificationSentOn'        => [
 			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 	],

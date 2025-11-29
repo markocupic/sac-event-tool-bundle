@@ -258,8 +258,12 @@ readonly class Event
             abs($objEventInvoice->organizationalFlatRate),
             $carTaxes,
         ]);
-
         $objPhpWord->replace('totalCosts', $this->prepareString(ceil($totalCosts)));
+
+        // Revenue for the section
+        $objPhpWord->replace('revenueForSection', (int) $objEventInvoice->revenueForSection, ['multiline' => false]);
+        $revenueForSectionInfoText = empty($objEventInvoice->revenueForSectionInfoText) ? '---' : $objEventInvoice->revenueForSectionInfoText;
+        $objPhpWord->replace('revenueForSectionInfoText', $this->prepareString($revenueForSectionInfoText), ['multiline' => true]);
 
         // Notice
         $notice = empty($objEventInvoice->notice) ? '---' : $objEventInvoice->notice;

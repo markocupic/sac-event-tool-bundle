@@ -57,5 +57,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['countCars'] = ['An
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['privateArrival'] = ['Anzahl privat angereister Personen', 'Privat angereiste Teilnehmende und Leitende werden bei der Spesenberechnung nicht berücksichtigt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['expenseReimbursement'] = ['Spesenentschädigung in CHF: (pauschal 10.-- pro Tag/Abend)', 'Geben Sie die pauschalen Spesen ein (Telefon, Porti, Getränke etc.).'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['organizationalFlatRate'] = ['Organisationspauschale in CHF: pauschal 10.-- pro Tag/Abend (auch bei Absage möglich)', 'Geben Sie die Organisationspauschale ein (nur für den/die Organisator/in).'];
+$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['revenueForSection'] = ['Einnahmen für Sektion in CHF', 'Geben Sie die Einnahmen für die Sektion in CHF ein.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['revenueForSectionInfoText'] = ['Einnahmen für Sektion Beschreibung', 'Geben Sie eine Beschreibung für die Sektions-Einnahmen ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['iban'] = ['IBAN Nummer', 'Geben Sie Ihre IBAN Nummer ein. Wird für die Überweisung auf Ihr Bankkonto benötigt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['notice'] = ['Weitere Anmerkungen', 'Geben Sie weitere Anmerkungen ein.'];
