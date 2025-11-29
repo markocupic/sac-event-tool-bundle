@@ -119,15 +119,6 @@ class CalendarEventsUtilTest extends ContaoTestCase
         ;
         $container->set('contao.routing.content_url_generator', $contentUrlGeneratorMock);
 
-        $frontendUser = $this->mockClassWithProperties(FrontendUser::class);
-        $security = $this->createMock(Security::class);
-        $security
-            ->expects($this->once())
-            ->method('getUser')
-            ->willReturn($frontendUser)
-        ;
-        $container->set('security.helper', $security);
-
         $backendUserModel = $this->mockClassWithProperties(UserModel::class, ['id' => 1, 'username' => 'johndoe', 'firstname' => 'John', 'lastname' => 'Doe', 'phone' => '041 999 99 99', 'mobile' => '041 999 99 99', 'email' => 'john.doe@foo.bar', 'gender' => 'male', 'disable' => false, 'hideUser' => false, 'start' => '', 'stop' => '']);
         $userAdapter = $this->mockAdapter(['findById']);
         $userAdapter
@@ -184,7 +175,7 @@ class CalendarEventsUtilTest extends ContaoTestCase
                                 'hideUser' => false,
                                 'start' => '',
                                 'stop' => '',
-                                'href' => 'profile_page?username=johndoe',
+                                'href' => 'profile_page?getUpcoming=1&username=johndoe',
                                 'has_link' => true,
                                 'avatar_path' => 'folder/male.jpg',
                                 'main_qualification' => '',
