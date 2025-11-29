@@ -20,22 +20,26 @@ class AgeGroupUtil
 
     public const GROUP_JUGEND = 'Jugend';
 
-    public static function getAgeGroup(int $dateOfBirthTimestamp, int $year): string
+    private const MAX_AGE_JUGEND_UND_SPORT = 20;
+
+    private const MAX_AGE_JUGEND = 22;
+
+    public static function getAgeGroup(int $dateOfBirthTimestamp, int $referenceYear): string
     {
-        $age = self::getAgeAtEndOfYear($dateOfBirthTimestamp, $year);
+        $age = self::calculateAgeAtEndOfYear($dateOfBirthTimestamp, $referenceYear);
 
         return match (true) {
-            $age <= 20 => self::GROUP_JUGEND_UND_SPORT,
-            $age <= 22 => self::GROUP_JUGEND,
+            $age <= self::MAX_AGE_JUGEND_UND_SPORT => self::GROUP_JUGEND_UND_SPORT,
+            $age <= self::MAX_AGE_JUGEND => self::GROUP_JUGEND,
             default => '',
         };
     }
 
-    private static function getAgeAtEndOfYear(int $dateOfBirthTimestamp, int $year): int
+    private static function calculateAgeAtEndOfYear(int $dateOfBirthTimestamp, int $referenceYear): int
     {
         $birthDate = (new \DateTimeImmutable())->setTimestamp($dateOfBirthTimestamp);
-        $endOfYear = new \DateTimeImmutable("$year-12-31");
+        $referenceYearEnd = new \DateTimeImmutable("$referenceYear-12-31");
 
-        return $endOfYear->diff($birthDate)->y;
+        return $referenceYearEnd->diff($birthDate)->y;
     }
 }
