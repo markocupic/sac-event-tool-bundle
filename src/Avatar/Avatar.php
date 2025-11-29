@@ -35,26 +35,53 @@ class Avatar
         $this->filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
     }
 
-    public function getAvatarResourcePath(MemberModel|UserModel|null $userModel, $blnAbsolute = false): string
+    public function getAvatarResourcePath(MemberModel|UserModel|null $userModel, $makeAbsolute = false): string
     {
-        if (!empty($userModel->avatar)) {
-            $objFiles = $this->filesModelAdapter->findByUuid($userModel->avatar);
+        $customAvatarPath = $this->getValidatedAvatarPath($userModel);
 
-            if (null !== $objFiles) {
-                if (is_file($this->projectDir.'/'.$objFiles->path)) {
-                    return $blnAbsolute ? Path::makeAbsolute($objFiles->path, $this->projectDir) : $objFiles->path;
-                }
-            }
+        if (null !== $customAvatarPath) {
+            return $this->formatPath($customAvatarPath, $makeAbsolute);
         }
 
-        if (!empty($userModel) && 'female' === $userModel->gender) {
-            return $blnAbsolute ? Path::makeAbsolute($this->sacevtAvatarFemale, $this->projectDir) : $this->sacevtAvatarFemale;
+        $defaultAvatarPath = $this->getDefaultAvatarPath($userModel);
+
+        return $this->formatPath($defaultAvatarPath, $makeAbsolute);
+    }
+
+    private function getValidatedAvatarPath(object|null $userModel): string|null
+    {
+        if (empty($userModel->avatar)) {
+            return null;
         }
 
-        if (!empty($userModel) && 'male' === $userModel->gender) {
-            return $blnAbsolute ? Path::makeAbsolute($this->sacevtAvatarMale, $this->projectDir) : $this->sacevtAvatarMale;
+        $objFiles = $this->filesModelAdapter->findByUuid($userModel->avatar);
+
+        if (null === $objFiles) {
+            return null;
         }
 
-        return $blnAbsolute ? Path::makeAbsolute($this->sacevtAvatarOther, $this->projectDir) : $this->sacevtAvatarOther;
+        if (!is_file(Path::join($this->projectDir, $objFiles->path))) {
+            return null;
+        }
+
+        return $objFiles->path;
+    }
+
+    private function getDefaultAvatarPath(object|null $userModel): string
+    {
+        if (empty($userModel)) {
+            return $this->sacevtAvatarOther;
+        }
+
+        return match ($userModel->gender) {
+            'female' => $this->sacevtAvatarFemale,
+            'male' => $this->sacevtAvatarMale,
+            default => $this->sacevtAvatarOther,
+        };
+    }
+
+    private function formatPath(string $path, bool $makeAbsolute): string
+    {
+        return $makeAbsolute ? Path::makeAbsolute($path, $this->projectDir) : Path::makeRelative($path, $this->projectDir);
     }
 }
