@@ -252,7 +252,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['rte'] = nu
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['mandatory'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['maxlength'] = 520;
 
-// Add new field instructorNotes
+// Add a new field instructorNotes
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructorNotes'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -260,7 +260,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructorNotes'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field courseId
+// Add a new field courseId
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId'] = [
 	'exclude'   => true,
 	'search'    => true,
@@ -269,7 +269,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId'] = [
 	'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
-// Add new field suitableForBeginners
+// Add a new field suitableForBeginners
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['suitableForBeginners'] = [
 	'exclude'   => true,
 	'filter'    => true,
@@ -278,7 +278,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['suitableForBeginners'] = [
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
-// Add new field isRecurringEvent
+// Add a new field isRecurringEvent
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['isRecurringEvent'] = [
 	'exclude'   => true,
 	'filter'    => true,
@@ -287,7 +287,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['isRecurringEvent'] = [
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
-// Add new field eventType
+// Add a new field eventType
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = [
 	'reference' => &$GLOBALS['TL_LANG']['MSC'],
 	'exclude'   => true,
@@ -297,7 +297,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = [
 	'sql'       => "varchar(32) NOT NULL default ''",
 ];
 
-// Add new field mountainguide
+// Add a new field mountainguide
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mountainguide'] = [
 	'exclude'   => true,
 	'filter'    => true,
@@ -309,7 +309,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mountainguide'] = [
 	'sql'       => "int(1) unsigned NOT NULL default 0",
 ];
 
-// Add new field mainInstructor
+// Add a new field mainInstructor
 // Hauptleiter (main instructor) is set automatically (the first instructor in the list is set as "Hauptleiter"
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mainInstructor'] = [
 	'exclude'    => true,
@@ -324,7 +324,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mainInstructor'] = [
 	'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
 ];
 
-// Add new field instructor
+// Add a new field instructor
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
 	'exclude'   => true,
 	'search'    => true,
@@ -350,7 +350,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
 	'sql'       => 'blob NULL',
 ];
 
-// Add new field terms
+// Add a new field terms
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['terms'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -358,7 +358,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['terms'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field issues
+// Add a new field issues
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['issues'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -366,7 +366,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['issues'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field requirements
+// Add a new field requirements
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['requirements'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -374,7 +374,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['requirements'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field leistungen
+// Add a new field leistungen
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['leistungen'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -382,7 +382,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['leistungen'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field courseLevel
+// Add a new field courseLevel
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel'] = [
 	'exclude'   => true,
 	'search'    => true,
@@ -393,7 +393,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel'] = [
 	'sql'       => 'int(10) unsigned NULL',
 ];
 
-// Add new field courseTypeLevel0
+// Add a new field courseTypeLevel0
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0'] = [
 	'exclude'   => true,
 	'search'    => true,
@@ -403,7 +403,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0'] = [
 	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
-// Add new field courseTypeLevel1
+// Add a new field courseTypeLevel1
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1'] = [
 	'exclude'    => true,
 	'search'     => true,
@@ -415,7 +415,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1'] = [
 	'sql'        => "int(10) unsigned NOT NULL default 0",
 ];
 
-// Add new field organizers
+// Add a new field organizers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['organizers'] = [
 	'exclude'    => true,
 	'search'     => true,
@@ -427,7 +427,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['organizers'] = [
 	'sql'        => 'blob NULL',
 ];
 
-// Add new field equipment
+// Add a new field equipment
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['equipment'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -435,7 +435,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['equipment'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field durationInfo
+// Add a new field durationInfo
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['durationInfo'] = [
 	'search'    => true,
 	'filter'    => true,
@@ -445,7 +445,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['durationInfo'] = [
 	'sql'       => "varchar(32) NOT NULL default ''",
 ];
 
-// Add new field instructorNotes
+// Add a new field instructorNotes
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructorNotes'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -453,7 +453,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructorNotes'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field addMinMaxMembers
+// Add a new field addMinMaxMembers
 // Add minimum and maximum members (set up to "true" by default, when creating a new event)
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addMinAndMaxMembers'] = [
 	'exclude'   => true,
@@ -463,7 +463,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addMinAndMaxMembers'] = [
 	'sql'       => ['type' => 'boolean', 'default' => true],
 ];
 
-// Add new field minMembers
+// Add a new field minMembers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['minMembers'] = [
 	'exclude'   => true,
 	'search'    => true,
@@ -472,7 +472,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['minMembers'] = [
 	'sql'       => 'int(3) unsigned NULL',
 ];
 
-// Add new field maxMembers
+// Add a new field maxMembers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['maxMembers'] = [
 	'exclude'   => true,
 	'search'    => true,
@@ -481,7 +481,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['maxMembers'] = [
 	'sql'       => 'int(3) unsigned NULL',
 ];
 
-// Add new field bookingEvent
+// Add a new field bookingEvent
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['bookingEvent'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -489,7 +489,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['bookingEvent'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field miscellaneous
+// Add a new field miscellaneous
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['miscellaneous'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -497,7 +497,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['miscellaneous'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field addIban
+// Add a new field addIban
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addIban'] = [
 	'exclude'   => true,
 	'filter'    => true,
@@ -506,7 +506,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addIban'] = [
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
-// Add new field iban
+// Add a new field iban
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['iban'] = [
 	'exclude'   => true,
 	'inputType' => 'text',
@@ -514,7 +514,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['iban'] = [
 	'sql'       => "varchar(32) NOT NULL default ''",
 ];
 
-// Add new field ibanBeneficiary
+// Add a new field ibanBeneficiary
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['ibanBeneficiary'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -523,7 +523,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['ibanBeneficiary'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field eventDates
+// Add a new field eventDates
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDates'] = [
 	'exclude'   => true,
 	'inputType' => 'multiColumnWizard',
@@ -536,7 +536,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDates'] = [
 	'sql'       => 'blob NULL',
 ];
 
-// Add new field eventState
+// Add a new field eventState
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
 	'exclude'   => true,
 	'filter'    => true,
@@ -547,7 +547,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
 	'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
-// Add new field rescheduledEventDate
+// Add a new field rescheduledEventDate
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['rescheduledEventDate'] = [
 	'exclude'   => true,
 	'inputType' => 'text',
@@ -555,7 +555,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['rescheduledEventDate'] = [
 	'sql'       => "bigint(20) unsigned NULL",
 ];
 
-// Add new field meetingPoint
+// Add a new field meetingPoint
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['meetingPoint'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -563,7 +563,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['meetingPoint'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field singleSRCBroschuere
+// Add a new field singleSRCBroschuere
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['singleSRCBroschuere'] = [
 	'exclude'   => true,
 	'inputType' => 'fileTree',
@@ -571,7 +571,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['singleSRCBroschuere'] = [
 	'sql'       => 'binary(16) NULL',
 ];
 
-// Add new field askForAhvNumber
+// Add a new field askForAhvNumber
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['askForAhvNumber'] = [
 	'exclude'   => true,
 	'filter'    => true,
@@ -580,7 +580,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['askForAhvNumber'] = [
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
-// Add new field generateMainInstructorContactDataFromDb
+// Add a new field generateMainInstructorContactDataFromDb
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generateMainInstructorContactDataFromDb'] = [
 	'filter'    => true,
 	'sorting'   => true,
@@ -591,7 +591,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generateMainInstructorContac
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
-// Add new field disableOnlineRegistration
+// Add a new field disableOnlineRegistration
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration'] = [
 	'filter'    => true,
 	'sorting'   => true,
@@ -602,7 +602,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration'] 
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
-// Add new field registrationGoesTo
+// Add a new field registrationGoesTo
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationGoesTo'] = [
 	'exclude'   => true,
 	'filter'    => true,
@@ -611,7 +611,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationGoesTo'] = [
 	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
-// Add new field autoConfirm
+// Add a new field autoConfirm
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['autoConfirm'] = [
 	'exclude'   => true,
 	'filter'    => true,
@@ -620,7 +620,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['autoConfirm'] = [
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
-// Add new field setRegistrationPeriod
+// Add a new field setRegistrationPeriod
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod'] = [
 	'exclude'   => true,
 	'inputType' => 'checkbox',
@@ -628,7 +628,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod'] = [
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
-// Add new field registrationStartDate
+// Add a new field registrationStartDate
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = [
 	'default'   => strtotime(Date::parse('Y-m-d')),
 	'exclude'   => true,
@@ -637,7 +637,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = [
 	'sql'       => 'bigint(20) unsigned NULL',
 ];
 
-// Add new field registrationEndDate
+// Add a new field registrationEndDate
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate'] = [
 	'default'   => strtotime(Date::parse('Y-m-d')) + (2 * 24 * 3600) - 60,
 	'exclude'   => true,
@@ -646,7 +646,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate'] = [
 	'sql'       => 'bigint(20) unsigned NULL',
 ];
 
-// Add new field allowDeregistration
+// Add a new field allowDeregistration
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['allowDeregistration'] = [
 	'exclude'   => true,
 	'filter'    => true,
@@ -655,7 +655,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['allowDeregistration'] = [
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
-// Add new field deregistrationLimit
+// Add a new field deregistrationLimit
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['deregistrationLimit'] = [
 	'exclude'   => true,
 	'filter'    => true,
@@ -665,7 +665,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['deregistrationLimit'] = [
 	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
-// Add new field addGallery
+// Add a new field addGallery
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addGallery'] = [
 	'exclude'   => true,
 	'filter'    => true,
@@ -674,7 +674,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addGallery'] = [
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
-// Add new field multiSRC
+// Add a new field multiSRC
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['multiSRC'] = [
 	'exclude'   => true,
 	'inputType' => 'fileTree',
@@ -682,12 +682,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['multiSRC'] = [
 	'sql'       => 'blob NULL',
 ];
 
-// Add new field orderSRC
+// Add a new field orderSRC
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['orderSRC'] = [
 	'sql' => 'blob NULL',
 ];
 
-// Add new field tour type
+// Add a new field tour type
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType'] = [
 	'exclude'    => true,
 	'filter'     => true,
@@ -698,7 +698,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType'] = [
 	'sql'        => 'blob NULL',
 ];
 
-// Add new field tourTechDifficulty
+// Add a new field tourTechDifficulty
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
 	'exclude'   => true,
 	'inputType' => 'multiColumnWizard',
@@ -734,7 +734,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
 	'sql'       => 'blob NULL',
 ];
 
-// Add new field tourProfile
+// Add a new field tourProfile
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = [
 	'exclude'   => true,
 	'inputType' => 'multiColumnWizard',
@@ -769,7 +769,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = [
 	'sql'       => 'blob NULL',
 ];
 
-// Add new field tourDetailText
+// Add a new field tourDetailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourDetailText'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -778,7 +778,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourDetailText'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field generalEventDetailText
+// Add a new field generalEventDetailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generalEventDetailText'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -786,7 +786,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generalEventDetailText'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field eventReleaseLevel
+// Add a new field eventReleaseLevel
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = [
 	'exclude'    => true,
 	'filter'     => true,
@@ -803,7 +803,7 @@ if (!Input::get('act') || 'select' === Input::get('act')) {
 	$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel']['options_callback'] = null;
 }
 
-// Add new field customizeEventRegistrationConfirmationEmailText
+// Add a new field customizeEventRegistrationConfirmationEmailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customizeEventRegistrationConfirmationEmailText'] = [
 	'exclude'   => true,
 	'filter'    => false,
@@ -812,7 +812,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customizeEventRegistrationCo
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
-// Add new field customEventRegistrationConfirmationEmailText
+// Add a new field customEventRegistrationConfirmationEmailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfirmationEmailText'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -822,7 +822,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfi
 
 // ****** Tour report fields **********:
 
-// Add new field filledInEventReportForm
+// Add a new field filledInEventReportForm
 // This field is autofilled, if a user has filled in the event report
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm'] = [
 	'exclude' => false,
@@ -830,7 +830,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm'] = 
 	'sql'     => ['type' => 'boolean', 'default' => false],
 ];
 
-// Add new field executionState
+// Add a new field executionState
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
 	'exclude'   => true,
 	'filter'    => true,
@@ -841,7 +841,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
 	'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
-// Add new field coordsCH1903
+// Add a new field coordsCH1903
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['coordsCH1903'] = [
 	'exclude'   => true,
 	'search'    => true,
@@ -851,7 +851,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['coordsCH1903'] = [
 	'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
-// Add new field journey
+// Add a new field journey
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = [
 	'exclude'    => true,
 	'filter'     => true,
@@ -862,7 +862,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = [
 	'sql'        => "varchar(255) NOT NULL default ''",
 ];
 
-// Add new field linkSacRoutePortal
+// Add a new field linkSacRoutePortal
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['linkSacRoutePortal'] = [
 	'exclude'   => true,
 	'search'    => true,
@@ -872,7 +872,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['linkSacRoutePortal'] = [
 	'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
-// Add new field eventSubstitutionText
+// Add a new field eventSubstitutionText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -880,7 +880,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field tourWeatherConditions
+// Add a new field tourWeatherConditions
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -888,7 +888,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field tourAvalancheConditions
+// Add a new field tourAvalancheConditions
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
@@ -898,7 +898,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = 
 	'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
-// Add new field tourSpecialIncidents
+// Add a new field tourSpecialIncidents
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
@@ -906,7 +906,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = [
 	'sql'       => 'text NULL',
 ];
 
-// Add new field eventReportAdditionalNotices
+// Add a new field eventReportAdditionalNotices
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReportAdditionalNotices'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
