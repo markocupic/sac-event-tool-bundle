@@ -283,6 +283,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                         // $dateFormat = 'j.n.';
                         $dateFormat = 'D, j.n.';
                     }
+
                     $showHeadline = true;
                     $showTeaser = true;
                     $showDetails = true;
@@ -298,8 +299,10 @@ class JahresprogrammExportController extends AbstractPrintExportController
                         $minMax[] = 'max. '.$objEvent->maxMembers;
                     }
 
-                    if ($this->organizer) {
-                        if (null !== ($eventOrganizerModel = $eventOrganizerModelAdapter->findById($this->organizer))) {
+                    $organizers = $this->calendarEventsUtil->getEventOrganizersAsArray($objEvent->current(), 'id');
+
+                    if (!empty($organizers)) {
+                        if (null !== ($eventOrganizerModel = $eventOrganizerModelAdapter->findById($organizers[0]))) {
                             $showHeadline = (bool) $eventOrganizerModel->annualProgramShowHeadline;
                             $showTeaser = (bool) $eventOrganizerModel->annualProgramShowTeaser;
                             $showDetails = (bool) $eventOrganizerModel->annualProgramShowDetails;
@@ -321,7 +324,6 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $organizerTitlePrint = implode(', ', $arrTitlePrint);
 
                     $arrData = $objEvent->row();
-
                     $arrData['eventId'] = $this->calendarEventsUtil->getEventData($objEvent->current(), 'eventId');
                     $arrData['organizers'] = implode(', ', $this->calendarEventsUtil->getEventOrganizersAsArray($objEvent->current(), 'title'));
                     $arrData['organizerTitle'] = $organizerTitle;
@@ -334,6 +336,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $arrData['instructors'] = implode(', ', $this->calendarEventsUtil->getInstructorNamesAsArray($objEvent->current()));
                     $arrData['tourType'] = implode(', ', $arrTourType);
                     $arrData['difficulty'] = implode(', ', $this->calendarEventsUtil->getTourTechDifficultiesAsArray($objEvent->current()));
+
                     // Layout settings
                     $arrData['showHeadline'] = $showHeadline;
                     $arrData['showTeaser'] = $showTeaser;
