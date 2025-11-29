@@ -30,7 +30,7 @@ use Symfony\Component\Routing\RouterInterface;
 #[AsContentElement(PurgeEventFavoritesLinkController::TYPE, category: 'sac_event_tool_content_elements', template: 'ce_purge_event_favorites_link')]
 class PurgeEventFavoritesLinkController extends AbstractContentElementController
 {
-    public const TYPE = 'purge_event_favorites_link';
+    public const string TYPE = 'purge_event_favorites_link';
 
     public function __construct(
         private readonly Security $security,

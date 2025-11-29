@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[AsContentElement(NestedFragmentUserPortraitListGroupController::TYPE, nestedFragments: true, category: 'sac_event_tool_content_elements')]
 class NestedFragmentUserPortraitListGroupController extends AbstractContentElementController
 {
-    public const TYPE = 'nested_fragment_user_portrait_list_group';
+    public const string TYPE = 'nested_fragment_user_portrait_list_group';
 
     protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {

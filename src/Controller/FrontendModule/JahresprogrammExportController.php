@@ -42,9 +42,9 @@ use Symfony\Component\HttpFoundation\Response;
 #[AsFrontendModule(JahresprogrammExportController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_jahresprogramm_export')]
 class JahresprogrammExportController extends AbstractPrintExportController
 {
-    public const TYPE = 'jahresprogramm_export';
+    public const string TYPE = 'jahresprogramm_export';
 
-    private const DEFAULT_EVENT_RELEASE_LEVEL = 3;
+    private const int DEFAULT_EVENT_RELEASE_LEVEL = 3;
 
     private FragmentTemplate|null $template = null;
 

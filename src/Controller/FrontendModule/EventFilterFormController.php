@@ -35,7 +35,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
 
     public const string DATE_FORMAT = 'Y-m-d';
 
-    private const MIN_YEAR = 2017;
+    private const int MIN_YEAR = 2017;
 
     private int $urlFixCount = 0;
 

@@ -20,7 +20,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class Configuration implements ConfigurationInterface
 {
-    public const ROOT_KEY = 'sacevt';
+    public const string ROOT_KEY = 'sacevt';
 
     public function __construct(private readonly string $projectDir)
     {

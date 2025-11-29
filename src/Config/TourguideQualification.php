@@ -16,23 +16,23 @@ namespace Markocupic\SacEventToolBundle\Config;
 
 class TourguideQualification
 {
-    public const TOURGUIDE_SAC = 1;
+    public const int TOURGUIDE_SAC = 1;
 
-    public const MOUNTAIN_GUIDE = 2;
+    public const int MOUNTAIN_GUIDE = 2;
 
-    public const PSYCHOLOGIST = 3;
+    public const int PSYCHOLOGIST = 3;
 
-    public const SKI_INSTRUCTOR = 4;
+    public const int SKI_INSTRUCTOR = 4;
 
-    public const DOCTOR = 5;
+    public const int DOCTOR = 5;
 
-    public const J_AND_S_INSTRUCTOR = 6;
+    public const int J_AND_S_INSTRUCTOR = 6;
 
-    public const HIKING_INSTRUCTOR = 7;
+    public const int HIKING_INSTRUCTOR = 7;
 
-    public const IGKA_INSTRUCTOR = 8;
+    public const int IGKA_INSTRUCTOR = 8;
 
-    public const ALL = [
+    public const array ALL = [
         self::TOURGUIDE_SAC,
         self::MOUNTAIN_GUIDE,
         self::PSYCHOLOGIST,

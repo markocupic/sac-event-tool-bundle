@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[AsContentElement(NestedFragmentButtonGroupController::TYPE, nestedFragments: true, category: 'sac_event_tool_content_elements')]
 class NestedFragmentButtonGroupController extends AbstractContentElementController
 {
-    public const TYPE = 'nested_fragment_button_group';
+    public const string TYPE = 'nested_fragment_button_group';
 
     protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {

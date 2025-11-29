@@ -19,11 +19,11 @@ namespace Markocupic\SacEventToolBundle\Config;
  */
 class EventExecutionState
 {
-    public const STATE_EXECUTED_LIKE_PREDICTED = 'event_executed_like_predicted';
+    public const string STATE_EXECUTED_LIKE_PREDICTED = 'event_executed_like_predicted';
 
-    public const STATE_NOT_EXECUTED_LIKE_PREDICTED = 'event_not_executed_like_predicted';
+    public const string STATE_NOT_EXECUTED_LIKE_PREDICTED = 'event_not_executed_like_predicted';
 
-    public const ALL = [
+    public const array ALL = [
         self::STATE_EXECUTED_LIKE_PREDICTED,
         self::STATE_NOT_EXECUTED_LIKE_PREDICTED,
     ];

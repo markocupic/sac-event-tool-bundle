@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[AsContentElement(NestedFragmentWrapperDivController::TYPE, nestedFragments: true, category: 'sac_event_tool_content_elements')]
 class NestedFragmentWrapperDivController extends AbstractContentElementController
 {
-    public const TYPE = 'nested_fragment_wrapper_div';
+    public const string TYPE = 'nested_fragment_wrapper_div';
 
     protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {

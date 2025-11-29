@@ -16,14 +16,14 @@ namespace Markocupic\SacEventToolBundle\String;
 
 class PhoneNumber
 {
-    private const SWISS_COUNTRY_CODE_PLUS = '+41';
+    private const string SWISS_COUNTRY_CODE_PLUS = '+41';
 
-    private const SWISS_COUNTRY_CODE_NUMERIC = '0041';
+    private const string SWISS_COUNTRY_CODE_NUMERIC = '0041';
 
-    private const SWISS_NUMBER_LENGTH = 9;
+    private const int SWISS_NUMBER_LENGTH = 9;
 
     // Swiss phone number without countrycode and whitespaces: 0799871234
-    private const SWISS_FORMAT_PATTERN = '/^([0]{1})([0-9]{2})([0-9]{3})([0-9]{2})([0-9]{2})$/';
+    private const string SWISS_FORMAT_PATTERN = '/^([0]{1})([0-9]{2})([0-9]{3})([0-9]{2})([0-9]{2})$/';
 
     /**
      * Formats a given phone number string according to Swiss phone number standards:
@@ -46,7 +46,7 @@ class PhoneNumber
             $phoneNumber = str_replace(self::SWISS_COUNTRY_CODE_PLUS, '', $phoneNumber);
             $phoneNumber = str_replace(self::SWISS_COUNTRY_CODE_NUMERIC, '', $phoneNumber);
 
-            // Add a leading zero, if there is no f.ex 41
+            // Add a leading zero if there is no f.ex 41
             if (!str_starts_with($phoneNumber, '0') && self::SWISS_NUMBER_LENGTH === \strlen($phoneNumber)) {
                 $phoneNumber = '0'.$phoneNumber;
             }

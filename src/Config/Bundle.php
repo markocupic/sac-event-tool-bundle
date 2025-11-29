@@ -16,5 +16,5 @@ namespace Markocupic\SacEventToolBundle\Config;
 
 class Bundle
 {
-    public const PACKAGE_NAME = 'markocupic_sac_event_tool';
+    public const string PACKAGE_NAME = 'markocupic_sac_event_tool';
 }

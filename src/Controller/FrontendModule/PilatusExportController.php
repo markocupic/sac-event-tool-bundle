@@ -39,9 +39,9 @@ use Symfony\Component\HttpFoundation\Response;
 #[AsFrontendModule(PilatusExportController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_pilatus_export')]
 class PilatusExportController extends AbstractPrintExportController
 {
-    public const TYPE = 'pilatus_export';
+    public const string TYPE = 'pilatus_export';
 
-    private const DEFAULT_EVENT_RELEASE_LEVEL = 3;
+    private const int DEFAULT_EVENT_RELEASE_LEVEL = 3;
 
     private ModuleModel|null $model;
 

@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class CalendarEventsMember
 {
-    public const TABLE = 'tl_calendar_events_member';
+    public const string TABLE = 'tl_calendar_events_member';
 
     // Adapters
     private Adapter $backend;

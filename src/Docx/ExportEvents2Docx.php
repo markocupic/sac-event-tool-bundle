@@ -39,7 +39,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ExportEvents2Docx
 {
-    private const TEMP_PATH = 'system/tmp';
+    private const string TEMP_PATH = 'system/tmp';
 
     private string|null $strTable;
 

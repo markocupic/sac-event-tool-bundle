@@ -16,13 +16,13 @@ namespace Markocupic\SacEventToolBundle\Util;
 
 class AgeGroupUtil
 {
-    public const GROUP_JUGEND_UND_SPORT = 'J+S';
+    public const string GROUP_JUGEND_UND_SPORT = 'J+S';
 
-    public const GROUP_JUGEND = 'Jugend';
+    public const string GROUP_JUGEND = 'Jugend';
 
-    private const MAX_AGE_JUGEND_UND_SPORT = 20;
+    private const int MAX_AGE_JUGEND_UND_SPORT = 20;
 
-    private const MAX_AGE_JUGEND = 22;
+    private const int MAX_AGE_JUGEND = 22;
 
     public static function getAgeGroup(int $dateOfBirthTimestamp, int $referenceYear): string
     {

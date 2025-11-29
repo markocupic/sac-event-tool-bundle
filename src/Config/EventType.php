@@ -16,15 +16,15 @@ namespace Markocupic\SacEventToolBundle\Config;
 
 class EventType
 {
-    public const COURSE = 'course';
+    public const string COURSE = 'course';
 
-    public const TOUR = 'tour';
+    public const string TOUR = 'tour';
 
-    public const LAST_MINUTE_TOUR = 'lastMinuteTour';
+    public const string LAST_MINUTE_TOUR = 'lastMinuteTour';
 
-    public const GENERAL_EVENT = 'generalEvent';
+    public const string GENERAL_EVENT = 'generalEvent';
 
-    public const ALL = [
+    public const array ALL = [
         self::COURSE,
         self::TOUR,
         self::LAST_MINUTE_TOUR,

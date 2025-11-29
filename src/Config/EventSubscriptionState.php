@@ -16,19 +16,19 @@ namespace Markocupic\SacEventToolBundle\Config;
 
 class EventSubscriptionState
 {
-    public const SUBSCRIPTION_NOT_CONFIRMED = 'subscription-not-confirmed';
+    public const string SUBSCRIPTION_NOT_CONFIRMED = 'subscription-not-confirmed';
 
-    public const SUBSCRIPTION_ACCEPTED = 'subscription-accepted';
+    public const string SUBSCRIPTION_ACCEPTED = 'subscription-accepted';
 
-    public const SUBSCRIPTION_REFUSED = 'subscription-refused';
+    public const string SUBSCRIPTION_REFUSED = 'subscription-refused';
 
-    public const SUBSCRIPTION_ON_WAITING_LIST = 'subscription-on-waiting-list';
+    public const string SUBSCRIPTION_ON_WAITING_LIST = 'subscription-on-waiting-list';
 
-    public const USER_HAS_UNSUBSCRIBED = 'user-has-unsubscribed';
+    public const string USER_HAS_UNSUBSCRIBED = 'user-has-unsubscribed';
 
-    public const SUBSCRIPTION_STATE_UNDEFINED = 'subscription-state-undefined';
+    public const string SUBSCRIPTION_STATE_UNDEFINED = 'subscription-state-undefined';
 
-    public const ALL = [
+    public const array ALL = [
         self::SUBSCRIPTION_NOT_CONFIRMED,
         self::SUBSCRIPTION_ACCEPTED,
         self::SUBSCRIPTION_REFUSED,
