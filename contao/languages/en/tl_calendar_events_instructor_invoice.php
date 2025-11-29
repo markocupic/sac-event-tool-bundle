@@ -42,11 +42,11 @@ $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['notice_legend'] = 
 
 // Fields
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['userPid'] = ['Begünstigter', 'Wählen Sie einen Namen aus der Liste aus.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['eventDuration'] = ['Event Dauer in Tagen', 'Geben Sie die Event-Dauer in Tagen an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['sleepingTaxes'] = ['Auslagen für Übernachtung in CHF', 'Geben Sie die übernachtungsauslagen ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['sleepingTaxesText'] = ['Auslagen für Übernachtung Beschreibung', 'Geben Sie eine Beschreibung für die Auslagen ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['miscTaxes'] = ['Sonstige Auslagen in CHF', 'Geben Sie eine Beschreibung für die Auslagen ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['miscTaxesText'] = ['Sonstige Auslagen Beschreibung', 'Geben Sie eine Beschreibung für die Auslagen ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['privateArrival'] = ['Anzahl privat angereister Personen', 'Privat angereiste Teilnehmende und Leitende werden bei der Spesenberechnung nicht berücksichtigt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['railwTaxes'] = ['ÖV-Kosten in CHF (Basis Halbtax)', 'Geben Sie die Kosten für die Benutzung des öffentlichen Verkehrs ein (Basis Halbtax).'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['railwTaxesText'] = ['ÖV-Kosten Beschreibung', 'Geben Sie eine Beschreibung für die Auslagen ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['cableCarTaxes'] = ['Kosten für Privat-/Bergbahnen in CHF', 'Geben Sie die Kosten für die Benutzung von Privat-/Bergbahnen ein.'];
@@ -54,8 +54,8 @@ $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['cableCarTaxesText'
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['roadTaxes'] = ['Park-/Strassen-/Tunnelgebühren pro Auto in CHF', 'Geben Sie die Park-/Strassen-/Tunnelgebühren pro Auto ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['carTaxesKm'] = ['Anzahl mit PW zurückgelegte Kilometer pro Fahrzeug', 'Geben Sie die Anzahl Kilometer ein, welche pro Fahrzeug zurückgelegt wurde. Wird für die Kilometerabrechnung benötigt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['countCars'] = ['Anzahl PW', "Geben Sie die Anzahl PW's ein. Wird für die Kilometerabrechnung benötigt."];
+$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['privateArrival'] = ['Anzahl privat angereister Personen', 'Privat angereiste Teilnehmende und Leitende werden bei der Spesenberechnung nicht berücksichtigt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['expenseReimbursement'] = ['Spesenentschädigung in CHF: (pauschal 10.-- pro Tag/Abend)', 'Geben Sie die pauschalen Spesen ein (Telefon, Porti, Getränke etc.).'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['organizationalFlatRate'] = ['Organisationspauschale in CHF: pauschal 10.-- pro Tag/Abend (auch bei Absage möglich)', 'Geben Sie die Organisationspauschale ein (nur für den/die Organisator/in).'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['iban'] = ['IBAN Nummer', 'Geben Sie Ihre IBAN Nummer ein. Wird für die Überweisung auf Ihr Bankkonto benötigt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['notice'] = ['Weitere Anmerkungen', 'Geben Sie weitere Anmerkungen ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['eventDuration'] = ['Event Dauer in Tagen', 'Geben Sie die Event-Dauer in Tagen an.'];
