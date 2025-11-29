@@ -238,16 +238,26 @@ readonly class Event
 
             if (false !== $resEventMember) {
                 // ((CHF 0.60 x AnzKm + Park-/Strassen-/Tunnelgebühren) x AnzAutos) : AnzPersonen
-                $carTaxes = (0.6 * $objEventInvoice->carTaxesKm + $objEventInvoice->roadTaxes) * $objEventInvoice->countCars;
+                $carTaxes = (0.6 * abs($objEventInvoice->carTaxesKm) + abs($objEventInvoice->roadTaxes)) * abs($objEventInvoice->countCars);
 
-                if ($countParticipantsTotal - $objEventInvoice->privateArrival > 0) {
-                    $carTaxes = $carTaxes / ($countParticipantsTotal - $objEventInvoice->privateArrival);
+                if ($countParticipantsTotal - abs($objEventInvoice->privateArrival) > 0) {
+                    $carTaxes = $carTaxes / ($countParticipantsTotal - abs($objEventInvoice->privateArrival));
                 }
             }
         }
 
         $objPhpWord->replace('carTaxes', $this->prepareString(round($carTaxes, 2)));
-        $totalCosts = $objEventInvoice->sleepingTaxes + $objEventInvoice->miscTaxes + $objEventInvoice->railwTaxes + $objEventInvoice->cableCarTaxes + $objEventInvoice->expenseReimbursement + $objEventInvoice->organizationalFlatRate + $carTaxes;
+
+        // Calculate total costs
+        $totalCosts = array_sum([
+            abs($objEventInvoice->sleepingTaxes),
+            abs($objEventInvoice->miscTaxes),
+            abs($objEventInvoice->railwTaxes),
+            abs($objEventInvoice->cableCarTaxes),
+            abs($objEventInvoice->expenseReimbursement),
+            abs($objEventInvoice->organizationalFlatRate),
+            $carTaxes,
+        ]);
         $objPhpWord->replace('totalCosts', $this->prepareString(ceil($totalCosts)));
 
         // Notice
