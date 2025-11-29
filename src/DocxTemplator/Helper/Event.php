@@ -32,6 +32,7 @@ use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
+use Markocupic\SacEventToolBundle\Util\AgeGroupUtil;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -160,8 +161,20 @@ readonly class Event
         // Count participants Member list
         $objEventMember = $this->eventMemberHelper->getParticipatedEventMembers($objEvent);
 
+        // Initialize age distribution counter
+        $ageDistributionCounter = [
+            AgeGroupUtil::GROUP_JUGEND_UND_SPORT => 0,
+            AgeGroupUtil::GROUP_JUGEND => 0,
+            'adults' => 0,
+        ];
+
         if (null !== $objEventMember) {
             while ($objEventMember->next()) {
+                // Count by age group
+                $ageGroup = AgeGroupUtil::getAgeGroup((int) $objEventMember->dateOfBirth, (int) $this->framework->getAdapter(Date::class)->parse('Y', $objEvent->startDate));
+                $ageGroup = empty($ageGroup) ? 'adults' : $ageGroup;
+                ++$ageDistributionCounter[$ageGroup];
+
                 if ('female' === $objEventMember->gender) {
                     ++$countFemale;
                 } elseif ('male' === $objEventMember->gender) {
@@ -183,6 +196,11 @@ readonly class Event
 
         if (null !== $objUser) {
             while ($objUser->next()) {
+                // Count by age group
+                $ageGroup = AgeGroupUtil::getAgeGroup((int) $objUser->dateOfBirth, (int) $this->framework->getAdapter(Date::class)->parse('Y', $objEvent->startDate));
+                $ageGroup = empty($ageGroup) ? 'adults' : $ageGroup;
+                ++$ageDistributionCounter[$ageGroup];
+
                 if ('female' === $objUser->gender) {
                     ++$countFemale;
                 } elseif ('male' === $objUser->gender) {
@@ -219,7 +237,8 @@ readonly class Event
         $objPhpWord->replace('countMale', $this->prepareString($countMale));
         $objPhpWord->replace('countFemale', $this->prepareString($countFemale));
         $objPhpWord->replace('countDivers', $this->prepareString($countDivers));
-
+        $ageGroupText = \sprintf('(Davon %d J&S, %d Jugend, %d über 22 Jahre)', ...array_values($ageGroupCounter));
+        $objPhpWord->replace('ageDistribution', $this->prepareString($ageGroupText));
         $objPhpWord->replace('weatherConditions', $this->prepareString($objEvent->tourWeatherConditions));
         $objPhpWord->replace('avalancheConditions', $this->prepareString($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->tourAvalancheConditions][0]));
         $objPhpWord->replace('specialIncidents', $this->prepareString($objEvent->tourSpecialIncidents));
