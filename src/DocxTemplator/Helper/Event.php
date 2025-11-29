@@ -258,6 +258,7 @@ readonly class Event
             abs($objEventInvoice->organizationalFlatRate),
             $carTaxes,
         ]);
+
         $objPhpWord->replace('totalCosts', $this->prepareString(ceil($totalCosts)));
 
         // Notice
