@@ -118,7 +118,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
-			'sql'       => "varchar(6) NOT NULL default '0'",
+			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
 		'sleepingTaxesText'      => [
 			'exclude'   => true,
@@ -131,7 +131,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
-			'sql'       => "varchar(6) NOT NULL default '0'",
+			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
 		'miscTaxesText'          => [
 			'exclude'   => true,
@@ -151,7 +151,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
-			'sql'       => "varchar(6) NOT NULL default '0'",
+			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
 		'railwTaxesText'         => [
 			'exclude'   => true,
@@ -164,7 +164,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
-			'sql'       => "varchar(6) NOT NULL default '0'",
+			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
 		'cableCarTaxesText'      => [
 			'exclude'   => true,
@@ -177,14 +177,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
-			'sql'       => "varchar(6) NOT NULL default '0'",
+			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
 		'carTaxesKm'             => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 6, 'doNotCopy' => true, 'tl_class' => 'clr'],
-			'sql'       => "varchar(6) NOT NULL default '0'",
+			'sql'       => "int(6) unsigned NOT NULL default 0",
 		],
 		'countCars'              => [
 			'exclude'   => true,
@@ -192,21 +192,21 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'inputType' => 'select',
 			'options'   => range(0, 9),
 			'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 1, 'tl_class' => 'clr'],
-			'sql'       => "varchar(1) NOT NULL default '0'",
+			'sql'       => "int(10) unsigned NOT NULL default 0",
 		],
 		'expenseReimbursement'   => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'doNotCopy' => true, 'tl_class' => 'clr'],
-			'sql'       => "varchar(6) NOT NULL default '0'",
+			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
 		'organizationalFlatRate' => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'doNotCopy' => true, 'tl_class' => 'clr'],
-			'sql'       => "varchar(6) NOT NULL default '0'",
+			'sql'       => "float(6) NOT NULL default '0.00'",
 		],
 		'notice'                 => [
 			'exclude'   => true,
