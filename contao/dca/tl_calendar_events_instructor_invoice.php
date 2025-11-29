@@ -56,21 +56,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 				'icon'       => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/file-pdf-regular.svg', 'markocupic_sac_event_tool'),
 				'attributes' => 'onclick="if (!confirm(\'' . ($GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoicePdfConfirm'] ?? null) . '\')) return false; Backend.getScrollOffset();"',
 			],
-			//'generateInvoiceDocx'     => [
-			//'href'       => 'action=generateInvoiceDocx&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
-			//'icon'       => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/file-word-regular.svg', 'markocupic_sac_event_tool'),
-			//'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoiceDocxConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
-			//],
 			'generateTourRapportPdf' => [
 				'href'       => 'action=generateTourRapportPdf&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
 				'icon'       => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/file-pdf-regular.svg', 'markocupic_sac_event_tool'),
 				'attributes' => 'onclick="if (!confirm(\'' . ($GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportPdfConfirm'] ?? null) . '\')) return false; Backend.getScrollOffset();"',
 			],
-			//'generateTourRapportDocx' => [
-			//'href'       => 'action=generateTourRapportDocx&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
-			//'icon'       => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/file-word-regular.svg', 'markocupic_sac_event_tool'),
-			//'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportDocxConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
-			//],
 			'sendRapport'            => [
 				'href'       => 'action=sendRapport',
 				'icon'       => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/paper-plane-solid.svg', 'markocupic_sac_event_tool'),
@@ -127,7 +117,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'],
+			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
 			'sql'       => "varchar(6) NOT NULL default '0'",
 		],
 		'sleepingTaxesText'      => [
@@ -140,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'],
+			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
 			'sql'       => "varchar(6) NOT NULL default '0'",
 		],
 		'miscTaxesText'          => [
@@ -160,7 +150,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'],
+			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
 			'sql'       => "varchar(6) NOT NULL default '0'",
 		],
 		'railwTaxesText'         => [
@@ -173,7 +163,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'],
+			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
 			'sql'       => "varchar(6) NOT NULL default '0'",
 		],
 		'cableCarTaxesText'      => [
@@ -186,7 +176,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'],
+			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'tl_class' => 'clr'],
 			'sql'       => "varchar(6) NOT NULL default '0'",
 		],
 		'carTaxesKm'             => [
@@ -208,15 +198,15 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 3, 'doNotCopy' => true, 'tl_class' => 'clr'],
-			'sql'       => "varchar(3) NOT NULL default '0'",
+			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'doNotCopy' => true, 'tl_class' => 'clr'],
+			'sql'       => "varchar(6) NOT NULL default '0'",
 		],
 		'organizationalFlatRate' => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 3, 'doNotCopy' => true, 'tl_class' => 'clr'],
-			'sql'       => "varchar(3) NOT NULL default '0'",
+			'eval'      => ['mandatory' => true, 'rgxp' => 'positiveMoneyValue', 'maxlength' => 6, 'doNotCopy' => true, 'tl_class' => 'clr'],
+			'sql'       => "varchar(6) NOT NULL default '0'",
 		],
 		'notice'                 => [
 			'exclude'   => true,
