@@ -237,7 +237,7 @@ readonly class Event
         $objPhpWord->replace('countMale', $this->prepareString($countMale));
         $objPhpWord->replace('countFemale', $this->prepareString($countFemale));
         $objPhpWord->replace('countDivers', $this->prepareString($countDivers));
-        $ageGroupText = \sprintf('(%d TN J&S, %d TN Jugend, %d TN über 22 Jahre)', ...array_values($ageDistributionCounter));
+        $ageGroupText = \sprintf('(Teilnehmende: %d J+S, %d Jugend, %d über 22 Jahre)', ...array_values($ageDistributionCounter));
         $objPhpWord->replace('ageDistribution', $this->prepareString($ageGroupText));
         $objPhpWord->replace('weatherConditions', $this->prepareString($objEvent->tourWeatherConditions));
         $objPhpWord->replace('avalancheConditions', $this->prepareString($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->tourAvalancheConditions][0]));
