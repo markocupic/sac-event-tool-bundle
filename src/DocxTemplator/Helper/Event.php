@@ -196,10 +196,10 @@ readonly class Event
 
         if (null !== $objUser) {
             while ($objUser->next()) {
-                // Count by age group
-                $ageGroup = AgeGroupUtil::getAgeGroup((int) $objUser->dateOfBirth, (int) $this->framework->getAdapter(Date::class)->parse('Y', $objEvent->startDate));
-                $ageGroup = empty($ageGroup) ? 'adults' : $ageGroup;
-                ++$ageDistributionCounter[$ageGroup];
+                // Count by age group (Do not add instructors to the age distribution counter)
+                // $ageGroup = AgeGroupUtil::getAgeGroup((int) $objUser->dateOfBirth, (int) $this->framework->getAdapter(Date::class)->parse('Y', $objEvent->startDate));
+                // $ageGroup = empty($ageGroup) ? 'adults' : $ageGroup;
+                // ++$ageDistributionCounter[$ageGroup];
 
                 if ('female' === $objUser->gender) {
                     ++$countFemale;
@@ -237,7 +237,7 @@ readonly class Event
         $objPhpWord->replace('countMale', $this->prepareString($countMale));
         $objPhpWord->replace('countFemale', $this->prepareString($countFemale));
         $objPhpWord->replace('countDivers', $this->prepareString($countDivers));
-        $ageGroupText = \sprintf('(Davon %d J&S, %d Jugend, %d über 22 Jahre)', ...array_values($ageDistributionCounter));
+        $ageGroupText = \sprintf('(%d TN J&S, %d TN Jugend, %d TN über 22 Jahre)', ...array_values($ageDistributionCounter));
         $objPhpWord->replace('ageDistribution', $this->prepareString($ageGroupText));
         $objPhpWord->replace('weatherConditions', $this->prepareString($objEvent->tourWeatherConditions));
         $objPhpWord->replace('avalancheConditions', $this->prepareString($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->tourAvalancheConditions][0]));
