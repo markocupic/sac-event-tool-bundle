@@ -85,6 +85,8 @@ readonly class AddCustomRegexpListener
 
                 return true;
             }
+
+            return true;
         }
 
         $objWidget->addError($this->translator->trans('ERR.SACMemberIdShouldBeNumberOrEmptyString', [], 'contao_default'));
@@ -122,6 +124,8 @@ readonly class AddCustomRegexpListener
 
                 return true;
             }
+
+            return true;
         }
 
         $objWidget->addError($this->translator->trans('ERR.SACMemberIdShouldBeNumberOrZero', [], 'contao_default'));
