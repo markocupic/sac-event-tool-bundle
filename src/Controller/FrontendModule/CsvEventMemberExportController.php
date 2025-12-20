@@ -20,12 +20,12 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
-use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Date;
-use Contao\Environment;
 use Contao\MemberModel;
 use Contao\ModuleModel;
+use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventType;
@@ -40,11 +40,8 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 {
     public const string TYPE = 'csv_event_member_export';
 
-    private array $arrLines = [];
-
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
-        private readonly ContaoFramework $framework,
         private readonly Connection $connection,
     ) {
     }
@@ -53,114 +50,116 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     {
         $form = $this->getForm($request);
 
-        if ($form instanceof StreamedResponse) {
-            return $form;
+        if ($form->isSubmitted() && $form->validate()) {
+            $records = $this->buildRecords($request);
+
+            $filename = \sprintf('Event-Member-Export_%s.csv', date('Y-m-d'));
+
+            return throw new ResponseException($this->getStream($records, $filename));
         }
 
         $template->set('form', $form->generate());
-        $template->set('dateFormat', $this->framework->getAdapter(Config::class)->get('dateFormat'));
+        $template->set('dateFormat', $this->getContaoAdapter(Config::class)->get('dateFormat'));
 
         return $template->getResponse();
     }
 
     private function getForm(Request $request): Form|StreamedResponse
     {
-        $objForm = new Form(
+        $form = new Form(
             'form-event-member-export',
-            'POST',
+            Request::METHOD_POST,
         );
 
-        $environment = $this->framework->getAdapter(Environment::class);
-        $objForm->setAction($environment->get('uri'));
+        $form->setAction($request->getUri());
 
         // Now let's add form fields:
-        $objForm->addFormField('event-type', [
+        $form->addFormField('event-type', [
             'label' => ['Event-Typ auswählen', ''],
             'inputType' => 'select',
             'options' => ['all' => 'Alle Events', EventType::TOUR => 'Tour', EventType::COURSE => 'Kurs'],
         ]);
 
-        $objForm->addFormField('startDate', [
+        $form->addFormField('startDate', [
             'label' => 'Startdatum',
             'inputType' => 'text',
             'eval' => ['rgxp' => 'date', 'mandatory' => true],
         ]);
 
-        $objForm->addFormField('endDate', [
+        $form->addFormField('endDate', [
             'label' => 'Enddatum',
             'inputType' => 'text',
             'eval' => ['rgxp' => 'date', 'mandatory' => true],
         ]);
 
-        $objForm->addFormField('mountainguide', [
+        $form->addFormField('mountainguide', [
             'label' => ['Bergführer', 'Nur Events mit Bergführer exportieren'],
             'inputType' => 'checkbox',
             'eval' => [],
         ]);
 
         // Add the submit-button
-        $objForm->addFormField('submit', [
+        $form->addFormField('submit', [
             'label' => 'Export starten',
             'inputType' => 'submit',
         ]);
 
-        if ($objForm->validate()) {
-            if ('form-event-member-export' === $request->request->get('FORM_SUBMIT')) {
-                $eventType = $request->request->get('event-type');
-                $arrFields = ['id', 'eventId', 'eventName', 'startDate', 'endDate', 'organizers', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'dateAdded'];
-                $startDate = strtotime($request->request->get('startDate'));
-                $endDate = strtotime($request->request->get('endDate'));
+        return $form;
+    }
 
-                // Add the headline first
-                $this->getHeadline($arrFields);
+    private function buildRecords(Request $request): array
+    {
+        $records = [];
 
-                $statement1 = $this->connection->executeQuery('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate', [$startDate, $endDate]);
+        $eventType = $request->request->get('event-type');
+        $fields = ['id', 'eventId', 'eventName', 'startDate', 'endDate', 'organizers', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'dateAdded'];
+        $tstampStart = strtotime($request->request->get('startDate'));
+        $tstampEnd = strtotime($request->request->get('endDate'));
 
-                while (false !== ($arrEvent = $statement1->fetchAssociative())) {
-                    if ('all' !== $eventType) {
-                        if ($arrEvent['eventType'] !== $eventType) {
-                            continue;
-                        }
-                    }
+        // Add the headline first
+        $records[] = $this->buildHeadline($fields);
 
-                    if ($request->request->get('mountainguide')) {
-                        if (EventMountainGuide::NO_MOUNTAIN_GUIDE === $arrEvent['mountainguide']) {
-                            continue;
-                        }
-                    }
+        $events = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events WHERE startDate >= ? AND startDate <= ? ORDER BY startDate', [$tstampStart, $tstampEnd]);
 
-                    $statement2 = $this->connection->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname', [$arrEvent['id']]);
-
-                    while (false !== ($arrEventMember = $statement2->fetchAssociative())) {
-                        $this->addLine($arrFields, $arrEventMember);
-                    }
+        foreach ($events as $event) {
+            if ('all' !== $eventType) {
+                if ($event['eventType'] !== $eventType) {
+                    continue;
                 }
+            }
 
-                return $this->printCsv(\sprintf('Event-Member-Export_%s.csv', date('Y-m-d')));
+            if ($request->request->get('mountainguide')) {
+                if (EventMountainGuide::NO_MOUNTAIN_GUIDE === $event['mountainguide']) {
+                    continue;
+                }
+            }
+
+            $members = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events_member WHERE eventId = ? ORDER BY lastname', [$event['id']]);
+
+            foreach ($members as $member) {
+                $records[] = $this->buildRecord($fields, $member);
             }
         }
 
-        return $objForm;
+        return $records;
     }
 
-    private function addLine(array $arrFields, array $arrEventMember): void
+    private function buildRecord(array $fields, array $arrEventMember): array
     {
         $arrLine = [];
 
-        foreach ($arrFields as $field) {
+        foreach ($fields as $field) {
             $arrLine[] = $this->getField($field, $arrEventMember);
         }
 
-        $this->arrLines[] = $arrLine;
+        return $arrLine;
     }
 
-    private function getHeadline(array $arrFields): void
+    private function buildHeadline(array $fields): array
     {
-        // Write headline
-        $controller = $this->framework->getAdapter(Controller::class);
         $arrHeadline = [];
 
-        foreach ($arrFields as $field) {
+        foreach ($fields as $field) {
             switch ($field) {
                 case 'mainInstructor':
                 case 'mountainguide':
@@ -169,44 +168,45 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                 case 'eventState':
                 case 'executionState':
                 case 'organizers':
-                    $controller->loadLanguageFile('tl_calendar_events');
+                    $this->getContaoAdapter(Controller::class)->loadLanguageFile('tl_calendar_events');
                     $arrHeadline[] = $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?? $field;
                     break;
                 case 'phone':
-                    $controller->loadLanguageFile('tl_member');
+                    $this->getContaoAdapter(Controller::class)->loadLanguageFile('tl_member');
                     $arrHeadline[] = $GLOBALS['TL_LANG']['tl_member'][$field][0] ?? $field;
                     break;
 
                 default:
-                    $controller->loadLanguageFile('tl_calendar_events_member');
+                    $this->getContaoAdapter(Controller::class)->loadLanguageFile('tl_calendar_events_member');
                     $arrHeadline[] = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0] ?? $field;
                     break;
             }
         }
-        $this->arrLines[] = $arrHeadline;
+
+        return $arrHeadline;
     }
 
     private function getField(string $field, array $arrEventMember): string
     {
-        $date = $this->framework->getAdapter(Date::class);
-        $config = $this->framework->getAdapter(Config::class);
-        $controller = $this->framework->getAdapter(Controller::class);
-        $calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
-        $memberModel = $this->framework->getAdapter(MemberModel::class);
+        $date = $this->getContaoAdapter(Date::class);
+        $calendarEventsModel = $this->getContaoAdapter(CalendarEventsModel::class);
 
         $value = '';
 
         switch ($field) {
             case 'password':
                 $value = '#######';
+
                 break;
             case 'dateAdded':
                 $value = $date->parse('Y-m-d', $arrEventMember['dateAdded']);
+
                 break;
             case 'dateOfBirth':
                 if (is_numeric($arrEventMember[$field])) {
-                    $value = $date->parse($config->get('dateFormat'), $arrEventMember[$field]);
+                    $value = $date->parse($this->getContaoAdapter(Config::class)->get('dateFormat'), $arrEventMember[$field]);
                 }
+
                 break;
             case 'organizers':
                 $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
@@ -214,32 +214,37 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                 if (null !== $objEvent) {
                     $arrOrganizer = $this->calendarEventsUtil->getEventOrganizersAsArray($objEvent, 'title');
                     $value = implode(', ', $arrOrganizer);
-                } break;
+                }
+                break;
             case 'stateOfSubscription':
                 $value = $GLOBALS['TL_LANG']['MSC'][$arrEventMember[$field]] ?? $arrEventMember[$field];
+
                 break;
             case 'startDate':
                 $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
 
                 if (null !== $objEvent) {
                     $value = $date->parse('Y-m-d', $objEvent->startDate);
-                    $value = $date->parse('Y-m-d', $objEvent->startDate);
-                } break;
+                }
+
+                break;
             case 'endDate':
                 $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
 
                 if (null !== $objEvent) {
                     $value = $date->parse('Y-m-d', $objEvent->endDate);
                 }
+
                 break;
             case 'executionState':
             case 'eventState':
-                $controller->loadLanguageFile('tl_calendar_events');
+                $this->getContaoAdapter(Controller::class)->loadLanguageFile('tl_calendar_events');
                 $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
 
                 if (null !== $objEvent) {
                     $value = $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] ?? $objEvent->$field;
                 }
+
                 break;
             case 'mainInstructor':
                 $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
@@ -247,6 +252,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                 if (null !== $objEvent) {
                     $value = $this->calendarEventsUtil->getMainInstructorName($objEvent);
                 }
+
                 break;
             case 'mountainguide':
                 $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
@@ -254,9 +260,10 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                 if (null !== $objEvent) {
                     $value = $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][$objEvent->$field];
                 }
+
                 break;
             case 'phone':
-                $objMember = $memberModel->findOneBySacMemberId($arrEventMember['sacMemberId']);
+                $objMember = $this->getContaoAdapter(MemberModel::class)->findOneBySacMemberId($arrEventMember['sacMemberId']);
 
                 if (null !== $objMember) {
                     $value = $objMember->$field;
@@ -265,24 +272,23 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
             default:
                 $value = $arrEventMember[$field];
+
                 break;
         }
 
         return (string) $value;
     }
 
-    private function printCsv(string $filename): StreamedResponse
+    private function getStream(array $records, string $filename): StreamedResponse
     {
-        $arrData = $this->arrLines;
-
-        // Convert special chars
         $arrFinal = [];
 
-        foreach ($arrData as $arrRow) {
+        foreach ($records as $row) {
             $arrLine = array_map(
-                static fn ($v) => html_entity_decode(htmlspecialchars_decode((string) $v)),
-                $arrRow,
+                static fn ($v) => \is_string($v) ? StringUtil::revertInputEncoding($v) : $v,
+                $row,
             );
+
             $arrFinal[] = $arrLine;
         }
 
