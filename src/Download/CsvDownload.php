@@ -35,6 +35,10 @@ class CsvDownload
 
     public const string ENCODING_ISO_8859_1 = 'ISO-8859-1'; // Latin
 
+    private const int FLUSH_THRESHOLD = 1024;
+
+    private string $outputEncoding = self::ENCODING_UTF8;
+
     private array $headline = [];
 
     private array $records = [];
@@ -42,7 +46,6 @@ class CsvDownload
     private Writer $writer;
 
     private array $headers = [
-        'Content-Type' => 'application/vnd.ms-excel',
         'Cache-Control' => 'max-age=0',
     ];
 
@@ -52,6 +55,18 @@ class CsvDownload
         $this->writer->setEndOfLine($endOfLine);
         $this->writer->setEnclosure($enclosure);
         $this->writer->setDelimiter($delimiter);
+    }
+
+    public function getOutputEncoding(): string
+    {
+        return $this->outputEncoding;
+    }
+
+    public function setOutputEncoding(string $outputEncoding): self
+    {
+        $this->outputEncoding = $outputEncoding;
+
+        return $this;
     }
 
     public function setHeadline(array $headline): self
@@ -122,6 +137,8 @@ class CsvDownload
             ->outputEncoding($outputEncoding)
         ;
 
+        $this->setOutputEncoding($outputEncoding);
+
         $this->writer->addFormatter($encoder);
 
         return $this;
@@ -138,25 +155,28 @@ class CsvDownload
     {
         $this->writer->insertAll($this->getRecords(true));
 
-        $response = new StreamedResponse(
-            fn () => $this->outputCsvContent($filename),
-            $status,
-            $headers,
-        );
-
+        $response = new StreamedResponse();
         $this->configureResponseHeaders($response, $filename, $headers);
+        $response->setCallback($this->createContentCallback());
 
-        return $response;
+        return $response->send();
     }
 
-    private function outputCsvContent(string $filename): void
+    private function createContentCallback(): callable
     {
-        $this->writer->download($filename);
+        return function (): void {
+            foreach ($this->writer->chunk(self::FLUSH_THRESHOLD) as $offset => $chunk) {
+                echo $chunk;
+                if (0 === $offset % self::FLUSH_THRESHOLD) {
+                    flush();
+                }
+            }
+        };
     }
 
     private function createWriter(): void
     {
-        $this->writer = Writer::createFromString();
+        $this->writer = Writer::from('php://temp', 'r+');
     }
 
     private function isValidOutputEncoding(string $encoding): bool
@@ -174,6 +194,10 @@ class CsvDownload
         foreach ($this->headers as $key => $value) {
             $response->headers->set($key, $value);
         }
+
+        // Set the content type
+        $contentType = "text/csv; charset=$this->outputEncoding";
+        $response->headers->set('Content-Type', $contentType);
 
         $response->headers->set('Content-Disposition', $disposition);
 
