@@ -44,6 +44,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['fields'] = ['startD
 
 // Subpalettes
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['allowDeregistration'] = 'deregistrationLimit';
+$GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addImage'] = 'singleSRC';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addGallery'] = 'multiSRC';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['setRegistrationPeriod'] = 'registrationStartDate,registrationEndDate';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addMinAndMaxMembers'] = 'minMembers,maxMembers';
@@ -69,6 +70,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour_report'] = $strLegend
 // Define selectors
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'allowDeregistration';
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addMinAndMaxMembers';
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addImage';
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addGallery';
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addIban';
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'setRegistrationPeriod';
