@@ -787,7 +787,8 @@ readonly class CalendarEventsUtil
         $this->framework->initialize();
 
         $arrData['type'] = 'gallery';
-        $arrData['tstamp'] = 0;
+        $arrData['invisible'] = false;
+        $arrData['tstamp'] = 1; // Must be set otherwise the gallery will be treated as a hidden content element
 
         if (empty($arrData['perRow'])) {
             $arrData['perRow'] = 4;
