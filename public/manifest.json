@@ -1,13 +1,13 @@
 {
   "backend.js": "/bundles/markocupicsaceventtool/backend.7b7beab4.js",
   "js/avatar_uploader.js": "/bundles/markocupicsaceventtool/js/avatar_uploader.5fa3ef58.js",
-  "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.fee78a64.css",
+  "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.062f270e.css",
   "images/events/course/booklet/fallback.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/fallback.jpg",
   "images/events/course/booklet/toc.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/toc.jpg",
   "images/events/course/booklet/logo_sac.png": "/bundles/markocupicsaceventtool/images/events/course/booklet/logo_sac.png",
   "images/events/course/booklet/cover.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/cover.jpg",
   "images/events/course/fallback_image.svg": "/bundles/markocupicsaceventtool/images/events/course/fallback_image.svg",
-  "vue/dist/vue.global.prod.js": "/bundles/markocupicsaceventtool/vue/dist/vue.global.prod.e76375c8.js",
+  "vue/dist/vue.global.prod.js": "/bundles/markocupicsaceventtool/vue/dist/vue.global.prod.9a83b0ef.js",
   "dexie/dist/dexie.js": "/bundles/markocupicsaceventtool/dexie/dist/dexie.7f999133.js",
   "choices.js/scripts/choices.min.js": "/bundles/markocupicsaceventtool/choices.js/scripts/choices.min.ed0a2e71.js",
   "icons/tour_booklet/oev-tour-badge.png": "/bundles/markocupicsaceventtool/icons/tour_booklet/oev-tour-badge.png",
@@ -77,5 +77,5 @@
   "../assets/ts/avatar_uploader.d.ts": "/bundles/markocupicsaceventtool/../assets/ts/avatar_uploader.d.ts",
   "backend.7b7beab4.js.map": "/bundles/markocupicsaceventtool/backend.7b7beab4.js.map",
   "avatar_uploader.5fa3ef58.js.map": "/bundles/markocupicsaceventtool/js/avatar_uploader.5fa3ef58.js.map",
-  "be_stylesheet.fee78a64.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.fee78a64.css.map"
+  "be_stylesheet.062f270e.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.062f270e.css.map"
 }
