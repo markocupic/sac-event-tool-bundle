@@ -3,7 +3,7 @@
         {% if addImage|default %}
             <!-- indexer::stop -->
             {% if jumpTo|default %}
-                <a href="{{ insert_tag('link_url::' ~ jumpTo) }}?username={{ username }}" title="{{ lastname ~ ' ' ~ firstname|trim }}">
+                <a href="{{ insert_tag('link_url::'~jumpTo) }}?username={{ username }}" title="{{ lastname~' '~firstname|trim }}">
             {% endif %}
             {{ contao_figure(singleSRC, imgSize, {
                 metadata: { alt: lastname~' '~firstname },
@@ -17,16 +17,16 @@
     </div>
     <div class="d-block content-user-portrait-list--user-detail-box">
         <div class="content-user-portrait-list--user-detail-box-name">
-            <strong>{{ lastname ~ ' ' ~ firstname }}</strong>
+            <strong>{{ lastname~' '~firstname }}</strong>
         </div>
         {% if has_logged_in_frontend_user() %}
             <div class="d-block content-user-portrait-list--user-detail-box-email small">
-                {% if email|default %}{{ insert_tag('email_open::'~email)|raw }}{{ email }}</a>{% endif %}
+                {% if email|default %}{{ insert_tag('email_open::'~email)|raw }}{{ insert_tag('email::'~email)|raw }}</a>{% endif %}
             </div>
         {% else %}
             {% if email|default and 'email' in showFieldsToGuests %}
                 <div class="d-block content-user-portrait-list--user-detail-box-email small">
-                    {% if email|default %}{{ insert_tag('email_open::'~email)|raw }}{{ email }}</a>{% endif %}
+                    {% if email|default %}{{ insert_tag('email_open::'~email)|raw }}{{ insert_tag('email::'~email)|raw }}</a>{% endif %}
                 </div>
             {% endif %}
         {% endif %}
