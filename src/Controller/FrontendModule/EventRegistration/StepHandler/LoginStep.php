@@ -68,8 +68,8 @@ class LoginStep implements StepHandlerInterface, ValidationStepInterface
     public function prepareStep(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): array
     {
         return [
-            'eventModel' => $eventModel,
-            'moduleModel' => $moduleModel,
+            'event_model' => $eventModel->current(),
+            'module_model' => $moduleModel->current(),
         ];
     }
 }

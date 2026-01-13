@@ -1,10 +1,10 @@
 {% trans_default_domain 'contao_default' %}
 
-{% set alert_type = event_member_model.stateOfSubscription == 'subscription-accepted' ? 'alert-success' : 'alert-info' %}
+{% set alert_type = event_registration_data.stateOfSubscription == 'subscription-accepted' ? 'alert-success' : 'alert-info' %}
 {% set message %}
-    Du bist für "{{ event_model.title }}" registriert.
+    Du bist für "{{ event_data.title }}" registriert.
     <br>
-    Status: {{ event_member_model.stateOfSubscriptionTrans }}
+    Status: {{ event_registration_data.stateOfSubscriptionTrans }}
 {% endset %}
 {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: alert_type, add_icon: true, icon_class: 'fa-solid fa-check-circle', text: message } %}
 
@@ -12,52 +12,52 @@
     <tr>
         <td class="fw-bold">Event</td>
         <td>
-            <p><a href="{{ event_model.eventUrl }}" title="zum Event">"{{ event_model.title }}"</a></p>
-            <p>Event-Datum: {{ event_model.startDate|date("d.m.Y") }}</p>
-            <p><a href="{{ path('sac_event_tool_download_event_ical', {'eventId': event_model.id}) }}"><span class="badge bg-primary"><i class="fa-regular fa-calendar-plus"></i> ICal</span></a></p>
+            <p><a href="{{ event_data.eventUrl }}" title="zum Event">"{{ event_data.title }}"</a></p>
+            <p>Event-Datum: {{ event_data.startDate|date("d.m.Y") }}</p>
+            <p><a href="{{ path('sac_event_tool_download_event_ical', {'eventId': event_data.id}) }}"><span class="badge bg-primary"><i class="fa-regular fa-calendar-plus"></i> ICal</span></a></p>
         </td>
     </tr>
     <tr>
         <td class="fw-bold">Name</td>
-        <td>{{ event_member_model.firstname }} {{ event_member_model.lastname }}</td>
+        <td>{{ event_registration_data.firstname }} {{ event_registration_data.lastname }}</td>
     </tr>
     <tr>
         <td class="fw-bold">Mitglieder-Nr.</td>
-        <td>{{ event_member_model.sacMemberId }}</td>
+        <td>{{ event_registration_data.sacMemberId }}</td>
     </tr>
     <tr>
         <td class="fw-bold">Strasse</td>
-        <td>{{ event_member_model.street }}</td>
+        <td>{{ event_registration_data.street }}</td>
     </tr>
     <tr>
         <td class="fw-bold">PLZ/Ort</td>
-        <td>{{ event_member_model.postal }} {{ event_member_model.city }}</td>
+        <td>{{ event_registration_data.postal }} {{ event_registration_data.city }}</td>
     </tr>
     <tr>
         <td class="fw-bold">E-Mail-Adresse</td>
-        <td>{{ event_member_model.email }}</td>
+        <td>{{ event_registration_data.email }}</td>
     </tr>
     <tr>
         <td class="fw-bold">Telefonnummer Festnetz</td>
-        <td>{{ event_member_model.phone }}</td>
+        <td>{{ event_registration_data.phone }}</td>
     </tr>
     <tr>
         <td class="fw-bold">Telefonnummer Mobile</td>
-        <td>{{ event_member_model.mobile }}</td>
+        <td>{{ event_registration_data.mobile }}</td>
     </tr>
     <tr>
         <td class="fw-bold">Registriert am</td>
-        <td>{{ event_member_model.dateAdded|date("d.m.Y H:m") }}</td>
+        <td>{{ event_registration_data.dateAdded|date("d.m.Y H:m") }}</td>
     </tr>
     <tr>
         <td class="fw-bold">Bemerkungen</td>
-        <td>{{ event_member_model.notes|nl2br }}</td>
+        <td>{{ event_registration_data.notes|nl2br }}</td>
     </tr>
     <tr>
         <td class="fw-bold">Notfallangaben</td>
-        <td>{{ event_member_model.emergencyPhoneName }}, {{ event_member_model.emergencyPhone }}</td>
+        <td>{{ event_registration_data.emergencyPhoneName }}, {{ event_registration_data.emergencyPhone }}</td>
     </tr>
-    {% if event_model.addIban %}
+    {% if event_data.addIban %}
         <tr>
             <td class="fw-bold">Bezahlung/Vorauskasse</td>
             <td>
@@ -65,12 +65,12 @@
                 <p>
                     <span class="fw-bold">IBAN:</span>
                     <br>
-                    {{ event_model.iban }}
+                    {{ event_data.iban }}
                     <br>
                     <br>
                     <span class="fw-bold">Begünstigter:</span>
                     <br>
-                    {{ event_model.ibanBeneficiary|nl2br }}
+                    {{ event_data.ibanBeneficiary|nl2br }}
                 </p>
                 <p>Details dazu erhältst du per E-Mail nach dem Absenden des Anmeldeformulars.</p>
             </td>

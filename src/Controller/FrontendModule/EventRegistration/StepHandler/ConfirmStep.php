@@ -88,12 +88,9 @@ class ConfirmStep implements StepHandlerInterface
         $arrEventsMember = $registrationModel->row();
         $arrEventsMember['stateOfSubscriptionTrans'] = $this->translator->trans('MSC.'.$arrEventsMember['stateOfSubscription'], [], 'contao_default');
 
-        $arrMember = $memberModel->row();
-
         return [
-            'event_model' => $arrEvent,
-            'event_member_model' => $arrEventsMember,
-            'member_model' => $arrMember,
+            'event_data' => $arrEvent,
+            'event_registration_data' => $arrEventsMember,
         ];
     }
 }
