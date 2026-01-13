@@ -169,7 +169,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             $lock->release();
         }
 
-        $template['eventModel'] = $eventModel;
+        $template['event_model'] = $eventModel->current();
 
         return $template;
     }
@@ -268,7 +268,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         $objForm->addFormField('notes', $this->getFormFieldConfig('notes'));
 
         // Do only ask for food habits if we have a multi-day event.
-        if ($this->hasMultiDaySpan($eventModel)) {
+        if ($this->hasMultiDaySpan($eventModel) || 'generalEvent' === $eventModel->eventType) {
             $objForm->addFormField('foodHabits', $this->getFormFieldConfig('foodHabits'));
         }
 

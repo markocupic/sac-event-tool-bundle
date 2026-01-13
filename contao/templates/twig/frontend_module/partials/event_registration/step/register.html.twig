@@ -1,6 +1,6 @@
 {% trans_default_domain 'contao_default' %}
-<h4 class="content-headline text-danger mt-0 mb-0">Anmelden für {{ ('MSC.'~eventModel.eventType~'_short')|trans }}:</h4>
-<h2 class="content-headline mt-0 mb-4 text-black">{{ eventModel.title }}</h2>
+<h4 class="content-headline text-danger mt-0 mb-0">Anmelden für {{ ('MSC.'~event_model.eventType~'_short')|trans }}:</h4>
+<h2 class="content-headline mt-0 mb-4 text-black">{{ event_model.title }}</h2>
 
 {% if errorMessage|default %}
     {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-danger', add_icon: true, icon_class: 'fa-solid fa-exclamation-circle', text: errorMessage} %}
@@ -10,19 +10,19 @@
     {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: infoMessage} %}
 {% endif %}
 
-{% if eventModel.addIban %}
+{% if event_model.addIban %}
     {% set iban_info %}
         {{ 'FORM.evt_reg_ibanText'|trans }}
         <br>
         <br>
         IBAN:
         <br>
-        {{ eventModel.iban }}
+        {{ event_model.iban }}
         <br>
         <br>
         {{ 'FORM.evt_reg_ibanBeneficiary'|trans }}:
         <br>
-        {{ eventModel.ibanBeneficiary|nl2br }}
+        {{ event_model.ibanBeneficiary|nl2br }}
     {% endset %}
     {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-info', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: iban_info} %}
 {% endif %}
@@ -78,7 +78,7 @@
                                 </div>
                             {% endif %}
 
-                            {% if eventModel.bookingEvent is not empty %}
+                            {% if event_model.bookingEvent is not empty %}
                                 {% set user = get_logged_in_frontend_user() %}
                                 {% set salutation = user.gender == 'female' ? 'Liebe' : 'Lieber' %}
                                 <div class="mt-4">
@@ -86,7 +86,7 @@
                                     <div class="border border-lighter p-3">
                                         <div class="booking-text event-detail event-info-box icon-box-small">
                                             <h5 class="mt-0 pt-0">Anmeldung</h5>
-                                            {{ eventModel.bookingEvent|nl2br }}
+                                            {{ event_model.bookingEvent|nl2br }}
                                         </div>
                                     </div>
                                     <div class="fst-italic mt-4 highlight-warning-ff-notes p-3">
@@ -196,7 +196,7 @@
         {# AGB Modal #}
         {{ render(controller(
             'Markocupic\\SacEventToolBundle\\Controller\\Agb\\CourseAndTourRegulationsModalController::getModal',
-            { 'event': eventModel }
+            { 'event': event_model }
         )) }}
         {# End AGB Modal #}
 
