@@ -109,13 +109,19 @@ readonly class EventMember
                         $emergencyPhoneName = $objMember->emergencyPhoneName;
                     }
 
+                    $remarks = [];
+
+                    if (null !== $objMember && !empty($objMember->foodHabits)) {
+                        $remarks[] = 'Essgewohnheiten: '.$objMember->foodHabits;
+                    }
+
                     $objPhpWord->addToClone('i', 'emergencyPhone', $this->prepareString((string) $emergencyPhone), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'emergencyPhoneName', $this->prepareString((string) $emergencyPhoneName), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'phone', $this->prepareString($strPhone), ['multiline' => true]);
                     $objPhpWord->addToClone('i', 'email', $this->prepareString($objUserModel->email), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'transportInfo', $this->prepareString($transportInfo), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'dateOfBirth', '' !== $objUserModel->dateOfBirth ? $dateAdapter->parse('Y', $objUserModel->dateOfBirth) : '', ['multiline' => false]);
-                    $objPhpWord->addToClone('i', 'remarks', '', ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'remarks', implode("\r\n\r\n", array_filter($remarks)), ['multiline' => false]);
                 }
             }
         }
