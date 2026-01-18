@@ -652,7 +652,7 @@ readonly class CalendarEventsUtil
         }
 
         if ('' !== $objUser->email) {
-            $arrContact[] = \sprintf('E-Mail: %s', $objUser->email);
+            $arrContact[] = \sprintf('E-Mail: %s', StringUtil::specialcharsUrl(StringUtil::encodeEmail($objUser->email)));
         }
 
         $arrContact = array_filter($arrContact);
