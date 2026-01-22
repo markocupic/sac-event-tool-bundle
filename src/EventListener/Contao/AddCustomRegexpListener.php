@@ -141,7 +141,7 @@ readonly class AddCustomRegexpListener
         }
 
         // Valid values are 0 or 123.45 or 12345. Invalid values are 123.4 123.456789 or -123.45.
-        if (1 === preg_match('/^(?:0|[1-9]\d*)(?:\.\d{2})?$/', $varValue)) {
+        if (1 === preg_match('/^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/', $varValue)) {
             return true;
         }
 
