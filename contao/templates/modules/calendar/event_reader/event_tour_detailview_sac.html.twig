@@ -105,18 +105,21 @@
                         <p class="pb-1">{{ get_event_data(model, 'leistungen')|nl2br }}</p>
                     {% endif %}
 
-                    <p>
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">
-                            Kurs- und Tourenreglement (Auszug)
-                        </a>
-                    </p>
-
-                    {# AGB Modal #}
-                    {{ render(controller(
-                        'Markocupic\\SacEventToolBundle\\Controller\\Agb\\CourseAndTourRegulationsModalController::getModal',
-                        { 'event': model }
-                    )) }}
-                    {# End AGB Modal #}
+                    {% if get_event_data(model, 'mountainguide') == constant('Markocupic\\SacEventToolBundle\\Config\\EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER') %}
+                        <p>
+                            <a href="https://sbv-asgm.ch/wp-content/uploads/2025_11_12-AVB_de-1.pdf" target="_blank">AVB des Schweizer Bergführerverbandes</a>
+                        </p>
+                    {% else %}
+                        <p>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">Kurs- und Tourenreglement (Auszug)</a>
+                        </p>
+                        {# AGB Modal #}
+                        {{ render(controller(
+                            'Markocupic\\SacEventToolBundle\\Controller\\Agb\\CourseAndTourRegulationsModalController::getModal',
+                            { 'event': model }
+                        )) }}
+                        {# End AGB Modal #}
+                    {% endif %}
                 </div>
 
             </div>
@@ -200,7 +203,7 @@
                         {% else %}
                             <p>Keine Online-Abmeldung</p>
                         {% endif %}
-                        <p><small>Es können ggf. Stornierungsgebühren anfallen (siehe <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">Kurs- und Tourenreglement</a>).</small></p>
+                        <p><small>Es können ggf. Stornierungsgebühren anfallen (siehe Leistungen/Preis).</small></p>
                     </div>
                 {% endif %}
             </div>

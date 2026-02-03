@@ -20,6 +20,7 @@ use Doctrine\DBAL\Connection;
 use Markocupic\ContaoFrontendUserNotification\Notification\DefaultFrontendUserNotification;
 use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\CarSeatInfo;
+use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
@@ -272,7 +273,13 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             $objForm->addFormField('foodHabits', $this->getFormFieldConfig('foodHabits'));
         }
 
-        $objForm->addFormField('agb', $this->getFormFieldConfig('agb'));
+        // Agb and avbSbv
+        if (EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER === $eventModel->mountainguide) {
+            $objForm->addFormField('avbSbv', $this->getFormFieldConfig('avbSbv'));
+        } else {
+            $objForm->addFormField('agb', $this->getFormFieldConfig('agb'));
+        }
+
         $objForm->addFormField('hasAcceptedPrivacyRules', $this->getFormFieldConfig('hasAcceptedPrivacyRules'));
 
         $objForm->addFormField('submit', $this->getFormFieldConfig('submit'));
@@ -298,9 +305,9 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         // validate() also checks whether the form has been submitted.
         if ($objForm->validate()) {
             // Save data to tl_calendar_events_member
-            $arrDataForm = $objForm->fetchAll();
+            $arrFormData = $objForm->fetchAll();
 
-            $registrationModel = $this->createNewEventRegistration($eventModel, $memberModel, $arrDataForm);
+            $registrationModel = $this->createNewEventRegistration($eventModel, $memberModel, $arrFormData);
 
             // Contao system log
             $strText = \sprintf(
@@ -381,6 +388,11 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             ],
             'agb' => [
                 'label' => ['', $this->translator->trans('FORM.evt_reg_agb', [], 'contao_default')],
+                'inputType' => 'checkbox',
+                'eval' => ['mandatory' => true],
+            ],
+            'avbSbv' => [
+                'label' => ['', $this->translator->trans('FORM.evt_reg_avbSbv', [], 'contao_default')],
                 'inputType' => 'checkbox',
                 'eval' => ['mandatory' => true],
             ],

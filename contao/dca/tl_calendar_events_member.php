@@ -123,7 +123,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		{emergency_phone_legend},emergencyPhone,emergencyPhoneName;
 		{stateOfParticipation_legend},hasParticipated;
 		{deregistration_legend},deregistrationCause;
-		{agb_legend},agb,hasAcceptedPrivacyRules
+		{agb_legend},agb,avbSbv,hasAcceptedPrivacyRules
 		',
 	],
 	'subpalettes' => [
@@ -301,6 +301,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sql'       => "varchar(11) NOT NULL default ''",
 		],
 		'agb'                         => [
+			'inputType' => 'checkbox',
+			'exclude'   => true,
+			'eval'      => ['doNotShow' => false, 'doNotCopy' => true],
+			'sql'       => ['type' => 'boolean', 'default' => false],
+		],
+		'avbSbv'                         => [
 			'inputType' => 'checkbox',
 			'exclude'   => true,
 			'eval'      => ['doNotShow' => false, 'doNotCopy' => true],
