@@ -251,38 +251,38 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
 
         if (null !== ($objJourney = $this->framework->getAdapter(CalendarEventsJourneyModel::class)->findById($eventModel->journey))) {
             if ('public-transport' === $objJourney->alias) {
-                $objForm->addFormField('ticketInfo', $this->getFormFieldConfig('ticketInfo'));
+                $objForm->addFormField('ticketInfo', $this->getFormFieldConfig('ticketInfo', $eventModel));
             }
 
             if ('car' === $objJourney->alias) {
-                $objForm->addFormField('carInfo', $this->getFormFieldConfig('carInfo'));
+                $objForm->addFormField('carInfo', $this->getFormFieldConfig('carInfo', $eventModel));
             }
         }
 
         if ($eventModel->askForAhvNumber) {
-            $objForm->addFormField('ahvNumber', $this->getFormFieldConfig('ahvNumber'));
+            $objForm->addFormField('ahvNumber', $this->getFormFieldConfig('ahvNumber', $eventModel));
         }
 
-        $objForm->addFormField('mobile', $this->getFormFieldConfig('mobile'));
-        $objForm->addFormField('emergencyPhone', $this->getFormFieldConfig('emergencyPhone'));
-        $objForm->addFormField('emergencyPhoneName', $this->getFormFieldConfig('emergencyPhoneName'));
-        $objForm->addFormField('notes', $this->getFormFieldConfig('notes'));
+        $objForm->addFormField('mobile', $this->getFormFieldConfig('mobile', $eventModel));
+        $objForm->addFormField('emergencyPhone', $this->getFormFieldConfig('emergencyPhone', $eventModel));
+        $objForm->addFormField('emergencyPhoneName', $this->getFormFieldConfig('emergencyPhoneName', $eventModel));
+        $objForm->addFormField('notes', $this->getFormFieldConfig('notes', $eventModel));
 
         // Do only ask for food habits if we have a multi-day event.
         if ($this->hasMultiDaySpan($eventModel) || 'generalEvent' === $eventModel->eventType) {
-            $objForm->addFormField('foodHabits', $this->getFormFieldConfig('foodHabits'));
+            $objForm->addFormField('foodHabits', $this->getFormFieldConfig('foodHabits', $eventModel));
         }
 
         // Agb and avbSbv
         if (EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER === $eventModel->mountainguide) {
-            $objForm->addFormField('avbSbv', $this->getFormFieldConfig('avbSbv'));
+            $objForm->addFormField('avbSbv', $this->getFormFieldConfig('avbSbv', $eventModel));
         } else {
-            $objForm->addFormField('agb', $this->getFormFieldConfig('agb'));
+            $objForm->addFormField('agb', $this->getFormFieldConfig('agb', $eventModel));
         }
 
-        $objForm->addFormField('hasAcceptedPrivacyRules', $this->getFormFieldConfig('hasAcceptedPrivacyRules'));
+        $objForm->addFormField('hasAcceptedPrivacyRules', $this->getFormFieldConfig('hasAcceptedPrivacyRules', $eventModel));
 
-        $objForm->addFormField('submit', $this->getFormFieldConfig('submit'));
+        $objForm->addFormField('submit', $this->getFormFieldConfig('submit', $eventModel));
 
         // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields. DO NOT use this
         // method with generate() as the "form" template provides those fields by default.
@@ -340,7 +340,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         return $objForm;
     }
 
-    private function getFormFieldConfig(string $field): array
+    private function getFormFieldConfig(string $field, CalendarEventsModel $eventsModel): array
     {
         $formFields = [
             'ticketInfo' => [
@@ -392,7 +392,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
                 'eval' => ['mandatory' => true],
             ],
             'avbSbv' => [
-                'label' => ['', $this->translator->trans('FORM.evt_reg_avbSbv', [], 'contao_default')],
+                'label' => ['', $this->translator->trans('FORM.evt_reg_avbSbv', [$this->getAvbSvbUrl($eventsModel)], 'contao_default')],
                 'inputType' => 'checkbox',
                 'eval' => ['mandatory' => true],
             ],
@@ -539,5 +539,16 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         $flash = $session->getFlashBag();
 
         return $flash->get('contao.FE.'.$type)[0] ?? null;
+    }
+
+    private function getAvbSvbUrl(CalendarEventsModel $eventModel): string
+    {
+        $organizers = $this->calendarEventsUtil->getEventOrganizerModels($eventModel);
+
+        if (empty($organizers)) {
+            return '';
+        }
+
+        return $organizers[0]->avbSvbUrl;
     }
 }

@@ -313,6 +313,10 @@ readonly class CalendarEventsUtil
                 $value = $this->getEventOrganizerLogoPaths($objEvent, $allowDuplicate);
                 break;
 
+            case 'eventOrganizerModels':
+                $value = $this->getEventOrganizerModels($objEvent);
+                break;
+
             case 'eventOrganizers':
                 $value = implode('<br>', $this->getEventOrganizersAsArray($objEvent));
                 break;
@@ -1227,6 +1231,31 @@ readonly class CalendarEventsUtil
         }
 
         return $strRegistrationsBadges;
+    }
+
+    public function getEventOrganizerModels(CalendarEventsModel $objEvent): array
+    {
+        $this->framework->initialize();
+
+        $arrReturn = [];
+
+        $arrValues = StringUtil::deserialize($objEvent->organizers, true);
+
+        if (empty($arrValues)) {
+            return $arrReturn;
+        }
+
+        foreach ($arrValues as $id) {
+            $objModel = $this->getAdapter(EventOrganizerModel::class)->findById($id);
+
+            if (null === $objModel) {
+                continue;
+            }
+
+            $arrReturn[] = $objModel;
+        }
+
+        return $arrReturn;
     }
 
     public function getEventOrganizersAsArray(CalendarEventsModel $objEvent, string $field = 'title'): array

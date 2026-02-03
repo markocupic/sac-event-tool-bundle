@@ -39,9 +39,18 @@
                     {% if not get_event_data(event_model, 'leistungen') is empty %}
                         <p class="pb-1">{{ get_event_data(event_model, 'leistungen')|nl2br }}</p>
                     {% endif %}
-                    <p>
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">Kurs- und Tourenreglement (Auszug)</a>
-                    </p>
+                    {% if is_with_mountainguide_offer %}
+                        {# Fetch the AVB SVB url from the first event organizer #}
+                        {% set event_organizer_model = get_event_data(event_model, 'eventOrganizerModels') %}
+                        {% set avb_svb_url = event_organizer_model[0].avbSvbUrl ?? '' %}
+                        <p>
+                            <a href="{{ avb_svb_url }}" target="_blank">AVB des Schweizer Bergführerverbandes</a>
+                        </p>
+                    {% else %}
+                        <p>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">Kurs- und Tourenreglement (Auszug)</a>
+                        </p>
+                    {% endif %}
                 </div>
             {% endif %}
             {% if not get_event_data(event_model, 'disableOnlineRegistration') %}
@@ -52,7 +61,7 @@
                     {% else %}
                         <p>Keine Online-Abmeldung</p>
                     {% endif %}
-                    <p><small>Es können ggf. Stornierungsgebühren anfallen (siehe <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">Kurs- und Tourenreglement</a>).</small></p>
+                    <p><small>Es können ggf. Stornierungsgebühren anfallen (siehe Leistungen/Preis).</small></p>
                 </div>
             {% endif %}
             {# AGB Modal #}

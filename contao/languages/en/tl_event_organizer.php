@@ -44,6 +44,7 @@ $GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationExtract'] = ['Ausschnit
 $GLOBALS['TL_LANG']['tl_event_organizer']['courseRegulationExtract'] = ['Ausschnitt aus dem Kursreglement', 'Bitte schreiben Sie hier die wichtigsten Ausschnitte aus dem Kursreglement.'];
 $GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationSRC'] = ['Tourenreglement Datei', 'Bitte wählen Sie die Datei aus.'];
 $GLOBALS['TL_LANG']['tl_event_organizer']['courseRegulationSRC'] = ['Kursreglement Datei', 'Bitte wählen Sie die Datei aus.'];
+$GLOBALS['TL_LANG']['tl_event_organizer']['avbSvbUrl'] = ['URL zu den AVB des SVB (für Events mit Bergf.-Angebot)', 'Externe URL zu den AVB des SVB.'];
 $GLOBALS['TL_LANG']['tl_event_organizer']['annualProgramShowHeadline'] = ['Zeige die Headline', ''];
 $GLOBALS['TL_LANG']['tl_event_organizer']['annualProgramShowTeaser'] = ['Zeige den Teasertext', ''];
 $GLOBALS['TL_LANG']['tl_event_organizer']['annualProgramShowDetails'] = ['Zeige die Details', ''];

@@ -207,7 +207,7 @@ $GLOBALS['TL_LANG']['FORM']['evt_reg_emergencyPhoneName'] = 'Name und Bezug der 
 $GLOBALS['TL_LANG']['FORM']['evt_reg_notes'] = 'Anmerkungen / Erfahrungen / Referenztouren';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_foodHabits'] = 'Essgewohnheiten (Vegetarier/in, Laktoseintoleranz, etc.)';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_agb'] = 'Ich akzeptiere <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">das Kurs- und Tourenreglement.</a>*';
-$GLOBALS['TL_LANG']['FORM']['evt_reg_avbSbv'] = 'Ich akzeptiere die <a href="https://sbv-asgm.ch/wp-content/uploads/2025_11_12-AVB_de-1.pdf" target="_blank">AVB des Schweizer Bergführerverbandes</a> und bestätige, dass die Eventleitung meine Vertragspartnerin ist.*';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_avbSbv'] = 'Ich akzeptiere die <a href="%s" target="_blank">AVB des Schweizer Bergführerverbandes</a> und bestätige, dass die Eventleitung meine Vertragspartnerin ist.*';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_hasAcceptedPrivacyRules'] = 'Ich habe die <a href="#" data-bs-toggle="modal" data-bs-target="#hasAcceptedPrivacyRulesModal">Hinweise zum Datenschutz und zu meinen Persönlichkeitsrechten</a> zur Kenntnis genommen und bin damit einverstanden.*';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_submit'] = 'Definitv für Event anmelden';
 
