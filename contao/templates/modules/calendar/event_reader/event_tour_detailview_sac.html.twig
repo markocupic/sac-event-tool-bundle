@@ -107,7 +107,7 @@
 
                     {% if is_with_mountainguide_offer %}
                         {# Fetch the AVB SVB url from the first event organizer #}
-                        {% set event_organizer_model = get_event_data(event_model, 'eventOrganizerModels') %}
+                        {% set event_organizer_model = get_event_data(model, 'eventOrganizerModels') %}
                         {% set avb_svb_url = event_organizer_model[0].avbSvbUrl ?? '' %}
                         <p>
                             <a href="{{ avb_svb_url }}" target="_blank">AVB des Schweizer Bergführerverbandes</a>
