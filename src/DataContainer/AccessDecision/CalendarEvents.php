@@ -328,13 +328,14 @@ class CalendarEvents
                         }
 
                         $session = $this->requestStack->getSession()->get('CURRENT');
-                        $arrIDS = $session['IDS'];
+
+                        $arrIDS = $session['IDS'] ?? [];
 
                         if (empty($arrIDS) || !\is_array($arrIDS)) {
                             return;
                         }
 
-                        $arrFields = $session['tl_calendar_events'];
+                        $arrFields = $session['tl_calendar_events'] ?? [];
 
                         if (empty($arrFields) || !\is_array($arrFields)) {
                             return;
