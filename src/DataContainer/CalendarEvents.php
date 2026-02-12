@@ -46,6 +46,7 @@ use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\EventReleaseLevelUtil;
+use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\Exception\EventReleaseLevelTransitionException;
 use Markocupic\SacEventToolBundle\Download\CsvDownload;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
@@ -140,7 +141,7 @@ class CalendarEvents
 
     /**
      * Reduce filter fields for tour guides and course instructors and Adjust filters
-     * depending on event type.
+     * depending on the event type.
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 80)]
     public function adjustFilterSearchAndSortingBoard(DataContainer $dc): void
@@ -1362,18 +1363,28 @@ class CalendarEvents
         return $varValue;
     }
 
-    /**
-     * Publish or unpublish events if eventReleaseLevel has reached the
-     * highest/lowest level.
-     *
-     * @throws \Exception
-     */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventReleaseLevel.save', priority: 90)]
     public function saveCallbackEventReleaseLevel(int $targetEventReleaseLevelId, DataContainer $dc): int
     {
         $objEvent = CalendarEventsModel::findById($dc->id);
 
-        return $this->eventReleaseLevelUtil->publishOrUnpublishEventDependingOnEventReleaseLevel($objEvent, $targetEventReleaseLevelId);
+        if (null === $objEvent) {
+            return $targetEventReleaseLevelId;
+        }
+
+        try {
+            $this->eventReleaseLevelUtil->validateEventReleaseLevelTransition($objEvent, $targetEventReleaseLevelId);
+            $this->eventReleaseLevelUtil->shiftEventReleaseLevel($objEvent, EventReleaseLevelPolicyModel::findById($targetEventReleaseLevelId));
+
+            // Everything ok, return the new event release level id
+            return $targetEventReleaseLevelId;
+        } catch (EventReleaseLevelTransitionException $e) {
+            $this->message->add($this->translator->trans($e->getTranslatableText(), $e->getParams(), 'contao_default'), $e->getErrorLevel());
+        } catch (\Exception $e) {
+            throw $e;
+        }
+
+        return $objEvent->eventReleaseLevel;
     }
 
     /**

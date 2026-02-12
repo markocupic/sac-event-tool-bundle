@@ -25,11 +25,10 @@ use Contao\Image;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
-use Contao\Versions;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\EventReleaseLevelUtil;
-use Markocupic\SacEventToolBundle\Event\ChangeEventReleaseLevelEvent;
+use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\Exception\EventReleaseLevelTransitionException;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyPackageModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
@@ -383,13 +382,13 @@ class CalendarEvents
                         }
 
                         $session = $this->requestStack->getSession()->get('CURRENT');
-                        $arrIDS = $session['IDS'];
+                        $arrIDS = $session['IDS'] ?? [];
 
                         if (empty($arrIDS) || !\is_array($arrIDS)) {
                             return;
                         }
 
-                        $arrFields = $session['tl_calendar_events'];
+                        $arrFields = $session['tl_calendar_events'] ?? [];
 
                         if (empty($arrFields) || !\is_array($arrFields)) {
                             return;
@@ -472,14 +471,11 @@ class CalendarEvents
             throw new \RuntimeException(\sprintf('Could not find a valid event release level for event with ID %d.', $dc->id));
         }
 
-        $targetReleaseLevel = 'upgradeEventReleaseLevel' === $action ? $objReleaseLevelModel->level + 1 : $objReleaseLevelModel->level - 1;
+        $targetEventReleaseLevel = 'upgradeEventReleaseLevel' === $action ? $objReleaseLevelModel->level + 1 : $objReleaseLevelModel->level - 1;
 
-        if (false === EventReleaseLevelPolicyModel::levelExists($dc->id, $targetReleaseLevel)) {
+        if (false === EventReleaseLevelPolicyModel::levelExists($dc->id, $targetEventReleaseLevel)) {
             $this->controller->redirect($this->system->getReferer());
         }
-
-        $objReleaseLevelModelCurrent = EventReleaseLevelPolicyModel::findById($objEvent->eventReleaseLevel);
-        $titleCurrent = $objReleaseLevelModelCurrent ? $objReleaseLevelModelCurrent->title : 'not defined';
 
         if ('upgradeEventReleaseLevel' === $action) {
             $objReleaseLevelModelTarget = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
@@ -487,39 +483,17 @@ class CalendarEvents
             $objReleaseLevelModelTarget = EventReleaseLevelPolicyModel::findPrevLevel($objEvent->eventReleaseLevel);
         }
 
-        $titleTarget = $objReleaseLevelModelTarget ? $objReleaseLevelModelTarget->title : 'not defined';
-
         if (null === $objReleaseLevelModelTarget) {
             $this->controller->redirect($this->system->getReferer());
         }
 
-        // Publish or unpublish event
-        $objEvent->eventReleaseLevel = $this->eventReleaseLevelUtil->publishOrUnpublishEventDependingOnEventReleaseLevel($objEvent, $objReleaseLevelModelTarget->id);
-
-        if ($objEvent->isModified()) {
-            $objEvent->tstamp = time();
-            $objEvent->save();
-
-            // Dispatch ChangeEventReleaseLevelEvent event
-            $event = new ChangeEventReleaseLevelEvent($request, $objEvent, 'upgradeEventReleaseLevel' === $action ? 'up' : 'down');
-            $this->eventDispatcher->dispatch($event);
-
-            // Create new version
-            $objVersions = new Versions('tl_calendar_events', $objEvent->id);
-            $objVersions->initialize();
-            $objVersions->create();
-
-            // System log
-            $this->contaoGeneralLogger?->info(
-                \sprintf(
-                    'Event release level for event with ID %d ["%s"] has been %s from "%s" to "%s".',
-                    $objEvent->id,
-                    $objEvent->title,
-                    'upgradeEventReleaseLevel' === $action ? 'upgraded' : 'downgraded',
-                    $titleCurrent,
-                    $titleTarget,
-                ),
-            );
+        try {
+            $this->eventReleaseLevelUtil->validateEventReleaseLevelTransition($objEvent, $objReleaseLevelModelTarget->id);
+            $this->eventReleaseLevelUtil->shiftEventReleaseLevel($objEvent, $objReleaseLevelModelTarget, 'upgradeEventReleaseLevel' === $action ? 'up' : 'down');
+        } catch (EventReleaseLevelTransitionException $e) {
+            $this->message->add($this->translator->trans($e->getTranslatableText(), $e->getParams(), 'contao_default'), $e->getErrorLevel());
+        } catch (\Exception $e) {
+            throw $e;
         }
 
         $this->controller->redirect($this->system->getReferer());
