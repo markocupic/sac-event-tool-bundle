@@ -8,7 +8,10 @@ use Symplify\EasyCodingStandard\Config\ECSConfig;
 use Symplify\EasyCodingStandard\ValueObject\Option;
 
 return ECSConfig::configure()
-	->withSets([SetList::CONTAO])
+	->withSets([
+		SetList::CONTAO,
+		\Markocupic\EasyCodingStandard\Set\SetList::MARKOCUPIC,
+		])
 	->withPaths([
 		__DIR__ . '/../../src',
 	])

@@ -27,7 +27,7 @@
         "tecnickcom/tcpdf": "^6.4",
         "terminal42/notification_center": "^2.0",
         "contao/manager-plugin": "^2.12",
-        "contao/easy-coding-standard": "^6.13"
+        "markocupic/easy-coding-standard": "^13.0"
     },
     "config": {
         "allow-plugins": {
