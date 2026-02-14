@@ -150,8 +150,8 @@ class EventReleaseLevelUtil
                                 $objEvent->title,
                                 $objEvent->id,
                                 $targetEventReleaseModel->level,
-                                $this->date->parse($this->config->get('datimFormat'), $calendar->validTimePeriodStart),
-                                $this->date->parse($this->config->get('datimFormat'), $calendar->validTimePeriodStop),
+                                $this->date->parse($this->config->get('dateFormat'), $calendar->validTimePeriodStart),
+                                $this->date->parse($this->config->get('dateFormat'), $calendar->validTimePeriodStop),
                             ],
                         ];
 
