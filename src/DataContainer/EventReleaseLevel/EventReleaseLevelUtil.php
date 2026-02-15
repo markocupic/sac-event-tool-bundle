@@ -86,7 +86,7 @@ class EventReleaseLevelUtil
         $currentEventReleaseModel = EventReleaseLevelPolicyModel::findById($objEvent->eventReleaseLevel);
 
         if (null === $currentEventReleaseModel) {
-            throw new \Exception(sprintf('Could not find the current event release level for event "%s" (ID %d).',$objEvent->title,$objEvent->id));
+            throw new \Exception(\sprintf('Could not find the current event release level for event "%s" (ID %d).', $objEvent->title, $objEvent->id));
         }
 
         $targetEventReleaseModel = EventReleaseLevelPolicyModel::findById($targetEventReleaseLevelId);
