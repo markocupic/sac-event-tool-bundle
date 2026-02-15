@@ -18,6 +18,7 @@ use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Date;
+use Contao\Email;
 use Contao\Folder;
 use Contao\MemberModel;
 use Contao\Message;
@@ -91,7 +92,10 @@ readonly class ClearFrontendUserData
                     $registration['eventId'],
                 );
 
-                mail($adminEmail, $subject, $message);
+                $email = new Email();
+                $email->subject = $subject;
+                $email->text = $message;
+                $email->sendTo($adminEmail);
             }
 
             /*
