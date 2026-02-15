@@ -36,4 +36,6 @@ $GLOBALS['TL_LANG']['tl_calendar'][EventType::COURSE] = 'SAC-Kurskalender';
 $GLOBALS['TL_LANG']['tl_calendar'][EventType::TOUR] = 'SAC-Tourenkalender';
 
 // Operations
+$GLOBALS['TL_LANG']['tl_calendar']['copy'] = ['Kalender mit Events kopieren', 'Kalender ID %s mit Events kopieren'];
+$GLOBALS['TL_LANG']['tl_calendar']['copyWithoutChildRecords'] = ['Kalender ohne Events kopieren', 'Kalender ID %s ohne Events kopieren'];
 $GLOBALS['TL_LANG']['tl_calendar']['cut'] = ['Kalender verschieben', 'Event ID %s verschieben'];

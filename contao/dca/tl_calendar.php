@@ -17,6 +17,21 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Contao\DataContainer;
 
+$GLOBALS['TL_DCA']['tl_calendar']['list']['operations'] = [
+	'edit',
+	'children',
+	'copy'                => [
+		'href' => 'act=paste&mode=copy',
+		'icon' => 'copychildren.svg',
+	],
+	'copyWithoutChildRecords' => [
+		'href' => 'act=paste&mode=copy&children=0',
+		'icon' => 'copy.svg',
+	],
+	'delete',
+	'show',
+];
+
 // Table config
 $GLOBALS['TL_DCA']['tl_calendar']['config']['ptable'] = 'tl_calendar_container';
 
@@ -100,13 +115,13 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['enableEventStartDateValidation'] = 
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['validTimePeriodStart'] = [
 	'inputType' => 'text',
 	'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-	'sql'       => "varchar(10) COLLATE ascii_bin NOT NULL default ''"
+	'sql'       => "varchar(10) COLLATE ascii_bin NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['validTimePeriodStop'] = [
 	'inputType' => 'text',
 	'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-	'sql'       => "varchar(10) COLLATE ascii_bin NOT NULL default ''"
+	'sql'       => "varchar(10) COLLATE ascii_bin NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['enableMaxEventReleaseLevelProtection'] = [

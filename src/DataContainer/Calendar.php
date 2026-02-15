@@ -14,17 +14,54 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Codefog\HasteBundle\UrlParser;
+use Contao\Controller;
 use Contao\CoreBundle\DataContainer\DataContainerOperation;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\CoreBundle\Security\DataContainer\CreateAction;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class Calendar
+readonly class Calendar
 {
     public function __construct(
         private AuthorizationCheckerInterface $authorizationChecker,
+        private ContaoFramework $framework,
+        private RequestStack $requestStack,
+        private UrlParser $urlParser,
     ) {
+    }
+
+    #[AsCallback(table: 'tl_calendar', target: 'config.onload')]
+    public function copyCalendarWithoutChildRecords(): void
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        $sessionData = $request->getSession()->all();
+
+        if (!isset($sessionData['CLIPBOARD']['tl_calendar']['children'])) {
+            return;
+        }
+
+        $doCopyChildRecords = $sessionData['CLIPBOARD']['tl_calendar']['children'];
+
+        if ($request->query->has('children')) {
+            $url = $this->urlParser->removeQueryString(['children']);
+            $this->framework->getAdapter(Controller::class)->redirect($url);
+        }
+
+        if ('copy' !== $request->query->get('act')) {
+            return;
+        }
+
+        if ('0' !== $doCopyChildRecords) {
+            // This is the default case from Contao Core
+            return;
+        }
+
+        $GLOBALS['TL_DCA']['tl_calendar_events']['config']['doNotCopyRecords'] = true;
     }
 
     #[AsCallback(table: 'tl_calendar', target: 'list.sorting.child_record')]
@@ -34,11 +71,24 @@ class Calendar
     }
 
     /**
+     * Do not display the "copy" buttons if the user has not the permission to create
+     * new records.
+     */
+    #[AsCallback(table: 'tl_calendar', target: 'list.operations.copy.button')]
+    #[AsCallback(table: 'tl_calendar', target: 'list.operations.copyWithoutChildRecords.button')]
+    public function copyButtonCallback(DataContainerOperation $operation): void
+    {
+        if (!$this->authorizationChecker->isGranted(ContaoCorePermissions::DC_PREFIX.'tl_calendar', new CreateAction('tl_calendar', $operation->getRecord()))) {
+            $operation->disable();
+        }
+    }
+
+    /**
      * Do not display the "show" button if the user has not the permission to create
      * new records.
      */
     #[AsCallback(table: 'tl_calendar', target: 'list.operations.show.button')]
-    public function copyButtonCallback(DataContainerOperation $operation): void
+    public function showButtonCallback(DataContainerOperation $operation): void
     {
         if (!$this->authorizationChecker->isGranted(ContaoCorePermissions::DC_PREFIX.'tl_calendar', new CreateAction('tl_calendar', $operation->getRecord()))) {
             $operation->disable();
