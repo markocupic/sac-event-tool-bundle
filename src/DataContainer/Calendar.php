@@ -57,7 +57,7 @@ readonly class Calendar
         }
 
         if ('0' !== $doCopyChildRecords) {
-            // This is the default case from Contao Core
+            // This is the normal behavior in the Contao calendar extension
             return;
         }
 
