@@ -20,13 +20,13 @@ use Contao\DataContainer;
 $GLOBALS['TL_DCA']['tl_calendar']['list']['operations'] = [
 	'edit',
 	'children',
-	'copy'                => [
-		'href' => 'act=paste&mode=copy',
-		'icon' => 'copychildren.svg',
-	],
 	'copyWithoutChildRecords' => [
 		'href' => 'act=paste&mode=copy&children=0',
 		'icon' => 'copy.svg',
+	],
+	'copy'                    => [
+		'href' => 'act=paste&mode=copy',
+		'icon' => 'copychildren.svg',
 	],
 	'delete',
 	'show',
