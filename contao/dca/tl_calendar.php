@@ -28,6 +28,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['list']['operations'] = [
 		'href' => 'act=paste&mode=copy',
 		'icon' => 'copychildren.svg',
 	],
+	'cut',
 	'delete',
 	'show',
 ];
