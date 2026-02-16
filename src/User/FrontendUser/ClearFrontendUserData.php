@@ -93,6 +93,7 @@ readonly class ClearFrontendUserData
                 );
 
                 $email = new Email();
+                $email->from = $adminEmail;
                 $email->subject = $subject;
                 $email->text = $message;
                 $email->sendTo($adminEmail);
