@@ -1,0 +1,72 @@
+.text-input-tokenizer {
+	border: 0 !important;
+	padding: 0;
+}
+
+.text-input-tokenizer.submitting {
+	color: transparent !important;
+}
+
+.tokenizer {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	position: relative;
+	padding: 4px;
+	border: 1px solid #ccc;
+	background: var(--form-bg);
+}
+
+.tokenizer input {
+	border: none;
+	outline: none;
+	flex: 1;
+	min-width: 120px;
+	background-color: transparent !important;
+	padding-top: 0 !important;
+}
+
+.token {
+	background: #00618f;
+	border-radius: 4px;
+	padding: 4px 8px;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: white;
+	margin-right: 4px;
+	margin-bottom: 4px;
+}
+
+.token.invalid {
+	border-color: #e63946;
+	background: #e60a0a;
+}
+
+.token .remove {
+	color: #ffffff !important;
+	cursor: pointer;
+	font-weight: bold;
+	border-left: 1px solid white;
+	padding-left: 4px;
+}
+
+.suggest-box {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	width: 300px;
+	background: var(--content-bg);
+	border: 1px solid #ccc;
+	z-index: 1000;
+}
+
+.suggest-box div {
+	padding: 6px;
+	cursor: pointer;
+}
+
+.suggest-box div:hover {
+	background: #eee;
+	color: #000000;
+}

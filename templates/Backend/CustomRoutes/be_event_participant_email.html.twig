@@ -49,9 +49,9 @@
     </div>
     {% set attributes = attrs()
         .setIfExists('nonce', csp_nonce('script-src'))
-        .set('src', asset('vue/dist/vue.global.prod.js', 'markocupic_sac_event_tool'))
-    %}
+        .set('src', asset('vue/dist/vue.global.prod.js', 'markocupic_sac_event_tool')) %}
     <script{{ attributes }}></script>
+
     <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
         window.addEventListener('DOMContentLoaded', (event) => {
 
@@ -379,8 +379,23 @@
             }, 100);
 
         });
-
     </script>
 
-{% endblock %}
+    {# Use the tokenizer and suggest script to handle email inputs #}
+    <link rel="stylesheet" href="{{ asset('text_input_tokenizer/css/style.css', 'markocupic_sac_event_tool') }}">
+    <script src="{{ asset('text_input_tokenizer/js/TextInputTokenizer.js', 'markocupic_sac_event_tool') }}"{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}></script>
+    <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
+        const suggestions = {{ user_role_emails|json_encode|raw }};
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('ctrl_recipientsCc');
+
+            if (!input) return;
+
+            const tokenizer = new TextInputTokenizer(input, {
+                suggestions: suggestions || [],
+                validator: value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()), // Validate emails
+            });
+        });
+    </script>
+{% endblock %}

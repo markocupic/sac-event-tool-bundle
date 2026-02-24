@@ -1,5 +1,5 @@
 {
-  "backend.js": "/bundles/markocupicsaceventtool/backend.7b7beab4.js",
+  "backend.js": "/bundles/markocupicsaceventtool/backend.c3137f5d.js",
   "js/avatar_uploader.js": "/bundles/markocupicsaceventtool/js/avatar_uploader.5fa3ef58.js",
   "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.062f270e.css",
   "images/events/course/booklet/fallback.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/fallback.jpg",
@@ -7,8 +7,8 @@
   "images/events/course/booklet/logo_sac.png": "/bundles/markocupicsaceventtool/images/events/course/booklet/logo_sac.png",
   "images/events/course/booklet/cover.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/cover.jpg",
   "images/events/course/fallback_image.svg": "/bundles/markocupicsaceventtool/images/events/course/fallback_image.svg",
-  "vue/dist/vue.global.prod.js": "/bundles/markocupicsaceventtool/vue/dist/vue.global.prod.9a83b0ef.js",
-  "dexie/dist/dexie.js": "/bundles/markocupicsaceventtool/dexie/dist/dexie.7f999133.js",
+  "vue/dist/vue.global.prod.js": "/bundles/markocupicsaceventtool/vue/dist/vue.global.prod.f2acbf9b.js",
+  "dexie/dist/dexie.js": "/bundles/markocupicsaceventtool/dexie/dist/dexie.491961bd.js",
   "choices.js/scripts/choices.min.js": "/bundles/markocupicsaceventtool/choices.js/scripts/choices.min.ed0a2e71.js",
   "icons/tour_booklet/oev-tour-badge.png": "/bundles/markocupicsaceventtool/icons/tour_booklet/oev-tour-badge.png",
   "sounds/bell.mp3": "/bundles/markocupicsaceventtool/sounds/bell.0ff4105d.mp3",
@@ -22,6 +22,7 @@
   "images/events/course/booklet/background.png": "/bundles/markocupicsaceventtool/images/events/course/booklet/background.png",
   "choices.js/styles/choices.min.css": "/bundles/markocupicsaceventtool/choices.js/styles/choices.min.8e5d5ee0.css",
   "eventlist/eventlist_vue.js": "/bundles/markocupicsaceventtool/eventlist/eventlist_vue.87a2fa7d.js",
+  "text_input_tokenizer/js/TextInputTokenizer.js": "/bundles/markocupicsaceventtool/text_input_tokenizer/js/TextInputTokenizer.1d96e0a5.js",
   "icons/fontawesome/default/presentation-screen-solid.svg": "/bundles/markocupicsaceventtool/icons/fontawesome/default/presentation-screen-solid.svg",
   "icons/fontawesome/disabled/presentation-screen-solid.svg": "/bundles/markocupicsaceventtool/icons/fontawesome/disabled/presentation-screen-solid.svg",
   "icons/fontawesome/default/paper-plane-solid.svg": "/bundles/markocupicsaceventtool/icons/fontawesome/default/paper-plane-solid.svg",
@@ -60,6 +61,7 @@
   "icons/fontawesome/disabled/square-regular.svg": "/bundles/markocupicsaceventtool/icons/fontawesome/disabled/square-regular.svg",
   "icons/event_states/event_status_4.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_4.svg",
   "icons/subscription-states/user-has-unsubscribed.svg": "/bundles/markocupicsaceventtool/icons/subscription-states/user-has-unsubscribed.svg",
+  "text_input_tokenizer/css/style.css": "/bundles/markocupicsaceventtool/text_input_tokenizer/css/style.7a88c597.css",
   "icons/subscription-states/subscription-accepted.svg": "/bundles/markocupicsaceventtool/icons/subscription-states/subscription-accepted.svg",
   "icons/event_states/event_status_2.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_2.svg",
   "icons/fontawesome/default/square-arrow-down-solid.svg": "/bundles/markocupicsaceventtool/icons/fontawesome/default/square-arrow-down-solid.svg",
@@ -75,7 +77,7 @@
   "icons/my_events_dashboard/more--dark.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more--dark.svg",
   "icons/my_events_dashboard/more.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more.svg",
   "../assets/ts/avatar_uploader.d.ts": "/bundles/markocupicsaceventtool/../assets/ts/avatar_uploader.d.ts",
-  "backend.7b7beab4.js.map": "/bundles/markocupicsaceventtool/backend.7b7beab4.js.map",
+  "backend.c3137f5d.js.map": "/bundles/markocupicsaceventtool/backend.c3137f5d.js.map",
   "avatar_uploader.5fa3ef58.js.map": "/bundles/markocupicsaceventtool/js/avatar_uploader.5fa3ef58.js.map",
   "be_stylesheet.062f270e.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.062f270e.css.map"
 }

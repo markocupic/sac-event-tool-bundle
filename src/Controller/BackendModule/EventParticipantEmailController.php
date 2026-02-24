@@ -169,6 +169,7 @@ class EventParticipantEmailController extends AbstractBackendController
         $view['request_token'] = $rt;
         $view['title'] = $this->translator->trans('MOD.calendar.0', [], 'contao_default');
         $view['headline'] = $this->translator->trans('MSC.evt_epe_appTitle', [$this->event->title], 'contao_default');
+		$view['user_role_emails'] = $this->getUserRoleEmails();
 
         if ($this->message->hasError()) {
             $view['error'] = $this->message->generateUnwrapped();
@@ -219,7 +220,7 @@ class EventParticipantEmailController extends AbstractBackendController
         $form->addFormField('recipientsCc', [
             'label' => $this->translator->trans('MSC.evt_epe_emailRecipientsCc', [], 'contao_default'),
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'emails', 'placeholder' => 'person_x@foo.ch,person_y@bar.ch,...'],
+            'eval' => ['rgxp' => 'emails', 'data-placeholder' => 'person_x@foo.ch,person_y@bar.ch,...'],
         ]);
 
         $form->addFormField('subject', [
@@ -607,4 +608,8 @@ class EventParticipantEmailController extends AbstractBackendController
 
         $session->set(self::SESSION_BAG_KEY, $bagAll);
     }
+
+	private function getUserRoleEmails(): array{
+		return $this->connection->fetchFirstColumn('SELECT DISTINCT email FROM tl_user_role WHERE email != "" ORDER BY email');
+	}
 }

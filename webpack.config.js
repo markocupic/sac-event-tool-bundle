@@ -46,6 +46,10 @@ Encore
         to: 'vue/dist/[path][name].[hash:8].[ext]',
         pattern: /(vue\.global\.prod\.js)$/,
     })
+    .copyFiles({
+        from: './assets/text_input_tokenizer',
+        to: 'text_input_tokenizer/[path][name].[hash:8].[ext]',
+    })
 
     // Typescripts
     .addEntry('js/avatar_uploader', './assets/ts/avatar_uploader.ts')
