@@ -313,17 +313,32 @@ class EventParticipantEmailController extends AbstractBackendController
         $arrEmailRecipients = array_unique($arrEmailRecipients);
 
         $senderEmail = $this->sacevtEventAdminEmail;
-        $transport = 'touren_und_kursadministration'; // hartkodiert
+
+        // Set the mailer.transport
+        $transport = 'touren_und_kursadministration'; // hard-coded
+
+        $text = $this->stringUtil->revertInputEncoding((string) $request->request->get('text'));
 
         $email = new Email();
         $email->getHeaders()->addHeader('X-Transport', $transport);
         $email->from(new Address($senderEmail, $this->sacevtEventAdminName));
         $email->returnPath(new Address($senderEmail, $this->sacevtEventAdminName));
-        $email->replyTo(new Address($this->user->email, $this->user->name));
         $email->subject($this->stringUtil->revertInputEncoding((string) $request->request->get('subject')));
-        $email->text($this->stringUtil->revertInputEncoding((string) $request->request->get('text')));
+        $email->text($text);
+        $email->html('<p>'.nl2br(htmlspecialchars($text)).'</p>');
         $email->addTo(new Address($arrEmailRecipients[0]));
         $email->to(...$arrEmailRecipients);
+
+        // Add some headers to prevent the email from being marked as spam
+        $email->getHeaders()->addTextHeader(
+            'List-Unsubscribe',
+            \sprintf('<mailto:%s?subject=unsubscribe>', $senderEmail),
+        );
+
+        $email->getHeaders()->addTextHeader(
+            'List-Unsubscribe-Post',
+            'List-Unsubscribe=One-Click',
+        );
 
         // Send a copy of the message to the logged-in user
         $user = $this->security->getUser();
@@ -340,13 +355,15 @@ class EventParticipantEmailController extends AbstractBackendController
 
         // Make a copy of each uploaded file using the original filename
         foreach ($files as $file) {
-            if (is_file($file['temp_storage_path'])) {
-                $pathOrigFilename = \dirname($file['temp_storage_path']).'/'.$file['name'];
-
-                $fs->copy($file['temp_storage_path'], $pathOrigFilename, true);
-
-                $email->addPart(new DataPart(new File($pathOrigFilename)));
+            if (!is_file($file['temp_storage_path'])) {
+                continue;
             }
+
+            $origFilePath = \dirname($file['temp_storage_path']).'/'.$file['name'];
+            $fs->copy($file['temp_storage_path'], $origFilePath, true);
+
+            // Attach the file to the email
+            $email->addPart(new DataPart(new File($origFilePath)));
         }
 
         try {
