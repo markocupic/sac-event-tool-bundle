@@ -188,6 +188,7 @@ class TextInputTokenizer {
         // Close the suggest box on outside-click
         document.addEventListener('click', (e) => {
             if (!this.wrapper.contains(e.target)) {
+                this.addToken(this.input.value.trim());
                 this.suggestBox.style.display = 'none';
             }
         });
@@ -200,6 +201,8 @@ class TextInputTokenizer {
         form.addEventListener('submit', () => {
             this.input.classList.add('submitting');
             window.setTimeout(() => this.input.classList.remove('submitting'), 5000);
+
+            this.addToken(this.input.value.trim());
 
             const tokens = this.getTokens();
             this.input.value = tokens.join(', ');
