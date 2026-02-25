@@ -22,7 +22,6 @@ use Contao\CoreBundle\Controller\AbstractBackendController;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Email;
 use Contao\Environment;
 use Contao\Events;
 use Contao\Message;
@@ -45,6 +44,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment as Twig;
@@ -52,7 +56,7 @@ use Twig\Environment as Twig;
 /**
  * This controller allows sending emails directly from the participant list.
  *
- * involved files:
+ * Involved files:
  * vendor/markocupic/sac-event-tool-bundle/contao/templates/backend/tl_calendar_events_member/be_event_participant_email.html.twig
  * vendor/markocupic/sac-event-tool-bundle/templates/EventRegistration/event_participant_email_subject_template.twig
  * vendor/markocupic/sac-event-tool-bundle/templates/EventRegistration/event_participant_email_text_template.twig
@@ -94,6 +98,7 @@ class EventParticipantEmailController extends AbstractBackendController
     private Adapter $validator;
 
     public function __construct(
+        private readonly MailerInterface $mailer,
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
@@ -169,7 +174,7 @@ class EventParticipantEmailController extends AbstractBackendController
         $view['request_token'] = $rt;
         $view['title'] = $this->translator->trans('MOD.calendar.0', [], 'contao_default');
         $view['headline'] = $this->translator->trans('MSC.evt_epe_appTitle', [$this->event->title], 'contao_default');
-		$view['user_role_emails'] = $this->getUserRoleEmails();
+        $view['user_role_emails'] = $this->getUserRoleEmails();
 
         if ($this->message->hasError()) {
             $view['error'] = $this->message->generateUnwrapped();
@@ -220,7 +225,7 @@ class EventParticipantEmailController extends AbstractBackendController
         $form->addFormField('recipientsCc', [
             'label' => $this->translator->trans('MSC.evt_epe_emailRecipientsCc', [], 'contao_default'),
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'emails', 'data-placeholder' => 'person_x@foo.ch,person_y@bar.ch,...'],
+            'eval' => ['rgxp' => 'emails', 'placeholder' => 'person_x@foo.ch,person_y@bar.ch,...'],
         ]);
 
         $form->addFormField('subject', [
@@ -243,7 +248,7 @@ class EventParticipantEmailController extends AbstractBackendController
 
         $request = $this->requestStack->getCurrentRequest();
 
-        // Try to send the email, if form inputs have passed the validation.
+        // Try to send the email if form inputs have passed the validation.
         if ($form->validate()) {
             if ($this->sendEmail($form)) {
                 // Show a confirmation message for the successful sending of the message
@@ -256,7 +261,7 @@ class EventParticipantEmailController extends AbstractBackendController
                 $this->controller->redirect($this->getBackUri());
             }
 
-            // Sending email failed! Reload page and show error message.
+            // Sending email failed! Reload the page and show the error message.
             $this->saveFormInputsToSession($form);
             $this->message->addError($this->translator->trans('MSC.evt_epe_sendingEmailFailed', [], 'contao_default'));
             $this->controller->reload();
@@ -307,18 +312,24 @@ class EventParticipantEmailController extends AbstractBackendController
         $arrEmailRecipients = array_merge($arrEmailRecipients, array_filter(explode(',', $recipients)));
         $arrEmailRecipients = array_unique($arrEmailRecipients);
 
-        $objEmail = new Email();
-        $objEmail->fromName = $this->stringUtil->revertInputEncoding($this->sacevtEventAdminName);
-        $objEmail->from = $this->sacevtEventAdminEmail;
-        $objEmail->replyTo($this->user->email);
-        $objEmail->subject = $this->stringUtil->revertInputEncoding((string) $request->request->get('subject'));
-        $objEmail->text = $this->stringUtil->revertInputEncoding((string) $request->request->get('text'));
+        $senderEmail = $this->sacevtEventAdminEmail;
+        $transport = 'touren_und_kursadministration'; // hartkodiert
+
+        $email = new Email();
+        $email->getHeaders()->addHeader('X-Transport', $transport);
+        $email->from(new Address($senderEmail, $this->sacevtEventAdminName));
+        $email->returnPath(new Address($senderEmail, $this->sacevtEventAdminName));
+        $email->replyTo(new Address($this->user->email, $this->user->name));
+        $email->subject($this->stringUtil->revertInputEncoding((string) $request->request->get('subject')));
+        $email->text($this->stringUtil->revertInputEncoding((string) $request->request->get('text')));
+        $email->addTo(new Address($arrEmailRecipients[0]));
+        $email->to(...$arrEmailRecipients);
 
         // Send a copy of the message to the logged-in user
         $user = $this->security->getUser();
 
         if ($user instanceof BackendUser && '' !== $user->email) {
-            $objEmail->sendCc($user->email);
+            $email->cc(new Address($user->email, $user->name));
         }
 
         // Handle file attachments
@@ -326,28 +337,23 @@ class EventParticipantEmailController extends AbstractBackendController
 
         $bag = $this->getSessionBag();
         $files = $bag['attachments'] ?? [];
-        $arrOrigFilenamePaths = [];
 
         // Make a copy of each uploaded file using the original filename
         foreach ($files as $file) {
             if (is_file($file['temp_storage_path'])) {
                 $pathOrigFilename = \dirname($file['temp_storage_path']).'/'.$file['name'];
-                $arrOrigFilenamePaths[] = $pathOrigFilename;
 
                 $fs->copy($file['temp_storage_path'], $pathOrigFilename, true);
-                $objEmail->attachFile($pathOrigFilename);
+
+                $email->addPart(new DataPart(new File($pathOrigFilename)));
             }
         }
 
         try {
-            $blnSend = $objEmail->sendTo($arrEmailRecipients);
+            $this->mailer->send($email);
+            $blnSend = true;
         } catch (\Exception $e) {
             $blnSend = false;
-        } finally {
-            // In any case, delete the temporarily created files. oreach
-            // ($arrOrigFilenamePaths as $path) { $fs->remove($path); Because Symfony mailer
-            // works via messenger, the files will already been deleted, when Symfony mailer
-            // starts sending the email.
         }
 
         return $blnSend;
@@ -589,7 +595,7 @@ class EventParticipantEmailController extends AbstractBackendController
         $bagAll = $session->get(self::SESSION_BAG_KEY, []);
 
         if (!isset($bagAll[$this->sid])) {
-            // First create a bag, if there isn't already one!
+            // First, create a bag if there isn't already one!
             $this->getSessionBag();
             $bagAll = $session->get(self::SESSION_BAG_KEY, []);
         }
@@ -609,7 +615,8 @@ class EventParticipantEmailController extends AbstractBackendController
         $session->set(self::SESSION_BAG_KEY, $bagAll);
     }
 
-	private function getUserRoleEmails(): array{
-		return $this->connection->fetchFirstColumn('SELECT DISTINCT email FROM tl_user_role WHERE email != "" ORDER BY email');
-	}
+    private function getUserRoleEmails(): array
+    {
+        return $this->connection->fetchFirstColumn('SELECT DISTINCT email FROM tl_user_role WHERE email != "" ORDER BY email');
+    }
 }
