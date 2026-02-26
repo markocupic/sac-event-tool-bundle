@@ -23,7 +23,6 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Email;
 use Contao\Events;
 use Contao\MemberModel;
 use Contao\Message;
@@ -36,6 +35,9 @@ use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
@@ -77,6 +79,7 @@ class NotifyEventRegistrationStateController
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
         private readonly Environment $twig,
+        private readonly MailerInterface $mailer,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
@@ -208,13 +211,13 @@ class NotifyEventRegistrationStateController
         $form->addFormField('subject', [
             'label' => 'Betreff',
             'inputType' => 'text',
-            'eval' => ['mandatory' => true],
+            'eval' => ['mandatory' => true, 'useRawRequestData' => true],
         ]);
 
         $form->addFormField('text', [
             'label' => 'Nachricht',
             'inputType' => 'textarea',
-            'eval' => ['rows' => 20, 'cols' => 80, 'mandatory' => true],
+            'eval' => ['rows' => 20, 'cols' => 80, 'mandatory' => true, 'useRawRequestData' => true],
         ]);
 
         $form->addFormField('submit', [
@@ -224,37 +227,41 @@ class NotifyEventRegistrationStateController
 
         $request = $this->requestStack->getCurrentRequest();
 
-        // Prefill email form from template
+        // Prefill the email form with text from the template
         if (!$request->isMethod('post')) {
-            $arrEmailTextTokens = $this->getTokenArray();
+            $textTokens = $this->getTokenArray();
 
             if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $this->action && $this->event->customizeEventRegistrationConfirmationEmailText && !empty($this->event->customEventRegistrationConfirmationEmailText)) {
                 // Only for accept_with_email!!! Replace tags for custom notification set in the
                 // events settings (tags can be used case-insensitive!)
-                $emailBodyText = $this->event->customEventRegistrationConfirmationEmailText;
+                $emailText = $this->event->customEventRegistrationConfirmationEmailText;
 
-                foreach ($arrEmailTextTokens as $k => $v) {
+                foreach ($textTokens as $k => $v) {
                     $strPattern = '/##'.$k.'##/i';
-                    $emailBodyText = preg_replace($strPattern, $v, $emailBodyText);
+                    $emailText = preg_replace($strPattern, $v, $emailText);
                 }
-                $emailBodyText = strip_tags($emailBodyText);
             } else {
-                // Render email body text from twig template
-                $arrEmailTextTokens['renderEmailText'] = true;
-                $emailBodyText = $this->twig->createTemplate(file_get_contents($this->configuration['templatePath']))->render($arrEmailTextTokens);
+                // Render the email body text from a twig template
+                $textTokens['renderEmailText'] = true;
+                $emailText = $this->twig->createTemplate(file_get_contents($this->configuration['templatePath']))->render($textTokens);
             }
 
             // Get event type
             $eventType = $this->translator->trans('MSC.'.$this->event->eventType, [], 'contao_default');
 
             // Add value to fields
-            $arrSubjectTokens = [
+            $subjectTokens = [
                 'eventType' => $eventType,
                 'eventTitle' => $this->event->title,
                 'renderEmailSubject' => true,
             ];
-            $form->getWidget('subject')->value = $this->twig->createTemplate(file_get_contents($this->configuration['templatePath']))->render($arrSubjectTokens);
-            $form->getWidget('text')->value = $emailBodyText;
+
+            $emailText = $this->stringUtil->revertInputEncoding($emailText);
+            $emailSubject = $this->twig->createTemplate(file_get_contents($this->configuration['templatePath']))->render($subjectTokens);
+            $emailSubject = $this->stringUtil->revertInputEncoding($emailSubject);
+
+            $form->getWidget('subject')->value = $emailSubject;
+            $form->getWidget('text')->value = $emailText;
         }
 
         if ($request->request->get('FORM_SUBMIT') === $this->configuration['formId'] && $form->validate()) {
@@ -275,17 +282,36 @@ class NotifyEventRegistrationStateController
             throw new \Exception('Please set a valid email address for the service parameter "sacevt.event_admin_email."');
         }
 
+        $senderAddress = new Address($this->sacevtEventAdminEmail, $this->stringUtil->revertInputEncoding($this->sacevtEventAdminName));
+        $replyToAddress = new Address($this->user->email, $this->stringUtil->revertInputEncoding($this->user->name));
         $transport = 'touren_und_kursadministration';
 
-        $email = new Email();
-        $email->addHeader('X-Transport', $transport);
-        $email->fromName = $this->stringUtil->revertInputEncoding($this->sacevtEventAdminName);
-        $email->from = $this->sacevtEventAdminEmail;
-        $email->replyTo($this->user->email);
-        $email->subject = $this->stringUtil->revertInputEncoding($form->getWidget('subject')->value);
-        $email->text = $this->stringUtil->revertInputEncoding(strip_tags((string) $form->getWidget('text')->value));
+        $subject = $form->getWidget('subject')->value;
+        $text = $form->getWidget('text')->value;
 
-        // Check if event participant has already been booked on another event at the
+        $email = new Email();
+        $email->getHeaders()->addTextHeader('X-Transport', $transport);
+        $email->from($senderAddress);
+        $email->sender($senderAddress);
+        $email->returnPath($senderAddress);
+        $email->replyTo($replyToAddress);
+
+        $email->subject($subject);
+        $email->text($text);
+        $email->html('<p>'.nl2br(htmlspecialchars($text)).'</p>');
+
+        // Add some headers to prevent the email from being marked as spam
+        $email->getHeaders()->addTextHeader(
+            'List-Unsubscribe',
+            \sprintf('<mailto:%s?subject=unsubscribe>', $senderAddress->getAddress()),
+        );
+
+        $email->getHeaders()->addTextHeader(
+            'List-Unsubscribe-Post',
+            'List-Unsubscribe=One-Click',
+        );
+
+        // Check if the event participant has already been booked on another event at the
         // same time.
         $objMember = $this->member->findOneBySacMemberId($this->registration->sacMemberId);
 
@@ -310,15 +336,18 @@ class NotifyEventRegistrationStateController
                 'kann für den Teilnehmer die Teilnahme am Event nicht bestätigt werden.',
             );
         } elseif ($this->validator->isEmail($this->registration->email)) {
-            // Send email notification
-            if ($email->sendTo($this->registration->email)) {
+            try {
+                // Send email notification
+                $email = $email->to(new Address($this->registration->email, $this->registration->firstname.' '.$this->registration->lastname));
+                $this->mailer->send($email);
+
                 $this->registration->stateOfSubscription = $this->configuration['stateOfSubscription'];
 
                 if ($this->registration->isModified()) {
                     $this->registration->tstamp = time();
                     $this->registration->save();
 
-                    // Create new version
+                    // Create a new version
                     $objVersions = new Versions($this->registration->getTable(), $this->registration->id);
                     $objVersions->initialize();
                     $objVersions->create();
@@ -327,9 +356,9 @@ class NotifyEventRegistrationStateController
                 $this->message->addInfo($this->configuration['backendMessage']);
 
                 return true;
+            } catch (\Exception $e) {
+                $hasError = true;
             }
-
-            $hasError = true;
         } else {
             $hasError = true;
         }
@@ -348,7 +377,7 @@ class NotifyEventRegistrationStateController
 
     private function getTokenArray(): array
     {
-        // Get event dates as a comma separated string
+        // Get event dates as a comma-separated string
         $eventDates = $this->calendarEventsUtil->getEventTimestamps($this->event);
         $df = $this->config->get('dateFormat');
         $strDates = implode(
