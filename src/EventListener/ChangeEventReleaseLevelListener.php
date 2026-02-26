@@ -16,7 +16,6 @@ namespace Markocupic\SacEventToolBundle\EventListener;
 
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
-use Contao\Config;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
@@ -38,8 +37,6 @@ use Twig\Error\SyntaxError;
 #[AsEventListener]
 final readonly class ChangeEventReleaseLevelListener
 {
-    private Adapter $configAdapter;
-
     private Adapter $eventReleaseLevelPolicyModelAdapter;
 
     public function __construct(
@@ -49,9 +46,10 @@ final readonly class ChangeEventReleaseLevelListener
         private RouterInterface $router,
         private ScopeMatcher $scopeMatcher,
         private Security $security,
+        private string $sacevtEventAdminEmail,
+        private string $sacevtEventAdminName,
     ) {
         $this->framework->initialize();
-        $this->configAdapter = $this->framework->getAdapter(Config::class);
         $this->eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
     }
 
@@ -92,8 +90,10 @@ final readonly class ChangeEventReleaseLevelListener
             }
 
             $objEmail = new Email();
-            $objEmail->from = $this->configAdapter->get('adminEmail');
-            $objEmail->fromName = 'Administrator SAC Pilatus';
+            // Set the correct transport
+            $objEmail->addHeader('X-Transport', 'touren_und_kursadministration');
+            $objEmail->from = $this->sacevtEventAdminEmail;
+            $objEmail->fromName = $this->sacevtEventAdminName;
             $objEmail->replyTo('noreply@sac-pilatus.ch');
 
             $objEmail->subject = \sprintf('Neue Freigabestufe (%s) für Event %s.', $objEventReleaseLevel->level, StringUtil::revertInputEncoding($objEvent->title));

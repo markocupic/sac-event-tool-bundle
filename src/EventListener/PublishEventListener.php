@@ -16,8 +16,6 @@ namespace Markocupic\SacEventToolBundle\EventListener;
 
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
-use Contao\Config;
-use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Email;
@@ -38,8 +36,6 @@ use Twig\Error\SyntaxError;
 #[AsEventListener]
 final readonly class PublishEventListener
 {
-    private Adapter $configAdapter;
-
     public function __construct(
         private CalendarEventsUtil $calendarEventsUtil,
         private ContaoFramework $framework,
@@ -47,9 +43,10 @@ final readonly class PublishEventListener
         private Security $security,
         private Environment $twig,
         private RouterInterface $router,
+        private string $sacevtEventAdminEmail,
+        private string $sacevtEventAdminName,
     ) {
         $this->framework->initialize();
-        $this->configAdapter = $this->framework->getAdapter(Config::class);
     }
 
     /**
@@ -76,8 +73,10 @@ final readonly class PublishEventListener
                     }
 
                     $objEmail = new Email();
-                    $objEmail->from = $this->configAdapter->get('adminEmail');
-                    $objEmail->fromName = 'Administrator SAC Pilatus';
+                    // Set the correct transport
+                    $objEmail->addHeader('X-Transport', 'touren_und_kursadministration');
+                    $objEmail->from = $this->sacevtEventAdminEmail;
+                    $objEmail->fromName = $this->sacevtEventAdminName;
                     $objEmail->replyTo('noreply@sac-pilatus.ch');
 
                     $objEmail->subject = \sprintf('Event %s wurde veröffentlicht', StringUtil::revertInputEncoding($objCalendarEvent->title));

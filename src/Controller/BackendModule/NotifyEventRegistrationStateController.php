@@ -275,7 +275,10 @@ class NotifyEventRegistrationStateController
             throw new \Exception('Please set a valid email address for the service parameter "sacevt.event_admin_email."');
         }
 
+        $transport = 'touren_und_kursadministration';
+
         $email = new Email();
+        $email->addHeader('X-Transport', $transport);
         $email->fromName = $this->stringUtil->revertInputEncoding($this->sacevtEventAdminName);
         $email->from = $this->sacevtEventAdminEmail;
         $email->replyTo($this->user->email);

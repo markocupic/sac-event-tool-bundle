@@ -507,6 +507,8 @@ class SendTourRapportNotificationController extends AbstractBackendController
     private function sendEmail(Request $request, Form $form, UserModel $biller, \SplFileObject $rapportFile, \SplFileObject $invoiceFile): bool
     {
         $objEmail = new Email();
+        // Set the correct transport
+        $objEmail->addHeader('X-Transport', 'touren_und_kursadministration');
         $objEmail->fromName = html_entity_decode($this->sacevtEventAdminName);
         $objEmail->from = $this->sacevtEventAdminEmail;
         $objEmail->replyTo($biller->email);
