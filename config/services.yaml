@@ -10,8 +10,6 @@ services:
             $sacevtAvatarFemale: '%sacevt.avatar.female%'
             $sacevtAvatarMale: '%sacevt.avatar.male%'
             $sacevtAvatarOther: '%sacevt.avatar.other%'
-            $sacevtEventAdminEmail: '%sacevt.event_admin_email%'
-            $sacevtEventAdminName: '%sacevt.event_admin_name%'
             $sacevtEventCourseLevels: '%sacevt.event.course.levels%'
             $sacevtEventCourseBookletFilenamePattern: '%sacevt.event.course.booklet_filename_pattern%'
             $sacevtEventCourseConfirmationFileNamePattern: '%sacevt.event.course_confirmation_file_name_pattern%'

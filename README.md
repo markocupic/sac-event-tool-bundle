@@ -26,8 +26,15 @@ sacevt:
     hostname: ftpserver.sac-cas.ch
     username: ****
     password: ******
-  event_admin_name: 'Touren- und Kursadministration SAC Sektion Pilatus'
-  event_admin_email: 'touren-und-kurs-administration@sac-pilatus.ch'
+  mailer_transports:
+    system_admin:
+      transport_name: 'system_admin'
+      sender_name: 'Web-Administrator SAC Sektion Pilatus'
+      sender_email: 'internet@sac-pilatus.ch'
+    event_admin:
+      transport_name: 'touren_und_kursadministration'
+      sender_name: 'Touren- und Kursadministration SAC Sektion Pilatus'
+      sender_email: 'touren-und-kurs-administration@sac-pilatus.ch'
 ```
 
 ### SAC Sektionen und OG

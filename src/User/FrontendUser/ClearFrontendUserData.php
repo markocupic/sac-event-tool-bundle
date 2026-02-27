@@ -27,12 +27,15 @@ use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class ClearFrontendUserData
 {
     public function __construct(
         private ContaoFramework $framework,
         private Connection $connection,
+        #[Autowire(param: 'sacevt.mailer_transports.system_admin')]
+        private array $mailerTransport,
         private string $projectDir,
         private string $sacevtUserFrontendAvatarDir,
         private LoggerInterface|null $contaoGeneralLogger = null,
@@ -49,8 +52,7 @@ readonly class ClearFrontendUserData
         $arrRegistrations = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events_member');
 
         foreach ($arrRegistrations as $registration) {
-            // Important!!! Do nothing if the participant was entered manually without an
-            // sacMemberId or member ID (tl_member)
+            // Important!!! Do nothing if the participant was entered manually without a sacMemberId or member ID (tl_member)
             if (empty($registration['contaoMemberId']) && empty($registration['sacMemberId'])) {
                 continue;
             }
@@ -93,7 +95,9 @@ readonly class ClearFrontendUserData
                 );
 
                 $email = new Email();
-                $email->from = $adminEmail;
+                $email->addHeader('X-Transport', $this->mailerTransport['transport_name']);
+                $email->from = $this->mailerTransport['sender_email'];
+                $email->fromName = $this->mailerTransport['sender_name'];
                 $email->subject = $subject;
                 $email->text = $message;
                 $email->sendTo($adminEmail);

@@ -39,6 +39,7 @@ use Markocupic\SacEventToolBundle\DocxTemplator\OutputType;
 use Markocupic\SacEventToolBundle\DocxTemplator\TourRapportGenerator;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -60,7 +61,7 @@ use Twig\Environment as Twig;
  * tour report are automatically attached to the message. Both files are converted
  * from docx to PDF using the CloudConvert API before sending.
  *
- * involved files:
+ * Involved files:
  * vendor/markocupic/sac-event-tool-bundle/templates/backend/tl_calendar_events_member/be_event_participant_email.html.twig
  * vendor/markocupic/sac-event-tool-bundle/templates/Email/EventRegistration/email_event_participant.twig
  * vendor/markocupic/sac-event-tool-bundle/contao/languages/en/default.php
@@ -90,14 +91,14 @@ class SendTourRapportNotificationController extends AbstractBackendController
     public function __construct(
         private readonly ContaoCsrfTokenManager $csrfTokenManager,
         private readonly ContaoFramework $framework,
+        #[Autowire(param: 'sacevt.mailer_transports.event_admin')]
+        private readonly array $mailerTransport,
         private readonly RequestStack $requestStack,
         private readonly RouterInterface $router,
         private readonly TourRapportGenerator $tourRapportGenerator,
         private readonly TranslatorInterface $translator,
         private readonly Twig $twig,
         private readonly UriSigner $uriSigner,
-        private readonly string $sacevtEventAdminEmail,
-        private readonly string $sacevtEventAdminName,
         private readonly string $sacevtEventTemplateTourInvoice,
         private readonly string $sacevtEventTemplateTourRapport,
         private readonly string $sacevtEventTourInvoiceFileNamePattern,
@@ -508,9 +509,9 @@ class SendTourRapportNotificationController extends AbstractBackendController
     {
         $objEmail = new Email();
         // Set the correct transport
-        $objEmail->addHeader('X-Transport', 'touren_und_kursadministration');
-        $objEmail->fromName = html_entity_decode($this->sacevtEventAdminName);
-        $objEmail->from = $this->sacevtEventAdminEmail;
+        $objEmail->addHeader('X-Transport', $this->mailerTransport['transport_name']);
+        $objEmail->fromName = html_entity_decode($this->mailerTransport['sender_name']);
+        $objEmail->from = $this->mailerTransport['sender_email'];
         $objEmail->replyTo($biller->email);
 
         $objEmail->subject = html_entity_decode((string) $request->request->get('subject'));

@@ -26,6 +26,7 @@ use Markocupic\SacEventToolBundle\Event\ChangeEventReleaseLevelEvent;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -43,11 +44,11 @@ final readonly class ChangeEventReleaseLevelListener
         private CalendarEventsUtil $calendarEventsUtil,
         private ContaoFramework $framework,
         private Environment $twig,
+        #[Autowire(param: 'sacevt.mailer_transports.event_admin')]
+        private array $mailerTransport,
         private RouterInterface $router,
         private ScopeMatcher $scopeMatcher,
         private Security $security,
-        private string $sacevtEventAdminEmail,
-        private string $sacevtEventAdminName,
     ) {
         $this->framework->initialize();
         $this->eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
@@ -91,9 +92,9 @@ final readonly class ChangeEventReleaseLevelListener
 
             $objEmail = new Email();
             // Set the correct transport
-            $objEmail->addHeader('X-Transport', 'touren_und_kursadministration');
-            $objEmail->from = $this->sacevtEventAdminEmail;
-            $objEmail->fromName = $this->sacevtEventAdminName;
+            $objEmail->addHeader('X-Transport', $this->mailerTransport['transport_name']);
+            $objEmail->from = $this->mailerTransport['sender_email'];
+            $objEmail->fromName = $this->mailerTransport['sender_name'];
             $objEmail->replyTo('noreply@sac-pilatus.ch');
 
             $objEmail->subject = \sprintf('Neue Freigabestufe (%s) für Event %s.', $objEventReleaseLevel->level, StringUtil::revertInputEncoding($objEvent->title));

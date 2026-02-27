@@ -44,10 +44,23 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('password')->cannotBeEmpty()->end()
                     ->end()
                 ->end()
-                // Event admin name
-                ->scalarNode('event_admin_name')->cannotBeEmpty()->end()
-                // Event admin email
-                ->scalarNode('event_admin_email')->cannotBeEmpty()->end()
+                // Mailer transports for system_admin and event_admin
+                ->arrayNode('mailer_transports')
+                    ->isRequired()
+                    ->validate()
+                        // Force the system_admin and event_admin mailer_transports to be configured
+                        ->ifTrue(static fn ($v) => !isset($v['system_admin']) || !isset($v['event_admin']))
+                        ->thenInvalid('You must configure both "system_admin" and "event_admin" mailer_transports.')
+                    ->end()
+                    ->useAttributeAsKey('name')
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('transport_name')->info('Enter the mailer-transport-name.')->cannotBeEmpty()->end()
+                            ->scalarNode('sender_email')->info('Enter the email address.')->cannotBeEmpty()->end()
+                            ->scalarNode('sender_name')->info('Enter the name e.g. "Web-Admin SAC Sektion Pilatus".')->cannotBeEmpty()->end()
+                        ->end()
+                    ->end()
+                ->end()
                 // Temp dir e.g system/tmp
                 ->scalarNode('temp_dir')->defaultValue('system/tmp')->cannotBeEmpty()->end()
                 // Avatars

@@ -49,8 +49,9 @@ class MarkocupicSacEventToolExtension extends Extension
         $container->setParameter($rootKey.'.locale', $config['locale']);
         $container->setParameter($rootKey.'.section_name', $config['section_name']);
         $container->setParameter($rootKey.'.member_sync_credentials', $config['member_sync_credentials']);
-        $container->setParameter($rootKey.'.event_admin_name', $config['event_admin_name']);
-        $container->setParameter($rootKey.'.event_admin_email', $config['event_admin_email']);
+        $container->setParameter($rootKey.'.mailer_transports', $config['mailer_transports']);
+        $container->setParameter($rootKey.'.mailer_transports.system_admin', $config['mailer_transports']['system_admin']);
+        $container->setParameter($rootKey.'.mailer_transports.event_admin', $config['mailer_transports']['event_admin']);
         $container->setParameter($rootKey.'.temp_dir', $config['temp_dir']);
         $container->setParameter($rootKey.'.avatar.female', $config['avatar']['female']);
         $container->setParameter($rootKey.'.avatar.male', $config['avatar']['male']);

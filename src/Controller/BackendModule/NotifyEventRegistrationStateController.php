@@ -33,6 +33,7 @@ use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Mailer\MailerInterface;
@@ -80,6 +81,8 @@ class NotifyEventRegistrationStateController
         private readonly ContaoFramework $framework,
         private readonly Environment $twig,
         private readonly MailerInterface $mailer,
+        #[Autowire(param: 'sacevt.mailer_transports.event_admin')]
+        private readonly array $mailerTransport,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
@@ -89,8 +92,6 @@ class NotifyEventRegistrationStateController
         private readonly string $sacevtEventRegistrationConfigEmailCancelTemplPath,
         private readonly string $sacevtEventRegistrationConfigEmailRefuseTemplPath,
         private readonly string $sacevtEventRegistrationConfigEmailWaitinglistTemplPath,
-        private readonly string $sacevtEventAdminEmail,
-        private readonly string $sacevtEventAdminName,
     ) {
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
@@ -278,19 +279,18 @@ class NotifyEventRegistrationStateController
     {
         $hasError = false;
 
-        if (!$this->validator->isEmail($this->sacevtEventAdminEmail)) {
-            throw new \Exception('Please set a valid email address for the service parameter "sacevt.event_admin_email."');
+        if (!$this->validator->isEmail($this->mailerTransport['sender_email'])) {
+            throw new \Exception('Please set a valid email address for the sender.');
         }
 
-        $senderAddress = new Address($this->sacevtEventAdminEmail, $this->stringUtil->revertInputEncoding($this->sacevtEventAdminName));
+        $senderAddress = new Address($this->mailerTransport['sender_email'], $this->stringUtil->revertInputEncoding($this->mailerTransport['sender_name']));
         $replyToAddress = new Address($this->user->email, $this->stringUtil->revertInputEncoding($this->user->name));
-        $transport = 'touren_und_kursadministration';
 
         $subject = $form->getWidget('subject')->value;
         $text = $form->getWidget('text')->value;
 
         $email = new Email();
-        $email->getHeaders()->addTextHeader('X-Transport', $transport);
+        $email->getHeaders()->addTextHeader('X-Transport', $this->mailerTransport['transport_name']);
         $email->from($senderAddress);
         $email->sender($senderAddress);
         $email->returnPath($senderAddress);

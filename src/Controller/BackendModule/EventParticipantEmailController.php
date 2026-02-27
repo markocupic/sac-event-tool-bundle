@@ -36,6 +36,7 @@ use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -103,13 +104,13 @@ class EventParticipantEmailController extends AbstractBackendController
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly EventRegistrationUtil $eventRegistrationUtil,
+        #[Autowire(param: 'sacevt.mailer_transports.event_admin')]
+        private readonly array $mailerTransport,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
         private readonly Twig $twig,
         private readonly UriSigner $uriSigner,
-        private readonly string $sacevtEventAdminEmail,
-        private readonly string $sacevtEventAdminName,
     ) {
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
@@ -312,17 +313,12 @@ class EventParticipantEmailController extends AbstractBackendController
         $arrEmailRecipients = array_merge($arrEmailRecipients, array_filter(explode(',', $recipients)));
         $arrEmailRecipients = array_unique($arrEmailRecipients);
 
-        $senderEmail = $this->sacevtEventAdminEmail;
-
-        // Set the mailer.transport
-        $transport = 'touren_und_kursadministration'; // hard-coded
-
         $text = $this->stringUtil->revertInputEncoding((string) $request->request->get('text'));
 
         $email = new Email();
-        $email->getHeaders()->addHeader('X-Transport', $transport);
-        $email->from(new Address($senderEmail, $this->sacevtEventAdminName));
-        $email->returnPath(new Address($senderEmail, $this->sacevtEventAdminName));
+        $email->getHeaders()->addHeader('X-Transport', $this->mailerTransport['transport_name']);
+        $email->from(new Address($this->mailerTransport['sender_email'], $this->mailerTransport['sender_name']));
+        $email->returnPath(new Address($this->mailerTransport['sender_email'], $this->mailerTransport['sender_name']));
         $email->subject($this->stringUtil->revertInputEncoding((string) $request->request->get('subject')));
         $email->text($text);
         $email->html('<p>'.nl2br(htmlspecialchars($text)).'</p>');
@@ -332,7 +328,7 @@ class EventParticipantEmailController extends AbstractBackendController
         // Add some headers to prevent the email from being marked as spam
         $email->getHeaders()->addTextHeader(
             'List-Unsubscribe',
-            \sprintf('<mailto:%s?subject=unsubscribe>', $senderEmail),
+            \sprintf('<mailto:%s?subject=unsubscribe>', $this->mailerTransport['sender_email']),
         );
 
         $email->getHeaders()->addTextHeader(
