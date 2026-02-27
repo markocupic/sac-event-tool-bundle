@@ -75,8 +75,13 @@ class TextInputTokenizer {
 
     addToken(value) {
         value = value.trim();
-        if (!value) return;
-        if (this.getTokens().includes(value)) return;
+        if (!value) {
+            return;
+        }
+
+        if (this.getTokens().includes(value)) {
+            return;
+        }
 
         const token = document.createElement('span');
         token.className = 'token';
@@ -161,9 +166,13 @@ class TextInputTokenizer {
             let val = this.input.value.trim();
 
             // Add the token if the user enters a comma
-            if (val.endsWith(',') || val.endsWith(' ') || val.endsWith('\n') || val.endsWith('\t') || val.endsWith('\r') || val.endsWith(';')) {
+            if (val.endsWith(',') || val.endsWith('\n') || val.endsWith('\t') || val.endsWith('\r') || val.endsWith(';')) {
                 const value = val.slice(0, -1).trim();
-                if (value.length > 0) this.addToken(value);
+
+                if (value.length > 0) {
+                    this.addToken(value);
+                }
+
                 this.input.value = '';
                 return;
             }
@@ -173,10 +182,14 @@ class TextInputTokenizer {
 
         // Keydown event
         this.input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' || e.code === 'Space') {
                 e.preventDefault();
                 const value = this.input.value.trim();
-                if (value.length > 0) this.addToken(value);
+
+                if (value.length > 0) {
+                    this.addToken(value);
+                }
+
                 this.input.value = '';
                 this.suggestBox.style.display = 'none';
             }
@@ -196,7 +209,10 @@ class TextInputTokenizer {
 
     updateInputValueOnSubmit() {
         const form = this.input.closest('form');
-        if (!form) return;
+
+        if (!form) {
+            return;
+        }
 
         form.addEventListener('submit', () => {
             this.input.classList.add('submitting');
