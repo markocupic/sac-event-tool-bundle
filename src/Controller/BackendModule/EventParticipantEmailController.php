@@ -22,8 +22,8 @@ use Contao\CoreBundle\Controller\AbstractBackendController;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\Environment;
-use Contao\Events;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
@@ -51,6 +51,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment as Twig;
 
@@ -90,8 +91,6 @@ class EventParticipantEmailController extends AbstractBackendController
 
     private Adapter $environment;
 
-    private Adapter $events;
-
     private Adapter $message;
 
     private Adapter $userModel;
@@ -103,6 +102,7 @@ class EventParticipantEmailController extends AbstractBackendController
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly EventRegistrationUtil $eventRegistrationUtil,
         #[Autowire(param: 'sacevt.mailer_transports.event_admin')]
         private readonly array $mailerTransport,
@@ -117,7 +117,6 @@ class EventParticipantEmailController extends AbstractBackendController
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->environment = $this->framework->getAdapter(Environment::class);
-        $this->events = $this->framework->getAdapter(Events::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->userModel = $this->framework->getAdapter(UserModel::class);
         $this->validator = $this->framework->getAdapter(Validator::class);
@@ -143,7 +142,7 @@ class EventParticipantEmailController extends AbstractBackendController
 
         if (!$blnAllow) {
             $this->message->addError($this->translator->trans('MSC.evt_epe_accessDenied', [], 'contao_default'));
-            $this->controller->redirect($this->getBackUri());
+            $this->controller->redirect($this->getBackUrl());
         }
 
         if ($this->environment->get('isAjaxRequest') && $request->isMethod('POST')) {
@@ -169,7 +168,7 @@ class EventParticipantEmailController extends AbstractBackendController
         $view = [];
         $view['event'] = $this->event;
         $view['allowed_extensions'] = self::ALLOWED_EXTENSIONS;
-        $view['back'] = $this->getBackUri();
+        $view['back'] = $this->getBackUrl();
         $view['form'] = $this->createAndValidateForm()->generate();
         $view['max_filesize'] = self::MAX_FILE_SIZE;
         $view['request_token'] = $rt;
@@ -196,7 +195,7 @@ class EventParticipantEmailController extends AbstractBackendController
 
         if (null === $this->event) {
             $this->message->addError($this->translator->trans('MSC.evt_epe_eventNotFound', [$eventId], 'contao_default'));
-            $this->controller->redirect($this->getBackUri());
+            $this->controller->redirect($this->getBackUrl());
         }
 
         // Get the logged-in Contao backend user
@@ -259,7 +258,7 @@ class EventParticipantEmailController extends AbstractBackendController
                 $this->clearSessionBag();
 
                 // All ok! Redirect the user back to the event member list.
-                $this->controller->redirect($this->getBackUri());
+                $this->controller->redirect($this->getBackUrl());
             }
 
             // Sending email failed! Reload the page and show the error message.
@@ -280,7 +279,7 @@ class EventParticipantEmailController extends AbstractBackendController
                     'renderEmailText' => true,
                     'event' => $this->event,
                     'user' => $this->userModel->findById($this->user->id),
-                    'event_url' => $this->events->generateEventUrl($this->event, true),
+                    'event_url' => $this->contentUrlGenerator->generate($this->event, [], UrlGeneratorInterface::ABSOLUTE_URL),
                 ]);
             }
         }
@@ -313,13 +312,14 @@ class EventParticipantEmailController extends AbstractBackendController
         $arrEmailRecipients = array_merge($arrEmailRecipients, array_filter(explode(',', $recipients)));
         $arrEmailRecipients = array_unique($arrEmailRecipients);
 
+        $subject = $this->stringUtil->revertInputEncoding((string) $request->request->get('subject'));
         $text = $this->stringUtil->revertInputEncoding((string) $request->request->get('text'));
 
         $email = new Email();
         $email->getHeaders()->addHeader('X-Transport', $this->mailerTransport['transport_name']);
         $email->from(new Address($this->mailerTransport['sender_email'], $this->mailerTransport['sender_name']));
         $email->returnPath(new Address($this->mailerTransport['sender_email'], $this->mailerTransport['sender_name']));
-        $email->subject($this->stringUtil->revertInputEncoding((string) $request->request->get('subject')));
+        $email->subject($subject);
         $email->text($text);
         $email->html('<p>'.nl2br(htmlspecialchars($text)).'</p>');
         $email->addTo(new Address($arrEmailRecipients[0]));
@@ -343,23 +343,15 @@ class EventParticipantEmailController extends AbstractBackendController
             $email->cc(new Address($user->email, $user->name));
         }
 
-        // Handle file attachments
-        $fs = new Filesystem();
-
         $bag = $this->getSessionBag();
         $files = $bag['attachments'] ?? [];
 
-        // Make a copy of each uploaded file using the original filename
         foreach ($files as $file) {
             if (!is_file($file['temp_storage_path'])) {
                 continue;
             }
 
-            $origFilePath = \dirname($file['temp_storage_path']).'/'.$file['name'];
-            $fs->copy($file['temp_storage_path'], $origFilePath, true);
-
-            // Attach the file to the email
-            $email->addPart(new DataPart(new File($origFilePath)));
+            $email->addPart(new DataPart(new File($file['temp_storage_path']), $file['name']));
         }
 
         try {
@@ -513,7 +505,7 @@ class EventParticipantEmailController extends AbstractBackendController
         $form->getWidget('text')->value = $bag['text'];
     }
 
-    private function getBackUri(): string
+    private function getBackUrl(): string
     {
         $bag = $this->getSessionBag();
 

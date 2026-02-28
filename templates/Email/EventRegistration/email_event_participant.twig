@@ -6,7 +6,7 @@ Hier kommt der Inhalt deiner E-Mail-Nachricht...
 
 Beste Grüsse
 
-{{ user.firstname }} {{ user.lastname }}
+{{ user.firstname|raw }} {{ user.lastname|raw }}
 
 {{ user.mobile|default('') }}
 {{ user.email|default('') }}
@@ -14,5 +14,5 @@ Beste Grüsse
 
 --------------------------
 {{ event.title|raw }}
-{{ event_url }}
+{{ event_url|raw }}
 {% endif %}
