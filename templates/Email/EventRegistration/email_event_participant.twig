@@ -1,4 +1,4 @@
-{%- if renderEmailSubject|default -%}Details zu {{ event.title|default('') }}{%- endif -%}
+{%- if renderEmailSubject|default -%}Details zu {{ event.title|default('')|raw }}{%- endif -%}
 {% if renderEmailText|default %}
 Liebe Teilnehmende oder Angemeldete
 
@@ -13,6 +13,6 @@ Beste Grüsse
 
 
 --------------------------
-{{ event.title }}
+{{ event.title|raw }}
 {{ event_url }}
 {% endif %}
