@@ -366,7 +366,7 @@ div.tl_header_tour_rapport table td {
   }
 
   & label {
-    font-weight: 600
+    font-weight: 600;
   }
 
   & legend {
@@ -393,10 +393,10 @@ div.tl_header_tour_rapport table td {
   }
 
   & .widget-checkbox span {
-    align-items: center;
+    align-items: flex-start;
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap
+    flex-wrap: nowrap
   }
 
   & .widget.tl_submit {
@@ -405,54 +405,86 @@ div.tl_header_tour_rapport table td {
     padding: 0
   }
 
-  & .tl_checkbox_container span > * {
-    margin: .5rem .5rem .5rem 0 !important
+  & .tl_checkbox_container fieldset > span {
+    margin: .5rem 0 !important;
+    gap: 0.35rem;
   }
 
-  & .email-attachment-list {
-    margin: 2rem 0 1rem
-  }
-
-  & .email-attachment-list li {
+  & .tl_checkbox_container span > label {
+    display: inline-flex;
     align-items: flex-start;
-    display: flex;
-    margin: .75rem 0
+    gap: 0.35rem;
+
+    img {
+      margin-top: 2px;
+      height: 13px;
+      width: 13px;
+    }
   }
 
-  & .delete-attachment-btn span {
-    border: 0;
-    display: inline-block;
-    height: 16px;
-    margin: 0 .5rem 0 0;
-    padding: 0;
-    width: 16px
+  #fileUploader {
+    margin-bottom: 1rem;
+
+    & .email-attachment-list {
+      margin: 1rem 0 1rem;
+      padding: 0;
+      list-style: none;
+    }
+
+    & .email-attachment-list li {
+      align-items: flex-start;
+      display: flex;
+      margin: 1px;
+      background-color: var(--panel-bg);
+      padding: 0.5rem;
+    }
+
+    #ctrl_attachment_upload::file-selector-button {
+      background: var(--form-button);
+      border: 1px solid var(--form-border);
+      border-radius: 2px;
+      box-sizing: border-box;
+      cursor: pointer;
+      height: 30px;
+      padding: 7px 12px;
+      transition: background .2s ease;
+    }
+
+    & .delete-attachment-btn span {
+      border: 0;
+      display: inline-block;
+      height: 16px;
+      margin: 0 .5rem 0 0;
+      padding: 0;
+      width: 16px
+    }
+
+    & .ajax-message-success, & .pending-upload-indicator {
+      color: green
+    }
+
+    & .upload-error-box {
+      margin: 2rem 0 0
+    }
+
+    & .blink {
+      animation: blinker 1s linear infinite
+    }
+
+    & .cc-info {
+      color: green;
+      margin: 32px 0 16px
+    }
+
+    & p.error {
+      color: red;
+      margin: 16px 0
+    }
   }
 
-  & .ajax-message-success, & .pending-upload-indicator {
-    color: green
-  }
-
-  & .upload-error-box {
-    margin: 2rem 0 0
-  }
-
-  & .blink {
-    animation: blinker 1s linear infinite
-  }
-
-  & .cc-info {
-    color: green;
-    margin: 32px 0 16px
-  }
-
-  & p.error {
-    color: red;
-    margin: 16px 0
-  }
-}
-
-@keyframes blinker {
-  50% {
-    opacity: 0
+  @keyframes blinker {
+    50% {
+      opacity: 0
+    }
   }
 }
