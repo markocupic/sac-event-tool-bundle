@@ -165,8 +165,8 @@ class TextInputTokenizer {
         this.input.addEventListener('input', () => {
             let val = this.input.value.trim();
 
-            // Add the token if the user enters a comma
-            if (val.endsWith(',') || val.endsWith('\n') || val.endsWith('\t') || val.endsWith('\r') || val.endsWith(';')) {
+            // Add the token if the user enters a comma or whitespace or ...
+            if (val.endsWith(',') || val.endsWith(' ') || val.endsWith('\n') || val.endsWith('\t') || val.endsWith('\r') || val.endsWith(';')) {
                 const value = val.slice(0, -1).trim();
 
                 if (value.length > 0) {
