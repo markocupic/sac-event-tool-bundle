@@ -490,6 +490,7 @@ class EventParticipantEmailController extends AbstractBackendController
     {
         $bag = $this->getSessionBag();
         $bag['recipients'] = $form->getWidget('recipients')->value;
+        $bag['recipientsCc'] = $form->getWidget('recipientsCc')->value;
         $bag['subject'] = $form->getWidget('subject')->value;
         $bag['text'] = $form->getWidget('text')->value;
 
@@ -501,6 +502,7 @@ class EventParticipantEmailController extends AbstractBackendController
         $bag = $this->getSessionBag();
 
         $form->getWidget('recipients')->value = $bag['recipients'];
+        $form->getWidget('recipientsCc')->value = $bag['recipientsCc'];
         $form->getWidget('subject')->value = $bag['subject'];
         $form->getWidget('text')->value = $bag['text'];
     }
