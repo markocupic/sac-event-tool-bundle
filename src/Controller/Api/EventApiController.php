@@ -88,11 +88,16 @@ class EventApiController extends AbstractController
 
         if (!empty($arrIds)) {
             $qb = $this->connection->createQueryBuilder();
-            $qb->select('*')
-                ->from('tl_calendar_events', 't')
-                ->where($qb->expr()->in('t.id', ':ids'))
+            $qb->select('e.*,c.title') // e -> tl_calendar_events, c -> tl_calendar
+                ->from('tl_calendar_events', 'e')
+                ->join('e', 'tl_calendar', 'c', 'e.pid = c.id')
+                ->where($qb->expr()->in('e.id', ':ids'))
                 ->setParameter('ids', $arrIds, ArrayParameterType::INTEGER)
-                ->orderBy('t.startDate', 'ASC')
+                ->orderBy('e.startDate', 'ASC')
+                ->addOrderBy('e.endDate', 'ASC')
+                ->addOrderBy('c.title', 'DESC')
+                ->addOrderBy('e.eventType', 'ASC')
+                ->addOrderBy('e.id', 'ASC')
             ;
 
             // Offset
