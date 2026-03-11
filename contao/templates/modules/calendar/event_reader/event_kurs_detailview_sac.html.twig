@@ -8,10 +8,6 @@
 
 <div class="event event-detailview layout_full block{{ get_event_data(model, 'class') }}">
 
-    {% if get_event_data(model, 'eventState') %}
-        <h4 class="event-state-headline mt-3 mb-0">{{ get_event_data(model, 'eventStateLabel') }}</h4>
-    {% endif %}
-
     <!-- indexer::continue -->
     <h1 class="content-headline mt-3">{{ get_event_data(model, 'title') }}</h1>
     <!-- indexer::stop -->
@@ -35,9 +31,16 @@
                 {% if not get_event_data(model, 'teaser') is empty %}
                     <!-- indexer::continue -->
                     <div class="teaser event-detail">
-                        <p class="mt-0"><strong>{{ get_event_data(model, 'teaser')|nl2br }}</strong></p>
+                        <p class="m-0 d-flex"><strong>{{ get_event_data(model, 'teaser')|nl2br }}</strong></p>
                     </div>
                     <!-- indexer::stop -->
+                {% endif %}
+
+                {% if get_event_data(model, 'eventState')|default %}
+                    <div class="eventdate event-detail event-info-box event-state-box d-flex flex-row align-items-start">
+                        <span class="event-state-icon d-inline-flex lh-1">{{ get_event_data(model, 'eventStateIcon')|raw }}</span>
+                        <span class="event-state-label lh-1">{{ get_event_data(model, 'eventStateLabel')|raw }}</span>
+                    </div>
                 {% endif %}
 
                 <div class="eventdate event-detail event-info-box icon-box-small">
