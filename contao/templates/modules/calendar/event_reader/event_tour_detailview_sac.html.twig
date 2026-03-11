@@ -26,13 +26,6 @@
                     <!-- indexer::stop -->
                 {% endif %}
 
-                {% if get_event_data(model, 'eventState')|default %}
-                    <div class="eventdate event-detail event-info-box event-state-box d-flex flex-row align-items-start">
-                        <span class="event-state-icon d-inline-flex lh-1">{{ get_event_data(model, 'eventStateIcon')|raw }}</span>
-                        <span class="event-state-label lh-1">{{ get_event_data(model, 'eventStateLabel')|raw }}</span>
-                    </div>
-                {% endif %}
-
                 <div class="eventdate event-detail event-info-box icon-box-small">
                     <h5>Datum/Dauer</h5>
                     <p>
@@ -162,6 +155,13 @@
             </div>
 
             <div class="box-layout-white">
+                {% if get_event_data(model, 'eventState')|default %}
+                    <div class="eventdate event-detail event-info-box event-state-box d-flex flex-row align-items-start">
+                        <span class="event-state-icon d-inline-flex lh-1">{{ get_event_data(model, 'eventStateIcon')|raw }}</span>
+                        <span class="event-state-label lh-1 fw-bold">{{ get_event_data(model, 'eventStateLabel')|raw }}</span>
+                    </div>
+                {% endif %}
+
                 <div class="booking-text event-detail event-info-box icon-box-small">
                     <h5>Anmeldung</h5>
                     <p>{% if get_event_data(model, 'disableOnlineRegistration') %}Keine {% endif %}Online-Anmeldung</p>
