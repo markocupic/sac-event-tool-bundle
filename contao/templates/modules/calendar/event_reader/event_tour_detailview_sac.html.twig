@@ -8,10 +8,6 @@
 
 <div class="event event-detailview layout_full block{{ get_event_data(model, 'class')|raw }}">
 
-    {% if get_event_data(model, 'eventState') %}
-        <h4 class="event-state-headline mt-3 mb-0">{{ get_event_data(model, 'eventStateLabel') }}</h4>
-    {% endif %}
-
     <h1 class="content-headline mt-3">{{ get_event_data(model, 'title') }}</h1>
 
     {% if  get_event_data(model, 'eventType') == 'lastMinuteTour' %}
