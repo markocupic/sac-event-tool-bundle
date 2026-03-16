@@ -191,8 +191,8 @@
             <div class="box-layout-white my-0 mt-3">
                 {% if get_event_data(model, 'eventState')|default %}
                     <div class="eventdate event-detail event-info-box event-state-box d-flex flex-row align-items-start">
-                        <span class="event-state-icon d-inline-flex lh-1">{{ get_event_data(model, 'eventStateIcon')|raw }}</span>
-                        <span class="event-state-label lh-1 fw-bold">{{ get_event_data(model, 'eventStateLabel')|raw }}</span>
+                        <span class="event-state-icon d-inline-flex lh-sm">{{ get_event_data(model, 'eventStateIcon')|raw }}</span>
+                        <h5 class="event-state-label lh-sm">{{ get_event_data(model, 'eventStateLabel')|raw }}</h5>
                     </div>
                 {% endif %}
 
