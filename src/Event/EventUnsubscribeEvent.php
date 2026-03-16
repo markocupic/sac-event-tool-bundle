@@ -21,7 +21,7 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class EventDeregistrationEvent extends Event
+class EventUnsubscribeEvent extends Event
 {
     public function __construct(
         private readonly Request $request,

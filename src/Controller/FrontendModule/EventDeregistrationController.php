@@ -36,7 +36,7 @@ use Contao\Versions;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\Exception\EventDeregistrationException;
-use Markocupic\SacEventToolBundle\Event\EventDeregistrationEvent;
+use Markocupic\SacEventToolBundle\Event\EventUnsubscribeEvent;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -52,7 +52,7 @@ use Terminal42\NotificationCenterBundle\NotificationCenter;
 use Terminal42\NotificationCenterBundle\Receipt\ReceiptCollection;
 
 #[AsFrontendModule(EventDeregistrationController::TYPE, category: 'sac_event_tool_frontend_modules')]
-#[AsEventListener(event: EventDeregistrationEvent::class, method: 'onEventDeregistration')]
+#[AsEventListener(event: EventUnsubscribeEvent::class, method: 'onEventDeregistration')]
 class EventDeregistrationController extends AbstractFrontendModuleController
 {
     public const string TYPE = 'event_deregistration';
@@ -94,7 +94,7 @@ class EventDeregistrationController extends AbstractFrontendModuleController
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    public function onEventDeregistration(EventDeregistrationEvent $event): ReceiptCollection
+    public function onEventDeregistration(EventUnsubscribeEvent $event): ReceiptCollection
     {
         // Load language file
         $this->getContaoAdapter(Controller::class)->loadLanguageFile('tl_calendar_events_member');
@@ -350,7 +350,7 @@ class EventDeregistrationController extends AbstractFrontendModuleController
         try {
             // Deregistration can be canceled via event listener. In the event listener you
             // have to throw an EventDeregistrationException.
-            $event = new EventDeregistrationEvent($this->requestStack->getCurrentRequest(), $registration, $calendarEvent, $memberModel, $moduleModel, $shouldDelete, $dataSubmit);
+            $event = new EventUnsubscribeEvent($this->requestStack->getCurrentRequest(), $registration, $calendarEvent, $memberModel, $moduleModel, $shouldDelete, $dataSubmit);
             $this->eventDispatcher->dispatch($event);
         } catch (EventDeregistrationException $e) {
             // Get the message from the exception
