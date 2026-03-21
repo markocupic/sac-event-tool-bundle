@@ -1,9 +1,16 @@
 <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-    document.querySelector('{{ elId }}').addEventListener('sacevt::event_list.insert', (e) => {
+    window.addEventListener('pageshow', (event) => {
+        if (!event.persisted) {
+            return;
+        }
+        reinitializeUIComponents()
+    });
 
-        const vue = e.detail.vueInstance;
-        //const json = e.detail.json ?? null;
+    document.querySelector('{{ elId }}').addEventListener('sacevt::event_list.insert', () => {
+        reinitializeUIComponents();
+    });
 
+    function reinitializeUIComponents() {
         // Async await stack with auto invocation (See: https://gist.github.com/markocupic/0f49df91b8968ef471b78865707a43d2)
         (async () => {
 
@@ -14,7 +21,7 @@
 
             await (() => {
                 return new Promise((resolve, reject) => {
-                    const el = document.querySelectorAll(vue.elId + ' [data-bs-toggle="tooltip"]');
+                    const el = document.querySelectorAll('[data-bs-toggle="tooltip"]');
                     if (typeof el !== 'undefined' && el.length > 0) {
 
                         for (let i = 0; i < el.length; ++i) {
@@ -51,7 +58,7 @@
             await (() => {
                 return new Promise((resolve, reject) => {
 
-                    const tooltipTriggerList = [].slice.call(document.querySelectorAll(vue.elId + ' [data-bs-toggle="tooltip"]'))
+                    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
                     tooltipTriggerList.map(function (tooltipTriggerEl) {
                         return new bootstrap.Tooltip(tooltipTriggerEl);
                     })
@@ -66,88 +73,6 @@
                     resolve('Re-initialize frontend login modal.');
                 });
             })();
-
-            // Use kind of a forward/backend cache (implemented with IndexedDB) to save already loaded items
-            // And scroll to last position when returning to the event list from a detail page
-            await (() => {
-                return new Promise((resolve, reject) => {
-                    const buttons = document.querySelectorAll(vue.elId + ' [data-has-event-href="true"]');
-                    for (const button of buttons) {
-                        button.addEventListener('click', async (event) => {
-                            event.stopPropagation();
-                            event.preventDefault();
-                            const link = button.getAttribute('data-href');
-
-                            const eventBox = button.closest('.js--event-list-item');
-                            const eventId = eventBox.dataset.id;
-                            const selector = eventBox.dataset.selector;
-
-                            const url = new URL(window.location.href);
-                            const urlParams = new URLSearchParams(url.search);
-                            const href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
-
-                            if (urlParams.has('itemId')) {
-                                urlParams.set('itemId', eventId);
-                            } else {
-                                urlParams.append('itemId', eventId);
-                            }
-
-                            // Current URL: https://my-website.com/page_a.html?event=200
-                            const nextURL = href + '?' + urlParams.toString();
-                            const nextTitle = document.title; // keep the same title
-
-                            // This will create a new entry in the browser's history, without reloading.
-                            window.history.replaceState({}, nextTitle, nextURL);
-
-                            const vueData = {
-                                'rows': vue.rows,
-                                'lastRequestUrl': vue.lastRequestUrl,
-                                'arrEventIds': vue.arrEventIds,
-                                'itemsTotal': vue.itemsTotal,
-                                'loadedItems': vue.loadedItems,
-                                'blnAllEventsLoaded': vue.blnAllEventsLoaded,
-                                'expiry': Date.now() + 5 * 60 * 1000,
-                            }
-
-                            // Use kind of a forward/backend cache:
-                            // Save the vue instance to the indexed DB.
-                            // That will prevent a time-consuming request,
-                            // if the user clicks back from the detail module to the listing module.
-                            try {
-                                const db = new Dexie('SacEventToolEventListing');
-                                await db.version(1).stores({
-                                    eventStore: '++id, path, expires'
-                                });
-
-                                await db.eventStore
-                                    .where("path")
-                                    .equals(btoa(nextURL + '&modId=' + vue.modId))
-                                    .delete()
-                                ;
-
-                                db.eventStore.put(
-                                    {
-                                        path: btoa(nextURL + '&modId=' + vue.modId),
-                                        eventId: eventId,
-                                        selector: selector,
-                                        vueDataSerialized:
-                                            JSON.stringify(vueData),
-                                        expires:
-                                            Math.round(+new Date() / 1000) + 24 * 3600,
-                                    }
-                                )
-                                ;
-                            } catch (e) {
-                                console.error('Something went wrong while trying to save the Vue.js instance in the indexed database.')
-                            }
-
-                            // Redirect to detail page
-                            window.location.href = link;
-                        });
-                    }
-                    resolve('Cached the event list object in the indexed DB!');
-                });
-            })();
         })();
-    });
+    }
 </script>

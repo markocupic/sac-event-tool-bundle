@@ -86,7 +86,7 @@ if (typeof VueEventList !== 'function') {
                     // Listen for pageshow event to detect back-forward-cache restore
                     window.addEventListener('pageshow', (event) => {
                         if (event.persisted) {
-                            // Page was restored from back-forward-cache
+                            // Page was restored from the back-forward-cache
                             self.blnLoadedFromCache = true;
                             console.log('Page restored from back-forward-cache.');
                         }
@@ -135,9 +135,7 @@ if (typeof VueEventList !== 'function') {
 
                     getTake: function getTake() {
                         const self = this;
-                        const urlString = window.location.href;
-                        const url = new URL(urlString);
-                        const take = url.searchParams.get('take_e' + self.modId);
+                        const take = (new URL(window.location.href)).searchParams.get('take_e' + self.modId);
 
                         return null === take ? null : parseInt(take);
                     },
@@ -145,114 +143,6 @@ if (typeof VueEventList !== 'function') {
                     // Load items from the server or the indexedDB cache
                     fetchItems: async function fetchItems() {
                         const self = this;
-
-                        let skipIndexedDB = false;
-
-                        // Skip indexedDB loading if data already exists from back-forward-cache
-                        if (self.blnLoadedFromCache && self.loadedItems > 0) {
-                            console.log('Skipping indexedDB load - data already present from back-forward-cache.');
-                            skipIndexedDB = true;
-                        }
-
-                        // Initialize indexedDB
-                        const db = new Dexie('SacEventToolEventListing');
-                        db.version(1).stores({
-                            eventStore: '++id, path, expires'
-                        });
-
-                        // Delete expired data
-                        await db.eventStore.where("expires")
-                            .below(Math.round(+new Date() / 1000))
-                            .delete()
-                        ;
-
-                        const eventStoreData = await db.eventStore
-                            .where("path")
-                            .equals(btoa(window.location.href + '&modId=' + self.modId))
-                            .first()
-                        ;
-
-                        // Search data in the forward-backwards (indexedDB) cache
-                        if (false === skipIndexedDB && eventStoreData && eventStoreData.path && eventStoreData.vueDataSerialized) {
-
-                            // Delete data from indexedDB
-                            await db.eventStore.delete(eventStoreData.id);
-
-                            const vueData = JSON.parse(eventStoreData.vueDataSerialized);
-
-                            // Return if storage data is outdated
-                            if (vueData.expiry < Date.now()) {
-                                return;
-                            }
-
-                            console.log('Loaded events from indexedDB cache.');
-
-                            self.rows = vueData.rows;
-                            self.lastRequestUrl = vueData.lastRequestUrl;
-                            self.arrEventIds = vueData.arrEventIds;
-                            self.itemsTotal = vueData.itemsTotal;
-                            self.loadedItems = vueData.loadedItems;
-                            self.blnAllEventsLoaded = vueData.blnAllEventsLoaded;
-                            self.blnIsBusy = false;
-
-                            await self.$nextTick();
-
-                            // Dispatch the sacevt::event_list.indexed_db_load event
-                            const event = new CustomEvent('sacevt::event_list.indexed_db_load', {
-                                detail: {
-                                    elId: self.elId,
-                                    storage: vueData,
-                                    vueInstance: self,
-                                },
-                            });
-
-                            document.dispatchEvent(event);
-
-                            // Create the sacevt::event_list.insert event
-                            const onInsertEvent = new CustomEvent('sacevt::event_list.insert', {
-                                detail: {
-                                    elId: self.elId,
-                                    vueInstance: self,
-                                    json: null,
-                                },
-                            });
-
-                            // Dispatch the sacevt::event_list.insert event
-                            document.querySelector(self.elId).dispatchEvent(onInsertEvent);
-
-                            // Scroll to last mouse click position
-                            (() => {
-                                const scrollToSelector = eventStoreData.selector;
-                                const elScrollTo = document.querySelector('[data-selector="' + scrollToSelector + '"]');
-
-                                if (elScrollTo) {
-                                    elScrollTo.scrollIntoView({behavior: "instant"});
-                                }
-                            })();
-
-                            // Parse current URL
-                            const url = new URL(window.location.href);
-                            const urlParams = url.searchParams;
-
-                            // Remove the "itemId" parameter when returning from the detail view
-                            if (urlParams.has('itemId')) {
-                                urlParams.delete('itemId');
-                            }
-
-                            // Build a clean base URL (origin + pathname)
-                            const baseUrl = new URL(window.location.pathname, window.location.origin);
-
-                            // Apply updated query parameters
-                            baseUrl.search = urlParams.toString();
-
-                            // Keep the same title
-                            const nextTitle = document.title;
-
-                            // Update browser history without reloading
-                            window.history.replaceState({}, nextTitle, baseUrl.toString());
-
-                            return;
-                        }
 
                         if (self.blnAllEventsLoaded === true) {
                             return;
@@ -263,7 +153,7 @@ if (typeof VueEventList !== 'function') {
                         // Add api parameters to the Form Data object
                         for (const [key, value] of Object.entries(self.apiParams)) {
                             if (key === 'offset') {
-                                formData.append('offset', parseInt(value) + self.loadedItems);
+                                formData.append('offset', self.loadedItems + parseInt(value.toString()));
                             } else if (Array.isArray(value)) {// Handle arrays correctly
                                 for (let i = 0; i < value.length; ++i) {
                                     formData.append(key + '[]', value[i]);
@@ -273,7 +163,7 @@ if (typeof VueEventList !== 'function') {
                             }
                         }
 
-                        // Set the limit on page load/refresh
+                        // Update when fetching more items
                         if (self.loadedItems === 0 && self.getTake() > 0) {
                             if (formData.has('limit')) {
                                 formData.set('limit', self.getTake());
@@ -287,9 +177,9 @@ if (typeof VueEventList !== 'function') {
                             formData.append('fields[]', prop);
                         }
 
-                        const urlParams = new URLSearchParams(Array.from(formData)).toString();
-                        const url = new URL('/eventApi/events', window.location.origin);
-                        url.search = urlParams.toString();
+                        let urlSearchParams = new URLSearchParams(Array.from(formData)).toString();
+                        let url = new URL('/eventApi/events', window.location.origin);
+                        url.search = urlSearchParams.toString();
 
                         self.lastRequestUrl = url;
 
@@ -344,18 +234,17 @@ if (typeof VueEventList !== 'function') {
                             // Update the URL with the take parameter
                             let take = self.getTake();
 
-                            const urlObj = new URL(window.location.href);
-                            const urlParams = urlObj.searchParams;
+                            let urlSearchParams = (new URL(window.location.href)).searchParams;
 
-                            // If more items have been loaded than the API limit, update the take value.
+                            // Update the URL in the browser without triggering a page reload
                             if (self.loadedItems > self.apiParams.limit) {
                                 take = self.loadedItems;
 
                                 const key = 'take_e' + self.modId;
-                                urlParams.set(key, take);
+                                urlSearchParams.set(key, take);
 
                                 const nextUrl = new URL(window.location.pathname, window.location.origin);
-                                nextUrl.search = urlParams.toString();
+                                nextUrl.search = urlSearchParams.toString();
 
                                 window.history.replaceState({}, document.title, nextUrl.toString());
                             }

@@ -37,11 +37,6 @@ Encore
         pattern: /(choices\.min\.js|choices\.min\.css)$/,
     })
     .copyFiles({
-        from: './node_modules/dexie/dist',
-        to: 'dexie/dist/[path][name].[hash:8].[ext]',
-        pattern: /(dexie\.js)$/,
-    })
-    .copyFiles({
         from: './node_modules/vue/dist',
         to: 'vue/dist/[path][name].[hash:8].[ext]',
         pattern: /(vue\.global\.prod\.js)$/,
