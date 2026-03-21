@@ -86,7 +86,7 @@
                     {# end event state icon #}
                     {# like icon #}
                     {% if not has_logged_in_frontend_user() %}
-                        <button class="event-list-item--like-button p-0" data-sac-login-toggle="modal" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
+                        <button class="event-list-item--like-button p-0" data-controller="sacptheme--frontend--bs-login-modal" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
                             <i class="fa-regular fa-heart"></i>
                         </button>
                     {% else %}
@@ -179,6 +179,3 @@
         });
     });
 </script>
-
-{# re-initialize AOS, Bootstrap/Popper.js and handle the forward/backend cache implemented with IndexedDB #}
-{% include '@Contao_MarkocupicSacEventToolBundle/frontend_module_partials/event_list/_insert_listener.html.twig' with {'elId': '#tour-list'} only %}

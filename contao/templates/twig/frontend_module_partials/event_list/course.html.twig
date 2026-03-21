@@ -72,7 +72,7 @@
                                     <div class="event-list-item--event-state-icon" v-html="row.eventStateIcon"  v-bind:aria-label="row.eventStateLabel" data-controller="sacevt--frontend--bs-tooltip" v-bind:data-bs-tooltip-title="row.eventStateLabel" data-bs-tooltip-placement="top" v-bind:class="row.eventState"></div>
 
                                     {% if not has_logged_in_frontend_user() %}
-                                        <button class="event-list-item--like-button p-0" data-sac-login-toggle="modal" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
+                                        <button class="event-list-item--like-button p-0" data-controller="sacptheme--frontend--bs-login-modal" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
                                             <i class="fa-regular fa-heart"></i>
                                         </button>
                                     {% else %}
@@ -161,6 +161,3 @@
         ],
     });
 </script>
-
-{# re-initialize AOS, Bootstrap/Popper.js and handle the forward/backend cache implemented with IndexedDB #}
-{% include '@Contao_MarkocupicSacEventToolBundle/frontend_module_partials/event_list/_insert_listener.html.twig' with {'elId': '#course-list'} only %}
