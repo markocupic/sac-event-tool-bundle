@@ -19,50 +19,11 @@
                 return new Promise(resolve => setTimeout(resolve, 100));
             })();
 
-            await (() => {
-                return new Promise((resolve, reject) => {
-                    const el = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-                    if (typeof el !== 'undefined' && el.length > 0) {
-
-                        for (let i = 0; i < el.length; ++i) {
-                            let title = '';
-                            // Get the title attribute by default from the data-title attribute.
-                            // The reason why we are doing this:
-                            // Popper.js deletes the original title attribute when it has been initialized.
-                            if (el[i].hasAttribute('data-title')) {
-                                title = el[i].getAttribute('data-title');
-                                el[i].setAttribute('data-bs-title', title);
-                                el[i].setAttribute('title', title);
-                                el[i].setAttribute('data-bs-toggle', 'tooltip');
-                            } else if (el[i].hasAttribute('title')) { // Fallback
-                                title = el[i].getAttribute('title');
-                                el[i].setAttribute('data-bs-title', title);
-                                el[i].setAttribute('data-title', title);
-                                el[i].setAttribute('data-bs-toggle', 'tooltip');
-                            }
-                        }
-                    }
-                    resolve('Add the title- and data-bs-title attribute from the data-title attribute.');
-                });
-            })();
-
             // Re-initialize AOS
             await (() => {
                 return new Promise((resolve, reject) => {
                     // AOS.refresh(); // Currently not in use
                     resolve('Re-initialize AOS.');
-                });
-            })();
-
-            // Re-initialize Bootstrap/Popper.js tooltips
-            await (() => {
-                return new Promise((resolve, reject) => {
-
-                    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-                    tooltipTriggerList.map(function (tooltipTriggerEl) {
-                        return new bootstrap.Tooltip(tooltipTriggerEl);
-                    })
-                    resolve('Re-initialize Bootstrap popper.js tooltips.');
                 });
             })();
 

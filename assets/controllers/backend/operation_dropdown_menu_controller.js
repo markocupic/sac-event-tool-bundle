@@ -12,7 +12,6 @@ export default class extends Controller {
     }
 
     toggle(event) {
-
         event.stopPropagation();
         const isOpen = this.#getDropdownMenuPortal().querySelector('.dropdown-menu--dropdown.show') ? true : false;
 

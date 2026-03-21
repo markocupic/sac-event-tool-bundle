@@ -5,7 +5,8 @@ Encore
     .setPublicPath('/bundles/markocupicsaceventtool')
     .setManifestKeyPrefix('')
 
-    .addEntry('backend', './assets/backend.js') // Register Stimulus controllers
+    .addEntry('stimulus_backend', './assets/stimulus_backend.js') // Register Stimulus controllers for the backend
+    .addEntry('stimulus_frontend', './assets/stimulus_frontend.js') // Register Stimulus controllers for the frontend
 
     .copyFiles({
         from: './assets/sounds',

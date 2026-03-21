@@ -870,7 +870,7 @@ readonly class CalendarEventsUtil
 
         if ($blnTooltip) {
             $strEventDuration = $blnAppendEventDuration ? ' ('.$this->getEventDuration($objEvent).')' : '';
-            $strTooltip = '<a tabindex="0" class="more-date-infos" data-bs-toggle="tooltip" data-placement="bottom" data-title="Eventdaten: '.StringUtil::specialchars(implode(', ', $arrDates)).'">und weitere</a>';
+            $strTooltip = '<a tabindex="0" class="more-date-infos" data-controller="sacevt--frontend--bs-tooltip" data-bs-tooltip-placement="bottom" data-bs-tooltip-title="Eventdaten: '.StringUtil::specialchars(implode(', ', $arrDates)).'">und weitere</a>';
 
             return $this->getAdapter(Date::class)->parse($dateFormat, $this->getStartTstamp($objEvent)).$strEventDuration.(!$blnInline ? '<br>' : ' ').$strTooltip;
         }
@@ -972,7 +972,7 @@ readonly class CalendarEventsUtil
 
     public function getPublicTransportBadge(): string
     {
-        return '<span class="badge badge-sm badge-pill bg-success" data-bs-toggle="tooltip" data-placement="top" data-title="Anreise mit ÖV">ÖV</span>';
+        return '<span class="badge badge-sm badge-pill bg-success" data-controller="sacevt--frontend--bs-tooltip" data-bs-tooltip-title="Anreise mit ÖV" data-bs-tooltip-placement="top">ÖV</span>';
     }
 
     public function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, bool $tooltip = false, bool $withTitle = false): array
@@ -1020,7 +1020,7 @@ readonly class CalendarEventsUtil
             }
 
             if ($tooltip) {
-                $html = '<span class="badge badge-sm badge-pill bg-primary" data-bs-toggle="tooltip" data-placement="top" data-title="Techn. Schwierigkeit: %s">%s</span>';
+                $html = '<span class="badge badge-sm badge-pill bg-primary" data-controller="sacevt--frontend--bs-tooltip" data-bs-tooltip-title="Techn. Schwierigkeit: %s" data-bs-tooltip-placement="top">%s</span>';
                 $arrReturn[] = \sprintf($html, StringUtil::specialchars($strDiffTitle), $strDiff);
             } elseif ($withTitle) {
                 $arrReturn[] = $strDiff.' ('.$strDiffTitle.')';
@@ -1107,7 +1107,7 @@ readonly class CalendarEventsUtil
             }
 
             if ($tooltip) {
-                $html = '<span class="badge badge-sm badge-pill bg-secondary" data-bs-toggle="tooltip" data-placement="top" data-title="Typ: %s">%s</span>';
+                $html = '<span class="badge badge-sm badge-pill bg-secondary" data-controller="sacevt--frontend--bs-tooltip" data-bs-tooltip-title="Typ: %s" data-bs-tooltip-placement="top">%s</span>';
                 $arrTourTypes[] = \sprintf($html, StringUtil::specialchars($objTourType->title), $objTourType->{$field});
             } else {
                 $arrTourTypes[] = $objTourType->{$field};
@@ -1121,7 +1121,7 @@ readonly class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $strBadge = '<span class="badge badge-sm badge-pill bg-%s" data-bs-toggle="tooltip" data-placement="top" data-title="%s">%s</span>';
+        $strBadge = '<span class="badge badge-sm badge-pill bg-%s" data-controller="sacevt--frontend--bs-tooltip" data-bs-tooltip-title="%s" data-bs-tooltip-placement="top">%s</span>';
 
         if ($withoutTooltip) {
             $strBadge = '%2$s (%3$s)'; // only text as output, e.g. 'noch 1 freie Plätze (5/6)`

@@ -17,6 +17,7 @@
         "vue": "^3.5"
     },
     "devDependencies": {
+        "bootstrap": "^5.3",
         "@babel/preset-env": "^7.0",
         "@hotwired/stimulus": "^3.2.2",
         "@hotwired/stimulus-webpack-helpers": "^1.0.1",
