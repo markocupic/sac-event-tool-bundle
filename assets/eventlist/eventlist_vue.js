@@ -76,15 +76,27 @@ if (typeof VueEventList !== 'function') {
                         blnAllEventsLoaded: false,
                         // The last (fetch) request url
                         lastRequestUrl: '',
+                        // Flag to prevent loading from indexedDB after back-forward-cache restore
+                        blnLoadedFromCache: false,
                     };
                 },
                 mounted() {
                     const self = this;
+
+                    // Listen for pageshow event to detect back-forward-cache restore
+                    window.addEventListener('pageshow', (event) => {
+                        if (event.persisted) {
+                            // Page was restored from back-forward-cache
+                            self.blnLoadedFromCache = true;
+                            console.log('Page restored from back-forward-cache.');
+                        }
+                    });
+
                     self.prepareRequest();
                 },
 
                 methods: {
-                    // Prepare ajax request
+                    // Prepare the ajax request
                     prepareRequest: function prepareRequest() {
                         const self = this;
                         if (self.blnIsBusy === false) {
@@ -93,7 +105,7 @@ if (typeof VueEventList !== 'function') {
                         }
                     },
 
-                    favorEvent: function favorEvent(index) {
+                    favorEvent: async function favorEvent(index) {
                         const affectedRow = this.rows[index];
                         const eventId = affectedRow.id;
 
@@ -101,23 +113,24 @@ if (typeof VueEventList !== 'function') {
                         formData.append('eventId', eventId);
                         formData.append('REQUEST_TOKEN', params.csrfToken);
 
-                        fetch(window.location.href, {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'x-requested-with': 'XMLHttpRequest',
-                            },
-                        }).then(response => {
+                        try {
+                            const response = await fetch(window.location.href, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'x-requested-with': 'XMLHttpRequest',
+                                },
+                            });
+
                             if (response.ok) {
-                                return response.json();
+                                const json = await response.json();
+                                if (json.status === 'success') {
+                                    this.rows[index].isFavoredEvent = json.isFavoredEvent;
+                                }
                             }
-                        }).then(json => {
-                            if (json['status'] === 'success') {
-                                this.rows[index]['isFavoredEvent'] = json['isFavoredEvent'];
-                            }
-                        }).catch(error => {
+                        } catch (error) {
                             console.error(error.message);
-                        })
+                        }
                     },
 
                     getTake: function getTake() {
@@ -129,9 +142,17 @@ if (typeof VueEventList !== 'function') {
                         return null === take ? null : parseInt(take);
                     },
 
-                    // Load items from server or indexed database
+                    // Load items from the server or the indexedDB cache
                     fetchItems: async function fetchItems() {
                         const self = this;
+
+                        let skipIndexedDB = false;
+
+                        // Skip indexedDB loading if data already exists from back-forward-cache
+                        if (self.blnLoadedFromCache && self.loadedItems > 0) {
+                            console.log('Skipping indexedDB load - data already present from back-forward-cache.');
+                            skipIndexedDB = true;
+                        }
 
                         // Initialize indexedDB
                         const db = new Dexie('SacEventToolEventListing');
@@ -151,10 +172,10 @@ if (typeof VueEventList !== 'function') {
                             .first()
                         ;
 
-                        // Search data in forward backend (indexed database) cache
-                        if (eventStoreData && eventStoreData.path && eventStoreData.vueDataSerialized) {
+                        // Search data in the forward-backwards (indexedDB) cache
+                        if (false === skipIndexedDB && eventStoreData && eventStoreData.path && eventStoreData.vueDataSerialized) {
 
-                            // Delete data from indexed database
+                            // Delete data from indexedDB
                             await db.eventStore.delete(eventStoreData.id);
 
                             const vueData = JSON.parse(eventStoreData.vueDataSerialized);
@@ -164,7 +185,7 @@ if (typeof VueEventList !== 'function') {
                                 return;
                             }
 
-                            console.log('Loaded events from the indexed database.');
+                            console.log('Loaded events from indexedDB cache.');
 
                             self.rows = vueData.rows;
                             self.lastRequestUrl = vueData.lastRequestUrl;
@@ -176,7 +197,7 @@ if (typeof VueEventList !== 'function') {
 
                             await self.$nextTick();
 
-                            // Dispatch the sacevt::event_list.indexed_db_load
+                            // Dispatch the sacevt::event_list.indexed_db_load event
                             const event = new CustomEvent('sacevt::event_list.indexed_db_load', {
                                 detail: {
                                     elId: self.elId,
@@ -187,7 +208,7 @@ if (typeof VueEventList !== 'function') {
 
                             document.dispatchEvent(event);
 
-                            // Create the on insert event
+                            // Create the sacevt::event_list.insert event
                             const onInsertEvent = new CustomEvent('sacevt::event_list.insert', {
                                 detail: {
                                     elId: self.elId,
@@ -196,7 +217,7 @@ if (typeof VueEventList !== 'function') {
                                 },
                             });
 
-                            // Dispatch the on insert event
+                            // Dispatch the sacevt::event_list.insert event
                             document.querySelector(self.elId).dispatchEvent(onInsertEvent);
 
                             // Scroll to last mouse click position
@@ -209,21 +230,26 @@ if (typeof VueEventList !== 'function') {
                                 }
                             })();
 
+                            // Parse current URL
                             const url = new URL(window.location.href);
-                            const urlParams = new URLSearchParams(url.search);
-                            const href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+                            const urlParams = url.searchParams;
 
-                            // Remove the "itemId" parameter when the user returns from the detail view
+                            // Remove the "itemId" parameter when returning from the detail view
                             if (urlParams.has('itemId')) {
                                 urlParams.delete('itemId');
                             }
 
-                            // Current URL: https://my-website.ch/demo_a.html?take_e234=200
-                            const nextURL = href + (urlParams.toString() ? '?' + urlParams.toString() : '');
-                            const nextTitle = document.title; // keep the same title
+                            // Build a clean base URL (origin + pathname)
+                            const baseUrl = new URL(window.location.pathname, window.location.origin);
 
-                            // This will create a new entry in the browser's history, without reloading
-                            window.history.replaceState({}, nextTitle, nextURL);
+                            // Apply updated query parameters
+                            baseUrl.search = urlParams.toString();
+
+                            // Keep the same title
+                            const nextTitle = document.title;
+
+                            // Update browser history without reloading
+                            window.history.replaceState({}, nextTitle, baseUrl.toString());
 
                             return;
                         }
@@ -247,7 +273,7 @@ if (typeof VueEventList !== 'function') {
                             }
                         }
 
-                        // Set limit on page load/refresh
+                        // Set the limit on page load/refresh
                         if (self.loadedItems === 0 && self.getTake() > 0) {
                             if (formData.has('limit')) {
                                 formData.set('limit', self.getTake());
@@ -262,7 +288,8 @@ if (typeof VueEventList !== 'function') {
                         }
 
                         const urlParams = new URLSearchParams(Array.from(formData)).toString();
-                        const url = window.location.protocol + '//' + window.location.hostname + '/eventApi/events?' + urlParams;
+                        const url = new URL('/eventApi/events', window.location.origin);
+                        url.search = urlParams.toString();
 
                         self.lastRequestUrl = url;
 
@@ -277,66 +304,63 @@ if (typeof VueEventList !== 'function') {
 
                         document.dispatchEvent(event);
 
-                        // Fetch
-                        fetch(url, {
+                        try {
+                            // Fetch
+                            const response = await fetch(url, {
                                 headers: {
                                     'x-requested-with': 'XMLHttpRequest'
-                                },
+                                }
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                             }
-                        ).then(function (res) {
-                            return res.json();
-                        }).then(function (json) {
+
+                            const json = await response.json();
 
                             self.blnIsBusy = false;
 
+                            // Process loaded records
                             let i = 0;
-                            self.itemsTotal = parseInt(json['meta']['itemsTotal']);
-                            for (const row of json['data']) {
+                            self.itemsTotal = parseInt(json.meta.itemsTotal);
+
+                            for (const row of json.data) {
                                 i++;
                                 row.selector = self.modId + '-' + row.id;
                                 self.rows.push(row);
                                 self.loadedItems++;
                             }
 
-                            // Store all ids of loaded events in self.arrEventIds
-                            for (const id of json['meta']['arrEventIds']) {
+                            // Save the event IDS
+                            for (const id of json.meta.arrEventIds) {
                                 self.arrEventIds.push(id);
                             }
 
-                            if (i === 0 || parseInt(json['meta']['itemsTotal']) === self.loadedItems) {
-                                self.blnAllEventsLoaded = true
+                            // Check if all events are loaded
+                            if (i === 0 || self.loadedItems === parseInt(json.meta.itemsTotal)) {
+                                self.blnAllEventsLoaded = true;
                             }
 
-                            if (self.blnAllEventsLoaded === true) {
-                                //console.log('Finished downloading process. ' + self.loadedItems + ' events loaded.');
-                            }
-                            return json;
-                        }).then(function (json) {
+                            // Update the URL with the take parameter
                             let take = self.getTake();
 
-                            const url = new URL(window.location.href);
-                            const urlParams = new URLSearchParams(url.search);
-                            const href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+                            const urlObj = new URL(window.location.href);
+                            const urlParams = urlObj.searchParams;
 
-                            if (self.loadedItems > self.apiParams['limit']) {
+                            // If more items have been loaded than the API limit, update the take value.
+                            if (self.loadedItems > self.apiParams.limit) {
                                 take = self.loadedItems;
-                                if (!urlParams.has('take_e' + self.modId)) {
-                                    urlParams.append('take_e' + self.modId, take);
-                                } else {
-                                    urlParams.set('take_e' + self.modId, take);
-                                }
 
-                                // Current URL: https://my-website.ch/demo_a.html?take_324=200
-                                const nextURL = href + '?' + urlParams.toString();
-                                const nextTitle = document.title; // keep the original title
+                                const key = 'take_e' + self.modId;
+                                urlParams.set(key, take);
 
-                                // This will create a new entry in the browser's history, without reloading
-                                window.history.replaceState({}, nextTitle, nextURL);
+                                const nextUrl = new URL(window.location.pathname, window.location.origin);
+                                nextUrl.search = urlParams.toString();
+
+                                window.history.replaceState({}, document.title, nextUrl.toString());
                             }
 
-                            return json;
-
-                        }).then(function (json) {
+                            // Dispatch the sacevt::event_list.insert event
                             const onInsertEvent = new CustomEvent('sacevt::event_list.insert', {
                                 detail: {
                                     vueInstance: self,
@@ -345,9 +369,13 @@ if (typeof VueEventList !== 'function') {
                             });
 
                             document.querySelector(self.elId).dispatchEvent(onInsertEvent);
-                            return json;
-                        });
 
+                            return json;
+
+                        } catch (err) {
+                            console.error('Fetch error:', err);
+                            throw err;
+                        }
                     },
                 }
             });
