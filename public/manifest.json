@@ -1,6 +1,6 @@
 {
-  "stimulus_backend.js": "/bundles/markocupicsaceventtool/stimulus_backend.acae627c.js",
-  "stimulus_frontend.js": "/bundles/markocupicsaceventtool/stimulus_frontend.40d3aa99.js",
+  "stimulus_backend.js": "/bundles/markocupicsaceventtool/stimulus_backend.982cac58.js",
+  "stimulus_frontend.js": "/bundles/markocupicsaceventtool/stimulus_frontend.a8e845e4.js",
   "js/avatar_uploader.js": "/bundles/markocupicsaceventtool/js/avatar_uploader.e12723b9.js",
   "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.3ac8e784.css",
   "images/events/course/booklet/fallback.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/fallback.jpg",
@@ -77,8 +77,8 @@
   "icons/my_events_dashboard/more--dark.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more--dark.svg",
   "icons/my_events_dashboard/more.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more.svg",
   "../assets/ts/avatar_uploader.d.ts": "/bundles/markocupicsaceventtool/../assets/ts/avatar_uploader.d.ts",
-  "stimulus_backend.acae627c.js.map": "/bundles/markocupicsaceventtool/stimulus_backend.acae627c.js.map",
-  "stimulus_frontend.40d3aa99.js.map": "/bundles/markocupicsaceventtool/stimulus_frontend.40d3aa99.js.map",
+  "stimulus_backend.982cac58.js.map": "/bundles/markocupicsaceventtool/stimulus_backend.982cac58.js.map",
+  "stimulus_frontend.a8e845e4.js.map": "/bundles/markocupicsaceventtool/stimulus_frontend.a8e845e4.js.map",
   "avatar_uploader.e12723b9.js.map": "/bundles/markocupicsaceventtool/js/avatar_uploader.e12723b9.js.map",
   "be_stylesheet.3ac8e784.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.3ac8e784.css.map"
 }
