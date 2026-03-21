@@ -870,7 +870,7 @@ readonly class CalendarEventsUtil
 
         if ($blnTooltip) {
             $strEventDuration = $blnAppendEventDuration ? ' ('.$this->getEventDuration($objEvent).')' : '';
-            $strTooltip = '<a tabindex="0" class="more-date-infos" data-controller="sacevt--frontend--bs-tooltip" data-bs-tooltip-placement="bottom" data-bs-tooltip-title="Eventdaten: '.StringUtil::specialchars(implode(', ', $arrDates)).'">und weitere</a>';
+            $strTooltip = '<a tabindex="0" class="more-date-infos" data-controller="sacevt--frontend--bs-tooltip" data-bs-tooltip-title="Eventdaten: '.StringUtil::specialchars(implode(', ', $arrDates)).'" data-bs-tooltip-placement="bottom">und weitere</a>';
 
             return $this->getAdapter(Date::class)->parse($dateFormat, $this->getStartTstamp($objEvent)).$strEventDuration.(!$blnInline ? '<br>' : ' ').$strTooltip;
         }
