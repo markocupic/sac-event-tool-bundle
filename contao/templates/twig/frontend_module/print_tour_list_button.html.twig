@@ -138,18 +138,16 @@
 
                     const button = document.getElementById(buttonId);
 
-                    if (typeof button === 'undefined') {
+                    if (typeof button === 'undefined' || !button) {
                         return;
                     }
 
-                    if (
-                        typeof e.detail.vueInstance.lastRequestUrl === 'undefined' ||
-                        e.detail.vueInstance.lastRequestUrl === ''
-                    ) {
+                    if (typeof e.detail.vueInstance.lastRequestUrl === 'undefined' || !e.detail.vueInstance.lastRequestUrl) {
                         return;
                     }
 
                     if (e.detail.vueInstance.lastRequestUrl) {
+
                         button.removeAttribute('disabled');
 
                         button.dataset.url = btoa(e.detail.vueInstance.lastRequestUrl);
