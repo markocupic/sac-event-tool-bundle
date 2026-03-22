@@ -86,7 +86,7 @@
                     {# end event state icon #}
                     {# like icon #}
                     {% if not has_logged_in_frontend_user() %}
-                        <button class="event-list-item--like-button p-0" data-controller="sacptheme--frontend--bs-login-modal" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
+                        <button class="event-list-item--like-button p-0" data-controller="sacptheme--frontend--bs-login-modal" data-action="click->sacptheme--frontend--bs-login-modal#open" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
                             <i class="fa-regular fa-heart"></i>
                         </button>
                     {% else %}

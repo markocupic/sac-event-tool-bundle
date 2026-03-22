@@ -72,7 +72,7 @@
                                     <div class="event-list-item--event-state-icon" v-html="row.eventStateIcon"  v-bind:aria-label="row.eventStateLabel" data-controller="sacevt--frontend--bs-tooltip" v-bind:data-bs-tooltip-title="row.eventStateLabel" data-bs-tooltip-placement="top" v-bind:class="row.eventState"></div>
 
                                     {% if not has_logged_in_frontend_user() %}
-                                        <button class="event-list-item--like-button p-0" data-controller="sacptheme--frontend--bs-login-modal" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
+                                        <button class="event-list-item--like-button p-0" data-controller="sacptheme--frontend--bs-login-modal" data-action="click->sacptheme--frontend--bs-login-modal#open" data-sac-login-target="same-site" title="Zu Merkliste hinzufügen">
                                             <i class="fa-regular fa-heart"></i>
                                         </button>
                                     {% else %}
