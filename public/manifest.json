@@ -1,6 +1,7 @@
 {
   "stimulus_backend.js": "/bundles/markocupicsaceventtool/stimulus_backend.982cac58.js",
   "stimulus_frontend.js": "/bundles/markocupicsaceventtool/stimulus_frontend.a8e845e4.js",
+  "swisstopo_map.js": "/bundles/markocupicsaceventtool/swisstopo_map.3c20e2d6.js",
   "js/avatar_uploader.js": "/bundles/markocupicsaceventtool/js/avatar_uploader.e12723b9.js",
   "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.3ac8e784.css",
   "images/events/course/booklet/fallback.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/fallback.jpg",
@@ -8,7 +9,7 @@
   "images/events/course/booklet/logo_sac.png": "/bundles/markocupicsaceventtool/images/events/course/booklet/logo_sac.png",
   "images/events/course/booklet/cover.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/cover.jpg",
   "images/events/course/fallback_image.svg": "/bundles/markocupicsaceventtool/images/events/course/fallback_image.svg",
-  "vue/dist/vue.global.prod.js": "/bundles/markocupicsaceventtool/vue/dist/vue.global.prod.81273862.js",
+  "vue/dist/vue.global.prod.js": "/bundles/markocupicsaceventtool/vue/dist/vue.global.prod.6536c728.js",
   "choices.js/scripts/choices.min.js": "/bundles/markocupicsaceventtool/choices.js/scripts/choices.min.15baab05.js",
   "icons/tour_booklet/oev-tour-badge.png": "/bundles/markocupicsaceventtool/icons/tour_booklet/oev-tour-badge.png",
   "sounds/bell.mp3": "/bundles/markocupicsaceventtool/sounds/bell.0ff4105d.mp3",
@@ -81,6 +82,7 @@
   "../assets/ts/avatar_uploader.d.ts": "/bundles/markocupicsaceventtool/../assets/ts/avatar_uploader.d.ts",
   "stimulus_backend.982cac58.js.map": "/bundles/markocupicsaceventtool/stimulus_backend.982cac58.js.map",
   "stimulus_frontend.a8e845e4.js.map": "/bundles/markocupicsaceventtool/stimulus_frontend.a8e845e4.js.map",
+  "swisstopo_map.3c20e2d6.js.map": "/bundles/markocupicsaceventtool/swisstopo_map.3c20e2d6.js.map",
   "avatar_uploader.e12723b9.js.map": "/bundles/markocupicsaceventtool/js/avatar_uploader.e12723b9.js.map",
   "be_stylesheet.3ac8e784.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.3ac8e784.css.map"
 }

@@ -7,6 +7,7 @@ Encore
 
     .addEntry('stimulus_backend', './assets/stimulus_backend.js') // Register Stimulus controllers for the backend
     .addEntry('stimulus_frontend', './assets/stimulus_frontend.js') // Register Stimulus controllers for the frontend
+    .addEntry('swisstopo_map', './assets/swisstopo_map.js') // Register the swisstopo map entry
 
     .copyFiles({
         from: './assets/sounds',

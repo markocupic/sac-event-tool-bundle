@@ -14,7 +14,9 @@
     "dependencies": {
         "@symfony/stimulus-bridge": "^4.0.1",
         "choices.js": "^11.1.0",
-        "vue": "^3.5"
+        "vue": "^3.5",
+        "ol": "9.2.4",
+        "proj4": "2.11.0"
     },
     "devDependencies": {
         "bootstrap": "^5.3",
