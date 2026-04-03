@@ -25,8 +25,8 @@
 
 {% set center = '2661071, 1202853' %} {# Tomlishorn/Pilatus #}
 {% set zoom = 50 %}
-{% set marker_src = asset('icons/swisstopo/map-marker.svg', 'markocupic_sac_event_tool') %}
-{% set api_url = 'eventApi/events?dateStart=2023-04-10&dateEnd=2026-12-31&fields[]=coordsCH1903&fields[]=title&fields[]=id&limit=10000' %}
+{% set marker_src = asset('icons/swisstopo/map-marker-red.svg', 'markocupic_sac_event_tool') %}
+{% set api_url = 'eventApi/events?dateStart=2023-04-10&dateEnd=2026-12-31&fields[]=coordsCH1903&fields[]=title&fields[]=location&fields[]=id&limit=10000' %}
 
 <script>
     // 1. Schweizer Projektion LV95 (EPSG:2056) registrieren
@@ -159,6 +159,11 @@
 
         if (!json.data ?? false) return;
 
+        json.data = json.data.map(item => ({
+            ...item,
+            title: contaoDecode(item.title)
+        }));
+
         for (const data of json.data) {
             let xCoord = data.coordsCH1903[0] ?? 0;
             let yCoord = data.coordsCH1903[1] ?? 0;
@@ -191,5 +196,45 @@
 
             map.addLayer(markerLayer);
         }
+
+        function contaoDecode(str) {
+            if (!str) return "";
+
+            // 1) HTML-Entities decodieren (zweimal, falls doppelt encodiert)
+            const textarea = document.createElement("textarea");
+            textarea.innerHTML = str;
+            let decoded = textarea.value;
+
+            textarea.innerHTML = decoded;
+            decoded = textarea.value;
+
+            // 2) UTF‑8 Mojibake reparieren (Contao Klassiker)
+            const replacements = {
+                "Ã¤": "ä",
+                "Ã„": "Ä",
+                "Ã¶": "ö",
+                "Ã–": "Ö",
+                "Ã¼": "ü",
+                "Ãœ": "Ü",
+                "ÃŸ": "ß",
+                "â€“": "–",
+                "â€”": "—",
+                "â€ž": "„",
+                "â€œ": "“",
+                "â€": "”",
+                "â€˜": "‘",
+                "â€™": "’",
+                "â€¢": "•",
+                "â€¦": "…",
+                "â‚¬": "€"
+            };
+
+            Object.keys(replacements).forEach(bad => {
+                decoded = decoded.replaceAll(bad, replacements[bad]);
+            });
+
+            return decoded;
+        }
+
     })
 </script>
