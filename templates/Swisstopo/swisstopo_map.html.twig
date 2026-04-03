@@ -9,14 +9,14 @@
 {# Tooltip markup #}
 <div id="tooltip" style="
   position: absolute;
-  background: #fff;
-  padding: 4px 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  background: #000;
+  padding: 6px 10px;
   white-space: nowrap;
   pointer-events: none;
   display: none;
   font-size: 12px;
+  color: #fff;
+  border-radius: 4px;
 "></div>
 
 {# Scripts #}
@@ -24,8 +24,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.11.0/proj4.js"></script>
 
 {% set center = '2661071, 1202853' %} {# Tomlishorn/Pilatus #}
-{% set zoom = 5 %}
+{% set zoom = 50 %}
 {% set marker_src = asset('icons/swisstopo/map-marker.svg', 'markocupic_sac_event_tool') %}
+{% set api_url = 'eventApi/events?dateStart=2023-04-10&dateEnd=2026-12-31&fields[]=coordsCH1903&fields[]=title&fields[]=id&limit=10000' %}
 
 <script>
     // 1. Schweizer Projektion LV95 (EPSG:2056) registrieren
@@ -56,8 +57,19 @@
         extent: [2420000, 1030000, 2900000, 1350000],
     });
 
+    const markerStyle = new ol.style.Style({
+        image: new ol.style.Icon({
+            src: '{{ marker_src }}',
+            anchor: [0.5, 1], // Spitze des Pins auf den Koordinatenpunkt
+            width: 38,   // Breite in px
+            height: 40,   // Höhe in px
+        })
+    });
+
+    let map;
+
     // 3. Karte erstellen
-    const map = new ol.Map({
+    map = new ol.Map({
         target: 'map',
         layers: [
             // Basiskarte-Layer
@@ -89,46 +101,6 @@
                     requestEncoding: 'REST',
                     wrapX: false,
                     crossOrigin: 'anonymous',
-                }),
-            }),
-            // Marker-Layer
-            new ol.layer.Vector({
-                source: new ol.source.Vector({
-                    features: [
-                        new ol.Feature({
-                            geometry: new ol.geom.Point([{{ center }}]), // LV95-Koordinaten
-                            url: "https://www.sac-pilatus.ch/touren-detailansicht/event-19289.html",
-                            title: "Tomlishorn 1",
-                        }),
-                    ],
-                }),
-                style: new ol.style.Style({
-                    image: new ol.style.Icon({
-                        src: '{{ marker_src }}',
-                        anchor: [0.5, 1], // Spitze des Pins auf den Koordinatenpunkt
-                        width: 38,   // Breite in px
-                        height: 40,   // Höhe in px
-                    }),
-                }),
-            }),
-            // Marker-Layer
-            new ol.layer.Vector({
-                source: new ol.source.Vector({
-                    features: [
-                        new ol.Feature({
-                            geometry: new ol.geom.Point([2661120, 1202853]), // LV95-Koordinaten
-                            url: "https://www.sac-pilatus.ch/touren-detailansicht/event-19289.html",
-                            title: "Tomlishorn 2",
-                        }),
-                    ],
-                }),
-                style: new ol.style.Style({
-                    image: new ol.style.Icon({
-                        src: '{{ marker_src }}',
-                        anchor: [0.5, 1], // Spitze des Pins auf den Koordinatenpunkt
-                        width: 38,   // Breite in px
-                        height: 40,   // Höhe in px
-                    }),
                 }),
             }),
         ],
@@ -177,4 +149,47 @@
             map.getTargetElement().style.cursor = "";
         }
     });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const res = await fetch('{{ api_url|raw }}');
+
+        const json = await res.json();
+
+        if (!json.data ?? false) return;
+
+        for (const data of json.data) {
+            let xCoord = data.coordsCH1903[0] ?? 0;
+            let yCoord = data.coordsCH1903[1] ?? 0;
+
+            if (xCoord && yCoord) {
+                xCoord = parseInt(xCoord);
+                yCoord = parseInt(yCoord);
+                xCoord = xCoord < 2000000 ? xCoord + 2000000 : xCoord;
+                yCoord = yCoord < 1000000 ? yCoord + 1000000 : yCoord;
+                const url = `https://www.sac-pilatus.ch/touren-detailansicht/event-${data.id}.html`;
+
+                addMarker(xCoord, yCoord, data.title, url);
+            }
+        }
+
+        function addMarker(x, y, title, url) {
+            console.log(x, y, title, url);
+            const markerLayer = new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    features: [
+                        new ol.Feature({
+                            geometry: new ol.geom.Point([x, y]), // LV95-Koordinaten
+                            url: url,
+                            title: title,
+                        }),
+                    ],
+                }),
+                style: markerStyle,
+            });
+
+            map.addLayer(markerLayer);
+        }
+    })
 </script>
