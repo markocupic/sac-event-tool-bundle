@@ -1,0 +1,106 @@
+{# swisstopo_map.html.twig #}
+
+{# CSS #}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
+
+{# Map Container #}
+<div id="map" style="width: 100%; height: 500px;"></div>
+
+{# Scripts #}
+<script src="https://cdn.jsdelivr.net/npm/ol@v9.2.4/dist/ol.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.11.0/proj4.js"></script>
+
+{% set center = '2661071, 1202853' %} {# Tomlishorn/Pilatus #}
+{% set zoom = 5 %}
+{% set marker_src = asset('icons/swisstopo/map-marker.svg', 'markocupic_sac_event_tool') %}
+
+<script>
+    // 1. Schweizer Projektion LV95 (EPSG:2056) registrieren
+    proj4.defs(
+        'EPSG:2056',
+        '+proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 ' +
+        '+k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel ' +
+        '+towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs'
+    );
+    ol.proj.proj4.register(proj4);
+
+    const swissProj = ol.proj.get('EPSG:2056');
+    swissProj.setExtent([2420000, 1030000, 2900000, 1350000]);
+
+    // 2. Swisstopo WMTS Tile-Grid konfigurieren
+    const resolutions = [
+        4000, 3750, 3500, 3250, 3000, 2750, 2500, 2250, 2000,
+        1750, 1500, 1250, 1000, 750, 650, 500, 250, 100, 50,
+        20, 10, 5, 2.5, 2, 1.5, 1, 0.5
+    ];
+    const matrixIds = resolutions.map((_, i) => String(i));
+
+    const tileGrid = new ol.tilegrid.WMTS({
+        origin: [2420000, 1350000],
+        resolutions: resolutions,
+        matrixIds: matrixIds,
+        tileSize: 256,
+        extent: [2420000, 1030000, 2900000, 1350000],
+    });
+
+    // 3. Karte erstellen
+    const map = new ol.Map({
+        target: 'map',
+        layers: [
+            // Basiskarte-Layer
+            new ol.layer.Tile({
+                source: new ol.source.WMTS({
+                    url: 'https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
+                    layer: 'ch.swisstopo.pixelkarte-farbe',
+                    matrixSet: '2056',
+                    format: 'image/jpeg',
+                    projection: swissProj,
+                    tileGrid: tileGrid,
+                    style: 'default',
+                    requestEncoding: 'REST',
+                    wrapX: false,
+                    crossOrigin: 'anonymous',
+                }),
+            }),
+            // Wanderwege-Layer
+            new ol.layer.Tile({
+                extent: [2420000, 1030000, 2900000, 1350000],
+                source: new ol.source.WMTS({
+                    url: 'https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.swisstlm3d-wanderwege/default/current/2056/{TileMatrix}/{TileCol}/{TileRow}.png',
+                    layer: 'ch.swisstopo.swisstlm3d-wanderwege',
+                    matrixSet: '2056',
+                    format: 'image/png',
+                    projection: swissProj,
+                    tileGrid: tileGrid,
+                    style: 'default',
+                    requestEncoding: 'REST',
+                    wrapX: false,
+                    crossOrigin: 'anonymous',
+                }),
+            }),
+            // Marker-Layer
+            new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    features: [
+                        new ol.Feature({
+                            geometry: new ol.geom.Point([{{ center }}]), // LV95-Koordinaten
+                        }),
+                    ],
+                }),
+                style: new ol.style.Style({
+                    image: new ol.style.Icon({
+                        src: '{{ marker_src }}',
+                        anchor: [0.5, 1], // Spitze des Pins auf den Koordinatenpunkt
+                        width: 38,   // Breite in px
+                        height: 40,   // Höhe in px
+                    }),
+                }),
+            }),
+        ],
+        view: new ol.View({
+            projection: swissProj,
+            center: [{{ center }}],   // Mittelpunkt in LV95
+            resolution: {{ zoom }},       // Zoom/resolution: 5 -> 1:5000
+        }),
+    });
+</script>

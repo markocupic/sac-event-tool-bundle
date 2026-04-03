@@ -74,6 +74,7 @@
   "icons/event_states/event_status_1.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_1.svg",
   "icons/event_states/event_status_3.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_3.svg",
   "icons/event_states/event_status_5.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_5.svg",
+  "icons/swisstopo/map-marker.svg": "/bundles/markocupicsaceventtool/icons/swisstopo/map-marker.svg",
   "icons/my_events_dashboard/more--dark.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more--dark.svg",
   "icons/my_events_dashboard/more.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more.svg",
   "../assets/ts/avatar_uploader.d.ts": "/bundles/markocupicsaceventtool/../assets/ts/avatar_uploader.d.ts",
