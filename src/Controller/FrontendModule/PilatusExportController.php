@@ -214,8 +214,7 @@ class PilatusExportController extends AbstractPrintExportController
                 $objForm->getWidget('timeRange')->value = $request->query->get('timeRange');
                 $objForm->getWidget('timeRangeStart')->value = '';
                 $objForm->getWidget('timeRangeEnd')->value = '';
-            }
-            // If the user has set the start & end date manually
+            } // If the user has set the start & end date manually
             elseif (null !== $request->query->get('timeRangeStart') || null !== $request->query->get('timeRangeEnd')) {
                 $addError = false;
 

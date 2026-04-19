@@ -13,9 +13,10 @@ declare(strict_types=1);
  */
 
 // Legends
-$GLOBALS['TL_LANG']['tl_user_group']['allowed_event_types_legend'] = 'SAC-Event-Tool Einstellungen';
+$GLOBALS['TL_LANG']['tl_user_group']['sac_event_tool_settings'] = 'SAC-Event-Tool Einstellungen';
 
 // Fields
 $GLOBALS['TL_LANG']['tl_user_group']['calendar_containers'] = ['Erlaubte SAC-Event-Jahrescontainer', ''];
 $GLOBALS['TL_LANG']['tl_user_group']['calendar_containerp'] = ['SAC-Event-Jahrescontainer Rechte', ''];
 $GLOBALS['TL_LANG']['tl_user_group']['allowedEventTypes'] = ['Erlaubte Event-Arten (SAC-Event-Tool)', 'Legen Sie fest, welche Art von Events ein MItglied dieser Gruppe erstellen kann.'];
+$GLOBALS['TL_LANG']['tl_user_group']['sac_event_tool_permissions'] = ['SAC-Event-Tool-Berechtigungen', 'Legen Sie fest, welche zusätzlichen Berechtigungen ein Mitglied dieser Gruppe erhalten soll.'];

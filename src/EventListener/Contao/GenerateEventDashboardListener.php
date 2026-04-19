@@ -114,7 +114,7 @@ readonly class GenerateEventDashboardListener
 
         // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und
         // Vergütungsformular drucken und einreichen" button
-        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $eventId)) {
+        if ($this->security->isGranted('contao_user.sac_event_tool_permissions', 'can_edit_all_invoice_forms') || $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $eventId)) {
             if (EventType::TOUR === $objEvent->eventType || EventType::LAST_MINUTE_TOUR === $objEvent->eventType) {
                 $href = $this->router->generate(
                     'contao_backend',

@@ -47,9 +47,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class CalendarEventsInstructorInvoice
 {
-    /**
-     * Import the back end user object.
-     */
     public function __construct(
         private CalendarEventsUtil $calendarEventsUtil,
         private Connection $connection,
@@ -75,61 +72,60 @@ readonly class CalendarEventsInstructorInvoice
     public function checkPermissions(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
-
+        $id = $request->query->get('id');
         $action = $request->query->get('action', '');
+        $act = $request->query->get('act', '');
 
-        $arrOperations = [
-            'generateInvoicePdf',
-            'generateTourRapportPdf',
-            'sendRapport',
-        ];
-
+        // Check event-level permissions
         if ($dc->currentPid) {
-            if (\in_array($action, $arrOperations, true)) {
-                $objInvoice = CalendarEventsInstructorInvoiceModel::findById($request->query->get('id'));
+            $operations = ['generateInvoicePdf', 'generateTourRapportPdf', 'sendRapport'];
 
-                if (null !== $objInvoice) {
-                    if (null !== $objInvoice->getRelated('pid')) {
-                        $objEvent = $objInvoice->getRelated('pid');
-                    }
-                }
+            if (\in_array($action, $operations, true)) {
+                $calEvent = CalendarEventsInstructorInvoiceModel::findById($id)?->getRelated('pid');
             } else {
-                $objEvent = CalendarEventsModel::findById($dc->currentPid);
+                $calEvent = CalendarEventsModel::findById($dc->currentPid);
             }
 
-            if (isset($objEvent)) {
-                $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id);
+            if (null !== ($calEvent ?? null)) {
+                $allow = match (true) {
+                    $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $calEvent->id) => true,
+                    $this->security->isGranted('contao_user.sac_event_tool_permissions', 'can_edit_all_invoice_forms') => true,
+                    default => false,
+                };
 
-                if (!$blnAllow) {
+                if (!$allow) {
                     Message::addError('Sie besitzen nicht die nötigen Rechte, um diese Seite zu sehen.');
                     Controller::redirect(System::getReferer());
                 }
             }
         }
 
-        $act = $request->query->get('act', '');
-        $user = $this->security->getUser();
+        // Check action-level permissions
+        if (\in_array($act, ['select', 'copyAll', 'deleteAll', 'editAll', 'overrideAll'], true)) {
+            Message::addError($this->translator->trans('ERR.actionNotSupported', [], 'contao_default'));
+            Controller::redirect(System::getReferer());
+        }
 
-        switch ($act) {
-            case 'select':
-            case 'copyAll':
-            case 'deleteAll':
-            case 'editAll':
-            case 'overrideAll':
-                Message::addError($this->translator->trans('ERR.actionNotSupported', [], 'contao_default'));
-                Controller::redirect(System::getReferer());
-            // no break
-            case 'edit':
-            case 'delete':
-                // A common user should not be allowed to edit another user's report
-                if (!$this->security->isGranted('ROLE_ADMIN')) {
-                    $id = $this->requestStack->getCurrentRequest()->query->get('id');
-                    $userPid = (int) $this->connection->fetchOne('SELECT userPid FROM tl_calendar_events_instructor_invoice WHERE id = ?', [$id]);
+        if ('edit' === $act || 'delete' === $act) {
+            $user = $this->security->getUser();
+            $userPid = (int) $this->connection->fetchOne(
+                'SELECT userPid FROM tl_calendar_events_instructor_invoice WHERE id = ?',
+                [$id],
+            );
 
-                    if ((int) $user->id !== $userPid) {
-                        throw new AccessDeniedException('Not enough permissions to '.$act.' data record ID '.$id.'.');
-                    }
-                }
+            $allow = match (true) {
+                $this->security->isGranted('ROLE_ADMIN') => true,
+                (int) $user->id === $userPid => true,
+                default => false,
+            };
+
+            if (!$allow && 'edit' === $act) {
+                $allow = $this->security->isGranted('contao_user.sac_event_tool_permissions', 'can_edit_all_invoice_forms');
+            }
+
+            if (!$allow) {
+                throw new AccessDeniedException('Not enough permissions to '.$act.' data record ID '.$id.'.');
+            }
         }
     }
 
@@ -144,9 +140,9 @@ readonly class CalendarEventsInstructorInvoice
             return;
         }
 
-        $objEventInvoice = CalendarEventsInstructorInvoiceModel::findById($id);
+        $invoice = CalendarEventsInstructorInvoiceModel::findById($id);
 
-        if (null === $objEventInvoice) {
+        if (null === $invoice) {
             return;
         }
 
@@ -158,15 +154,18 @@ readonly class CalendarEventsInstructorInvoice
 
         try {
             if ('generateInvoicePdf' === $request->query->get('action')) {
-                throw new ResponseException($this->tourRapportGenerator->download(DocumentType::INVOICE, $objEventInvoice, OutputType::PDF, $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern));
+                $response = $this->tourRapportGenerator->download(DocumentType::INVOICE, $invoice, OutputType::PDF, $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
+
+                throw new ResponseException($response);
             }
 
             if ('generateTourRapportPdf' === $request->query->get('action')) {
-                throw new ResponseException($this->tourRapportGenerator->download(DocumentType::RAPPORT, $objEventInvoice, OutputType::PDF, $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern));
+                $response = $this->tourRapportGenerator->download(DocumentType::RAPPORT, $invoice, OutputType::PDF, $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
+
+                throw new ResponseException($response);
             }
-        } catch (ResponseException|TourRapportGeneratorException|\Exception $e) {
+        } catch (\Exception $e) {
             $errMsg = match (true) {
-                $e instanceof ResponseException => throw $e,
                 $e instanceof TourRapportGeneratorException => $e->getTranslatableText(),
                 default => throw $e,
             };
@@ -186,13 +185,13 @@ readonly class CalendarEventsInstructorInvoice
             return;
         }
 
-        $objEvent = CalendarEventsModel::findById($dc->currentPid);
+        $calEvent = CalendarEventsModel::findById($dc->currentPid);
 
-        if (null === $objEvent) {
+        if (null === $calEvent) {
             return;
         }
 
-        if (!$objEvent->filledInEventReportForm) {
+        if (!$calEvent->filledInEventReportForm) {
             Message::addError($this->translator->trans('ERR.evt_strn_eventRapportMustFilledOutCorrectly', [], 'contao_default'));
             Controller::redirect(System::getReferer());
         }
@@ -216,13 +215,13 @@ readonly class CalendarEventsInstructorInvoice
             return;
         }
 
-        $objEvent = CalendarEventsModel::findById($dc->currentPid);
+        $calEvent = CalendarEventsModel::findById($dc->currentPid);
 
-        if (null === $objEvent) {
+        if (null === $calEvent) {
             return;
         }
 
-        if (!$objEvent->filledInEventReportForm) {
+        if (!$calEvent->filledInEventReportForm) {
             Message::addError($this->translator->trans('ERR.evt_strn_eventRapportMustFilledOutCorrectly', [], 'contao_default'));
             Controller::redirect(System::getReferer());
         }
@@ -253,19 +252,40 @@ readonly class CalendarEventsInstructorInvoice
     }
 
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.edit.button', priority: 90)]
-    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.delete.button', priority: 90)]
     public function editButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
-        $blnAllow = true;
-
         $user = $this->security->getUser();
 
-        // A common user should not be allowed to edit or delete another user's rapport
-        if (!$this->security->isGranted('ROLE_ADMIN') && (int) $row['userPid'] !== (int) $user->id) {
-            $blnAllow = false;
+        // A common user should not be allowed to edit another user's rapport
+        $allow = match (true) {
+            $this->security->isGranted('ROLE_ADMIN') => true,
+            (int) $row['userPid'] === (int) $user->id => true,
+            $this->security->isGranted('contao_user.sac_event_tool_permissions', 'can_edit_all_invoice_forms') => true,
+            default => false,
+        };
+
+        if (false === $allow) {
+            return Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
         }
 
-        if (false === $blnAllow) {
+        $href = Backend::addToUrl($href.'&amp;id='.$row['id']);
+
+        return '<a href="'.StringUtil::specialcharsUrl($href).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+    }
+
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.delete.button', priority: 90)]
+    public function deleteButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    {
+        $user = $this->security->getUser();
+
+        // A common user should not be allowed to delete another user's rapport
+        $allow = match (true) {
+            $this->security->isGranted('ROLE_ADMIN') => true,
+            (int) $row['userPid'] === (int) $user->id => true,
+            default => false,
+        };
+
+        if (false === $allow) {
             return Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
         }
 
@@ -277,12 +297,12 @@ readonly class CalendarEventsInstructorInvoice
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.sendRapport.button', priority: 90)]
     public function sendRapport(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
-        $blnAllow = false;
-        $blnRapportNotificationEnabled = false;
+        $allow = false;
+        $rapportNotificationEnabled = false;
 
-        $objEvent = CalendarEventsModel::findById($row['pid']);
+        $calEvent = CalendarEventsModel::findById($row['pid']);
 
-        $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
+        $arrOrganizers = StringUtil::deserialize($calEvent->organizers, true);
         $organizers = EventOrganizerModel::findByIds($arrOrganizers);
 
         if (null !== $organizers) {
@@ -290,27 +310,27 @@ readonly class CalendarEventsInstructorInvoice
                 if ($organizers->enableRapportNotification) {
                     // Only show the icon without a link if rapport notification is disabled in the
                     // organizer model.
-                    $blnRapportNotificationEnabled = true;
+                    $rapportNotificationEnabled = true;
                 }
             }
         }
 
-        if (null !== $objEvent && $objEvent->filledInEventReportForm && $blnRapportNotificationEnabled) {
-            $blnAllow = true;
+        if (null !== $calEvent && $calEvent->filledInEventReportForm && $rapportNotificationEnabled) {
+            $allow = true;
         }
 
-        if (true === $blnAllow) {
+        if (true === $allow) {
             $user = $this->security->getUser();
 
             // A common user should not be allowed to send another user's report
             if ($this->security->isGranted('ROLE_ADMIN')) {
-                $blnAllow = true;
+                $allow = true;
             } elseif ((int) $row['userPid'] !== (int) $user->id) {
-                $blnAllow = false;
+                $allow = false;
             }
         }
 
-        if (false === $blnAllow) {
+        if (false === $allow) {
             return Image::getHtml(str_replace('default', 'disabled', $icon), $label).' ';
         }
 
@@ -328,15 +348,15 @@ readonly class CalendarEventsInstructorInvoice
      * @Callback(table="tl_calendar_events_instructor_invoice", target="edit.buttons")
      */
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'edit.buttons')]
-    public function buttonsCallback(array $arrButtons, DataContainer $dc): array
+    public function buttonsCallback(array $buttons, DataContainer $dc): array
     {
         $request = $this->requestStack->getCurrentRequest();
 
         if ('edit' === $request->query->get('act')) {
-            unset($arrButtons['saveNcreate'], $arrButtons['saveNduplicate'], $arrButtons['saveNedit'], $arrButtons['saveNback']);
+            unset($buttons['saveNcreate'], $buttons['saveNduplicate'], $buttons['saveNedit'], $buttons['saveNback']);
         }
 
-        return $arrButtons;
+        return $buttons;
     }
 
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'fields.iban.load')]
@@ -345,29 +365,29 @@ readonly class CalendarEventsInstructorInvoice
         // Override value from database
         $value = '';
 
-        $objInvoice = CalendarEventsInstructorInvoiceModel::findById($dc->id);
+        $invoice = CalendarEventsInstructorInvoiceModel::findById($dc->id);
 
-        if (null === $objInvoice) {
+        if (null === $invoice) {
             return $value;
         }
 
-        if (!$objInvoice->userPid) {
+        if (!$invoice->userPid) {
             return $value;
         }
 
-        $objUser = UserModel::findById($objInvoice->userPid);
+        $user = UserModel::findById($invoice->userPid);
 
-        if (null === $objUser) {
+        if (null === $user) {
             return $value;
         }
 
-        $value = $objUser->iban;
-        $objInvoice->iban = $value;
-        $objInvoice->save();
+        $value = $user->iban;
+        $invoice->iban = $value;
+        $invoice->save();
 
         if (!empty($value)) {
             $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice']['fields']['iban']['eval']['readonly'] = true;
-            Message::addInfo($this->translator->trans('MSC.evt_strn_ibanWasTakenFromUserDb', [$objUser->name], 'contao_default'));
+            Message::addInfo($this->translator->trans('MSC.evt_strn_ibanWasTakenFromUserDb', [$user->name], 'contao_default'));
         } else {
             Message::addInfo($this->translator->trans('ERR.evt_strn_ibanNotFound', [], 'contao_default'));
         }
@@ -385,28 +405,28 @@ readonly class CalendarEventsInstructorInvoice
             return $value;
         }
 
-        $objEvent = CalendarEventsModel::findById($dc->activeRecord->pid);
+        $calEvent = CalendarEventsModel::findById($dc->activeRecord->pid);
 
-        if (null === $objEvent) {
+        if (null === $calEvent) {
             return $value;
         }
 
-        $objEventMember = $this->eventMember->getParticipatedEventMembers($objEvent);
+        $calEventMember = $this->eventMember->getParticipatedEventMembers($calEvent);
 
-        if (null === $objEventMember) {
+        if (null === $calEventMember) {
             return $value;
         }
 
-        $countParticipants = $objEventMember->count();
+        $countParticipants = $calEventMember->count();
 
         // Count instructors
-        $arrInstructors = $this->calendarEventsUtil->getInstructorsAsArray($objEvent);
-        $countInstructors = \count($arrInstructors);
+        $instructors = $this->calendarEventsUtil->getInstructorsAsArray($calEvent);
+        $countInstructors = \count($instructors);
 
-        $countParticipantsTotal = $countParticipants + $countInstructors;
+        $total = $countParticipants + $countInstructors;
 
-        if ($countParticipantsTotal < $value) {
-            throw new \Exception($this->translator->trans('ERR.invalidNumberOfPrivateArrivals', [$value, $countParticipantsTotal], 'contao_default'));
+        if ($total < $value) {
+            throw new \Exception($this->translator->trans('ERR.invalidNumberOfPrivateArrivals', [$value, $total], 'contao_default'));
         }
 
         // Return the processed value

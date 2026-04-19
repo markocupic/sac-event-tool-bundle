@@ -16,9 +16,9 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
 
 // Extend default palette
 PaletteManipulator::create()
-	->addLegend('allowed_event_types_legend', 'calendars_legend', PaletteManipulator::POSITION_AFTER)
+	->addLegend('sac_event_tool_settings', 'calendars_legend', PaletteManipulator::POSITION_AFTER)
 	->addField(['calendar_containers', 'calendar_containerp'], 'calendars_legend', PaletteManipulator::POSITION_PREPEND)
-	->addField(['allowedEventTypes'], 'allowed_event_types_legend', PaletteManipulator::POSITION_PREPEND)
+	->addField(['allowedEventTypes', 'sac_event_tool_permissions'], 'sac_event_tool_settings', PaletteManipulator::POSITION_PREPEND)
 	->applyToPalette('default', 'tl_user_group');
 
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['calendar_containers'] = [
@@ -45,4 +45,15 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['allowedEventTypes'] = [
 	'foreignKey' => 'tl_event_type.title',
 	'sql'        => 'blob NULL',
 	'eval'       => ['multiple' => true, 'mandatory' => false, 'tl_class' => 'clr'],
+];
+
+$GLOBALS['TL_DCA']['tl_user_group']['fields']['sac_event_tool_permissions'] = [
+	'exclude'   => true,
+	'inputType' => 'checkbox',
+	'eval'      => ['multiple' => true],
+	'reference' => &$GLOBALS['TL_LANG']['MSC'],
+	'options'   => [
+		'can_edit_all_invoice_forms',
+	],
+	'sql'       => ['type' => 'blob', 'notnull' => false],
 ];

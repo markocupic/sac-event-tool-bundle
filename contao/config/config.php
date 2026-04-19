@@ -126,6 +126,7 @@ $GLOBALS['TL_MAINTENANCE'][] = EventRegistrationSync::class;
  */
 $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containers';
 $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
+$GLOBALS['TL_PERMISSIONS'][] = 'sac_event_tool_permissions';
 
 /*
  * Legacy Contao frontend modules

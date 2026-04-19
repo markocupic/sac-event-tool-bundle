@@ -96,6 +96,7 @@ $GLOBALS['TL_LANG']['MSC'][EventType::GENERAL_EVENT . '_short'] = 'Veranstaltung
 $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][EventMountainGuide::NO_MOUNTAIN_GUIDE] = '«ohne Bergführer/in» und «ohne Bergführerangebot»';
 $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][EventMountainGuide::WITH_MOUNTAIN_GUIDE] = '«mit Bergführer/in» und «ohne Bergführerangebot»';
 $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER] = '«mit Bergführer/in» und «mit Bergführerangebot»';
+$GLOBALS['TL_LANG']['MSC']['can_edit_all_invoice_forms'] = 'Erlaube das Bearbeiten aller Vergütungsformulare';
 
 // Buttons
 $GLOBALS['TL_LANG']['MSC']['sendEmail'] = 'E-Mail senden';
