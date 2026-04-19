@@ -295,7 +295,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = [
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'select',
-	'eval'      => ['submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'mandatory' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['submitOnChange' => true, 'includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(32) NOT NULL default ''",
 ];
 
@@ -545,7 +545,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
 	'inputType' => 'select',
 	'options'   => EventState::ALL,
 	'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-	'eval'      => ['mandatory' => false, 'submitOnChange' => true, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_calendar_events']['noSpecificEventState'], 'doNotShow' => false, 'tl_class' => 'm12 clr'],
+	'eval'      => ['mandatory' => false, 'submitOnChange' => true, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_calendar_events']['noSpecificEventState'], 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
@@ -825,7 +825,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfi
 // ****** Tour report fields **********:
 
 // Add a new field filledInEventReportForm
-// This field is autofilled, if a user has filled in the event report
+// This field is autofilled if a user has filled in the event report
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm'] = [
 	'exclude' => false,
 	'eval'    => ['doNotShow' => true, 'tl_class' => 'm12 clr'],

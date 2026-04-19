@@ -746,9 +746,26 @@ class CalendarEvents
             return '';
         }
 
+        // Label and help
+        if (isset($arrDcaFields[$fieldName]['label'])) {
+            $label = $arrDcaFields[$fieldName]['label'][0] ?? $fieldName;
+            $help = $arrDcaFields[$fieldName]['label'][1] ?? $fieldName;
+        } else {
+            $label = isset($GLOBALS['TL_LANG']['MSC'][$fieldName]) && \is_array($GLOBALS['TL_LANG']['MSC'][$fieldName]) ? $GLOBALS['TL_LANG']['MSC'][$fieldName][0] : $GLOBALS['TL_LANG']['MSC'][$fieldName];
+            $help = isset($GLOBALS['TL_LANG']['MSC'][$fieldName]) && \is_array($GLOBALS['TL_LANG']['MSC'][$fieldName]) ? $GLOBALS['TL_LANG']['MSC'][$fieldName][1] : $GLOBALS['TL_LANG']['MSC'][$fieldName];
+        }
+
+        if (empty($label)) {
+            $label = $fieldName;
+        }
+
+        if (!empty($help)) {
+            $help = '<p class="tl_help tl_tip tl_full_height">'.$help.'</p>';
+        }
+
         // Do only show allowed fields
-        if ('password' === ($arrDcaFields[$fieldName]['inputType'] ?? false) || ($arrDcaFields[$fieldName]['eval']['doNotShow'] ?? false) || ($arrDcaFields[$fieldName]['eval']['hideInput'] ?? false)) {
-            return '********';
+        if ($arrDcaFields[$fieldName]['eval']['hideInput'] ?? false) {
+            $varFieldValue = '********';
         }
 
         $varFieldValue = $this->stringUtil->deserialize($varFieldValue);
@@ -919,29 +936,13 @@ class CalendarEvents
             $varFieldValue = $arrDcaFields[$fieldName]['options'][$varFieldValue] ?? null;
         }
 
-        // Label and help
-        if (isset($arrDcaFields[$fieldName]['label'])) {
-            $label = $arrDcaFields[$fieldName]['label'][0] ?? $fieldName;
-            $help = $arrDcaFields[$fieldName]['label'][1] ?? $fieldName;
-        } else {
-            $label = isset($GLOBALS['TL_LANG']['MSC'][$fieldName]) && \is_array($GLOBALS['TL_LANG']['MSC'][$fieldName]) ? $GLOBALS['TL_LANG']['MSC'][$fieldName][0] : $GLOBALS['TL_LANG']['MSC'][$fieldName];
-            $help = isset($GLOBALS['TL_LANG']['MSC'][$fieldName]) && \is_array($GLOBALS['TL_LANG']['MSC'][$fieldName]) ? $GLOBALS['TL_LANG']['MSC'][$fieldName][1] : $GLOBALS['TL_LANG']['MSC'][$fieldName];
-        }
+        $markup = '<div class="clr readonly">
+			<h3><label for="ctrl_title">%s</label></h3>
+    		<div class="field-content-box" data-field="%s">%s</div>
+			%s
+		</div>';
 
-        if (empty($label)) {
-            $label = $fieldName;
-        }
-
-        if (!empty($help)) {
-            $help = '<p class="tl_help tl_tip tl_full_height">'.$help.'</p>';
-        }
-
-        return '
-<div class="clr readonly">
-    <h3><label for="ctrl_title">'.$label.'</label></h3>
-    <div class="field-content-box" data-field="'.$this->stringUtil->specialchars($fieldName).'">'.(string) $varFieldValue.'</div>
-'.$help.'
-</div>';
+        return \sprintf($markup, $label, $this->stringUtil->specialchars($fieldName), $varFieldValue, $help);
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventDates.load', priority: 100)]
