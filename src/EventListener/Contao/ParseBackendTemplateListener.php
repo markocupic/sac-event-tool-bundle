@@ -14,19 +14,20 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
-use Contao\BackendTemplate;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Input;
-use Contao\System;
 use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\Renderer\ListRenderer;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
+use Markocupic\SacEventToolBundle\Event\GenerateEventDashboardEvent;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment as Twig;
 
 /**
@@ -38,129 +39,128 @@ readonly class ParseBackendTemplateListener
     public function __construct(
         private CalendarEventsUtil $calendarEventsUtil,
         private ContaoFramework $framework,
+        private EventDispatcherInterface $eventDispatcher,
+        private RequestStack $requestStack,
         private Twig $twig,
     ) {
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function __invoke(string $strBuffer, string $strTemplate): string
+    public function __invoke(string $buffer, string $template): string
     {
-        // Set adapters
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
-        if ('be_main' === $strTemplate) {
-            // Add icon explanation legend to tl_calendar_events_member
-            if ('calendar' === $inputAdapter->get('do') && 'tl_calendar_events' === $inputAdapter->get('table') && 'edit' === $inputAdapter->get('act')) {
-                if (preg_match('/<div class="tl_formbody_edit">/sU', $strBuffer, $matches)) {
-                    $strDashboard = $this->_generateEventDashboard();
-                    $strBuffer = preg_replace('/<div class="tl_formbody_edit">/sU', $matches[0].$strDashboard, $strBuffer);
-                }
+        $do = $inputAdapter->get('do');
+        $table = $inputAdapter->get('table');
+        $act = $inputAdapter->get('act');
+
+        if ('be_main' !== $template || 'calendar' !== $do) {
+            return $buffer;
+        }
+
+        // Add icon explanation legends to tl_calendar_events_member
+        if ('tl_calendar_events' === $table && 'edit' === $act) {
+            if (preg_match('/<div class="tl_formbody_edit">/sU', $buffer, $matches)) {
+                $dashboard = $this->generateButtonNavbar();
+                $buffer = preg_replace('/<div class="tl_formbody_edit">/sU', $matches[0].$dashboard, $buffer);
             }
 
-            // Add icon explanation legend to tl_calendar_events_member
-            if ('calendar' === $inputAdapter->get('do') && 'tl_calendar_events_member' === $inputAdapter->get('table')) {
-                $objEvent = $calendarEventsModelAdapter->findById($inputAdapter->get('id'));
+            return $buffer;
+        }
 
-                if (null !== $objEvent) {
-                    if (preg_match('/<table class=\"tl_listing(.*)<\/table>/sU', $strBuffer)) {
-                        $controllerAdapter->loadDataContainer('tl_calendar_events_member');
-                        $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
+        // Add icon explanation legend to tl_calendar_events_member
+        if ('tl_calendar_events_member' === $table) {
+            $calEvent = $calendarEventsModelAdapter->findById($inputAdapter->get('id'));
 
-                        $arrEvent = $objEvent->row();
-                        $arrEvent['time_span'] = $this->calendarEventsUtil->getEventPeriod($objEvent);
-                        $arrEvent['instructors'] = $this->calendarEventsUtil->getInstructorNamesAsArray($objEvent);
+            if (null === $calEvent) {
+                return $buffer;
+            }
 
-                        $arrRegistration = [];
-                        $arrRegistration['states'] = array_diff(EventSubscriptionState::ALL, [EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED]);
+            if (preg_match('/<table class=\"tl_listing(.*)<\/table>/sU', $buffer)) {
+                $controllerAdapter->loadDataContainer('tl_calendar_events_member');
+                $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
-                        $html = $this->twig->render('@MarkocupicSacEventTool/Backend/CalendarEventsMember/explanations.html.twig', [
-                            'event' => $arrEvent,
-                            'registration' => $arrRegistration,
-                        ]);
+                $dataEvent = $calEvent->row();
+                $dataEvent['time_span'] = $this->calendarEventsUtil->getEventPeriod($calEvent);
+                $dataEvent['instructors'] = $this->calendarEventsUtil->getInstructorNamesAsArray($calEvent);
 
-                        // Add legend to the listing table
-                        $strBuffer = preg_replace('/<table class=\"tl_listing(.*)<\/table>/sU', '${0}'.$html, $strBuffer);
+                $registration = [
+                    'states' => array_diff(EventSubscriptionState::ALL, [EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED]),
+                ];
+
+                $html = $this->twig->render('@MarkocupicSacEventTool/Backend/CalendarEventsMember/explanations.html.twig', [
+                    'event' => $dataEvent,
+                    'registration' => $registration,
+                ]);
+
+                // Add legend to the listing table
+                $buffer = preg_replace('/<table class=\"tl_listing(.*)<\/table>/sU', '${0}'.$html, $buffer);
+            }
+
+            // Show a pop-up window if the participant is not confirmed and the instructor tries to change the participation status.
+            if (preg_match_all('/<a href=\"\/contao\?do=calendar\&amp;id=(\\d+)&amp;table=tl_calendar_events_member&amp;act=toggle&amp;field=hasParticipated(.*)\"(.*)onclick="(.*)">(.*)<\/a>/sU', $buffer, $matches)) {
+                foreach (array_keys($matches[0]) as $k) {
+                    $regId = $matches[1][$k];
+
+                    $registration = $calendarEventsMemberModelAdapter->findById($regId);
+
+                    if (null === $registration) {
+                        continue;
                     }
 
-                    // Show a pop-up window if the participant is not confirmed and the instructor
-                    // tries to change the participation status.
-                    if (preg_match_all('/<a href=\"\/contao\?do=calendar\&amp;id=(\\d+)&amp;table=tl_calendar_events_member&amp;act=toggle&amp;field=hasParticipated(.*)\"(.*)onclick="(.*)">(.*)<\/a>/sU', $strBuffer, $matches)) {
-                        foreach (array_keys($matches[0]) as $k) {
-                            $regId = $matches[1][$k];
+                    $allowedSubscriptionStates = [EventSubscriptionState::SUBSCRIPTION_ACCEPTED];
 
-                            $registration = $calendarEventsMemberModelAdapter->findById($regId);
-                            $allowedSubscriptionStates = [EventSubscriptionState::SUBSCRIPTION_ACCEPTED];
-
-                            if (null !== $registration) {
-                                if (\in_array($registration->stateOfSubscription, $allowedSubscriptionStates, true)) {
-                                    continue;
-                                }
-
-                                $onClickAttr = \sprintf("if(window.confirm('Der Anmeldestatus dieser Person hat nicht den Status &laquo;BESTÄTIGT&raquo;. Bist du sicher, dass du den Teilnahmestatus ändern willst?')){%s}else{return false}", $matches[4][$k]);
-                                $strLink = $matches[0][$k];
-                                $strLinkNew = str_replace(
-                                    'onclick="'.$matches[4][$k].'"',
-                                    \sprintf('onclick="%s"', $onClickAttr),
-                                    $strLink,
-                                );
-
-                                $strBuffer = str_replace($strLink, $strLinkNew, $strBuffer);
-                            }
-                        }
+                    if (\in_array($registration->stateOfSubscription, $allowedSubscriptionStates, true)) {
+                        continue;
                     }
+
+                    $onClickAttr = \sprintf("if(window.confirm('Der Anmeldestatus dieser Person hat nicht den Status &laquo;BESTÄTIGT&raquo;. Bist du sicher, dass du den Teilnahmestatus ändern willst?')){%s}else{return false}", $matches[4][$k]);
+                    $strLink = $matches[0][$k];
+                    $strLinkNew = str_replace(
+                        'onclick="'.$matches[4][$k].'"',
+                        \sprintf('onclick="%s"', $onClickAttr),
+                        $strLink,
+                    );
+
+                    $buffer = str_replace($strLink, $strLinkNew, $buffer);
                 }
             }
         }
 
-        return $strBuffer;
+        return $buffer;
     }
 
-    /**
-     * @throws \Exception
-     */
-    private function _generateEventDashboard(): string
+    private function generateButtonNavbar(): string
     {
         // Set adapters
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-        $objEvent = $calendarEventsModelAdapter->findById($inputAdapter->get('id'));
+        $calEvent = $calendarEventsModelAdapter->findById($inputAdapter->get('id'));
 
-        if (null === $objEvent) {
+        if (null === $calEvent || !$calEvent->tstamp || '' === $calEvent->title) {
             return '';
         }
 
-        if (!$objEvent->tstamp || '' === $objEvent->title) {
+        $calendar = $calEvent->getRelated('pid');
+
+        if (null === $calendar) {
             return '';
         }
 
-        $objCalendar = $objEvent->getRelated('pid');
-
-        if (null === $objCalendar) {
-            return '';
-        }
-
-        $objTemplate = new BackendTemplate('be_calendar_events_event_dashboard');
-
-        // Use KnpMenu to generate button-menu
         $factory = new MenuFactory();
-        $menu = $factory->createItem('Event Dashboard');
+        $menuItem = $factory->createItem('Event Dashboard');
 
-        // HOOK: Use hooks to generate the mini dashboard. So other plugins are able to
-        // add items as well.
-        if (isset($GLOBALS['TL_HOOKS']['generateEventDashboard']) && \is_array($GLOBALS['TL_HOOKS']['generateEventDashboard'])) {
-            foreach ($GLOBALS['TL_HOOKS']['generateEventDashboard'] as $callback) {
-                System::importStatic($callback[0])->{$callback[1]}($menu, $objEvent);
-            }
-        }
+        $event = new GenerateEventDashboardEvent($menuItem, $calEvent, $this->requestStack->getCurrentRequest());
+
+        // Use event listeners to generate the mini dashboard. So other plugins are able to add items as well.
+        $this->eventDispatcher->dispatch($event);
 
         $renderer = new ListRenderer(new Matcher());
-        $objTemplate->menu = $renderer->render($menu);
 
-        return $objTemplate->parse();
+        return $this->twig->render('@MarkocupicSacEventTool/Backend/CalendarEvents/event_dashboard.html.twig', [
+            'menu' => $renderer->render($event->getMenuItem()),
+        ]);
     }
 }

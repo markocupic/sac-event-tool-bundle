@@ -1,7 +1,0 @@
-<div class="event-dashboard">
-  <div class="tl_submit_container">
-
-    <?= $this->menu ?>
-
-  </div>
-</div>
