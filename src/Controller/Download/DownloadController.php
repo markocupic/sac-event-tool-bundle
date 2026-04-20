@@ -47,7 +47,10 @@ class DownloadController extends AbstractController
      * /_download/print_workshop_booklet_as_pdf/2023
      * /_download/print_workshop_booklet_as_pdf -> current year.
      */
-    #[Route('/_download/print_workshop_booklet_as_pdf/{year}', name: 'sac_event_tool_download_print_workshop_booklet_as_pdf', defaults: ['_scope' => 'frontend', '_token_check' => false])]
+    #[Route('/_download/print_workshop_booklet_as_pdf/{year}',
+        name: 'sac_event_tool_download_print_workshop_booklet_as_pdf',
+        requirements: ['year' => '\d+'],
+        defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function printWorkshopBookletAsPdfAction(int $year = 0): Response
     {
         $user = $this->tokenStorage->getToken()?->getUser();
@@ -79,7 +82,10 @@ class DownloadController extends AbstractController
      * /_download/print_workshop_details_as_docx/2017
      * /_download/print_workshop_details_as_docx/year=2017/89.
      */
-    #[Route('/_download/print_workshop_details_as_docx/{year}/{eventId}', name: 'sac_event_tool_download_print_workshop_details_as_docx', defaults: ['_scope' => 'frontend', '_token_check' => false])]
+    #[Route('/_download/print_workshop_details_as_docx/{year}/{eventId}',
+        name: 'sac_event_tool_download_print_workshop_details_as_docx',
+        requirements: ['year' => '\d+', 'eventId' => '\d+'],
+        defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function printWorkshopDetailsAsDocxAction(int $year = 0, int|null $eventId = null): Response
     {
         $user = $this->tokenStorage->getToken()?->getUser();
@@ -106,7 +112,10 @@ class DownloadController extends AbstractController
      * Download workshop details as a PDF document:
      * /_download/print_workshop_details_as_pdf/643.
      */
-    #[Route('/_download/print_workshop_details_as_pdf/{eventId}', name: 'sac_event_tool_download_print_workshop_details_as_pdf', defaults: ['_scope' => 'frontend', '_token_check' => false])]
+    #[Route('/_download/print_workshop_details_as_pdf/{eventId}',
+        name: 'sac_event_tool_download_print_workshop_details_as_pdf',
+        requirements: ['eventId' => '\d+'],
+        defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function printWorkshopDetailsAsPdfAction(int $eventId): Response
     {
         $user = $this->tokenStorage->getToken()?->getUser();
@@ -131,7 +140,10 @@ class DownloadController extends AbstractController
     /**
      * Send ICal to the browser.
      */
-    #[Route('/_download/download_event_ical/{eventId}', name: 'sac_event_tool_download_event_ical', defaults: ['_scope' => 'frontend', '_token_check' => false])]
+    #[Route('/_download/download_event_ical/{eventId}',
+        name: 'sac_event_tool_download_event_ical',
+        requirements: ['eventId' => '\d+'],
+        defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function downloadEventICalAction(int $eventId): Response
     {
         $event = $this->framework->getAdapter(CalendarEventsModel::class)->findById($eventId);
@@ -144,12 +156,15 @@ class DownloadController extends AbstractController
     }
 
     /**
-     * The defaultAction has to be at the bottom of the class Handles download requests.
+     * The fallback action has to be at the bottom of the class.
      */
-    #[Route('/_download/{slug}', name: 'sac_event_tool_download', defaults: ['_scope' => 'frontend', '_token_check' => false])]
+    #[Route('/_download/{slug}',
+        name: 'sac_event_tool_download',
+        defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function defaultAction($slug = ''): Response
     {
-        $msg = \sprintf('Welcome to %s::%s. You have called the Service with this route: _download/%s', self::class, __FUNCTION__, $slug);
+        $safeSlug = htmlspecialchars($slug, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $msg = \sprintf('Welcome to %s::%s. You have called the Service with this route: _download/%s', self::class, __FUNCTION__, $safeSlug);
 
         return new Response($msg);
     }
