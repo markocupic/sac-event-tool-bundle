@@ -80,8 +80,6 @@ class EventApiController extends AbstractController
                 'itemsTotal' => \count($arrIds),
                 'queryTime' => '',
                 'arrEventIds' => [],
-                'sql' => $qb->getSQL(),
-                'params' => $qb->getParameters(),
             ],
             'data' => [],
         ];
@@ -141,16 +139,15 @@ class EventApiController extends AbstractController
 
         $arrJSON['meta']['queryTime'] = (string) $stopwatch->stop('event list api query time');
 
-        // Allow cross domain requests
+        // Allow cross-domain requests
         $response = new JsonResponse($arrJSON, 200, ['Access-Control-Allow-Origin' => '*']);
 
-        // Enable cache for not logged in frontend users (guests)
+        // Enable cache for not logged-in frontend users (guests)
         $user = $this->security->getUser();
 
         if (!$user instanceof FrontendUser) {
             $response->setPublic();
             $response->setSharedMaxAge(self::CACHE_MAX_AGE);
-            $response->setPrivate();
             $response->setMaxAge(self::CACHE_MAX_AGE);
         }
 
@@ -159,7 +156,7 @@ class EventApiController extends AbstractController
 
     /**
      * This route is used for the "pilatus" export, where events are loaded by xhr
-     * when the modal window opens $_POST['id'], $_POST['fields'] as comma separated
+     * when the modal window opens $_POST['id'], $_POST['fields'] as comma-separated
      * string is optional.
      *
      * @throws \Exception
@@ -171,7 +168,7 @@ class EventApiController extends AbstractController
 
         $calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        $eventId = (int) $request->request->get('id');
+        $eventId = (int) $request->query->get('id');
         $arrFields = '' !== $request->get('fields') ? explode(',', $request->get('fields')) : [];
 
         $arrJSON = [
@@ -186,7 +183,7 @@ class EventApiController extends AbstractController
             $arrEvent = [];
 
             foreach (array_keys($objEvent->row()) as $k) {
-                // If $arrFields is empty send all properties
+                // If $arrFields is empty, send all properties
                 if (!empty($arrFields)) {
                     if (!\in_array($k, $arrFields, true)) {
                         continue;
@@ -198,21 +195,23 @@ class EventApiController extends AbstractController
             $arrJSON['arrEventData'] = $arrEvent;
         }
 
-        // Allow cross domain requests
+        // Allow cross-domain requests
         return new JsonResponse($arrJSON, 200, ['Access-Control-Allow-Origin' => '*']);
     }
 
     private function getQueryParamsFromRequest(Request $request): array
     {
+        $toIntArray = static fn (mixed $v): array => \is_array($v) ? array_map('intval', $v) : [];
+
         return [
             // Arrays
-            'organizers' => $request->get('organizers'),
+            'organizers' => $toIntArray($request->get('organizers')),
             'eventType' => $request->get('eventType'),
-            'tourType' => $request->get('tourType'),
-            'courseType' => $request->get('courseType'),
-            'calendarIds' => $request->get('calendarIds'),
+            'tourType' => $toIntArray($request->get('tourType')),
+            'courseType' => $toIntArray($request->get('courseType')),
+            'calendarIds' => $toIntArray($request->get('calendarIds')),
             'fields' => $request->get('fields'),
-            'arrIds' => $request->get('arrIds'),
+            'arrIds' => $toIntArray($request->get('arrIds')),
             // Integers
             'offset' => empty($request->get('offset')) ? 0 : (int) $request->get('offset'),
             'limit' => empty($request->get('limit')) ? 0 : (int) $request->get('limit'),
@@ -231,7 +230,7 @@ class EventApiController extends AbstractController
     }
 
     /**
-     * Deserialize arrays, convert binary uuids and clean strings from illegal characters.
+     * Deserialize arrays, convert binary uuids, and clean strings from illegal characters.
      */
     private function prepareValue(mixed $varValue): mixed
     {
@@ -257,7 +256,7 @@ class EventApiController extends AbstractController
 
     private function buildQuery(Connection $connection, array $params): QueryBuilder
     {
-        // Ignore date range, if certain query params were set
+        // Ignore date range if certain query params were set
         $blnIgnoreDate = false;
 
         $qb = $connection->createQueryBuilder();
@@ -360,17 +359,21 @@ class EventApiController extends AbstractController
                     continue;
                 }
 
-                $strNeedle = trim($strNeedle);
-
                 // Search expression in title & teaser
-                $arrOrExpr[] = $qb->expr()->like('t.title', $qb->expr()->literal('%'.$strNeedle.'%'));
-                $arrOrExpr[] = $qb->expr()->like('t.teaser', $qb->expr()->literal('%'.$strNeedle.'%'));
+                $strNeedle = trim($strNeedle);
+                $safeNeedle = addcslashes($strNeedle, '%_\\');
+
+                $arrOrExpr[] = $qb->expr()->like('t.title', ':needle');
+                $arrOrExpr[] = $qb->expr()->like('t.teaser', ':needle');
+                $qb->setParameter('needle', '%'.$safeNeedle.'%');
 
                 // Check if search expression is the name of an instructor
+                $safeNeedleInst = addcslashes($strNeedle, '%_\\');
                 $qbSt = $connection->createQueryBuilder();
                 $qbSt->select('id')
                     ->from('tl_user', 'u')
-                    ->where($qbSt->expr()->like('u.name', $qbSt->expr()->literal('%'.$strNeedle.'%')))
+                    ->where($qbSt->expr()->like('u.name', ':needleInst'))
+                    ->setParameter('needleInst', '%'.$safeNeedleInst.'%')
                 ;
 
                 $arrInst = $qbSt->fetchFirstColumn();
@@ -410,14 +413,20 @@ class EventApiController extends AbstractController
             // Show event if it has an organizer with the flag ignoreFilterInEventList=true
             if (!empty($arrIgnoredOrganizer)) {
                 foreach ($arrIgnoredOrganizer as $orgId) {
-                    $arrOrExpr[] = $qb->expr()->like('t.organizers', $qb->expr()->literal('%:"'.$orgId.'";%'));
+                    $paramName = 'orgIgnored'.(int) $orgId;
+                    $arrOrExpr[] = $qb->expr()->like('t.organizers', ':'.$paramName);
+                    $qb->setParameter($paramName, '%:"'.(int) $orgId.'";%');
                 }
             }
 
             // Show event if its organizer is in the search param
             foreach ($params['organizers'] as $orgId) {
+                $orgId = (int) $orgId;
+
                 if (!\in_array($orgId, array_map('intval', $arrIgnoredOrganizer), true)) {
-                    $arrOrExpr[] = $qb->expr()->like('t.organizers', $qb->expr()->literal('%:"'.$orgId.'";%'));
+                    $paramName = 'org'.$orgId;
+                    $arrOrExpr[] = $qb->expr()->like('t.organizers', ':'.$paramName);
+                    $qb->setParameter($paramName, '%:"'.$orgId.'";%');
                 }
             }
 
@@ -430,9 +439,12 @@ class EventApiController extends AbstractController
         if (!empty($params['tourType']) && \is_array($params['tourType'])) {
             $arrOrExpr = [];
 
-            // Show event if its organizer is in the search param
+            // Show event if its tourType is in the search param
             foreach ($params['tourType'] as $tourTypeId) {
-                $arrOrExpr[] = $qb->expr()->like('t.tourType', $qb->expr()->literal('%:"'.$tourTypeId.'";%'));
+                $tourTypeId = (int) $tourTypeId;
+                $paramName = 'tourType'.$tourTypeId;
+                $arrOrExpr[] = $qb->expr()->like('t.tourType', ':'.$paramName);
+                $qb->setParameter($paramName, '%:"'.$tourTypeId.'";%');
             }
 
             if (!empty($arrOrExpr)) {
@@ -452,7 +464,9 @@ class EventApiController extends AbstractController
             $strId = preg_replace('/\s/', '', $params['courseId']);
 
             if (!empty($strId)) {
-                $qb->andWhere($qb->expr()->like('t.courseId', $qb->expr()->literal('%'.$strId.'%')));
+                $safeCourseId = addcslashes($strId, '%_\\');
+                $qb->andWhere($qb->expr()->like('t.courseId', ':courseId'));
+                $qb->setParameter('courseId', '%'.$safeCourseId.'%');
                 $blnIgnoreDate = true;
             }
         }
