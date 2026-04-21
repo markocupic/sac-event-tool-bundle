@@ -33,10 +33,14 @@ use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Routing\Annotation\Route;
 
 class UpcomingEventsController extends AbstractController
 {
+    // Maximum allowed limit to prevent DoS via large queries
+    private const int MAX_LIMIT = 1000;
+
     private readonly Adapter $calendarEventsModel;
 
     private readonly Adapter $events;
@@ -47,9 +51,10 @@ class UpcomingEventsController extends AbstractController
 
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
+        private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly FeedFactory $feedFactory,
-        private readonly Connection $connection,
+        private readonly LockFactory $lockFactory,
         private readonly string $sacevtLocale,
         private readonly string $projectDir,
     ) {
@@ -62,23 +67,32 @@ class UpcomingEventsController extends AbstractController
     /**
      * Generate the RSS Feed for https://www.sac-cas.ch/de/der-sac/sektionen/sac-pilatus/.
      */
-    #[Route('/_rssfeeds/sac_cas_upcoming_events/{section}/{limit}', name: 'sac_event_tool_rss_feed_sac_cas_upcoming_events', defaults: ['_scope' => 'frontend'])]
-    public function printLatestEvents(string $section = '4250', int $limit = 100): Response
+    #[Route('/_rssfeeds/sac_cas_upcoming_events/{section}/{limit}',
+        name: 'sac_event_tool_rss_feed_sac_cas_upcoming_events',
+        requirements: ['section' => '\d+', 'limit' => '\d+'],
+        defaults: ['_scope' => 'frontend'])]
+    public function printLatestEvents(int $section = 4250, int $limit = 100): Response
     {
         // Initialize Contao framework
         $this->framework->initialize();
 
-        $limit = $limit < 1 ? 0 : $limit;
+        // Enforce bounds on limit to prevent DoS via massive queries
+        $limit = min(max(1, $limit), self::MAX_LIMIT);
 
         $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
 
-        if (!\in_array($section, $arrSectionIds, true)) {
-            return new Response('Section with ID '.$section.' not found. Please use a valid section ID like '.implode(', ', $arrSectionIds).'.');
+        // Do not disclose valid section IDs in the error response
+        if (!\in_array($section, array_map('intval', $arrSectionIds), true)) {
+            return new Response('Section not found.', Response::HTTP_NOT_FOUND);
         }
 
         $sectionName = $this->connection->fetchOne('SELECT name FROM tl_sac_section WHERE sectionId = ?', [$section]);
 
-        $filePath = 'share/rss_feed_'.str_replace(' ', '_', strtolower($sectionName)).'.xml';
+        // Sanitize section-name to prevent path traversal when building the file path.
+        // Only allow alphanumeric characters, hyphens and underscores.
+        $safeName = preg_replace('/[^a-z0-9_-]/', '_', strtolower((string) $sectionName));
+        $filePath = 'share/rss_feed_'.$safeName.'.xml';
+        $absolutePath = Path::join($this->projectDir, 'public', $filePath);
 
         // Create feed
         $rss = $this->feedFactory->createFeed('utf-8');
@@ -145,39 +159,62 @@ class UpcomingEventsController extends AbstractController
             new Item('generator', $this->stringUtil->specialchars(self::class)),
         );
 
+        // Guard against null return from getEvents() (no organizers found)
         $stmt = $this->getEvents($section, $limit);
 
-        while (false !== ($arrEvent = $stmt->fetchAssociative())) {
-            $eventsModel = $this->calendarEventsModel->findById($arrEvent['id']);
+        if (null !== $stmt) {
+            $events = $stmt->fetchAllAssociative();
 
-            $arrEvent = array_map(
-                static fn ($varValue) => str_replace(['&quot;', '&#40;', '&#41;', '[-]', '&shy;', '[nbsp]', '&nbsp;'], ['"', '(', ')', '', '', ' ', ' '], (string) $varValue),
-                $arrEvent,
-            );
+            foreach ($events as $event) {
+                $eventsModel = $this->calendarEventsModel->findById($event['id']);
 
-            $rss->addChannelItemField(
-                new ItemGroup('item', [
-                    new Item('title', strip_tags($this->stringUtil->stripInsertTags($arrEvent['title'])), ['cdata' => true]),
-                    new Item('link', $this->stringUtil->specialchars($this->events->generateEventUrl($eventsModel, true))),
-                    new Item('description', strip_tags(preg_replace('/[\n\r]+/', ' ', $arrEvent['teaser'])), ['cdata' => true]),
-                    new Item('pubDate', date('r', (int) $eventsModel->startDate)),
-                    new Item('author', implode(', ', $this->calendarEventsUtil->getInstructorNamesAsArray($eventsModel))),
-                    new Item('guid', $this->stringUtil->specialchars($this->events->generateEventUrl($eventsModel, true))),
-                    new Item('tourdb:startdate', date('Y-m-d', (int) $eventsModel->startDate)),
-                    new Item('tourdb:enddate', date('Y-m-d', (int) $eventsModel->endDate)),
-                ]),
-            );
+                $event = array_map(
+                    static fn ($varValue) => str_replace(['&quot;', '&#40;', '&#41;', '[-]', '&shy;', '[nbsp]', '&nbsp;'], ['"', '(', ')', '', '', ' ', ' '], (string) $varValue),
+                    $event,
+                );
+
+                // Escape instructor names to prevent XML injection in the author field
+                $authorNames = array_map(
+                    static fn (string $name) => htmlspecialchars($name, ENT_XML1 | ENT_QUOTES, 'UTF-8'),
+                    $this->calendarEventsUtil->getInstructorNamesAsArray($eventsModel),
+                );
+
+                $rss->addChannelItemField(
+                    new ItemGroup('item', [
+                        new Item('title', strip_tags($this->stringUtil->stripInsertTags($event['title'])), ['cdata' => true]),
+                        new Item('link', $this->stringUtil->specialchars($this->events->generateEventUrl($eventsModel, true))),
+                        new Item('description', strip_tags(preg_replace('/[\n\r]+/', ' ', $event['teaser'])), ['cdata' => true]),
+                        new Item('pubDate', date('r', (int) $eventsModel->startDate)),
+                        new Item('author', implode(', ', $authorNames)),
+                        new Item('guid', $this->stringUtil->specialchars($this->events->generateEventUrl($eventsModel, true))),
+                        new Item('tourdb:startdate', date('Y-m-d', (int) $eventsModel->startDate)),
+                        new Item('tourdb:enddate', date('Y-m-d', (int) $eventsModel->endDate)),
+                    ]),
+                );
+            }
         }
 
-        return $rss->render(Path::join($this->projectDir, 'public').'/'.$filePath);
+        // Use an exclusive lock to prevent race conditions when multiple requests
+        // try to write the same feed file concurrently.
+        $lock = $this->lockFactory->createLock(self::class);
+        $lock->acquire(true);
+
+        try {
+            $response = $rss->render($absolutePath);
+        } finally {
+            $lock->release();
+        }
+
+        return $response;
     }
 
     /**
      * @throws Exception
      */
-    private function getEvents(string $section, int $limit): Result|null
+    private function getEvents(int $section, int $limit): Result|null
     {
         $qb = $this->connection->createQueryBuilder();
+
         $qb->select('id')
             ->from('tl_event_organizer', 't')
             ->where($qb->expr()->like('t.belongsToOrganization', $qb->expr()->literal('%'.$section.'%')))
@@ -203,7 +240,6 @@ class UpcomingEventsController extends AbstractController
         $arrOrExpr = [];
 
         foreach ($arrOrgIds as $orgId) {
-            $orgId = (string) $orgId;
             $arrOrExpr[] = $qb->expr()->like('t.organizers', $qb->expr()->literal('%:"'.$orgId.'";%'));
         }
 
