@@ -508,6 +508,7 @@ class CalendarEvents
         if (null !== $objEventsModel) {
             // Set the currently logged-in user as the author of the event
             $objEventsModel->author = $user->id;
+            $objEventsModel->alias = 'event-'.$objEventsModel->id;
             $objEventsModel->save();
 
             // Set eventReleaseLevel
