@@ -28,6 +28,7 @@ use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
+use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsInstructorInvoiceVoter;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -266,16 +267,20 @@ class CalendarEventsMember
 
         $eventId = $request->query->get('id', 0);
 
-        $objEvent = $this->calendarEvents->findById($eventId);
+        $calEvent = $this->calendarEvents->findById($eventId);
 
-        if (null !== $objEvent) {
+        if (null !== $calEvent) {
             // Check if backend user is allowed
-            if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id)) {
-                if (EventType::TOUR === $objEvent->eventType || EventType::LAST_MINUTE_TOUR === $objEvent->eventType) {
+            if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $calEvent->id)) {
+                if (EventType::TOUR === $calEvent->eventType || EventType::LAST_MINUTE_TOUR === $calEvent->eventType) {
                     $href = $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'];
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'] = \sprintf($href, $eventId);
                     $blnAllowTourReportButton = true;
+                }
+            }
 
+            if ($this->security->isGranted(CalendarEventsInstructorInvoiceVoter::HAS_ACCESS, $calEvent)) {
+                if (EventType::TOUR === $calEvent->eventType || EventType::LAST_MINUTE_TOUR === $calEvent->eventType) {
                     $href = $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']['href'];
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']['href'] = \sprintf($href, $eventId);
                     $blnAllowInstructorInvoiceButton = true;

@@ -74,6 +74,9 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = [
 		'table'  => [TableWizard::class, 'importTable'],
 		'list'   => [ListWizard::class, 'importList'],
 	],
+	'sac_permission_tool'        => [
+		'tables' => ['tl_permission_policy'],
+	],
 	'sac_event_organizer_tool'   => [
 		'tables' => ['tl_event_organizer'],
 		'table'  => [TableWizard::class, 'importTable'],
@@ -126,7 +129,6 @@ $GLOBALS['TL_MAINTENANCE'][] = EventRegistrationSync::class;
  */
 $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containers';
 $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
-$GLOBALS['TL_PERMISSIONS'][] = 'sac_event_tool_permissions';
 
 /*
  * Legacy Contao frontend modules

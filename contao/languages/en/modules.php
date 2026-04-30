@@ -43,6 +43,7 @@ $GLOBALS['TL_LANG']['MOD']['sac_section_tool'] = ['SAC Sektionen und OG'];
 $GLOBALS['TL_LANG']['MOD']['sac_tour_difficulty_tool'] = ['Schwierigkeitsgrade für Touren'];
 $GLOBALS['TL_LANG']['MOD']['sac_tour_type_tool'] = ['Tourentypen'];
 $GLOBALS['TL_LANG']['MOD']['sac_user_role_tool'] = ['Vereinsfunktionen-Tool'];
+$GLOBALS['TL_LANG']['MOD']['sac_permission_tool'] = ['Permission-Tool'];
 
 // Contao legacy frontend modules
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'] = ['Event Reader Vorschau'];

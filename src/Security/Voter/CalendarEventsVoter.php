@@ -24,6 +24,7 @@ use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class CalendarEventsVoter extends Voter
@@ -54,13 +55,8 @@ class CalendarEventsVoter extends Voter
 
     private Adapter $eventReleaseLevelPolicy;
 
-    private Adapter $stringUtil;
-
-    private CalendarEventsModel|null $event = null;
-
-    private BackendUser|null $user = null;
-
     public function __construct(
+        private readonly AccessDecisionManagerInterface $accessDecisionManager,
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
         private readonly Security $security,
@@ -70,7 +66,6 @@ class CalendarEventsVoter extends Voter
         // Adapters
         $this->calendarEvent = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->eventReleaseLevelPolicy = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
-        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }
 
     /**
@@ -93,11 +88,11 @@ class CalendarEventsVoter extends Voter
         }
 
         if ('up' === $direction) {
-            if ($eventReleaseLevelPolicyModel === $eventReleaseLevelPolicyModel::findMaxLevelByEventId($eventsModel->id)) {
+            if ((int) $eventReleaseLevelPolicyModel->id === (int) $eventReleaseLevelPolicyModel::findMaxLevelByEventId($eventsModel->id)?->id) {
                 return false;
             }
         } else {
-            if ($eventReleaseLevelPolicyModel === $eventReleaseLevelPolicyModel::findMinLevelByEventId($eventsModel->id)) {
+            if ((int) $eventReleaseLevelPolicyModel->id === (int) $eventReleaseLevelPolicyModel::findMinLevelByEventId($eventsModel->id)?->id) {
                 return false;
             }
         }
@@ -125,8 +120,8 @@ class CalendarEventsVoter extends Voter
         }
 
         // Check if the user is member of an allowed group
-        $arrAllowedGroups = $this->stringUtil->deserialize($eventReleaseLevelPolicyModel->groupReleaseLevelPerm, true);
-        $arrUserGroups = $this->stringUtil->deserialize($user->groups, true);
+        $arrAllowedGroups = StringUtil::deserialize($eventReleaseLevelPolicyModel->groupReleaseLevelPerm, true);
+        $arrUserGroups = StringUtil::deserialize($user->groups, true);
 
         foreach ($arrAllowedGroups as $v) {
             if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
@@ -163,25 +158,26 @@ class CalendarEventsVoter extends Voter
      */
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
     {
-        $this->user = $token->getUser();
+        $user = $token->getUser();
 
-        if (!$this->user instanceof BackendUser) {
+        if (!$user instanceof BackendUser) {
             // the user must be logged in; if not, deny access
             return false;
         }
 
-        $this->event = $this->calendarEvent->findById($subject);
+        $calEvent = $this->calendarEvent->findById($subject);
 
-        if (null === $this->event) {
+        if (null === $calEvent) {
             return false;
         }
 
         return match ($attribute) {
-            self::CAN_DELETE_EVENT => $this->canDeleteEvent(),
-            self::CAN_WRITE_EVENT => $this->canWriteEvent(),
-            self::CAN_CUT_EVENT => $this->canCutEvent(),
-            self::CAN_UPGRADE_EVENT_RELEASE_LEVEL, self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL => $this->canSwitchReleaseLevel($attribute),
-            self::CAN_ADMINISTER_EVENT_REGISTRATIONS => $this->canAdministerEventRegistrations(),
+            self::CAN_DELETE_EVENT => $this->canDeleteEvent($token, $calEvent),
+            self::CAN_WRITE_EVENT => $this->canWriteEvent($token, $calEvent),
+            self::CAN_CUT_EVENT => $this->canCutEvent($token, $calEvent),
+            self::CAN_UPGRADE_EVENT_RELEASE_LEVEL => $this->canSwitchReleaseLevel($token, $calEvent, $attribute),
+            self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL => $this->canSwitchReleaseLevel($token, $calEvent, $attribute),
+            self::CAN_ADMINISTER_EVENT_REGISTRATIONS => $this->canAdministerEventRegistrations($token, $calEvent),
             default => throw new \LogicException(\sprintf('You vote on a unsupported attribute "%s"!', $attribute)),
         };
     }
@@ -196,15 +192,17 @@ class CalendarEventsVoter extends Voter
      *
      * @throws \Exception
      */
-    private function canDeleteEvent(): bool
+    private function canDeleteEvent(TokenInterface $token, CalendarEventsModel $calEvent): bool
     {
-        if (!empty($this->event->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($this->event->eventReleaseLevel);
+        $user = $token->getUser();
+
+        if (!empty($calEvent->eventReleaseLevel)) {
+            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($calEvent->eventReleaseLevel);
 
             if (null === $releaseLevelPolicy) {
                 $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
 
-                throw new \Exception(\sprintf($msg, $this->event->id));
+                throw new \Exception(\sprintf($msg, $calEvent->id));
             }
         } else {
             // Grant delete-access if the event is not assigned to a release level.
@@ -212,22 +210,22 @@ class CalendarEventsVoter extends Voter
         }
 
         // Allow deletion to admins.
-        if ($this->security->isGranted('ROLE_ADMIN')) {
+        if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
             return true;
         }
 
         if ($releaseLevelPolicy->allowDeleteAccessToAuthor) {
-            if ((int) $this->user->id === (int) $this->event->author) {
+            if ((int) $user->id === (int) $calEvent->author) {
                 // Grant delete-access if... authors have delete-access and the user has the role
                 // "author" on the current event
                 return true;
             }
         }
 
-        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($this->event);
+        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($calEvent);
 
         if ($releaseLevelPolicy->allowDeleteAccessToInstructors) {
-            if (\in_array($this->user->id, $arrEventInstructors, false)) {
+            if (\in_array($user->id, $arrEventInstructors, false)) {
                 // Grant delete-access if... instructors have delete-access and the user has the
                 // role "instructor" on the current event
                 return true;
@@ -235,8 +233,8 @@ class CalendarEventsVoter extends Voter
         }
 
         // Check if the user is member of an allowed group
-        $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupEventPerm, true);
-        $arrUserGroups = $this->stringUtil->deserialize($this->user->groups, true);
+        $arrAllowedGroups = StringUtil::deserialize($releaseLevelPolicy->groupEventPerm, true);
+        $arrUserGroups = StringUtil::deserialize($user->groups, true);
 
         foreach ($arrAllowedGroups as $v) {
             if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
@@ -262,15 +260,18 @@ class CalendarEventsVoter extends Voter
      *
      * @throws \Exception
      */
-    private function canCutEvent(): bool
+    private function canCutEvent(TokenInterface $token, CalendarEventsModel $calEvent): bool
     {
-        if (!empty($this->event->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($this->event->eventReleaseLevel);
+        /** @var BackendUser $user */
+        $user = $token->getUser();
+
+        if (!empty($calEvent->eventReleaseLevel)) {
+            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($calEvent->eventReleaseLevel);
 
             if (null === $releaseLevelPolicy) {
                 $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
 
-                throw new \Exception(\sprintf($msg, $this->event->id));
+                throw new \Exception(\sprintf($msg, $calEvent->id));
             }
         } else {
             // Grant cut-access if the event is not assigned to a release level.
@@ -278,22 +279,22 @@ class CalendarEventsVoter extends Voter
         }
 
         // Allow cut event to admins.
-        if ($this->security->isGranted('ROLE_ADMIN')) {
+        if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
             return true;
         }
 
         if ($releaseLevelPolicy->allowCutAccessToAuthor) {
-            if ((int) $this->user->id === (int) $this->event->author) {
+            if ((int) $user->id === (int) $calEvent->author) {
                 // Grant cut-access if... authors have cut-access and the user has the role
                 // "author" on the current event
                 return true;
             }
         }
 
-        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($this->event);
+        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($calEvent);
 
         if ($releaseLevelPolicy->allowCutAccessToInstructors) {
-            if (\in_array($this->user->id, $arrEventInstructors, false)) {
+            if (\in_array($user->id, $arrEventInstructors, false)) {
                 // Grant cut-access if... instructors have cut-access and the user has the role
                 // "instructor" on the current event
                 return true;
@@ -301,8 +302,8 @@ class CalendarEventsVoter extends Voter
         }
 
         // Check if the user is member of an allowed group
-        $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupEventPerm, true);
-        $arrUserGroups = $this->stringUtil->deserialize($this->user->groups, true);
+        $arrAllowedGroups = StringUtil::deserialize($releaseLevelPolicy->groupEventPerm, true);
+        $arrUserGroups = StringUtil::deserialize($user->groups, true);
 
         foreach ($arrAllowedGroups as $v) {
             if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
@@ -329,15 +330,17 @@ class CalendarEventsVoter extends Voter
      *
      * @throws \Exception
      */
-    private function canWriteEvent(): bool
+    private function canWriteEvent(TokenInterface $token, CalendarEventsModel $calEvent): bool
     {
-        if (!empty($this->event->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($this->event->eventReleaseLevel);
+        $user = $token->getUser();
+
+        if (!empty($calEvent->eventReleaseLevel)) {
+            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($calEvent->eventReleaseLevel);
 
             if (null === $releaseLevelPolicy) {
                 $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
 
-                throw new \Exception(\sprintf($msg, $this->event->id));
+                throw new \Exception(\sprintf($msg, $calEvent->id));
             }
         } else {
             // Grant write- or write-access if the event is not assigned to a release level.
@@ -345,37 +348,37 @@ class CalendarEventsVoter extends Voter
         }
 
         // Allow write-access to admins.
-        if ($this->security->isGranted('ROLE_ADMIN')) {
+        if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
             return true;
         }
 
         if ($releaseLevelPolicy->allowWriteAccessToAuthor) {
-            if ((int) $this->user->id === (int) $this->event->author) {
+            if ((int) $user->id === (int) $calEvent->author) {
                 // Grant write-access if... authors have write-access and the user has the role
                 // "author" on the current event
                 return true;
             }
         }
 
-        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($this->event);
+        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($calEvent);
 
         if ($releaseLevelPolicy->allowWriteAccessToInstructors) {
-            if (\in_array($this->user->id, $arrEventInstructors, false)) {
+            if (\in_array($user->id, $arrEventInstructors, false)) {
                 // Grant write-access if... instructors have write-access and the user has the
                 // role "instructor" on the current event
                 return true;
             }
         }
 
-        if (!empty($this->event->registrationGoesTo)) {
-            if ($this->user->id === $this->event->registrationGoesTo) {
+        if (!empty($calEvent->registrationGoesTo)) {
+            if ($user->id === $calEvent->registrationGoesTo) {
                 return true;
             }
         }
 
         // Check if the user is member of an allowed group
-        $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupEventPerm, true);
-        $arrUserGroups = $this->stringUtil->deserialize($this->user->groups, true);
+        $arrAllowedGroups = StringUtil::deserialize($releaseLevelPolicy->groupEventPerm, true);
+        $arrUserGroups = StringUtil::deserialize($user->groups, true);
 
         foreach ($arrAllowedGroups as $v) {
             if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
@@ -403,15 +406,17 @@ class CalendarEventsVoter extends Voter
      *
      * @throws \Exception
      */
-    private function canAdministerEventRegistrations(): bool
+    private function canAdministerEventRegistrations(TokenInterface $token, CalendarEventsModel $calEvent): bool
     {
-        if (!empty($this->event->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($this->event->eventReleaseLevel);
+        $user = $token->getUser();
+
+        if (!empty($calEvent->eventReleaseLevel)) {
+            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($calEvent->eventReleaseLevel);
 
             if (null === $releaseLevelPolicy) {
                 $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
 
-                throw new \Exception(\sprintf($msg, $this->event->id));
+                throw new \Exception(\sprintf($msg, $calEvent->id));
             }
         } else {
             // Grant access if the event is not assigned to a release level.
@@ -419,43 +424,43 @@ class CalendarEventsVoter extends Voter
         }
 
         // Grant action to admins.
-        if ($this->security->isGranted('ROLE_ADMIN')) {
+        if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
             return true;
         }
 
-        $regStartTime = $this->event->registrationStartDate + $this->regStartTimeOffset;
+        $regStartTime = $calEvent->registrationStartDate + $this->regStartTimeOffset;
 
-        if ($this->event->setRegistrationPeriod && $regStartTime > time()) {
+        if ($calEvent->setRegistrationPeriod && $regStartTime > time()) {
             return false;
         }
 
         if ($releaseLevelPolicy->allowAdministerEventRegistrationsToAuthors) {
-            if ((int) $this->user->id === (int) $this->event->author) {
+            if ((int) $user->id === (int) $calEvent->author) {
                 // Grant action if... if authors are allowed and the user has the role "author"
                 // on the current event
                 return true;
             }
         }
 
-        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($this->event);
+        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($calEvent);
 
         if ($releaseLevelPolicy->allowAdministerEventRegistrationsToInstructors) {
-            if (\in_array($this->user->id, $arrEventInstructors, true)) {
+            if (\in_array($user->id, $arrEventInstructors, true)) {
                 // Grant action if... instructors are allowed and the user has the role
                 // "instructor" on the current event
                 return true;
             }
         }
 
-        if (!empty($this->event->registrationGoesTo)) {
-            if ($this->user->id === $this->event->registrationGoesTo) {
+        if (!empty($calEvent->registrationGoesTo)) {
+            if ($user->id === $calEvent->registrationGoesTo) {
                 return true;
             }
         }
 
         // Check if the user is member of an allowed group
-        $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupEventPerm, true);
-        $arrUserGroups = $this->stringUtil->deserialize($this->user->groups, true);
+        $arrAllowedGroups = StringUtil::deserialize($releaseLevelPolicy->groupEventPerm, true);
+        $arrUserGroups = StringUtil::deserialize($user->groups, true);
 
         foreach ($arrAllowedGroups as $v) {
             if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
@@ -481,29 +486,31 @@ class CalendarEventsVoter extends Voter
      *
      * @throws \Exception
      */
-    private function canSwitchReleaseLevel(string $attribute): bool
+    private function canSwitchReleaseLevel(TokenInterface $token, CalendarEventsModel $calEvent, string $direction): bool
     {
-        if (!empty($this->event->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($this->event->eventReleaseLevel);
+        $user = $token->getUser();
+
+        if (!empty($calEvent->eventReleaseLevel)) {
+            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($calEvent->eventReleaseLevel);
 
             if (null === $releaseLevelPolicy) {
                 $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
 
-                throw new \Exception(\sprintf($msg, $this->event->id));
+                throw new \Exception(\sprintf($msg, $calEvent->id));
             }
         } else {
             // Grant write- or write-access if the event is not assigned to a release level.
             return true;
         }
 
-        if (self::CAN_UPGRADE_EVENT_RELEASE_LEVEL === $attribute) {
-            $direction = 'up';
-        } elseif (self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL === $attribute) {
-            $direction = 'down';
+        if (self::CAN_UPGRADE_EVENT_RELEASE_LEVEL === $direction) {
+            $direct = 'up';
+        } elseif (self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL === $direction) {
+            $direct = 'down';
         } else {
-            throw new \LogicException(\sprintf('$attribute should be either "%s" or "%s" "%s" given.', self::CAN_UPGRADE_EVENT_RELEASE_LEVEL, self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $attribute));
+            throw new \LogicException(\sprintf('$direction should be either "%s" or "%s" "%s" given.', self::CAN_UPGRADE_EVENT_RELEASE_LEVEL, self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $direction));
         }
 
-        return $this->canChangeReleaseLevel($this->event, $this->user, $releaseLevelPolicy, $direction);
+        return $this->canChangeReleaseLevel($calEvent, $user, $releaseLevelPolicy, $direct);
     }
 }

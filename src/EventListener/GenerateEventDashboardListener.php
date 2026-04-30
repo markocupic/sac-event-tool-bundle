@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\EventListener;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Event\GenerateEventDashboardEvent;
+use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsInstructorInvoiceVoter;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -111,7 +112,7 @@ readonly class GenerateEventDashboardListener
 
         // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und
         // Vergütungsformular drucken und einreichen" button
-        if ($this->security->isGranted('contao_user.sac_event_tool_permissions', 'can_edit_all_invoice_forms') || $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $eventId)) {
+        if ($this->security->isGranted(CalendarEventsInstructorInvoiceVoter::HAS_ACCESS, $calEvent)) {
             if (EventType::TOUR === $calEvent->eventType || EventType::LAST_MINUTE_TOUR === $calEvent->eventType) {
                 $href = $this->router->generate(
                     'contao_backend',

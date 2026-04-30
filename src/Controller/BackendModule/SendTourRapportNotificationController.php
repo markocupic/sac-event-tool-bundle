@@ -22,6 +22,7 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\AbstractBackendController;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Util\UrlUtil;
@@ -39,6 +40,8 @@ use Markocupic\SacEventToolBundle\DocxTemplator\OutputType;
 use Markocupic\SacEventToolBundle\DocxTemplator\TourRapportGenerator;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
+use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsInstructorInvoiceVoter;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -95,6 +98,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
         private readonly array $mailerTransport,
         private readonly RequestStack $requestStack,
         private readonly RouterInterface $router,
+        private readonly Security $security,
         private readonly TourRapportGenerator $tourRapportGenerator,
         private readonly TranslatorInterface $translator,
         private readonly Twig $twig,
@@ -127,10 +131,14 @@ class SendTourRapportNotificationController extends AbstractBackendController
         $this->checkIsSignedUrlValid($request);
 
         $invoice = $this->getInvoice($rapport_id);
-        $event = $this->prevalidateDocumentGenerationAndGetEvent($invoice);
+        $calEvent = $this->prevalidateDocumentGenerationAndGetEvent($invoice);
 
-        if (null === $event) {
+        if (null === $calEvent) {
             return $this->redirectToRefererPage($request);
+        }
+
+        if (!$this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_SEND, $calEvent)) {
+            throw new AccessDeniedException('You are not allowed to access this page.');
         }
 
         if ($response = $this->handleDownloadActions($action, $invoice)) {
@@ -138,14 +146,14 @@ class SendTourRapportNotificationController extends AbstractBackendController
         }
 
         $biller = $this->getBiller($rapport_id);
-        $form = $this->createAndValidateForm($request, $event, $biller);
+        $form = $this->createAndValidateForm($request, $calEvent, $biller);
 
         if ($form->isSubmitted()) {
             // Generate documents, send email and redirect to the referer page
             return $this->processFormSubmission($request, $form, $invoice, $biller);
         }
 
-        return $this->renderFormView($request, $form, $event, $invoice, $rapport_id, $sid, $rt);
+        return $this->renderFormView($request, $form, $calEvent, $invoice, $rapport_id, $sid, $rt);
     }
 
     private function prevalidateDocumentGenerationAndGetEvent(CalendarEventsInstructorInvoiceModel $invoice): CalendarEventsModel|null
@@ -172,13 +180,13 @@ class SendTourRapportNotificationController extends AbstractBackendController
         return null;
     }
 
-    private function renderFormView(Request $request, Form $form, CalendarEventsModel $event, CalendarEventsInstructorInvoiceModel $invoice, int $rapport_id, string $sid, string $rt): Response
+    private function renderFormView(Request $request, Form $form, CalendarEventsModel $calEvent, CalendarEventsInstructorInvoiceModel $invoice, int $rapport_id, string $sid, string $rt): Response
     {
         $view = [
             'title' => $this->translator->trans('MOD.calendar.0', [], 'contao_default'),
             'headline' => $this->translator->trans('MSC.evt_strn_title', [], 'contao_default'),
             'request_token' => $rt,
-            'event' => $event,
+            'event' => $calEvent,
             'back' => $this->getRefererUri($request),
             'form' => $form->generate(),
             'download_tour_rapport_uri' => $this->generateSignedDownloadUri($rapport_id, $sid, $rt, 'download_tour_rapport'),
@@ -379,18 +387,18 @@ class SendTourRapportNotificationController extends AbstractBackendController
         return $this->redirect($url);
     }
 
-    private function getOrganizers(CalendarEventsModel $event): Collection|null
+    private function getOrganizers(CalendarEventsModel $calEvent): Collection|null
     {
-        $arrIDS = $this->stringUtil->deserialize($event->organizers, true);
+        $arrIDS = $this->stringUtil->deserialize($calEvent->organizers, true);
 
         return $this->framework->getAdapter(EventOrganizerModel::class)->findMultipleByIds($arrIDS);
     }
 
-    private function getRecipients(CalendarEventsModel $event): array
+    private function getRecipients(CalendarEventsModel $calEvent): array
     {
         $arrRecipients = [];
 
-        $organizer = $this->getOrganizers($event);
+        $organizer = $this->getOrganizers($calEvent);
 
         if (null !== $organizer) {
             $i = 0;
@@ -413,7 +421,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
         return array_filter(array_unique($arrRecipients));
     }
 
-    private function createAndValidateForm(Request $request, CalendarEventsModel $event, UserModel $biller): Form
+    private function createAndValidateForm(Request $request, CalendarEventsModel $calEvent, UserModel $biller): Form
     {
         $form = new Form(
             'send_tour_rapport_notification_form',
@@ -472,12 +480,12 @@ class SendTourRapportNotificationController extends AbstractBackendController
         // Preset input fields "subject" and "text" with a default text
         if ('send_tour_rapport_notification_form' !== $request->request->get('FORM_SUBMIT')) {
             if (empty($form->getWidget('recipients')->value) && empty($form->getWidget('text')->value) && empty($form->getWidget('subject')->value)) {
-                $form->getWidget('recipients')->value = implode(',', $this->getRecipients($event));
+                $form->getWidget('recipients')->value = implode(',', $this->getRecipients($calEvent));
 
                 // Render email subject
                 $subject = $this->twig->render('@MarkocupicSacEventTool/Email/TourRapport/email_tour_rapport.twig', [
                     'renderEmailSubject' => true,
-                    'event' => $event,
+                    'event' => $calEvent,
                     'instructor' => $biller,
                 ]);
 
@@ -488,9 +496,9 @@ class SendTourRapportNotificationController extends AbstractBackendController
                 // Render email text
                 $text = $this->twig->render('@MarkocupicSacEventTool/Email/TourRapport/email_tour_rapport.twig', [
                     'renderEmailText' => true,
-                    'event' => $event,
+                    'event' => $calEvent,
                     'instructor' => $biller,
-                    'event_url' => $this->events->generateEventUrl($event, true),
+                    'event_url' => $this->events->generateEventUrl($calEvent, true),
                 ]);
 
                 $text = $this->stringUtil->revertInputEncoding($text);

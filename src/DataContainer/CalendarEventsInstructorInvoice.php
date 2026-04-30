@@ -37,8 +37,7 @@ use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
 use Markocupic\SacEventToolBundle\DocxTemplator\OutputType;
 use Markocupic\SacEventToolBundle\DocxTemplator\TourRapportGenerator;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
-use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
-use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
+use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsInstructorInvoiceVoter;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -72,58 +71,95 @@ readonly class CalendarEventsInstructorInvoice
     public function checkPermissions(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
-        $id = $request->query->get('id');
-        $action = $request->query->get('action', '');
-        $act = $request->query->get('act', '');
+        $id = (int) $request->query->get('id');
+        $action = (string) $request->query->get('action', '');
+        $act = (string) $request->query->get('act', '');
+        $customActions = ['generateInvoicePdf', 'generateTourRapportPdf', 'sendRapport'];
 
-        // Check event-level permissions
-        if ($dc->currentPid) {
-            $operations = ['generateInvoicePdf', 'generateTourRapportPdf', 'sendRapport'];
+        // Check custom actions
+        if (!empty($action) && !\in_array($action, $customActions, true)) {
+            throw new AccessDeniedException(\sprintf('Not supported user action "%s".', $action));
+        }
 
-            if (\in_array($action, $operations, true)) {
-                $calEvent = CalendarEventsInstructorInvoiceModel::findById($id)?->getRelated('pid');
-            } else {
-                $calEvent = CalendarEventsModel::findById($dc->currentPid);
+        if (empty($act) && empty($action)) {
+            $eventId = $dc->currentPid;
+            $calEvent = CalendarEventsModel::findById($eventId);
+
+            $hasAccess = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::HAS_ACCESS, $calEvent);
+
+            if (!$hasAccess) {
+                throw new AccessDeniedException('Access denied!');
             }
 
-            if (null !== ($calEvent ?? null)) {
-                $allow = match (true) {
-                    $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $calEvent->id) => true,
-                    $this->security->isGranted('contao_user.sac_event_tool_permissions', 'can_edit_all_invoice_forms') => true,
-                    default => false,
-                };
+            $canCreate = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_CREATE, $calEvent);
 
-                if (!$allow) {
-                    Message::addError('Sie besitzen nicht die nötigen Rechte, um diese Seite zu sehen.');
-                    Controller::redirect(System::getReferer());
+            if (!$canCreate) {
+                $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice']['config']['notCopyable'] = true;
+                $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice']['config']['notCreatable'] = true;
+            }
+        }
+
+        // Check event-level permissions
+        if (!empty($action)) {
+            $calEvent = CalendarEventsInstructorInvoiceModel::findById($dc->currentPid)?->getRelated('pid');
+
+            if (null === $calEvent) {
+                throw new \Exception(\sprintf('Event with ID "%s" not found!', $dc->currentPid));
+            }
+
+            // Allow only admins, event instructors, and special users with permission to open the invoice listing.
+            if ('generateInvoicePdf' === $action || 'generateTourRapportPdf' === $action) {
+                $canDownload = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_DOWNLOAD, $calEvent);
+
+                if (!$canDownload) {
+                    throw new AccessDeniedException('Not enough permissions to download the tour report or the invoice.');
+                }
+            }
+
+            if ('sendRapport' === $action) {
+                $canSend = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_SEND, $calEvent);
+
+                if (!$canSend) {
+                    throw new AccessDeniedException('Not enough permissions to send the tour report.');
                 }
             }
         }
 
         // Check action-level permissions
-        if (\in_array($act, ['select', 'copyAll', 'deleteAll', 'editAll', 'overrideAll'], true)) {
-            Message::addError($this->translator->trans('ERR.actionNotSupported', [], 'contao_default'));
-            Controller::redirect(System::getReferer());
-        }
+        if (!empty($act)) {
+            if (\in_array($act, ['select', 'copyAll', 'deleteAll', 'editAll', 'overrideAll'], true)) {
+                Message::addError($this->translator->trans('ERR.actionNotSupported', [], 'contao_default'));
+                Controller::redirect(System::getReferer());
+            } elseif ('create' === $act) {
+                $eventId = $id;
+                $calEvent = CalendarEventsModel::findById($eventId);
+                $canCreate = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_CREATE, $calEvent);
 
-        if ('edit' === $act || 'delete' === $act) {
-            $user = $this->security->getUser();
-            $userPid = (int) $this->connection->fetchOne(
-                'SELECT userPid FROM tl_calendar_events_instructor_invoice WHERE id = ?',
-                [$id],
-            );
+                if (!$canCreate) {
+                    throw new AccessDeniedException('Not enough permissions to create a new invoice.');
+                }
+            } elseif ('edit' === $act) {
+                $calEvent = CalendarEventsModel::findById($dc->currentPid);
+                $canEdit = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_UPDATE, $calEvent);
 
-            $allow = match (true) {
-                $this->security->isGranted('ROLE_ADMIN') => true,
-                (int) $user->id === $userPid => true,
-                default => false,
-            };
+                if (!$canEdit) {
+                    throw new AccessDeniedException('Not enough permissions to '.$act.' data record ID '.$id.'.');
+                }
+            } elseif ('delete' === $act) {
+                $calEvent = CalendarEventsModel::findById($dc->currentPid);
+                $canDelete = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_DELETE, $calEvent);
 
-            if (!$allow && 'edit' === $act) {
-                $allow = $this->security->isGranted('contao_user.sac_event_tool_permissions', 'can_edit_all_invoice_forms');
-            }
+                if (!$canDelete) {
+                    throw new AccessDeniedException('Not enough permissions to '.$act.' data record ID '.$id.'.');
+                }
+            } elseif ('show' === $act) {
+                $calEvent = CalendarEventsModel::findById($dc->currentPid);
+                $canShow = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::HAS_ACCESS, $calEvent);
 
-            if (!$allow) {
+                if (!$canShow) {
+                    throw new AccessDeniedException('Not enough permissions to '.$act.' data record ID '.$id.'.');
+                }
+            } else {
                 throw new AccessDeniedException('Not enough permissions to '.$act.' data record ID '.$id.'.');
             }
         }
@@ -254,17 +290,11 @@ readonly class CalendarEventsInstructorInvoice
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.edit.button', priority: 90)]
     public function editButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
-        $user = $this->security->getUser();
+        $calEvent = CalendarEventsModel::findById($row['pid']);
 
-        // A common user should not be allowed to edit another user's rapport
-        $allow = match (true) {
-            $this->security->isGranted('ROLE_ADMIN') => true,
-            (int) $row['userPid'] === (int) $user->id => true,
-            $this->security->isGranted('contao_user.sac_event_tool_permissions', 'can_edit_all_invoice_forms') => true,
-            default => false,
-        };
+        $allow = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_UPDATE, $calEvent);
 
-        if (false === $allow) {
+        if (!$allow) {
             return Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
         }
 
@@ -276,16 +306,11 @@ readonly class CalendarEventsInstructorInvoice
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.delete.button', priority: 90)]
     public function deleteButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
-        $user = $this->security->getUser();
+        $calEvent = CalendarEventsModel::findById($row['pid']);
 
-        // A common user should not be allowed to delete another user's rapport
-        $allow = match (true) {
-            $this->security->isGranted('ROLE_ADMIN') => true,
-            (int) $row['userPid'] === (int) $user->id => true,
-            default => false,
-        };
+        $allow = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_DELETE, $calEvent);
 
-        if (false === $allow) {
+        if (!$allow) {
             return Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
         }
 
@@ -297,38 +322,9 @@ readonly class CalendarEventsInstructorInvoice
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.sendRapport.button', priority: 90)]
     public function sendRapport(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
-        $allow = false;
-        $rapportNotificationEnabled = false;
-
         $calEvent = CalendarEventsModel::findById($row['pid']);
 
-        $arrOrganizers = StringUtil::deserialize($calEvent->organizers, true);
-        $organizers = EventOrganizerModel::findByIds($arrOrganizers);
-
-        if (null !== $organizers) {
-            while ($organizers->next()) {
-                if ($organizers->enableRapportNotification) {
-                    // Only show the icon without a link if rapport notification is disabled in the
-                    // organizer model.
-                    $rapportNotificationEnabled = true;
-                }
-            }
-        }
-
-        if (null !== $calEvent && $calEvent->filledInEventReportForm && $rapportNotificationEnabled) {
-            $allow = true;
-        }
-
-        if (true === $allow) {
-            $user = $this->security->getUser();
-
-            // A common user should not be allowed to send another user's report
-            if ($this->security->isGranted('ROLE_ADMIN')) {
-                $allow = true;
-            } elseif ((int) $row['userPid'] !== (int) $user->id) {
-                $allow = false;
-            }
-        }
+        $allow = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_SEND, $calEvent);
 
         if (false === $allow) {
             return Image::getHtml(str_replace('default', 'disabled', $icon), $label).' ';
