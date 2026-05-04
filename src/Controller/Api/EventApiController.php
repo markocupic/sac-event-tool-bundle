@@ -41,6 +41,7 @@ class EventApiController extends AbstractController
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly Security $security,
+        private readonly Stopwatch $stopwatch,
     ) {
     }
 
@@ -61,36 +62,35 @@ class EventApiController extends AbstractController
         // Get query filter params from request
         $params = $this->getQueryParamsFromRequest($request);
 
-        $stopwatch = new Stopwatch();
-        $stopwatch->start('event list api query time');
+        $this->stopwatch->start('event list api query time');
 
         // Build the first query
-        $qb = $this->buildQuery($this->connection, $params);
+        $qb = $this->buildQuery($params);
 
-        /** @var array<int> $arrIds */
-        $arrIds = $qb->fetchFirstColumn();
+        /** @var array<int> $ids */
+        $ids = $qb->fetchFirstColumn();
 
         // Now we have all the ids, let's prepare the second query
-        $arrFields = empty($params['fields']) ? [] : $params['fields'];
+        $fields = empty($params['fields']) ? [] : $params['fields'];
 
         $arrJSON = [
             'meta' => [
                 'status' => 'success',
-                'countItems' => 0,
-                'itemsTotal' => \count($arrIds),
+                'perPage' => 0,
+                'itemsTotal' => \count($ids),
                 'queryTime' => '',
                 'arrEventIds' => [],
             ],
             'data' => [],
         ];
 
-        if (!empty($arrIds)) {
+        if (!empty($ids)) {
             $qb = $this->connection->createQueryBuilder();
             $qb->select('e.*,c.title') // e -> tl_calendar_events, c -> tl_calendar
                 ->from('tl_calendar_events', 'e')
                 ->join('e', 'tl_calendar', 'c', 'e.pid = c.id')
                 ->where($qb->expr()->in('e.id', ':ids'))
-                ->setParameter('ids', $arrIds, ArrayParameterType::INTEGER)
+                ->setParameter('ids', $ids, ArrayParameterType::INTEGER)
                 ->orderBy('e.startDate', 'ASC')
                 ->addOrderBy('e.endDate', 'ASC')
                 ->addOrderBy('c.title', 'DESC')
@@ -108,28 +108,25 @@ class EventApiController extends AbstractController
                 $qb->setMaxResults($params['limit']);
             }
 
-            $results = $qb->executeQuery();
+            $calEvents = $qb->fetchAllAssociative();
 
-            while (false !== ($arrEvent = $results->fetchAssociative())) {
-                ++$arrJSON['meta']['countItems'];
-                $oData = null;
+            foreach ($calEvents as $calEvent) {
+                ++$arrJSON['meta']['perPage'];
 
                 /** @var CalendarEventsModel $objEvent */
-                $objEvent = $calendarEventsModel->findById($arrEvent['id']);
+                $objEvent = $calendarEventsModel->findById($calEvent['id']);
 
                 if (null !== $objEvent) {
-                    $arrJSON['meta']['arrEventIds'][] = $arrEvent['id'];
+                    $arrJSON['meta']['arrEventIds'][] = $calEvent['id'];
 
-                    if (null === $oData) {
-                        $oData = new \stdClass();
+                    $oData = new \stdClass();
 
-                        foreach ($arrFields as $key) {
-                            $value = $this->calendarEventsUtil->getEventData($objEvent, $key);
-                            // $key may contain a query string: eventImage?size=5
-                            $parts = explode('?', $key, 2);
-                            $key = $parts[0];
-                            $oData->{$key} = $this->prepareValue($value);
-                        }
+                    foreach ($fields as $key) {
+                        $value = $this->calendarEventsUtil->getEventData($objEvent, $key);
+                        // $key may contain a query string: eventImage?size=5
+                        $parts = explode('?', $key, 2);
+                        $key = $parts[0];
+                        $oData->{$key} = $this->prepareValue($value);
                     }
 
                     $arrJSON['data'][] = $oData;
@@ -137,10 +134,9 @@ class EventApiController extends AbstractController
             }
         }
 
-        $arrJSON['meta']['queryTime'] = (string) $stopwatch->stop('event list api query time');
+        $arrJSON['meta']['queryTime'] = (string) $this->stopwatch->stop('event list api query time');
 
-        // Allow cross-domain requests
-        $response = new JsonResponse($arrJSON, 200, ['Access-Control-Allow-Origin' => '*']);
+        $response = new JsonResponse($arrJSON, 200);
 
         // Enable cache for not logged-in frontend users (guests)
         $user = $this->security->getUser();
@@ -169,63 +165,75 @@ class EventApiController extends AbstractController
         $calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
 
         $eventId = (int) $request->query->get('id');
-        $arrFields = '' !== $request->get('fields') ? explode(',', $request->get('fields')) : [];
+
+        $toStringArray = static fn (array $v): array => array_values(array_unique(array_filter(array_map('strval', $v))));
+
+        // Arrays -> we cannot use $request->query->get() for non-scalar values
+        $fields = $toStringArray($request->query->all('fields'));
 
         $arrJSON = [
             'status' => 'error',
-            'arrEventData' => '',
+            'arrEventData' => [],
             'eventId' => $eventId,
-            'arrFields' => $arrFields,
+            'arrFields' => $fields,
         ];
 
-        if (null !== ($objEvent = $calendarEventsModel->findById($eventId))) {
+        $respStatus = 404;
+
+        $objEvent = $calendarEventsModel->findById($eventId);
+
+        if (null !== $objEvent && $objEvent->published) {
             $arrJSON['status'] = 'success';
             $arrEvent = [];
 
             foreach (array_keys($objEvent->row()) as $k) {
-                // If $arrFields is empty, send all properties
-                if (!empty($arrFields)) {
-                    if (!\in_array($k, $arrFields, true)) {
+                // If $fields is empty, send all properties
+                if (!empty($fields)) {
+                    if (!\in_array($k, $fields, true)) {
                         continue;
                     }
                 }
 
                 $arrEvent[$k] = $this->prepareValue($this->calendarEventsUtil->getEventData($objEvent, $k));
             }
+
             $arrJSON['arrEventData'] = $arrEvent;
+            $respStatus = 200;
         }
 
-        // Allow cross-domain requests
-        return new JsonResponse($arrJSON, 200, ['Access-Control-Allow-Origin' => '*']);
+        return new JsonResponse($arrJSON, $respStatus);
     }
 
     private function getQueryParamsFromRequest(Request $request): array
     {
         $toIntArray = static fn (mixed $v): array => \is_array($v) ? array_map('intval', $v) : [];
 
+        $toStringArray = static fn (array $v): array => array_values(array_unique(array_filter(array_map('strval', $v))));
+
         return [
-            // Arrays
-            'organizers' => $toIntArray($request->get('organizers')),
-            'eventType' => $request->get('eventType'),
-            'tourType' => $toIntArray($request->get('tourType')),
-            'courseType' => $toIntArray($request->get('courseType')),
-            'calendarIds' => $toIntArray($request->get('calendarIds')),
-            'fields' => $request->get('fields'),
-            'arrIds' => $toIntArray($request->get('arrIds')),
+            // Arrays -> we cannot use $request->query->get() for non-scalar values
+            'organizers' => $toIntArray($request->query->all('organizers')),
+            'tourType' => $toIntArray($request->query->all('tourType')),
+            'courseType' => $toIntArray($request->query->all('courseType')),
+            'calendarIds' => $toIntArray($request->query->all('calendarIds')),
+            'arrIds' => $toIntArray($request->query->all('arrIds')),
+            'eventType' => $toStringArray($request->query->all('eventType')),
+            'fields' => $toStringArray($request->query->all('fields')),
             // Integers
-            'offset' => empty($request->get('offset')) ? 0 : (int) $request->get('offset'),
-            'limit' => empty($request->get('limit')) ? 0 : (int) $request->get('limit'),
+            'offset' => (int) $request->query->get('offset', 0),
+            'limit' => (int) $request->query->get('limit', 0),
             // Strings
-            'courseId' => $request->get('courseId'),
-            'eventId' => $request->get('eventId'),
-            'getUpcoming' => $request->get('getUpcoming') ? '1' : '',
-            'dateStart' => $request->get('dateStart'),
-            'dateEnd' => $request->get('dateEnd'),
-            'textSearch' => $request->get('textSearch'),
-            'username' => $request->get('username'),
-            'suitableForBeginners' => $request->get('suitableForBeginners') ? '1' : '',
-            'publicTransportEvent' => $request->get('publicTransportEvent') ? '1' : '',
-            'favoredEvent' => $request->get('favoredEvent') ? '1' : '',
+            'courseId' => $request->query->get('courseId'),
+            'eventId' => $request->query->get('eventId'),
+            'dateStart' => $request->query->get('dateStart'),
+            'dateEnd' => $request->query->get('dateEnd'),
+            'textSearch' => $request->query->get('textSearch'),
+            'username' => $request->query->get('username'),
+            // booleans
+            'getUpcoming' => '1' === $request->query->get('getUpcoming'),
+            'suitableForBeginners' => '1' === $request->query->get('suitableForBeginners'),
+            'publicTransportEvent' => '1' === $request->query->get('publicTransportEvent'),
+            'favoredEvent' => '1' === $request->query->get('favoredEvent'),
         ];
     }
 
@@ -238,7 +246,7 @@ class EventApiController extends AbstractController
         $validator = $this->framework->getAdapter(Validator::class);
 
         // Transform bin uuids
-        $varValue = $validator->isBinaryUuid($varValue) ? $stringUtil->binToUuid($varValue) : $varValue;
+        $varValue = \is_string($varValue) && $validator->isBinaryUuid($varValue) ? $stringUtil->binToUuid($varValue) : $varValue;
 
         // Deserialize arrays
         $varValue = $stringUtil->deserialize($varValue);
@@ -251,15 +259,15 @@ class EventApiController extends AbstractController
         $varValue = \is_string($varValue) && $validator->isBinaryUuid($varValue) ? $stringUtil->binToUuid($varValue) : $varValue;
         $varValue = \is_string($varValue) ? $stringUtil->decodeEntities($varValue) : $varValue;
 
-        return \is_string($varValue) || \is_array($varValue) ? mb_convert_encoding($varValue, 'UTF-8', 'UTF-8') : $varValue;
+        return \is_string($varValue) ? mb_scrub($varValue, 'UTF-8') : $varValue;
     }
 
-    private function buildQuery(Connection $connection, array $params): QueryBuilder
+    private function buildQuery(array $params): QueryBuilder
     {
         // Ignore date range if certain query params were set
         $blnIgnoreDate = false;
 
-        $qb = $connection->createQueryBuilder();
+        $qb = $this->connection->createQueryBuilder();
 
         $qb->select('id')
             ->from('tl_calendar_events', 't')
@@ -286,14 +294,14 @@ class EventApiController extends AbstractController
         }
 
         // Filter by suitableForBeginners
-        if ('1' === $params['suitableForBeginners']) {
+        if ($params['suitableForBeginners']) {
             $qb->andWhere('t.suitableForBeginners = :suitableForBeginners');
             $qb->setParameter('suitableForBeginners', 1, Types::INTEGER);
         }
 
         // Filter by publicTransportEvent
-        if ('1' === $params['publicTransportEvent']) {
-            $idPublicTransportJourney = $connection->fetchOne(
+        if ($params['publicTransportEvent']) {
+            $idPublicTransportJourney = $this->connection->fetchOne(
                 'SELECT id from tl_calendar_events_journey WHERE alias = :alias',
                 ['alias' => 'public-transport'],
                 ['alias' => Types::STRING],
@@ -307,7 +315,7 @@ class EventApiController extends AbstractController
 
         // Filter by a certain instructor $_GET['username']
         if (!empty($params['username'])) {
-            $userId = $connection->fetchOne(
+            $userId = $this->connection->fetchOne(
                 'SELECT id FROM tl_user WHERE username = :username',
                 ['username' => $params['username']],
                 ['username' => Types::STRING],
@@ -317,7 +325,7 @@ class EventApiController extends AbstractController
                 $userId = 0;
             }
 
-            $qb2 = $connection->createQueryBuilder();
+            $qb2 = $this->connection->createQueryBuilder();
 
             $qb2->select('pid')
                 ->from('tl_calendar_events_instructor', 't')
@@ -325,26 +333,32 @@ class EventApiController extends AbstractController
                 ->setParameter('instructorId', $userId, Types::INTEGER)
             ;
 
-            $arrEvents = $qb2->fetchFirstColumn();
+            $ids = $qb2->fetchFirstColumn();
 
-            $qb->andWhere($qb->expr()->in('t.id', ':arrEvents'));
-            $qb->setParameter('arrEvents', $arrEvents, ArrayParameterType::INTEGER);
+            $eventIds = empty($ids) ? [0] : $ids;
+
+            $qb->andWhere($qb->expr()->in('t.id', ':eventIds'));
+            $qb->setParameter('eventIds', $eventIds, ArrayParameterType::INTEGER);
         }
 
         // Show favored events only
-        if ('1' === $params['favoredEvent']) {
+        if ($params['favoredEvent']) {
             $user = $this->security->getUser();
 
+            $favoredEventsIds = [0];
+
             if ($user instanceof FrontendUser) {
-                $arrFavoredEventsIds = $this->connection->fetchFirstColumn(
+                $ids = $this->connection->fetchFirstColumn(
                     'SELECT eventId FROM tl_favored_events WHERE memberId = ?',
                     [$user->id],
                     [Types::INTEGER],
                 );
 
-                $qb->andWhere($qb->expr()->in('t.id', ':arrFavoredEvents'));
-                $qb->setParameter('arrFavoredEvents', $arrFavoredEventsIds, ArrayParameterType::INTEGER);
+                $favoredEventsIds = empty($ids) ? [0] : $ids;
             }
+
+            $qb->andWhere($qb->expr()->in('t.id', ':favoredEvents'));
+            $qb->setParameter('favoredEvents', $favoredEventsIds, ArrayParameterType::INTEGER);
         }
 
         // Search term (search for expression in tl_calendar_events.title and
@@ -352,69 +366,72 @@ class EventApiController extends AbstractController
         if (!empty($params['textSearch'])) {
             // Support multiple search terms Only return these events in which each search
             // term (needle) was found.
+            $i = 0;
+
             foreach (explode(' ', $params['textSearch']) as $strNeedle) {
-                $arrOrExpr = [];
+                $orExpressions = [];
 
                 if (empty(trim($strNeedle))) {
                     continue;
                 }
 
+                ++$i;
+
                 // Search expression in title & teaser
                 $strNeedle = trim($strNeedle);
                 $safeNeedle = addcslashes($strNeedle, '%_\\');
 
-                $arrOrExpr[] = $qb->expr()->like('t.title', ':needle');
-                $arrOrExpr[] = $qb->expr()->like('t.teaser', ':needle');
-                $qb->setParameter('needle', '%'.$safeNeedle.'%');
+                $orExpressions[] = $qb->expr()->like('t.title', ":needle$i");
+                $orExpressions[] = $qb->expr()->like('t.teaser', ":needle$i");
+                $qb->setParameter("needle$i", '%'.$safeNeedle.'%');
 
                 // Check if search expression is the name of an instructor
-                $safeNeedleInst = addcslashes($strNeedle, '%_\\');
-                $qbSt = $connection->createQueryBuilder();
+                $qbSt = $this->connection->createQueryBuilder();
                 $qbSt->select('id')
                     ->from('tl_user', 'u')
-                    ->where($qbSt->expr()->like('u.name', ':needleInst'))
-                    ->setParameter('needleInst', '%'.$safeNeedleInst.'%')
+                    ->where($qbSt->expr()->like('u.name', ":needleInst$i"))
+                    ->setParameter("needleInst$i", '%'.$safeNeedle.'%')
                 ;
 
-                $arrInst = $qbSt->fetchFirstColumn();
+                $instructorIds = $qbSt->fetchFirstColumn();
 
                 // Check if instructor is the instructor in this event
-                foreach ($arrInst as $instrId) {
-                    $arrOrExpr[] = $qb->expr()->in(
+                foreach ($instructorIds as $instructorId) {
+                    $orExpressions[] = $qb->expr()->in(
                         't.id',
-                        $connection->createQueryBuilder()
+                        $this->connection->createQueryBuilder()
                             ->select('pid')
                             ->from('tl_calendar_events_instructor', 't2')
-                            ->where('t2.userId = :qbStInstructorId'.$instrId)
+                            ->where('t2.userId = :qbStInstructorId'.$instructorId)
                             ->getSQL(),
                     );
                     $qb->setParameter('qbStInstructorId'.$instrId, $instrId, Types::INTEGER);
                 }
 
-                if (!empty($arrOrExpr)) {
-                    $qb->andWhere($qb->expr()->or(...$arrOrExpr));
+                if (!empty($orExpressions)) {
+                    $qb->andWhere($qb->expr()->or(...$orExpressions));
                 }
             }
         }
 
         // Filter by organizers (multiselect)
         if (!empty($params['organizers']) && \is_array($params['organizers'])) {
-            $qbEvtOrg = $connection->createQueryBuilder();
+            $qbEvtOrg = $this->connection->createQueryBuilder();
             $qbEvtOrg->select('id')
                 ->from('tl_event_organizer', 'o')
                 ->where('o.ignoreFilterInEventList = :true')
                 ->setParameter('true', 1, Types::INTEGER)
             ;
 
-            $arrIgnoredOrganizer = $qbEvtOrg->fetchFirstColumn();
+            $ignoredOrganizerIds = $qbEvtOrg->fetchFirstColumn();
 
-            $arrOrExpr = [];
+            $orExpressions = [];
 
             // Show event if it has an organizer with the flag ignoreFilterInEventList=true
-            if (!empty($arrIgnoredOrganizer)) {
-                foreach ($arrIgnoredOrganizer as $orgId) {
+            if (!empty($ignoredOrganizerIds)) {
+                foreach ($ignoredOrganizerIds as $orgId) {
                     $paramName = 'orgIgnored'.(int) $orgId;
-                    $arrOrExpr[] = $qb->expr()->like('t.organizers', ':'.$paramName);
+                    $orExpressions[] = $qb->expr()->like('t.organizers', ':'.$paramName);
                     $qb->setParameter($paramName, '%:"'.(int) $orgId.'";%');
                 }
             }
@@ -423,40 +440,40 @@ class EventApiController extends AbstractController
             foreach ($params['organizers'] as $orgId) {
                 $orgId = (int) $orgId;
 
-                if (!\in_array($orgId, array_map('intval', $arrIgnoredOrganizer), true)) {
+                if (!\in_array($orgId, array_map('intval', $ignoredOrganizerIds), true)) {
                     $paramName = 'org'.$orgId;
-                    $arrOrExpr[] = $qb->expr()->like('t.organizers', ':'.$paramName);
+                    $orExpressions[] = $qb->expr()->like('t.organizers', ':'.$paramName);
                     $qb->setParameter($paramName, '%:"'.$orgId.'";%');
                 }
             }
 
-            if (!empty($arrOrExpr)) {
-                $qb->andWhere($qb->expr()->or(...$arrOrExpr));
+            if (!empty($orExpressions)) {
+                $qb->andWhere($qb->expr()->or(...$orExpressions));
             }
         }
 
         // Filter by tourType (multiselect)
         if (!empty($params['tourType']) && \is_array($params['tourType'])) {
-            $arrOrExpr = [];
+            $orExpressions = [];
 
             // Show event if its tourType is in the search param
             foreach ($params['tourType'] as $tourTypeId) {
                 $tourTypeId = (int) $tourTypeId;
                 $paramName = 'tourType'.$tourTypeId;
-                $arrOrExpr[] = $qb->expr()->like('t.tourType', ':'.$paramName);
+                $orExpressions[] = $qb->expr()->like('t.tourType', ':'.$paramName);
                 $qb->setParameter($paramName, '%:"'.$tourTypeId.'";%');
             }
 
-            if (!empty($arrOrExpr)) {
-                $qb->andWhere($qb->expr()->or(...$arrOrExpr));
+            if (!empty($orExpressions)) {
+                $qb->andWhere($qb->expr()->or(...$orExpressions));
             }
         }
 
         // Filter by course type (multiselect)
         if (!empty($params['courseType']) && \is_array($params['courseType'])) {
-            $arrIds = $params['courseType'];
+            $courseTypeIds = $params['courseType'];
             $qb->andWhere($qb->expr()->in('t.courseTypeLevel1', ':ids'));
-            $qb->setParameter('ids', $arrIds, ArrayParameterType::INTEGER);
+            $qb->setParameter('ids', $courseTypeIds, ArrayParameterType::INTEGER);
         }
 
         // Filter by course id
@@ -474,29 +491,34 @@ class EventApiController extends AbstractController
         // Filter by event id
         if (!empty($params['eventId'])) {
             $strId = preg_replace('/\s/', '', $params['eventId']);
-            $arrChunk = explode('-', $strId);
 
-            $eventId = $arrChunk[1] ?? $strId;
+            if (preg_match('/^\d+-(\d+)$/', $strId, $matches)) {
+                $eventId = (int) $matches[1]; // e.g. "2026-789" → 789
+            } elseif (preg_match('/^\d+$/', $strId)) {
+                $eventId = (int) $strId; // e.g. "789" → 789
+            } else {
+                $eventId = 0;
+            }
 
             $qb->andWhere('t.id = :eventId');
-            $qb->setParameter('eventId', $eventId, Types::STRING);
+            $qb->setParameter('eventId', $eventId, Types::INTEGER);
             $blnIgnoreDate = true;
         }
 
         if (!$blnIgnoreDate) {
-            if ('1' === $params['getUpcoming'] || (empty($params['dateStart']) && empty($params['dateEnd'] && '0' !== $params['getUpcoming']))) {
-                $tstampStart = strtotime(date('Y-m-d', time()));
+            if ($params['getUpcoming']) {
+                $tstampStart = strtotime('today');
                 $qb->andWhere($qb->expr()->gte('t.startDate', ':tstampStart'));
                 $qb->setParameter('tstampStart', $tstampStart, Types::INTEGER);
             } else {
                 if (!empty($params['dateStart']) && (false !== ($tstampStart = strtotime($params['dateStart'])))) {
-                    // event filter: date start filter
+                    // event filter: date filter
                     $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
                     $qb->setParameter('tstampStart', $tstampStart, Types::INTEGER);
                 }
 
                 if (!empty($params['dateEnd']) && (false !== ($tstampStop = strtotime($params['dateEnd'])))) {
-                    // event filter: date start filter
+                    // event filter: date filter
                     $qb->andWhere($qb->expr()->lte('t.endDate', ':tstampStop'));
                     $qb->setParameter('tstampStop', $tstampStop, Types::INTEGER);
                 }
