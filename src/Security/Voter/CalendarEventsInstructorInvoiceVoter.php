@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\Security\Voter;
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\StringUtil;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Markocupic\SacEventToolBundle\Security\Policy\InvoicePolicyRepository;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
@@ -93,23 +94,25 @@ class CalendarEventsInstructorInvoiceVoter extends Voter
         return $this->isGranted($token, $calEvent, 'can_create');
     }
 
-    private function canUpdate(TokenInterface $token, CalendarEventsModel $calEvent): bool
+    private function canUpdate(TokenInterface $token, CalendarEventsInstructorInvoiceModel $invoice): bool
     {
-        return $this->isGranted($token, $calEvent, 'can_update');
+        return $this->isGranted($token, $invoice, 'can_update');
     }
 
-    private function canDelete(TokenInterface $token, CalendarEventsModel $calEvent): bool
+    private function canDelete(TokenInterface $token, CalendarEventsInstructorInvoiceModel $invoice): bool
     {
-        return $this->isGranted($token, $calEvent, 'can_delete');
+        return $this->isGranted($token, $invoice, 'can_delete');
     }
 
-    private function canDownload(TokenInterface $token, CalendarEventsModel $calEvent): bool
+    private function canDownload(TokenInterface $token, CalendarEventsInstructorInvoiceModel $invoice): bool
     {
-        return $this->isGranted($token, $calEvent, 'can_download');
+        return $this->isGranted($token, $invoice, 'can_download');
     }
 
-    private function canSend(TokenInterface $token, CalendarEventsModel $calEvent): bool
+    private function canSend(TokenInterface $token, CalendarEventsInstructorInvoiceModel $invoice): bool
     {
+        $calEvent = CalendarEventsModel::findById($invoice->pid);
+
         // Report form must be filled out
         if (!$calEvent->filledInEventReportForm) {
             return false;
@@ -120,26 +123,28 @@ class CalendarEventsInstructorInvoiceVoter extends Voter
             return false;
         }
 
-        return $this->isGranted($token, $calEvent, 'can_send');
+        return $this->isGranted($token, $invoice, 'can_send');
     }
 
-    private function isGranted(TokenInterface $token, CalendarEventsModel $event, string $requiredFlag): bool
+    private function isGranted(TokenInterface $token, CalendarEventsInstructorInvoiceModel|CalendarEventsModel $model, string $requiredFlag): bool
     {
         // Admins always have full access
         if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
             return true;
         }
 
+        $calEvent = $model instanceof CalendarEventsModel ? $model : CalendarEventsModel::findById($model->pid);
+
         $policy = $this->policyRepository->loadPolicy($token);
 
         $eventInstructorIds = array_map(
             'intval',
-            $this->calendarEventsUtil->getInstructorsAsArray($event),
+            $this->calendarEventsUtil->getInstructorsAsArray($calEvent),
         );
 
         $user = $token->getUser();
 
-        return $policy->allows($user->id, $eventInstructorIds, $requiredFlag);
+        return $policy->allows($user->id, $model, $eventInstructorIds, $requiredFlag);
     }
 
     /**

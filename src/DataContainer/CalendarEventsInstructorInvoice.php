@@ -109,7 +109,8 @@ readonly class CalendarEventsInstructorInvoice
 
             // Allow only admins, event instructors, and special users with permission to open the invoice listing.
             if ('generateInvoicePdf' === $action || 'generateTourRapportPdf' === $action) {
-                $canDownload = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_DOWNLOAD, $calEvent);
+                $invoice = CalendarEventsInstructorInvoiceModel::findById($id);
+                $canDownload = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_DOWNLOAD, $invoice);
 
                 if (!$canDownload) {
                     throw new AccessDeniedException('Not enough permissions to download the tour report or the invoice.');
@@ -117,7 +118,8 @@ readonly class CalendarEventsInstructorInvoice
             }
 
             if ('sendRapport' === $action) {
-                $canSend = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_SEND, $calEvent);
+                $invoice = CalendarEventsInstructorInvoiceModel::findById($id);
+                $canSend = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_SEND, $invoice);
 
                 if (!$canSend) {
                     throw new AccessDeniedException('Not enough permissions to send the tour report.');
@@ -139,15 +141,15 @@ readonly class CalendarEventsInstructorInvoice
                     throw new AccessDeniedException('Not enough permissions to create a new invoice.');
                 }
             } elseif ('edit' === $act) {
-                $calEvent = CalendarEventsModel::findById($dc->currentPid);
-                $canEdit = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_UPDATE, $calEvent);
+                $invoice = CalendarEventsInstructorInvoiceModel::findById($id);
+                $canEdit = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_UPDATE, $invoice);
 
                 if (!$canEdit) {
                     throw new AccessDeniedException('Not enough permissions to '.$act.' data record ID '.$id.'.');
                 }
             } elseif ('delete' === $act) {
-                $calEvent = CalendarEventsModel::findById($dc->currentPid);
-                $canDelete = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_DELETE, $calEvent);
+                $invoice = CalendarEventsInstructorInvoiceModel::findById($id);
+                $canDelete = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_DELETE, $invoice);
 
                 if (!$canDelete) {
                     throw new AccessDeniedException('Not enough permissions to '.$act.' data record ID '.$id.'.');
@@ -290,9 +292,9 @@ readonly class CalendarEventsInstructorInvoice
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.edit.button', priority: 90)]
     public function editButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
-        $calEvent = CalendarEventsModel::findById($row['pid']);
+        $invoice = CalendarEventsInstructorInvoiceModel::findById($row['id']);
 
-        $allow = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_UPDATE, $calEvent);
+        $allow = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_UPDATE, $invoice);
 
         if (!$allow) {
             return Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
@@ -306,9 +308,9 @@ readonly class CalendarEventsInstructorInvoice
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.delete.button', priority: 90)]
     public function deleteButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
-        $calEvent = CalendarEventsModel::findById($row['pid']);
+        $invoice = CalendarEventsInstructorInvoiceModel::findById($row['id']);
 
-        $allow = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_DELETE, $calEvent);
+        $allow = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_DELETE, $invoice);
 
         if (!$allow) {
             return Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
@@ -322,9 +324,9 @@ readonly class CalendarEventsInstructorInvoice
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.sendRapport.button', priority: 90)]
     public function sendRapport(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
-        $calEvent = CalendarEventsModel::findById($row['pid']);
+        $invoice = CalendarEventsInstructorInvoiceModel::findById($row['id']);
 
-        $allow = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_SEND, $calEvent);
+        $allow = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_SEND, $invoice);
 
         if (false === $allow) {
             return Image::getHtml(str_replace('default', 'disabled', $icon), $label).' ';

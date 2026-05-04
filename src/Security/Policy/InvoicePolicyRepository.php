@@ -44,6 +44,7 @@ final readonly class InvoicePolicyRepository
 
                 $rules[] = new InvoicePolicyRule(
                     flags: $flags,
+                    appliesToInvoiceOwners: !empty($rule['invoice_owners']),
                     appliesToInstructors: !empty($rule['event_instructors']),
                     groupId: !empty($rule['group']) ? (int) $rule['group'] : null,
                     accessDecisionManager: $this->accessDecisionManager,

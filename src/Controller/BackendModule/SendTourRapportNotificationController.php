@@ -137,7 +137,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
             return $this->redirectToRefererPage($request);
         }
 
-        if (!$this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_SEND, $calEvent)) {
+        if (!$this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_SEND, $invoice)) {
             throw new AccessDeniedException('You are not allowed to access this page.');
         }
 

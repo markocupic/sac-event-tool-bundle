@@ -79,21 +79,26 @@ $GLOBALS['TL_DCA']['tl_permission_policy'] = [
 		],
 		'calendar_events_instructor_invoice_rules' => [
 			'inputType' => 'group',
-			'palette'   => ['event_instructors', 'group', 'flags'],
+			'palette'   => ['invoice_owners', 'event_instructors', 'group', 'flags'],
 			'fields'    => [
+				'invoice_owners'    => [
+					'label'     => &$GLOBALS['TL_LANG']['tl_permission_policy']['calendar_events_instructor_invoice_rules__invoice_owners'],
+					'inputType' => 'checkbox',
+					'eval'      => ['tl_class' => 'clr'],
+				],
 				'event_instructors' => [
-					'label' => &$GLOBALS['TL_LANG']['tl_permission_policy']['calendar_events_instructor_invoice_rules__event_instructors'],
+					'label'     => &$GLOBALS['TL_LANG']['tl_permission_policy']['calendar_events_instructor_invoice_rules__event_instructors'],
 					'inputType' => 'checkbox',
 					'eval'      => ['tl_class' => 'clr'],
 				],
 				'group'             => [
-					'label' => &$GLOBALS['TL_LANG']['tl_permission_policy']['calendar_events_instructor_invoice_rules__group'],
+					'label'     => &$GLOBALS['TL_LANG']['tl_permission_policy']['calendar_events_instructor_invoice_rules__group'],
 					'inputType' => 'select',
 					'options'   => System::getContainer()->get('database_connection')->fetchAllKeyValue('SELECT id, name FROM tl_user_group'),
 					'eval'      => ['includeBlankOption' => true, 'tl_class' => 'clr'],
 				],
-				'flags'  => [
-					'label' => &$GLOBALS['TL_LANG']['tl_permission_policy']['calendar_events_instructor_invoice_rules__flags'],
+				'flags'             => [
+					'label'     => &$GLOBALS['TL_LANG']['tl_permission_policy']['calendar_events_instructor_invoice_rules__flags'],
 					'inputType' => 'select',
 					'options'   => ['has_access', 'can_create', 'can_update', 'can_delete', 'can_download', 'can_send'],
 					'eval'      => ['multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],

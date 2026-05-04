@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Security\Policy;
 
+use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 
@@ -21,6 +22,7 @@ final readonly class InvoicePolicyRule
 {
     public function __construct(
         private array $flags,
+        private bool $appliesToInvoiceOwners,
         private bool $appliesToInstructors,
         private int|null $groupId,
         private AccessDecisionManagerInterface $accessDecisionManager,
@@ -33,6 +35,11 @@ final readonly class InvoicePolicyRule
         return \in_array($requiredFlag, $this->flags, true);
     }
 
+    public function matchesInvoiceOwner(int $userId, CalendarEventsInstructorInvoiceModel $invoice): bool
+    {
+        return $this->appliesToInvoiceOwners && $userId === $invoice->userPid;
+    }
+
     public function matchesInstructor(int $userId, array $eventInstructorIds): bool
     {
         return $this->appliesToInstructors && \in_array($userId, $eventInstructorIds, true);
@@ -40,7 +47,7 @@ final readonly class InvoicePolicyRule
 
     public function matchesGroup(): bool
     {
-        if (null === $this->groupId) {
+        if (empty($this->groupId)) {
             return false;
         }
 

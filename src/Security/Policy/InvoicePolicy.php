@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Security\Policy;
 
+use Contao\CalendarEventsModel;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
+
 final readonly class InvoicePolicy
 {
     /**
@@ -24,11 +27,17 @@ final readonly class InvoicePolicy
     ) {
     }
 
-    public function allows(int $userId, array $eventInstructorIds, string $requiredFlag): bool
+    public function allows(int $userId, CalendarEventsInstructorInvoiceModel|CalendarEventsModel $model, array $eventInstructorIds, string $requiredFlag): bool
     {
         foreach ($this->rules as $rule) {
             if (!$rule->hasFlag($requiredFlag)) {
                 continue;
+            }
+
+            if ($model instanceof CalendarEventsInstructorInvoiceModel) {
+                if ($rule->matchesInvoiceOwner($userId, $model)) {
+                    return true;
+                }
             }
 
             if ($rule->matchesInstructor($userId, $eventInstructorIds)) {
