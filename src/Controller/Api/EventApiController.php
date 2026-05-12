@@ -405,7 +405,7 @@ class EventApiController extends AbstractController
                             ->where('t2.userId = :qbStInstructorId'.$instructorId)
                             ->getSQL(),
                     );
-                    $qb->setParameter('qbStInstructorId'.$instrId, $instrId, Types::INTEGER);
+                    $qb->setParameter('qbStInstructorId'.$instructorId, $instructorId, Types::INTEGER);
                 }
 
                 if (!empty($orExpressions)) {
