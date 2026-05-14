@@ -506,7 +506,7 @@ class EventApiController extends AbstractController
         }
 
         if (!$blnIgnoreDate) {
-            if ($params['getUpcoming']) {
+            if ($params['getUpcoming'] || (empty($params['dateStart']) && empty($params['dateEnd']))) {
                 $tstampStart = strtotime('today');
                 $qb->andWhere($qb->expr()->gte('t.startDate', ':tstampStart'));
                 $qb->setParameter('tstampStart', $tstampStart, Types::INTEGER);
