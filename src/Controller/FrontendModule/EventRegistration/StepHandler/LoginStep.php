@@ -57,12 +57,8 @@ class LoginStep implements StepHandlerInterface, ValidationStepInterface
 
     public function validate(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): bool
     {
-        $user = $this->security->getUser();
-        if ($user instanceof FrontendUser) {
-            return true;
-        }
-
-        return false;
+        // Make the registration form accessible for logged-in users only.
+        return $this->security->getUser() instanceof FrontendUser;
     }
 
     public function prepareStep(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): array
