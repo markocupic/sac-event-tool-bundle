@@ -29,7 +29,6 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\St
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\StepManager;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment as TwigEnvironment;
 
@@ -39,7 +38,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
     public const string TYPE = 'event_registration';
 
     public function __construct(
-        private readonly RequestStack $requestStack,
         private readonly ScopeMatcher $scopeMatcher,
         private readonly StepManager $stepManager,
         private readonly TwigEnvironment $twig,
@@ -65,9 +63,9 @@ class EventRegistrationController extends AbstractFrontendModuleController
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         // Resolve the event model from URL parameters.
-        try {
-            $eventModel = $this->getEventModel();
-        } catch (\Throwable $e) {
+        $eventModel = $this->getEventModel();
+
+        if (null === $eventModel) {
             throw new PageNotFoundException('No valid event id/alias could be found in the url parameters.');
         }
 
@@ -77,8 +75,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
             return $this->redirect($url);
         }
 
-        // Check all previous steps if they are valid, if not, redirect to the first
-        // invalid step
+        // Validate all previous steps and redirect to the first invalid one.
         /** @var StepHandlerInterface $previousStep */
         foreach ($this->stepManager->getPreviousSteps($step) as $previousStep) {
             if ($previousStep instanceof ValidationStepInterface && !$previousStep->validate($eventModel, $request, $model)) {
@@ -109,9 +106,18 @@ class EventRegistrationController extends AbstractFrontendModuleController
         return $this->redirect($url);
     }
 
-    private function getEventModel(): CalendarEventsModel
+    private function getEventModel(): CalendarEventsModel|null
     {
+        // The auto_item parameter must be read via Contao\Input.
+        // Contao’s frontend request handling relies on its own Input system when
+        // validating reader URLs (items/auto_item). If the parameter is only accessed
+        // through the Symfony Request object, Contao may not recognize it as being
+        // used within the reader context and can later trigger a PageNotFoundException.
         $eventIdOrAlias = (string) $this->getContaoAdapter(Input::class)->get('auto_item');
+
+        if ('' === $eventIdOrAlias) {
+            return null;
+        }
 
         return $this->getContaoAdapter(CalendarEventsModel::class)->findByIdOrAlias($eventIdOrAlias);
     }
