@@ -7,6 +7,7 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrat
 use Codefog\HasteBundle\Form\Form;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -110,7 +111,13 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
     public function prepareStep(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): array
     {
         $template = [];
+
         $user = $this->security->getUser();
+
+        if (!$user instanceof FrontendUser) {
+            throw new AccessDeniedException('User must be logged in as a Contao Frontend User.');
+        }
+
         $memberModel = $this->framework->getAdapter(MemberModel::class)->findById($user->id);
         $mainInstructorModel = $this->framework->getAdapter(UserModel::class)->findById($eventModel->mainInstructor);
 
@@ -158,14 +165,12 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
                 $this->connection->rollBack();
             }
 
-            // Display a message to the user. Display a message to the user.
+            // Display a message to the user.
             $this->framework->getAdapter(Message::class)->addError($this->translator->trans('ERR.evt_reg_unknownError', [], 'contao_default'));
 
             $this->addErrorMessageToTemplate($template, $request);
 
-            if (method_exists($e, 'getMessage')) {
-                $this->contaoErrorLogger?->error($e->getMessage(), ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION_ERROR)]);
-            }
+            $this->contaoErrorLogger?->error($e->getMessage(), ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION_ERROR)]);
         } finally {
             $lock->release();
         }
@@ -188,7 +193,9 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             throw new EventRegistrationException('You can not subscribe to the current event because it is not published.', EventRegistrationException::LEVEL_ERROR, 'ERR.evt_reg_eventNotPublishedYet', []);
         }
 
-        if (null === ($adapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class)->findOneByEventId($eventModel->id)) || !$adapter->findOneByEventId($eventModel->id)->allowRegistration) {
+        $eventReleaseLevelPolicy = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class)->findOneByEventId($eventModel->id);
+
+        if (null === $eventReleaseLevelPolicy || !$eventReleaseLevelPolicy->allowRegistration) {
             throw new EventRegistrationException('The event release level policy does not allow you to register for this event.', EventRegistrationException::LEVEL_ERROR, 'ERR.evt_reg_eventReleaseLevelPolicyDoesNotAllowRegistrations', [$eventModel->title]);
         }
 
@@ -296,7 +303,6 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
                 $objWidget = $objForm->getWidget($field);
 
                 if (empty($objWidget->value)) {
-                    $objWidget = $objForm->getWidget($field);
                     $objWidget->value = $memberModel->{$field};
                 }
             }
