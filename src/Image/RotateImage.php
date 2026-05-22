@@ -70,10 +70,7 @@ class RotateImage
             if ($imagick->readImage($filesModel->getAbsolutePath())) {
                 if ($imagick->rotateImage(new \ImagickPixel('none'), $angle)) {
                     if ($imagick->writeImage($target)) {
-                        $imagick->clear();
-                        $imagick->destroy();
-
-                        return true;
+                        return $imagick->clear();
                     }
                 }
             }
