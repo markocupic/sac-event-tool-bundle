@@ -169,18 +169,14 @@ class EventRegistrationListGeneratorCsv
     {
         $dataMember = $this->connection->fetchAssociative('SELECT * FROM tl_member WHERE sacMemberId = ?', [$dataInstructor['sacMemberId'] ?? '']);
 
-        if (false === $dataMember) {
-            return [];
-        }
-
         $row = [];
 
         foreach (self::FIELDS as $field) {
             $value = match ($field) {
                 'role' => 'TL',
                 'ahvNumber', 'emergencyPhone', 'emergencyPhoneName', 'foodHabits' => (string) $dataMember[$field] ?? '' ,
-                'sacMemberId', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email' => $dataInstructor[$field],
-                'J+S/Jugend' => AgeGroupUtil::getAgeGroup((int) $dataInstructor['dateOfBirth'], (int) Date::parse('Y', $eventsModel->startDate)),
+                'sacMemberId', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email' => $dataInstructor[$field] ?? '',
+                'J+S/Jugend' => empty($dataInstructor['dateOfBirth']) ? '' : AgeGroupUtil::getAgeGroup((int) $dataInstructor['dateOfBirth'], (int) Date::parse('Y', $eventsModel->startDate)),
                 default => '',
             };
 
