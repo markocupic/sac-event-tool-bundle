@@ -5,13 +5,16 @@
 
 <!-- indexer::stop -->
 <p class="back"><a href="javascript:history.go(-1)" title="Zurück">Zurück</a></p>
+<!-- indexer::continue -->
 
 <div class="event event-detailview layout_full block{{ get_event_data(model, 'class')|raw }}">
 
     <h1 class="content-headline mt-3">{{ get_event_data(model, 'title') }}</h1>
 
     {% if  get_event_data(model, 'eventType') == 'lastMinuteTour' %}
+        <!-- indexer::stop -->
         <h4 class="content-headline last-minute-tour">Last minute tour (Spontantour)</h4>
+        <!-- indexer::continue -->
     {% endif %}
 
     <div class="row gx-3">
@@ -19,13 +22,12 @@
         <div class="col-lg-6">
             <div class="box-layout-white">
                 {% if not get_event_data(model, 'teaser') is empty %}
-                    <!-- indexer::continue -->
                     <div class="teaser event-detail mb-3">
                         <p class="m-0 d-flex"><strong>{{ get_event_data(model, 'teaser') }}</strong></p>
                     </div>
-                    <!-- indexer::stop -->
                 {% endif %}
 
+                <!-- indexer::stop -->
                 <div class="eventdate event-detail event-info-box icon-box-small">
                     <h5>Datum/Dauer</h5>
                     <p>
@@ -35,7 +37,9 @@
                         {% endif %}
                     </p>
                 </div>
+                <!-- indexer::continue -->
 
+                <!-- indexer::stop -->
                 <div class="organizers event-detail event-info-box icon-box-small">
                     <h5>Organisierende Gruppe</h5>
                     <div class="event-detail event-info-box organizer-logo mb-4">
@@ -52,40 +56,38 @@
                         <p>Keine Gruppe ausgewählt</p>
                     {% endif %}
                 </div>
+                <!-- indexer::continue -->
 
                 <div class="requirements event-detail event-info-box icon-box-small">
                     <h5>Eventnummer</h5>
-                    <!-- indexer::continue -->
                     <p class="event-id">
                         {#  event id f.ex. 2019-3233331 #}
                         {{ get_event_data(model, 'eventId') }}
                     </p>
-                    <!-- indexer::stop -->
                 </div>
 
                 {% if not get_event_data(model, 'location') is empty %}
                     <div class="location event-detail event-info-box icon-box-small">
                         <h5>Veranstaltungsort/Ausgangspunkt</h5>
-                        <!-- indexer::continue -->
                         <p>{{ get_event_data(model, 'location') }}</p>
-                        <!-- indexer::stop -->
                     </div>
                 {% endif %}
 
                 {% if get_event_data(model, 'hasCoords') %}
+                    <!-- indexer::stop -->
                     <div class="geo-location event-detail event-info-box icon-box-small">
                         <h5>Karte</h5>
-                        <!-- indexer::continue -->
                         <div class="event-info-box-inner swiss-topo-location-map">
                             <iframe src="{{ get_event_data(model, 'geoLinkUrl') }}" width="100%" height="100%" allow="geolocation"></iframe>
                         </div>
-                        <!-- indexer::stop -->
                     </div>
+                    <!-- indexer::continue -->
                 {% endif %}
 
                 {% set is_with_mountainguide_offer = constant('\\Markocupic\\SacEventToolBundle\\Config\\EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER') == get_event_data(model, 'mountainguide') ? true : false %}
                 {% set is_with_mountainguide = constant('\\Markocupic\\SacEventToolBundle\\Config\\EventMountainGuide::WITH_MOUNTAIN_GUIDE') == get_event_data(model, 'mountainguide') ? true : false %}
 
+                <!-- indexer::stop -->
                 <div class="price event-detail event-info-box icon-box-small">
                     <h5>Leistungen/Preis</h5>
 
@@ -120,7 +122,7 @@
                         {# End AGB Modal #}
                     {% endif %}
                 </div>
-
+                <!-- indexer::continue -->
             </div>
 
             <div class="box-layout-white">
@@ -137,13 +139,16 @@
                 </div>
 
                 {% if get_event_data(model, 'setRegistrationPeriod') %}
+                    <!-- indexer::stop -->
                     <div class="booking-time-span event-detail event-info-box icon-box-small">
                         <h5>Anmeldung möglich</h5>
                         <p>Vom {{ get_event_data(model, 'registrationStartTimeWithOffsetFormatted') }} bis zum {{ get_event_data(model, 'registrationEndDateFormatted') }}</p>
                     </div>
+                    <!-- indexer::continue -->
                 {% endif %}
 
                 {% if not get_event_data(model, 'bookingCounterAsText') is empty %}
+                    <!-- indexer::stop -->
                     <div class="booking-counter event-detail event-info-box icon-box-small">
                         <h5>Bestätigte Anmeldungen</h5>
                         <p>{{ get_event_data(model, 'bookingCounterAsText') }}</p>
@@ -151,6 +156,7 @@
                             <p><small>Es sind min. {{ get_event_data(model, 'minMembers') }} Teilnehmende erforderlich.</small></p>
                         {% endif %}
                     </div>
+                    <!-- indexer::continue -->
                 {% endif %}
             </div>
 
@@ -164,14 +170,20 @@
 
                 <div class="booking-text event-detail event-info-box icon-box-small">
                     <h5>Anmeldung</h5>
+                    <!-- indexer::stop -->
                     <p>{% if get_event_data(model, 'disableOnlineRegistration') %}Keine {% endif %}Online-Anmeldung</p>
+                    <!-- indexer::continue -->
 
                     {% if not get_event_data(model, 'bookingEvent') is empty %}
+                        <!-- indexer::stop -->
                         <p class="mt-3">{{ get_event_data(model, 'bookingEvent')|nl2br }}</p>
+                        <!-- indexer::continue -->
                     {% endif %}
 
                     {% if get_event_data(model, 'generateMainInstructorContactDataFromDb?includeHidden=false') %}
+                        <!-- indexer::stop -->
                         <p class="mt-3">{{ get_event_data(model, 'mainInstructorContactDataFromDb?includeHidden=false')|raw }}</p>
+                        <!-- indexer::continue -->
                     {% endif %}
 
                     {# buttons #}
@@ -202,6 +214,7 @@
                 </div>
 
                 {% if not get_event_data(model, 'disableOnlineRegistration') %}
+                    <!-- indexer::stop -->
                     <div class="booking-text event-detail event-info-box icon-box-small">
                         <h5>Abmeldung</h5>
                         {% if get_event_data(model, 'allowDeregistration') %}
@@ -211,6 +224,7 @@
                         {% endif %}
                         <p><small>Es können ggf. Stornierungsgebühren anfallen (siehe Leistungen/Preis).</small></p>
                     </div>
+                    <!-- indexer::continue -->
                 {% endif %}
             </div>
         </div>
@@ -220,15 +234,16 @@
         <div class="col-lg-6">
             <div class="box-layout-transparent">
                 {% if not get_event_data(model, 'tourType') is empty %}
+                    <!-- indexer::stop -->
                     <div class="tour-type event-detail event-info-box icon-box-small">
-                        <!-- indexer::continue -->
                         <h5 class="mt-lg-0">Touren-Typ</h5>
                         <p>{{ get_event_data(model, 'tourTypesTitles')|raw }}</p>
-                        <!-- indexer::stop -->
                     </div>
+                    <!-- indexer::continue -->
                 {% endif %}
 
                 {% if get_event_data(model, 'eventType') == 'tour' or get_event_data(model, 'eventType') == 'lastMinuteTour' %}
+                    <!-- indexer::stop -->
                     <div class="tour-difficulties event-detail event-info-box icon-box-small">
                         <h5>Schwierigkeit</h5>
                         {% set diffs = get_event_data(model, 'tourTechDifficultiesAsGenericArray') %}
@@ -252,109 +267,120 @@
                                     .set('src', asset('js/BootstrapPopoverManager.js','markocupic_sac_event_tool')) %}
                                 <script{{ attributes }}></script>
                                 <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-                                    const popover = new BootstrapPopoverManager();
-                                    popover.init();
+                                  const popover = new BootstrapPopoverManager();
+                                  popover.init();
                                 </script>
                             {% endadd %}
                         </ul>
                     </div>
+                    <!-- indexer::continue -->
                 {% endif %}
 
                 {% if get_event_data(model, 'eventType') == 'tour' or get_event_data(model, 'eventType') == 'lastMinuteTour' %}
                     {% if get_event_data(model, 'suitableForBeginners') %}
+                        <!-- indexer::stop -->
                         <div class="suitableForBeginners event-detail event-info-box icon-box-small">
-                            <!-- indexer::continue -->
                             <h5>Für Anfänger geeignet</h5>
                             <p>Ideale Tour für Einsteiger</p>
-                            <!-- indexer::stop -->
                         </div>
+                        <!-- indexer::continue -->
                     {% endif %}
                 {% endif %}
 
                 {% if not get_event_data(model, 'requirements') is empty %}
+                    <!-- indexer::stop -->
                     <div class="requirements event-detail event-info-box icon-box-small">
                         <h5>Voraussetzungen/Anforderungen</h5>
-                        <!-- indexer::continue -->
                         <p class="requirements-text">{{ get_event_data(model, 'requirements')|nl2br }}</p>
-                        <!-- indexer::stop -->
                     </div>
+                    <!-- indexer::continue -->
                 {% endif %}
 
                 {% if (get_event_data(model, 'eventType') == 'tour' or get_event_data(model, 'eventType') == 'lastMinuteTour') and not get_event_data(model, 'tourDetailText') is empty %}
                     <div class="tour-detail-text event-detail event-info-box icon-box-small">
                         <h5>Route/Details</h5>
-                        <!-- indexer::continue -->
                         <p>{{ get_event_data(model, 'tourDetailText')|nl2br }}</p>
-                        <!-- indexer::stop -->
                     </div>
                 {% endif %}
 
                 {% if get_event_data(model, 'eventType') == 'generalEvent' and not get_event_data(model, 'generalEventDetailText') is empty %}
                     <div class="general-event-detail-text event-detail event-info-box icon-box-small">
                         <h5>Details</h5>
-                        <!-- indexer::continue -->
                         <p>{{ get_event_data(model, 'generalEventDetailText')|nl2br }}</p>
-                        <!-- indexer::stop -->
                     </div>
                 {% endif %}
 
                 {% if (get_event_data(model, 'eventType') == 'tour' or get_event_data(model, 'eventType') == 'lastMinuteTour') and not get_event_data(model, 'arrTourProfile') is empty %}
+                    <!-- indexer::stop -->
                     <div class="tour-profile event-detail event-info-box icon-box-small">
                         <h5>Profil</h5>
                         <p>{{ get_event_data(model, 'arrTourProfile')|join('<br>')|raw }}<p>
                     </div>
+                    <!-- indexer::continue -->
                 {% endif %}
 
                 {% if not get_event_data(model, 'journey') is empty and get_event_data(model, 'journey') != 'not-specified' %}
+                    <!-- indexer::stop -->
                     <div class="journey event-detail event-info-box icon-box-small">
                         <h5>Anreise mit</h5>
                         <p>{{ get_event_data(model, 'journey')|nl2br }}</p>
                     </div>
+                    <!-- indexer::continue -->
                 {% endif %}
 
                 {% if not get_event_data(model, 'meetingPoint') is empty %}
+                    <!-- indexer::stop -->
                     <div class="meeting-point event-detail event-info-box icon-box-small">
                         <h5>Zeit und Treffpunkt</h5>
                         <p>{{ get_event_data(model, 'meetingPoint')|nl2br }}</p>
                     </div>
+                    <!-- indexer::continue -->
                 {% endif %}
 
                 {% if not get_event_data(model, 'equipment') is empty %}
+                    <!-- indexer::stop -->
                     <div class="equipment event-detail event-info-box icon-box-small">
                         <h5>Benötigtes Material</h5>
                         <p>{{ get_event_data(model, 'equipment')|nl2br }}</p>
                     </div>
+                    <!-- indexer::continue -->
                 {% endif %}
 
                 {% if not get_event_data(model, 'miscellaneous') is empty %}
+                    <!-- indexer::stop -->
                     <div class="miscellaneous event-detail event-info-box icon-box-small last">
                         <h5>Sonstiges</h5>
                         <p>{{ get_event_data(model, 'miscellaneous')|nl2br }}</p>
                     </div>
+                    <!-- indexer::continue -->
                 {% endif %}
 
                 <div class="links event-detail event-info-box icon-box-small">
                     <h5>Links</h5>
                     <div class="d-flex flex-wrap">
                         {% if not get_event_data(model, 'linkSacRoutePortal') is empty %}
+                            <!-- indexer::stop -->
                             <div class="me-2 mt-3 mb-3">
                                 <a href="{{ get_event_data(model, 'linkSacRoutePortal') }}" rel="noopener" target="_blank" title="Routen-Details auf SAC-Tourenportal" class="btn btn-block btn-primary">
                                     <i class="fa-regular fa-compass"></i> Route auf SAC-Tourenportal
                                 </a>
                             </div>
+                            <!-- indexer::continue -->
                         {% endif %}
-
+                        <!-- indexer::stop -->
                         <div class="me-2 mt-3 mb-3">
                             <a href="{{ insert_tag('link_url::ausruestungslisten') }}" rel="noopener" target="_blank" title="Hier geht es zur Ausrüstungsempfehlung unserer SAC-Tourenleitenden" class="btn btn-block text-nowrap btn-outline-primary">
                                 <i class="fa-regular fa-gear"></i> Ausrüstungsempfehlung
                             </a>
                         </div>
+                        <!-- indexer::continue -->
                     </div>
                 </div>
 
                 {# enclosures/downloads #}
                 {# !Urheberrechtsverletzung bei urheberrechtlich geschützten Anhängen wie Topos, Karten, etc. #}
                 {% if get_event_data(model, 'enclosure') %}
+                    <!-- indexer::stop -->
                     <div class="event-enclosures event-detail event-info-box icon-box-small">
                         <h5>Downloads / Weitere Informationen</h5>
                         {% if has_logged_in_frontend_user() or 'true' == app.request.query.get('event_preview') %} {# poor security level! #}
@@ -370,6 +396,7 @@
                             <p>Bitte einloggen, um die Anlagen anschauen zu können.</p>
                         {% endif %}
                     </div>
+                    <!-- indexer::continue -->
                 {% endif %}
 
             </div>
@@ -386,7 +413,6 @@
     {# gallery end #}
 
 </div>
-<!-- indexer::continue -->
 
 {# add jsonLD schema.org data #}
 {% do add_event_schema_org_data(model, Template) %}

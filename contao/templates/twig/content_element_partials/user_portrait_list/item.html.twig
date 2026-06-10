@@ -19,17 +19,25 @@
         <div class="content-user-portrait-list--user-detail-box-name">
             <strong>{{ lastname~' '~firstname }}</strong>
         </div>
+
         {% if has_logged_in_frontend_user() %}
-            <div class="d-block content-user-portrait-list--user-detail-box-email small">
-                {% if email|default %}{{ insert_tag('email_open::'~email)|raw }}{{ insert_tag('email::'~email)|raw }}</a>{% endif %}
-            </div>
+            {% if email|default %}
+                <!-- indexer::stop -->
+                <div class="d-block content-user-portrait-list--user-detail-box-email small">
+                    {{ insert_tag('email::'~email)|raw }}
+                </div>
+                <!-- indexer::continue -->
+            {% endif %}
         {% else %}
             {% if email|default and 'email' in showFieldsToGuests %}
+                <!-- indexer::stop -->
                 <div class="d-block content-user-portrait-list--user-detail-box-email small">
-                    {% if email|default %}{{ insert_tag('email_open::'~email)|raw }}{{ insert_tag('email::'~email)|raw }}</a>{% endif %}
+                    {% if email|default %}{{ insert_tag('email::'~email)|raw }}{% endif %}
                 </div>
+                <!-- indexer::continue -->
             {% endif %}
         {% endif %}
+
         <!-- indexer::stop -->
         <div class="mt-2">
             {% if has_logged_in_frontend_user() %}

@@ -21,9 +21,10 @@
                     {{ figure|raw }}
                 </a>
             </div>
+            <!-- indexer::stop -->
             <div class="contact-box--col-2">
                 <div class="contact-box--instructor-name mb-2 fw-bold text-break">
-                    <a href="{{ instructor.href }}" title="Leiter Portrait ansehen"><!-- indexer::continue -->{{ instructor.lastname }} {{ instructor.firstname }}<!-- indexer::stop --></a>
+                    <a href="{{ instructor.href }}" title="Leiter Portrait ansehen">{{ instructor.lastname }} {{ instructor.firstname }}</a>
                 </div>
                 {% if instructor.main_qualification %}
                     <div class="contact-box--instructor-main-qualification text-break my-2">
@@ -44,6 +45,7 @@
                     {% endfor %}
                 {% endif %}
             </div>
+            <!-- indexer::continue -->
         </li>
     {% endfor %}
 </ul>
