@@ -23,7 +23,8 @@ use Contao\Date;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Download\CsvDownload;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
-use Markocupic\SacEventToolBundle\String\PhoneNumber;
+use Markocupic\SacEventToolBundle\String\Formatter\PhoneNumberFormatter;
+use Markocupic\SacEventToolBundle\Util\AgeGroupUtil;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -31,6 +32,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class EventRegistrationListGeneratorCsv
 {
     private const array FIELDS = [
+        'role',
         'id',
         'stateOfSubscription',
         'dateAdded',
@@ -72,7 +74,6 @@ class EventRegistrationListGeneratorCsv
         private readonly ContaoFramework $framework,
         private readonly Connection $connection,
         private readonly EventRegistrationUtil $eventRegistrationUtil,
-        private readonly PhoneNumber $phoneNumber,
         private readonly string $sacevtEventMemberListFileNamePattern,
     ) {
         // Adapters
@@ -92,6 +93,13 @@ class EventRegistrationListGeneratorCsv
         // Insert headline
         $csv->setHeadline($this->buildHeadlineRow($eventTimestamps));
 
+        // Insert instructor rows
+        $instructors = $this->fetchInstructors($event->id);
+
+        foreach ($instructors as $instructor) {
+            $csv->addRecord($this->buildInstructorRow($instructor, $event));
+        }
+
         // Insert registration rows
         $registrations = $this->fetchRegistrations($event->id);
 
@@ -110,10 +118,14 @@ class EventRegistrationListGeneratorCsv
     {
         $this->controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
-        $headline = array_map(
-            static fn ($field) => $GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0] ?? $field,
-            self::FIELDS,
-        );
+        $headline = [];
+
+        foreach (self::FIELDS as $field) {
+            $headline[$field] = match ($field) {
+                'role' => 'Rolle',
+                default => $GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0] ?? $field,
+            };
+        }
 
         // Add event dates! See:
         // https://github.com/jonasmueller1/sac-pilatus-website/issues/203
@@ -132,6 +144,54 @@ class EventRegistrationListGeneratorCsv
         );
     }
 
+    private function fetchInstructors(int $eventId): array
+    {
+        $model = CalendarEventsModel::findById($eventId);
+        if (null === $model) {
+            return [];
+        }
+
+        $ids = $this->calendarEventsUtil->getInstructorsAsArray($model);
+
+        if (empty($ids)) {
+            return [];
+        }
+
+        return $this->connection->fetchAllAssociative(
+            'SELECT * FROM tl_user WHERE id IN (:ids)',
+            ['ids' => implode(',', array_map('intval', $ids))],
+        );
+    }
+
+    private function buildInstructorRow(array $dataInstructor, CalendarEventsModel $eventsModel): array
+    {
+        $dataMember = $this->connection->fetchAssociative('SELECT * FROM tl_member WHERE sacMemberId = ?', [$dataInstructor['sacMemberId'] ?? '']);
+
+        if (false === $dataMember) {
+            return [];
+        }
+
+        $row = [];
+
+        foreach (self::FIELDS as $field) {
+            $value = match ($field) {
+                'role' => 'TL',
+                'ahvNumber', 'emergencyPhone', 'emergencyPhoneName' => (string) $dataMember[$field] ?? '' ,
+                'sacMemberId', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email' => $dataInstructor[$field],
+                'J+S/Jugend' => AgeGroupUtil::getAgeGroup((int) $dataInstructor['dateOfBirth'], (int) Date::parse('Y', $eventsModel->startDate)),
+                default => '',
+            };
+
+            $row[] = $this->formatFieldValue($field, $value, null);
+        }
+
+        $eventTimestamps = $this->calendarEventsUtil->getEventTimestamps($eventsModel);
+
+        // Add event dates! See:
+        // https://github.com/jonasmueller1/sac-pilatus-website/issues/203
+        return array_merge($row, array_fill(0, \count($eventTimestamps), ''));
+    }
+
     private function buildRegistrationRow(array $dataRegistration, array $eventTimestamps): array
     {
         $row = [];
@@ -139,7 +199,13 @@ class EventRegistrationListGeneratorCsv
         $registration = $this->calendarEventsMemberAdapter->findById($dataRegistration['id']);
 
         foreach (self::FIELDS as $field) {
-            $row[] = $this->formatFieldValue($field, $dataRegistration[$field] ?? '', $registration);
+            $value = match ($field) {
+                'role' => 'TN',
+                'dateAdded' => Date::parse($this->configAdapter->get('datimFormat'), $dataRegistration[$field] ?? ''),
+                'J+S/Jugend' => null === $registration ? '' : $this->eventRegistrationUtil->getAgeGroup($registration),
+                default => $dataRegistration[$field] ?? '',
+            };
+            $row[] = $this->formatFieldValue($field, $value, $registration);
         }
 
         // Add event dates! See:
@@ -152,11 +218,9 @@ class EventRegistrationListGeneratorCsv
         $value = html_entity_decode((string) $value);
 
         return match ($field) {
-            'phone', 'mobile', 'emergencyPhone' => '' === $value ? '' : 'T: '.$this->phoneNumber->beautify($value),
+            'phone', 'mobile', 'emergencyPhone' => '' === $value ? '' : 'T: '.PhoneNumberFormatter::format($value),
             'stateOfSubscription', 'gender' => $GLOBALS['TL_LANG']['MSC'][$value] ?? $value,
-            'dateAdded' => date($this->configAdapter->get('datimFormat'), (int) $value),
             'dateOfBirth' => date($this->configAdapter->get('dateFormat'), (int) $value),
-            'J+S/Jugend' => null === $registration ? '' : $this->eventRegistrationUtil->getAgeGroup($registration),
             default => $value,
         };
     }
