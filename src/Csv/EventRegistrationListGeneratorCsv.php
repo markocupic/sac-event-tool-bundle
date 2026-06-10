@@ -20,6 +20,7 @@ use Contao\Controller;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Download\CsvDownload;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
@@ -159,7 +160,8 @@ class EventRegistrationListGeneratorCsv
 
         return $this->connection->fetchAllAssociative(
             'SELECT * FROM tl_user WHERE id IN (:ids)',
-            ['ids' => implode(',', array_map('intval', $ids))],
+            ['ids' => array_map('intval', $ids)],
+            ['ids' => ArrayParameterType::INTEGER],
         );
     }
 
@@ -176,7 +178,7 @@ class EventRegistrationListGeneratorCsv
         foreach (self::FIELDS as $field) {
             $value = match ($field) {
                 'role' => 'TL',
-                'ahvNumber', 'emergencyPhone', 'emergencyPhoneName' => (string) $dataMember[$field] ?? '' ,
+                'ahvNumber', 'emergencyPhone', 'emergencyPhoneName', 'foodHabits' => (string) $dataMember[$field] ?? '' ,
                 'sacMemberId', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email' => $dataInstructor[$field],
                 'J+S/Jugend' => AgeGroupUtil::getAgeGroup((int) $dataInstructor['dateOfBirth'], (int) Date::parse('Y', $eventsModel->startDate)),
                 default => '',
