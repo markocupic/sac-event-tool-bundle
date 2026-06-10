@@ -20,6 +20,7 @@ use Contao\Database;
 use Contao\MemberModel;
 use Contao\Widget;
 use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
+use Markocupic\SacEventToolBundle\String\Validator\AhvValidator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -31,6 +32,24 @@ readonly class AddCustomRegexpListener
         private EventDurationInfo $eventDurationInfo,
         private RequestStack $requestStack,
     ) {
+    }
+
+    #[AsHook('addCustomRegexp', priority: 100)]
+    public function isValidAhvNumber(string $strRegexp, $varValue, Widget $objWidget): bool
+    {
+        if ('ahv' !== $strRegexp) {
+            return false;
+        }
+
+        if ('' === $varValue) {
+            return true;
+        }
+
+        if (!AhvValidator::validate($varValue)) {
+            $objWidget->addError($this->translator->trans('ERR.invalidAhvNumber', [], 'contao_default'));
+        }
+
+        return true;
     }
 
     #[AsHook('addCustomRegexp', priority: 100)]

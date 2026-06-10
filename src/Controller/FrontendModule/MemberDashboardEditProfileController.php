@@ -120,6 +120,12 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
             'eval' => ['class' => 'form-control', 'mandatory' => false, 'maxlength' => 5000],
         ]);
 
+        $form->addFormField('ahvNumber', [
+            'label' => $this->translator->trans('FORM.evt_reg_ahvNumber', [], 'contao_default'),
+            'inputType' => 'text',
+            'eval' => ['class' => 'form-control', 'rgxp' => 'ahv', 'mandatory' => false, 'maxlength' => 16],
+        ]);
+
         $form->addFormField('submit', [
             'label' => $this->translator->trans('MSC.save', [], 'contao_default'),
             'inputType' => 'submit',
@@ -127,7 +133,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         ]);
 
         // Get form presets from tl_member
-        $fields = ['emergencyPhone', 'emergencyPhoneName', 'foodHabits'];
+        $fields = ['emergencyPhone', 'emergencyPhoneName', 'foodHabits', 'ahvNumber'];
 
         foreach ($fields as $field) {
             $widget = $form->getWidget($field);

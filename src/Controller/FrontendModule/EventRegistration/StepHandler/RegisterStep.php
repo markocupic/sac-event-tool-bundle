@@ -364,7 +364,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             'ahvNumber' => [
                 'label' => $this->translator->trans('FORM.evt_reg_ahvNumber', [], 'contao_default'),
                 'inputType' => 'text',
-                'eval' => ['mandatory' => true, 'maxlength' => 16, 'rgxp' => 'alnum', 'placeholder' => '756.1234.5678.97'],
+                'eval' => ['mandatory' => true, 'maxlength' => 16, 'rgxp' => 'ahv', 'placeholder' => '756.7086.3589.03'],
             ],
             'mobile' => [
                 'label' => $this->translator->trans('FORM.evt_reg_mobile', [], 'contao_default'),

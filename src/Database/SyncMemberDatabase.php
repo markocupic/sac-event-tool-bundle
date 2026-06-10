@@ -21,7 +21,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\DataContainer\Util;
-use Markocupic\SacEventToolBundle\String\PhoneNumber;
+use Markocupic\SacEventToolBundle\String\Formatter\PhoneNumberFormatter;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -70,7 +70,6 @@ class SyncMemberDatabase
     public function __construct(
         private readonly Connection $connection,
         private readonly PasswordHasherFactory $passwordHasherFactory,
-        private readonly PhoneNumber $phoneNumber,
         private readonly Util $util,
         #[\SensitiveParameter]
         private readonly array $sacevtMemberSyncCredentials,
@@ -469,8 +468,8 @@ class SyncMemberDatabase
         if (false === $existingMember) {
             // Insert new temp member
             $arrData['sectionId'] = serialize($this->formatSectionId($arrData['sectionId']));
-            $arrData['phone'] = $this->phoneNumber->beautify($arrData['phone']);
-            $arrData['mobile'] = $this->phoneNumber->beautify($arrData['mobile']);
+            $arrData['phone'] = PhoneNumberFormatter::format($arrData['phone']);
+            $arrData['mobile'] = PhoneNumberFormatter::format($arrData['mobile']);
 
             $this->connection->insert(self::TEMP_TABLE_NAME, $arrData);
         } else {

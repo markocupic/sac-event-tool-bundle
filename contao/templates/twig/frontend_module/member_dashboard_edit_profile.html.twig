@@ -69,6 +69,10 @@
                             <label class="mb-1 form-label fw-bold" for="ctrl_foodHabits">{{ form.getWidget('foodHabits').label }}</label>
                             {{ form.getWidget('foodHabits').generateWithError()|raw }}
                         </div>
+                        <div class="col-12">
+                            <label class="mb-1 form-label fw-bold" for="ctrl_ahvNumber">{{ form.getWidget('ahvNumber').label }}</label>
+                            {{ form.getWidget('ahvNumber').generateWithError()|raw }}
+                        </div>
                         <div class="col-6">
                             {{ form.getWidget('submit').generateWithError()|raw }}
                         </div>

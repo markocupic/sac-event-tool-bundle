@@ -94,7 +94,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['ahvNumber'] = [
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => ['mandatory' => false, 'maxlength' => 16, 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+    'eval' => ['mandatory' => false, 'maxlength' => 16, 'rgxp' => 'ahv', 'placeholder' => '756.7086.3589.03', 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
     'sql'       => "varchar(255) NOT NULL default ''",
 ];
 

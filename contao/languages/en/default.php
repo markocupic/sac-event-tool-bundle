@@ -61,6 +61,7 @@ $GLOBALS['TL_LANG']['MSC']['participantCannotBeRegisteredBecauseHeHasBeenConfirm
 $GLOBALS['TL_LANG']['MSC']['participantHasBeenNotifiedCannotBeRegisteredBecauseHeHasBeenConfirmedAtAnotherEvent'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".';
 $GLOBALS['TL_LANG']['MSC']['participantHasBeenNotifiedAboutTheRegistrationStatusChange'] = 'Der Teilnehmer %s %s wurde via E-Mail über die Änderung des Anmeldestatus benachrichtigt.';
 $GLOBALS['TL_LANG']['MSC']['participantHasBeenAddedToTheWaitingList'] = 'Der Teilnehmer %s %s wurde auf die Warteliste gesetzt.';
+$GLOBALS['TL_LANG']['ERR']['invalidAhvNumber'] = 'Ungültige AHV Nummer! Bitte geben Sie eine 16-stellige Nummer im Format 756.XXXX.XXXX.XX ein. Sie finden diese auf Ihrer Krankenversicherungskarte.';
 
 // tl_calendar_events_instructor_invoice
 $GLOBALS['TL_LANG']['ERR']['actionNotSupported'] = 'Diese Aktion wird nicht unterstützt.';
@@ -202,7 +203,7 @@ $GLOBALS['TL_LANG']['FORM']['evt_reg_ticketInfo'] = 'Ich besitze ein ÖV-Abonnem
 $GLOBALS['TL_LANG']['FORM']['evt_reg_blankLabelTicketInfo'] = 'bitte auswählen';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_blankLabelCarInfo'] = 'bitte auswählen';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_carInfo'] = 'Ich könnte ein Auto mit ... Plätzen (inkl. Fahrer/in) stellen';
-$GLOBALS['TL_LANG']['FORM']['evt_reg_ahvNumber'] = 'AHV-Nummer';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_ahvNumber'] = 'AHV Nr. (nur für J+S Abrechnungen -> Siehe deine Krankenversicherungskarte)';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_mobile'] = 'Mobilnummer';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_emergencyPhone'] = 'Notfalltelefonnummer / In Notfällen zu kontaktieren';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_emergencyPhoneName'] = 'Name und Bezug der dir anvertrauten Kontaktperson für Notfälle';
