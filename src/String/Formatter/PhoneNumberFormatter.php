@@ -16,49 +16,90 @@ namespace Markocupic\SacEventToolBundle\String\Formatter;
 
 class PhoneNumberFormatter
 {
-    private const string SWISS_COUNTRY_CODE_PLUS = '+41';
-
-    private const string SWISS_COUNTRY_CODE_NUMERIC = '0041';
-
-    private const int SWISS_NUMBER_LENGTH = 9;
-
-    // Swiss phone number without countrycode and whitespaces: 0799871234
-    private const string SWISS_FORMAT_PATTERN = '/^([0]{1})([0-9]{2})([0-9]{3})([0-9]{2})([0-9]{2})$/';
+    // National significant number (NSN): 9 digits, e.g., 79 987 12 34
+    private const int NSN_LENGTH = 9;
 
     /**
-     * Formats a given phone number string according to Swiss phone number standards:
-     * +41799871234 => 079 987 12 34
-     * 0041799871234 => 079 987 12 34
-     * 0799871234 => 079 987 12 34
+     * Formats a Swiss phone number into the human-readable national format.
      *
-     * - Removes any whitespace in the input string.
-     * - Strips the Swiss country code from the phone number.
-     * - Adds a leading zero if the phone number doesn't start with one and has the expected Swiss number length.
-     * - Formats the phone number into a more human-readable format by adding spaces at appropriate positions.
+     * Mobile / landline (NSN 79..., 44...):
+     *   +41 79 987 12 34 => 079 987 12 34
+     *   0041 79 987 12 34 => 079 987 12 34
+     *   +41 (0)79 987 1234 => 079 987 12 34
+     *   079-987-12-34 => 079 987 12 34
+     *   044 668 18 00 => 044 668 18 00
+     *
+     * Service numbers (08xx / 09xx) are grouped 4-3-3:
+     *   0800 123 456 => 0800 123 456
+     *
+     * The input may contain spaces, dashes, slashes, dots or parentheses; all
+     * non-digit characters (except a leading "+") are ignored.
+     *
+     * If the input cannot be parsed as a valid Swiss number, the ORIGINAL,
+     * untouched input string is returned (no partial mangling).
      */
     public static function format(string $phoneNumber = ''): string
     {
-        // Remove whitespaces
-        $phoneNumber = preg_replace('/\s+/', '', $phoneNumber);
+        $original = $phoneNumber;
 
-        if ('' !== $phoneNumber) {
-            // Remove country code
-            $phoneNumber = str_replace(self::SWISS_COUNTRY_CODE_PLUS, '', $phoneNumber);
-            $phoneNumber = str_replace(self::SWISS_COUNTRY_CODE_NUMERIC, '', $phoneNumber);
+        // Keep digits only, preserving a single leading "+" (international prefix).
+        $hasPlus = str_starts_with(ltrim($phoneNumber), '+');
+        $digits = preg_replace('/\D+/', '', $phoneNumber);
 
-            // Add a leading zero if there is no f.ex 41
-            if (!str_starts_with($phoneNumber, '0') && self::SWISS_NUMBER_LENGTH === \strlen($phoneNumber)) {
-                $phoneNumber = '0'.$phoneNumber;
-            }
-
-            if (preg_match(self::SWISS_FORMAT_PATTERN, $phoneNumber)) {
-                $replace = '$1$2 $3 $4 $5';
-
-                // Search for 0799871234 and replace it with 079 987 12 34
-                $phoneNumber = preg_replace(self::SWISS_FORMAT_PATTERN, $replace, $phoneNumber);
-            }
+        if (null === $digits || '' === $digits) {
+            return $original;
         }
 
-        return $phoneNumber;
+        $nsn = self::extractNsn($hasPlus ? '+'.$digits : $digits);
+
+        if (null === $nsn) {
+            // Not a valid Swiss number -> return the input unchanged.
+            return $original;
+        }
+
+        return self::group('0'.$nsn);
+    }
+
+    /**
+     * Extracts the 9-digit national significant number (NSN) from any supported
+     * input notation or returns null if the input is not a valid Swiss number.
+     */
+    private static function extractNsn(string $input): string|null
+    {
+        // Strip the country code, anchored to the start of the string only.
+        $rest = match (true) {
+            str_starts_with($input, '+41') => substr($input, 3),
+            str_starts_with($input, '0041') => substr($input, 4),
+            // Bare country code without a prefix, e.g., 41799871234
+            str_starts_with($input, '41') && self::NSN_LENGTH + 2 === \strlen($input) => substr($input, 2),
+            // Already in national format: drop the trunk "0".
+            str_starts_with($input, '0') => substr($input, 1),
+            default => $input,
+        };
+
+        // Drop an optional informational "0" left over from the +41 (0)79... notation.
+        if (self::NSN_LENGTH < \strlen($rest) && str_starts_with($rest, '0')) {
+            $rest = substr($rest, 1);
+        }
+
+        if (1 !== preg_match('/^\d{'.self::NSN_LENGTH.'}$/', $rest)) {
+            return null;
+        }
+
+        return $rest;
+    }
+
+    /**
+     * Groups a 10-digit national number into the conventional spacing.
+     */
+    private static function group(string $national): string
+    {
+        // Service numbers 08xx / 09xx are grouped 4-3-3: 0800 123 456
+        if (str_starts_with($national, '08') || str_starts_with($national, '09')) {
+            return preg_replace('/^(\d{4})(\d{3})(\d{3})$/', '$1 $2 $3', $national);
+        }
+
+        // Mobile / landline grouped 3-3-2-2: 079 987 12 34
+        return preg_replace('/^(\d{3})(\d{3})(\d{2})(\d{2})$/', '$1 $2 $3 $4', $national);
     }
 }
