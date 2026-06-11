@@ -29,6 +29,7 @@ use Markocupic\SacEventToolBundle\Util\AgeGroupUtil;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class EventRegistrationListGeneratorCsv
 {
@@ -58,7 +59,7 @@ class EventRegistrationListGeneratorCsv
         'emergencyPhone',
         'emergencyPhoneName',
         'hasParticipated',
-        'J+S/Jugend',
+        'ageGroup',
     ];
 
     // Adapters
@@ -108,8 +109,9 @@ class EventRegistrationListGeneratorCsv
             $csv->addRecord($this->buildRegistrationRow($registration, $eventTimestamps));
         }
 
-        // Sanitize event title
-        $eventTitle = preg_replace('/[^a-zA-Z0-9_-]+/', '_', strtolower($event->title));
+        // Create the file name from the sanitized event title
+        $slugger = new AsciiSlugger('de');
+        $eventTitle = $slugger->slug($event->title, '_')->lower()->toString();
         $filename = \sprintf($this->sacevtEventMemberListFileNamePattern, $eventTitle, 'csv');
 
         return $csv->createResponse($filename);
@@ -124,6 +126,8 @@ class EventRegistrationListGeneratorCsv
         foreach (self::FIELDS as $field) {
             $headline[$field] = match ($field) {
                 'role' => 'Rolle',
+                'id' => 'ID',
+                'ageGroup' => 'J+S/Jugend',
                 default => $GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0] ?? $field,
             };
         }
@@ -148,6 +152,7 @@ class EventRegistrationListGeneratorCsv
     private function fetchInstructors(int $eventId): array
     {
         $model = CalendarEventsModel::findById($eventId);
+
         if (null === $model) {
             return [];
         }
@@ -167,16 +172,20 @@ class EventRegistrationListGeneratorCsv
 
     private function buildInstructorRow(array $dataInstructor, CalendarEventsModel $eventsModel): array
     {
-        $dataMember = $this->connection->fetchAssociative('SELECT * FROM tl_member WHERE sacMemberId = ?', [$dataInstructor['sacMemberId'] ?? '']);
+        $dataMember = [];
+
+        if (!empty($dataInstructor['sacMemberId'])) {
+            $dataMember = $this->connection->fetchAssociative('SELECT * FROM tl_member WHERE sacMemberId = ?', [$dataInstructor['sacMemberId']]) ?: [];
+        }
 
         $row = [];
 
         foreach (self::FIELDS as $field) {
             $value = match ($field) {
                 'role' => 'TL',
-                'ahvNumber', 'emergencyPhone', 'emergencyPhoneName', 'foodHabits' => (string) $dataMember[$field] ?? '' ,
+                'ahvNumber', 'emergencyPhone', 'emergencyPhoneName', 'foodHabits' => (string) ($dataMember[$field] ?? ''),
                 'sacMemberId', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email' => $dataInstructor[$field] ?? '',
-                'J+S/Jugend' => empty($dataInstructor['dateOfBirth']) ? '' : AgeGroupUtil::getAgeGroup((int) $dataInstructor['dateOfBirth'], (int) Date::parse('Y', $eventsModel->startDate)),
+                'ageGroup' => empty($dataInstructor['dateOfBirth']) ? '' : AgeGroupUtil::getAgeGroup((int) $dataInstructor['dateOfBirth'], (int) $this->dateAdapter->parse('Y', (int) $eventsModel->startDate)),
                 default => '',
             };
 
@@ -199,10 +208,11 @@ class EventRegistrationListGeneratorCsv
         foreach (self::FIELDS as $field) {
             $value = match ($field) {
                 'role' => 'TN',
-                'dateAdded' => Date::parse($this->configAdapter->get('datimFormat'), $dataRegistration[$field] ?? ''),
-                'J+S/Jugend' => null === $registration ? '' : $this->eventRegistrationUtil->getAgeGroup($registration),
+                'dateAdded' => empty($dataRegistration[$field]) ? '' : $this->dateAdapter->parse($this->configAdapter->get('datimFormat'), (int) $dataRegistration[$field]),
+                'ageGroup' => null === $registration ? '' : $this->eventRegistrationUtil->getAgeGroup($registration),
                 default => $dataRegistration[$field] ?? '',
             };
+
             $row[] = $this->formatFieldValue($field, $value, $registration);
         }
 
@@ -215,10 +225,14 @@ class EventRegistrationListGeneratorCsv
     {
         $value = html_entity_decode((string) $value);
 
+        if ('' === $value) {
+            return '';
+        }
+
         return match ($field) {
-            'phone', 'mobile', 'emergencyPhone' => '' === $value ? '' : 'T: '.PhoneNumberFormatter::format($value),
+            'phone', 'mobile', 'emergencyPhone' => 'T: '.PhoneNumberFormatter::format($value),
             'stateOfSubscription', 'gender' => $GLOBALS['TL_LANG']['MSC'][$value] ?? $value,
-            'dateOfBirth' => date($this->configAdapter->get('dateFormat'), (int) $value),
+            'dateOfBirth' => $this->dateAdapter->parse($this->configAdapter->get('dateFormat'), (int) $value),
             default => $value,
         };
     }
