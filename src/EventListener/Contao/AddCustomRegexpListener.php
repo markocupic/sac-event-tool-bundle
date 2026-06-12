@@ -41,10 +41,6 @@ readonly class AddCustomRegexpListener
             return false;
         }
 
-        if ('' === $varValue) {
-            return true;
-        }
-
         if (!AhvValidator::validate($varValue)) {
             $objWidget->addError($this->translator->trans('ERR.invalidAhvNumber', [], 'contao_default'));
         }
