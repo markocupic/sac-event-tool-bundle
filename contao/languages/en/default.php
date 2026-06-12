@@ -287,4 +287,4 @@ $GLOBALS['TL_LANG']['ERR']['SACMemberIdShouldBeNumberOrEmptyString'] = 'Das ist 
 $GLOBALS['TL_LANG']['ERR']['SACMemberIdShouldBeNumberOrZero'] = 'Das ist keine gültige SAC Mitgliedernummer. Geben Sie eine mind. 6-stellige Zahl ein oder 0.';
 $GLOBALS['TL_LANG']['ERR']['userWithThisSACMemberIdAlreadyExists'] = 'Es existiert bereits ein Benutzer mit der SAC Mitgliedernummer %s.';
 $GLOBALS['TL_LANG']['ERR']['invalidMinOrMaxMemberValue'] = 'Ungültige Eingabe! Geben Sie eine Zahl zwischen 2 und 999 ein.';
-$GLOBALS['TL_LANG']['ERR']['valueMustBePosMoney'] = 'Ungültige Eingabe! Geben Sie einem positiven Geldbetrag ein: z.B. 0 oder 10 oder 5.10';
+$GLOBALS['TL_LANG']['ERR']['mustBePositiveCashAmount'] = 'Ungültige Eingabe! Geben Sie einem positiven Geldbetrag ein: z.B. 0 oder 10 oder 5.10';

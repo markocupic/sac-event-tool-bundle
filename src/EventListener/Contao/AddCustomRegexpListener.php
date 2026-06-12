@@ -21,6 +21,7 @@ use Contao\MemberModel;
 use Contao\Widget;
 use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
 use Markocupic\SacEventToolBundle\String\Validator\AhvValidator;
+use Markocupic\SacEventToolBundle\String\Validator\CashAmountValidator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -151,16 +152,16 @@ readonly class AddCustomRegexpListener
     #[AsHook('addCustomRegexp', priority: 100)]
     public function isPositiveMoney(string $strRegexp, $varValue, Widget $objWidget): bool
     {
-        if ('positiveMoneyValue' !== $strRegexp) {
+        if ('positiveCashAmount' !== $strRegexp) {
             return false;
         }
 
-        // Valid values are 0 or 123.45 or 12345. Invalid values are 123.4 123.456789 or -123.45.
-        if (1 === preg_match('/^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/', $varValue)) {
+        // Valid values are 0 or 123.45 or 123.4. Invalid values are 123.456789 or -123.45.
+        if (CashAmountValidator::isPositiveCashAmount($varValue)) {
             return true;
         }
 
-        $objWidget->addError($this->translator->trans('ERR.valueMustBePosMoney', [], 'contao_default'));
+        $objWidget->addError($this->translator->trans('ERR.mustBePositiveCashAmount', [], 'contao_default'));
 
         return true;
     }
