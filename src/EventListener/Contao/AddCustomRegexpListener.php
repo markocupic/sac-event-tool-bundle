@@ -16,9 +16,10 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Database;
 use Contao\MemberModel;
 use Contao\Widget;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
 use Markocupic\SacEventToolBundle\String\Validator\AhvValidator;
 use Markocupic\SacEventToolBundle\String\Validator\CashAmountValidator;
@@ -28,31 +29,32 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 readonly class AddCustomRegexpListener
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private Connection $connection,
         private ContaoFramework $framework,
         private EventDurationInfo $eventDurationInfo,
         private RequestStack $requestStack,
+        private TranslatorInterface $translator,
     ) {
     }
 
     #[AsHook('addCustomRegexp', priority: 100)]
-    public function isValidAhvNumber(string $strRegexp, $varValue, Widget $objWidget): bool
+    public function isValidAhvNumber(string $regexp, $input, Widget $widget): bool
     {
-        if ('ahv' !== $strRegexp) {
+        if ('ahv' !== $regexp) {
             return false;
         }
 
-        if (!AhvValidator::validate($varValue)) {
-            $objWidget->addError($this->translator->trans('ERR.invalidAhvNumber', [], 'contao_default'));
+        if (!AhvValidator::validate($input)) {
+            $widget->addError($this->translator->trans('ERR.invalidAhvNumber', [], 'contao_default'));
         }
 
         return true;
     }
 
     #[AsHook('addCustomRegexp', priority: 100)]
-    public function isValidDurationInfo(string $strRegexp, $varValue, Widget $objWidget): bool
+    public function isValidDurationInfo(string $regexp, $input, Widget $widget): bool
     {
-        if ('durationInfo' !== $strRegexp) {
+        if ('durationInfo' !== $regexp) {
             return false;
         }
 
@@ -62,102 +64,96 @@ readonly class AddCustomRegexpListener
         // $_POST['eventDates'] is a non-scalar value.
         $post = $request->request->all();
 
-        if (empty($varValue) || empty($post['eventDates'][0])) {
+        if (empty($input) || empty($post['eventDates'][0])) {
             return true;
         }
 
-        if (!$this->eventDurationInfo->has($varValue)) {
+        if (!$this->eventDurationInfo->has($input)) {
             return true;
         }
 
-        $arrDurationInfo = $this->eventDurationInfo->get($varValue);
+        $arrDurationInfo = $this->eventDurationInfo->get($input);
         $countDates = \count($post['eventDates']);
 
         if ($arrDurationInfo['dateRows'] !== $countDates) {
-            $objWidget->addError($this->translator->trans('ERR.invalidEventDurationInfo', [], 'contao_default'));
+            $widget->addError($this->translator->trans('ERR.invalidEventDurationInfo', [], 'contao_default'));
         }
 
         return true;
     }
 
     #[AsHook('addCustomRegexp', priority: 100)]
-    public function isSacMemberIdEmptyOrString(string $strRegexp, $varValue, Widget $objWidget): bool
+    public function isSacMemberIdEmptyOrString(string $regexp, $input, Widget $widget): bool
     {
-        if ('sacMemberIdOrEmptyString' !== $strRegexp) {
+        if ('sacMemberIdOrEmptyString' !== $regexp) {
             return false;
         }
 
-        if ('' === $varValue) {
+        if ('' === $input) {
             return true;
         }
 
-        if (preg_match('/^[1-9]\d{5,}$/', $varValue)) {
-            $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
+        if (preg_match('/^[1-9]\d{5,}$/', $input)) {
+            $memberModel = $this->framework->getAdapter(MemberModel::class)->findOneBySacMemberId($input);
 
-            $objMemberModel = $memberModelAdapter->findOneBySacMemberId(trim($varValue));
-
-            if (null === $objMemberModel) {
-                $objWidget->addError($this->translator->trans('ERR.memberWithSACMemberIdNotFound', [$varValue], 'contao_default'));
+            if (null === $memberModel) {
+                $widget->addError($this->translator->trans('ERR.memberWithSACMemberIdNotFound', [$input], 'contao_default'));
 
                 return true;
             }
 
+            // All ok!
             return true;
         }
 
-        $objWidget->addError($this->translator->trans('ERR.SACMemberIdShouldBeNumberOrEmptyString', [], 'contao_default'));
+        $widget->addError($this->translator->trans('ERR.SACMemberIdShouldBeNumberOrEmptyString', [], 'contao_default'));
 
         return true;
     }
 
     #[AsHook('addCustomRegexp', priority: 100)]
-    public function isSacMemberIdUniqueOrZero(string $strRegexp, $varValue, Widget $objWidget): bool
+    public function isSacMemberIdUniqueOrZero(string $regexp, $input, Widget $widget): bool
     {
-        if ('sacMemberIdIsUniqueOrZero' !== $strRegexp) {
+        if ('sacMemberIdIsUniqueOrZero' !== $regexp) {
             return false;
         }
 
-        if (0 === $varValue || '0' === $varValue) {
+        if (0 === $input || '0' === $input) {
             return true;
         }
 
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
-
-        if (preg_match('/^[1-9]\d{5,}$/', $varValue)) {
-            $objMemberModel = $memberModelAdapter->findOneBySacMemberId($varValue);
-
-            if (null === $objMemberModel) {
-                $objWidget->addError($this->translator->trans('ERR.memberWithSACMemberIdNotFound', [$varValue], 'contao_default'));
-
-                return true;
-            }
-
-            $objUser = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_user WHERE sacMemberId = ?')->execute($varValue);
-
-            if ($objUser->numRows > 1) {
-                $objWidget->addError($this->translator->trans('ERR.userWithThisSACMemberIdAlreadyExists', [$varValue], 'contao_default'));
-
-                return true;
-            }
+        if (!preg_match('/^[1-9]\d{5,}$/', $input)) {
+            $widget->addError($this->translator->trans('ERR.SACMemberIdShouldBeNumberOrZero', [], 'contao_default'));
 
             return true;
         }
 
-        $objWidget->addError($this->translator->trans('ERR.SACMemberIdShouldBeNumberOrZero', [], 'contao_default'));
+        $memberModel = $this->framework->getAdapter(MemberModel::class)->findOneBySacMemberId($input);
+
+        if (null === $memberModel) {
+            $widget->addError($this->translator->trans('ERR.memberWithSACMemberIdNotFound', [$input], 'contao_default'));
+
+            return true;
+        }
+
+        $count = $this->connection->fetchOne('SELECT COUNT(id) FROM tl_user WHERE sacMemberId = ?', [$input], [Types::INTEGER]);
+
+        if ($count > 1) {
+            $widget->addError($this->translator->trans('ERR.userWithThisSACMemberIdAlreadyExists', [$input], 'contao_default'));
+        }
 
         return true;
     }
 
     #[AsHook('addCustomRegexp', priority: 100)]
-    public function isPositiveMoney(string $strRegexp, $varValue, Widget $objWidget): bool
+    public function isPositiveMoney(string $regexp, $input, Widget $objWidget): bool
     {
-        if ('positiveCashAmount' !== $strRegexp) {
+        if ('positiveCashAmount' !== $regexp) {
             return false;
         }
 
         // Valid values are 0 or 123.45 or 123.4. Invalid values are 123.456789 or -123.45.
-        if (CashAmountValidator::isPositiveCashAmount($varValue)) {
+        if (CashAmountValidator::isPositiveCashAmount($input)) {
             return true;
         }
 
