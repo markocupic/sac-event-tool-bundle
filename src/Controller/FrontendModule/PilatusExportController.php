@@ -60,10 +60,10 @@ class PilatusExportController extends AbstractPrintExportController
     private array $events = [];
 
     // Editable course fields.
-    private array $courseFeEditableFields = ['teaser', 'issues', 'terms', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous'];
+    private array $courseFeEditableFields = ['teaser', 'issues', 'terms', 'requirements', 'equipment', 'leistungen', 'bookingDetails', 'meetingPoint', 'miscellaneous'];
 
     // Editable tour fields.
-    private array $tourFeEditableFields = ['teaser', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous'];
+    private array $tourFeEditableFields = ['teaser', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingDetails', 'meetingPoint', 'miscellaneous'];
 
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,

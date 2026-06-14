@@ -354,7 +354,7 @@ class WorkshopBookletGenerator
         $objPartial->leistungen = $this->nl2br($objEvent->leistungen);
 
         // Sign in
-        $objPartial->bookingEvent = str_replace('(at)', '@', html_entity_decode($this->nl2br((string) $objEvent->bookingEvent)));
+        $objPartial->bookingDetails = str_replace('(at)', '@', html_entity_decode($this->nl2br((string) $objEvent->bookingDetails)));
 
         // Equipment
         $objPartial->equipment = $this->nl2br($objEvent->equipment);

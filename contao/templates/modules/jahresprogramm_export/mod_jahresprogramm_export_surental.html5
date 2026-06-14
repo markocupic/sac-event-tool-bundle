@@ -175,9 +175,9 @@
     <td class="event-export-leistungen font-italic">Anmeldung</td>
     <td class="event-export-booking-info do-not-show-row-when-empty" colspan="4">
       <?= $arrEvent['bookingInfo'] ?>
-      <?php if ('' != $arrEvent['bookingEvent']): ?>
+      <?php if ('' != $arrEvent['bookingDetails']): ?>
       {{br}}
-      <?= nl2br($arrEvent['bookingEvent']) ?>
+      <?= nl2br($arrEvent['bookingDetails']) ?>
       <?php endif; ?>
     </td>
   </tr>
@@ -276,7 +276,7 @@
       <?= $arrEvent['bookingInfo'] ?>
       <?php if ('' != $arrEvent['bookingInfo']): ?>
       {{br}}
-      <?= nl2br($arrEvent['bookingEvent']) ?>
+      <?= nl2br($arrEvent['bookingDetails']) ?>
       <?php endif; ?>
     </td>
   </tr>

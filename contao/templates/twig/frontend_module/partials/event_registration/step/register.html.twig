@@ -78,7 +78,7 @@
                                 </div>
                             {% endif %}
 
-                            {% if event_model.bookingEvent is not empty %}
+                            {% if event_model.bookingDetails|default is not empty %}
                                 {% set user = get_logged_in_frontend_user() %}
                                 {% set salutation = user.gender == 'female' ? 'Liebe' : 'Lieber' %}
                                 <div class="mt-4">
@@ -86,7 +86,7 @@
                                     <div class="border border-lighter p-3">
                                         <div class="booking-text event-detail event-info-box icon-box-small">
                                             <h5 class="mt-0 pt-0">Anmeldung</h5>
-                                            {{ event_model.bookingEvent|nl2br }}
+                                            {{ event_model.bookingDetails|nl2br }}
                                         </div>
                                     </div>
                                     <div class="fst-italic mt-4 highlight-warning-ff-notes p-3">

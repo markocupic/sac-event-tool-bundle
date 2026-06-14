@@ -155,7 +155,7 @@ class ExportEvents2Docx
                     'Bergf./Tourenl.' => 'mountainguide',
                     'Leiter' => 'instructor',
                     'Preis/Leistungen' => 'leistungen',
-                    'Anmeldung' => 'bookingEvent',
+                    'Anmeldung' => 'bookingDetails',
                     'Material' => 'equipment',
                     'Weiteres' => 'miscellaneous',
                 ];

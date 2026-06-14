@@ -104,16 +104,16 @@
   </tr>
   <?php endif; ?>
   <tr class="event-export-row-body" data-recurringevent="<?php if ($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-    <td class="event-export-bookingEvent">Anmeldung</td>
-    <td class="event-export-bookingEvent">
+    <td class="event-export-bookingDetails">Anmeldung</td>
+    <td class="event-export-bookingDetails">
       <?php if (!$arrEvent['disableOnlineRegistration']): ?>
       Event-Nummer: <?= $arrEvent['courseId'] ?>
       <?php endif; ?>
       <?php if (isset($arrEvent['registrationPeriod'])): ?>
       {{br}}Anmeldung möglich vom <?= $arrEvent['registrationPeriod'] ?>
       <?php endif; ?>
-      <?php if ('' != $arrEvent['bookingEvent']): ?>
-      {{br}}<?= $arrEvent['bookingEvent'] ?>
+      <?php if ('' != $arrEvent['bookingDetails']): ?>
+      {{br}}<?= $arrEvent['bookingDetails'] ?>
       <?php endif; ?>
       <?php if ($arrEvent['generateMainInstructorContactDataFromDb']): ?>
       {{br}}<?= \Contao\System::getContainer()->get(\Markocupic\SacEventToolBundle\Util\CalendarEventsUtil::class)->generateMainInstructorContactDataFromDb(\Contao\CalendarEventsModel::findByPk($arrEvent['id'])) ?>
@@ -275,14 +275,14 @@
   </tr>
   <?php endif; ?>
   <time class="event-export-row-body" data-recurringevent="<?php if ($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-    <td class="event-export-bookingEvent">Anmeldung</td>
+    <td class="event-export-bookingDetails">Anmeldung</td>
     <?php $arrText = []; ?>
     <?php if (!$arrEvent['disableOnlineRegistration']): ?>
-    <?php $arrText[] = sprintf('Mit Event-Nummer: %s-%s', \Contao\Date::parse('Y', $arrEvent['startDate']), $arrEvent['id'], $arrEvent['bookingEvent']); ?>
+    <?php $arrText[] = sprintf('Mit Event-Nummer: %s-%s', \Contao\Date::parse('Y', $arrEvent['startDate']), $arrEvent['id'], $arrEvent['bookingDetails']); ?>
     <?php endif; ?>
-    <?php if ('' != $arrEvent['bookingEvent']): ?>
+    <?php if ('' != $arrEvent['bookingDetails']): ?>
     <!-- experimental: Redaktion muss diese Einträge prüfen und evtl. doppelt vorhandene Inhalte manuell löschen -->
-    <?php $arrText[] = '<span style="background-color: #FFFF00">'.trim($arrEvent['bookingEvent']).'</span>'; ?>
+    <?php $arrText[] = '<span style="background-color: #FFFF00">'.trim($arrEvent['bookingDetails']).'</span>'; ?>
     <?php endif; ?>
     <!-- end experimental --->
 
@@ -298,7 +298,7 @@
   <?php if (empty($arrText)): ?>
   <?php $arrText[] = 'Kontaktdaten siehe JP'; ?>
   <?php endif; ?>
-  <td class="event-export-bookingEvent"><?= implode('{{br}}', array_filter($arrText)) ?></td>
+  <td class="event-export-bookingDetails"><?= implode('{{br}}', array_filter($arrText)) ?></td>
   </tr>
   <?php if (isset($arrEvent['qrCode'])): ?>
   <tr class="event-export-row-body" data-recurringevent="<?php if ($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">

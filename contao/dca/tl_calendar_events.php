@@ -89,7 +89,7 @@ PaletteManipulator::create()
 	->addField(['addTime', 'startTime', 'endTime'], 'date_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['isRecurringEvent'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['location', 'coordsCH1903', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'linkSacRoutePortal'], 'details_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['location', 'coordsCH1903', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingDetails', 'miscellaneous', 'linkSacRoutePortal'], 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['terms', 'issues'], 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['instructorNotes'], 'more_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['addMinAndMaxMembers'], 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
@@ -112,7 +112,7 @@ PaletteManipulator::create()
 	->addField(['eventDates', 'durationInfo'], 'date_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['isRecurringEvent'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['location', 'coordsCH1903', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'linkSacRoutePortal'], 'details_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['location', 'coordsCH1903', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingDetails', 'miscellaneous', 'linkSacRoutePortal'], 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['instructorNotes'], 'more_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['addMinAndMaxMembers'], 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo', 'autoConfirm'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
@@ -135,7 +135,7 @@ PaletteManipulator::create()
 	->addField(['eventDates', 'durationInfo'], 'date_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['isRecurringEvent'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['location', 'coordsCH1903', 'journey', 'generalEventDetailText', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'], 'details_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['location', 'coordsCH1903', 'journey', 'generalEventDetailText', 'leistungen', 'equipment', 'meetingPoint', 'bookingDetails', 'miscellaneous'], 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['instructorNotes'], 'more_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['addMinAndMaxMembers'], 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo', 'autoConfirm'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
@@ -156,7 +156,7 @@ PaletteManipulator::create()
 	->addField(['eventDates', 'durationInfo'], 'date_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['isRecurringEvent'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['terms', 'issues', 'location', 'coordsCH1903', 'journey', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'], 'details_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['terms', 'issues', 'location', 'coordsCH1903', 'journey', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingDetails', 'miscellaneous'], 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['instructorNotes'], 'more_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['addMinAndMaxMembers'], 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo', 'autoConfirm'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
@@ -483,8 +483,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['maxMembers'] = [
 	'sql'       => 'int(3) unsigned NULL',
 ];
 
-// Add a new field bookingEvent
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['bookingEvent'] = [
+// Add a new field bookingDetails
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['bookingDetails'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
 	'eval'      => ['mandatory' => false, 'tl_class' => 'm12 clr'],

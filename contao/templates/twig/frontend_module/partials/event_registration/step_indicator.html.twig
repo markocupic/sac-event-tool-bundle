@@ -5,7 +5,7 @@
         'confirm': '3. Bestätigung',
     } %}
     {% for item in items %}
-        <span class="checkout-step{% if item.current %} step--current{% endif %}{% if item.processed %} step--processed{% endif %}">{{ step_trans[item.name] }}</span>
+        <span class="checkout-step{% if item.current %} step--current{% endif %}{% if item.processed == true %} step--processed{% endif %}">{{ step_trans[item.name] }}</span>
         {% if loop.last is not true %}
         <span class="step-indicator-divider"> &#10140; </span>
         {% endif %}

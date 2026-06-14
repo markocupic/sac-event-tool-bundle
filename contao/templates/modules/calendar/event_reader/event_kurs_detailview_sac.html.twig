@@ -207,9 +207,9 @@
                     <p>{% if get_event_data(model, 'disableOnlineRegistration') %}Keine {% endif %}Online-Anmeldung</p>
                     <!-- indexer::continue -->
 
-                    {% if not get_event_data(model, 'bookingEvent') is empty %}
+                    {% if not get_event_data(model, 'bookingDetails') is empty %}
                         <!-- indexer::stop -->
-                        <p>{{ get_event_data(model, 'bookingEvent')|nl2br }}</p>
+                        <p>{{ get_event_data(model, 'bookingDetails')|nl2br }}</p>
                         <!-- indexer::continue -->
                     {% endif %}
 

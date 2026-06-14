@@ -61,7 +61,7 @@
 
   <tr style="<?= $this->rowStyleA ?>">
     <td style="<?= $this->cellStyleA ?>">Anmeldung</td>
-    <td style="<?= $this->cellStyleB ?>"><?= $this->bookingEvent ?></td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->bookingDetails ?></td>
   </tr>
 
   <?php if ('' != $this->equipment): ?>

@@ -196,7 +196,7 @@ class EventDeregistrationController extends AbstractFrontendModuleController
             }
 
             $template->set('form', $form->generate());
-            $template->set('event_booking_conditions', $calendarEvent->bookingEvent);
+            $template->set('event_booking_conditions', $calendarEvent->bookingDetails);
         }
 
         $this->addMessagesToTemplate($template, $request);
