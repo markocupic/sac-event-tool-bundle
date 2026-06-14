@@ -93,7 +93,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         }
 
         $template->set('stepType', $step::getName());
-        $template->set('stepIndicator', $this->renderStepIndicatorResponse($step, $eventModel, $request, $model)->getContent());
+        $template->set('stepIndicator', $this->renderStepIndicatorResponse($step, $isValid, $eventModel, $request, $model)->getContent());
         $template->set('step', $this->renderStepResponse($step, $eventModel, $request, $model)->getContent());
 
         return $template->getResponse();
@@ -125,7 +125,13 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private function getStepUrlIfMiss(StepHandlerInterface $stepHandler, Request $request): string|null
     {
         if ($request->query->get('action') !== $stepHandler::getName()) {
-            return $this->urlParser->addQueryString('action='.$stepHandler::getName(), $request->getUri());
+            $url = $this->urlParser->addQueryString('action='.$stepHandler::getName(), $request->getUri());
+
+            // Only redirect if the URL actually changed — guards against an infinite
+            // redirect loop if addQueryString fails to inject the parameter.
+            if ($url !== $request->getUri()) {
+                return $url;
+            }
         }
 
         return null;
@@ -141,32 +147,36 @@ class EventRegistrationController extends AbstractFrontendModuleController
         );
     }
 
-    private function renderStepIndicatorResponse(StepHandlerInterface $currentStep, CalendarEventsModel $eventModel, Request $request, ModuleModel $model): Response
+    private function renderStepIndicatorResponse(StepHandlerInterface $currentStep, bool $currentStepIsValid, CalendarEventsModel $eventModel, Request $request, ModuleModel $model): Response
     {
         $items = [];
+        $reachedCurrent = false;
 
         foreach (array_keys($this->stepManager->getSteps()) as $stepName) {
             $step = $this->stepManager->getStep($stepName);
+            $isCurrent = $step::getName() === $currentStep::getName();
 
-            $item = [];
-            $item['name'] = $step::getName();
-            $item['current'] = $step::getName() === $currentStep::getName();
-
-            if ($step instanceof ValidationStepInterface && !$step->validate($eventModel, $request, $model)) {
-                $item['processed'] = false;
+            if ($isCurrent) {
+                $isValid = $currentStepIsValid;
+                $reachedCurrent = true;
+            } elseif (!$reachedCurrent && $step instanceof ValidationStepInterface) {
+                $isValid = $step->validate($eventModel, $request, $model);
             } else {
-                $item['processed'] = true;
+                $isValid = false;
             }
 
-            $items[] = $item;
+            $items[] = [
+                'name' => $step::getName(),
+                'is_current' => $isCurrent,
+                'is_future' => $reachedCurrent && !$isCurrent,
+                'is_valid' => $isValid,
+            ];
         }
 
         return new Response(
             $this->twig->render(
                 '@Contao_MarkocupicSacEventToolBundle/frontend_module/partials/event_registration/step_indicator.html.twig',
-                [
-                    'items' => $items,
-                ],
+                ['items' => $items],
             ),
         );
     }
