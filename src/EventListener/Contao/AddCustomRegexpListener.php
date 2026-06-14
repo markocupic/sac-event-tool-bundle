@@ -146,7 +146,7 @@ readonly class AddCustomRegexpListener
     }
 
     #[AsHook('addCustomRegexp', priority: 100)]
-    public function isPositiveMoney(string $regexp, $input, Widget $objWidget): bool
+    public function isPositiveMoney(string $regexp, $input, Widget $widget): bool
     {
         if ('positiveCashAmount' !== $regexp) {
             return false;
@@ -157,7 +157,7 @@ readonly class AddCustomRegexpListener
             return true;
         }
 
-        $objWidget->addError($this->translator->trans('ERR.mustBePositiveCashAmount', [], 'contao_default'));
+        $widget->addError($this->translator->trans('ERR.mustBePositiveCashAmount', [], 'contao_default'));
 
         return true;
     }
