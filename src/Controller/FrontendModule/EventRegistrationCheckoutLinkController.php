@@ -21,6 +21,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\CoreBundle\Routing\Page\PageRegistry;
 use Contao\CoreBundle\Twig\FragmentTemplate;
+use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,7 +45,7 @@ final class EventRegistrationCheckoutLinkController extends AbstractFrontendModu
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
         // Get the alias from auto_item
-        $eventAlias = $request->attributes->get('auto_item');
+        $eventAlias = $this->framework->getAdapter(Input::class)->get('auto_item');
 
         if (empty($eventAlias)) {
             return new Response('', Response::HTTP_NO_CONTENT);
