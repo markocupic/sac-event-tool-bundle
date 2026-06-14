@@ -18,60 +18,72 @@ use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Routing\ScopeMatcher;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
+use Contao\CoreBundle\Routing\Page\PageRegistry;
 use Contao\CoreBundle\Twig\FragmentTemplate;
-use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[AsFrontendModule(EventRegistrationCheckoutLinkController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_event_registration_checkout_link')]
-class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleController
+final class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleController
 {
     public const string TYPE = 'event_registration_checkout_link';
 
-    private PageModel|null $objJumpTo = null;
-
-    private CalendarEventsModel|null $objEvent = null;
-
     public function __construct(
         private readonly ContaoFramework $framework,
-        private readonly ScopeMatcher $scopeMatcher,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
+        private readonly PageRegistry $pageRegistry,
     ) {
-    }
-
-    public function __invoke(Request $request, ModuleModel $model, string $section, array|null $classes = null, PageModel|null $page = null): Response
-    {
-        $inputAdapter = $this->framework->getAdapter(Input::class);
-        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-        $pageModelAdapter = $this->framework->getAdapter(PageModel::class);
-
-        // Get the alias from auto_item
-        $eventAlias = $inputAdapter->get('auto_item');
-
-        if ($this->scopeMatcher->isFrontendRequest($request) && empty($eventAlias)) {
-            return new Response('', Response::HTTP_NO_CONTENT);
-        }
-
-        $this->objEvent = $calendarEventsModelAdapter->findByIdOrAlias($eventAlias);
-        $this->objJumpTo = $pageModelAdapter->findPublishedById($model->eventRegCheckoutLinkPage);
-
-        if ($this->scopeMatcher->isFrontendRequest($request) && (null === $this->objEvent || null === $this->objJumpTo)) {
-            return new Response('', Response::HTTP_NO_CONTENT);
-        }
-
-        // Call the parent method
-        return parent::__invoke($request, $model, $section, $classes);
     }
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        $params = '/'.$this->objEvent->alias;
+        // Get the alias from auto_item
+        $eventAlias = $request->attributes->get('auto_item');
 
-        $template->set('jumpTo', $this->objJumpTo->getFrontendUrl($params));
+        if (empty($eventAlias)) {
+            return new Response('', Response::HTTP_NO_CONTENT);
+        }
+
+        $calEvent = $this->framework->getAdapter(CalendarEventsModel::class)->findByIdOrAlias($eventAlias);
+
+        if (null === $calEvent) {
+            return new Response('', Response::HTTP_NO_CONTENT);
+        }
+
+        $jumpToPage = $this->framework->getAdapter(PageModel::class)->findPublishedById($model->eventRegCheckoutLinkPage);
+
+        if (null === $jumpToPage) {
+            return new Response('', Response::HTTP_NO_CONTENT);
+        }
+
+        $urlParams = '/'.$calEvent->alias;
+
+        $template->set('jumpTo', $this->getFrontendUrl($jumpToPage, $urlParams));
         $template->set('btnLbl', $model->eventRegCheckoutLinkLabel);
 
         return $template->getResponse();
+    }
+
+    private function getFrontendUrl(PageModel $pageModel, string $urlParams): string
+    {
+        $pageModel->loadDetails();
+
+        try {
+            $url = $this->contentUrlGenerator->generate($pageModel, ['parameters' => $urlParams], UrlGeneratorInterface::ABSOLUTE_URL);
+        } catch (RouteNotFoundException $e) {
+            if (!$this->pageRegistry->isRoutable($pageModel)) {
+                throw new ResourceNotFoundException(\sprintf('Page ID %s is not routable', $pageModel->id), 0, $e);
+            }
+
+            throw $e;
+        }
+
+        return $url;
     }
 }
