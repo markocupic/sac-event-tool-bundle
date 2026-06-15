@@ -23,7 +23,7 @@ use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 
 /**
- * This class handles file backup operations for different intervals including
+ * This class handles file backup operations for different intervals, including
  * daily, weekly, and monthly. It schedules cron jobs for creating backups and
  * manages old backups by removing files older than a specified time threshold.
  */
@@ -66,9 +66,9 @@ class FileBackupCron extends AbstractController
     }
 
     /**
-     * Every day at 3:45 AM.
+     * Every day at 21:30 PM.
      */
-    #[AsCronJob('23 21 * * *')]
+    #[AsCronJob('30 21 * * *')]
     public function daily(): void
     {
         $timeCut = strtotime('-14 days');
