@@ -219,7 +219,7 @@ class MyEventsDashboardController
             'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
             'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
         ]);
-        $operation['title'] = $this->translator->trans('MSC.bhs_dashb_registrationList', [], 'contao_default');
+        $operation['title'] = $this->translator->trans('MSC.bhs_dashb_eventListing', [], 'contao_default');
         $operation['link_attributes'] = [
             'data-turbo' => 'false',
         ];
