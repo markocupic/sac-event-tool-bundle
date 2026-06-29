@@ -38,8 +38,10 @@ use Contao\System;
 use Contao\User;
 use Contao\UserGroupModel;
 use Contao\UserModel;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
@@ -491,6 +493,17 @@ class CalendarEvents
             $objEventsModel->customEventRegistrationConfirmationEmailText = file_get_contents($this->sacevtEventRegistrationConfigEmailAcceptCustomTemplPath);
 
             $objEventsModel->save();
+
+            // Add a new entry in tl_calendar_events_instructor!
+            // This makes the entry appear in the "My Events Dashboard" in the backend.
+            $set = [
+                'pid' => $insertId,
+                'userId' => $user->id,
+                'isMainInstructor' => 1,
+                'tstamp' => time(),
+            ];
+
+            $this->connection->insert('tl_calendar_events_instructor', $set);
         }
     }
 
@@ -1323,44 +1336,55 @@ class CalendarEvents
         if (!$dc->id) {
             return $varValue;
         }
-
         $arrInstructors = $this->stringUtil->deserialize($varValue, true);
+        $instructorIds = array_column($arrInstructors, 'instructorId');
+        $instructorIds = !empty($instructorIds) ? array_map('intval', $instructorIds) : $instructorIds;
+        file_put_contents(System::getContainer()->getParameter('kernel.project_dir').'/test.log', "\n".print_r($instructorIds, true), FILE_APPEND);
 
-        // Use a child table to store instructors Delete instructor
-        $this->connection->delete('tl_calendar_events_instructor', ['pid' => $dc->id]);
-
-        $i = 0;
-
-        foreach ($arrInstructors as $arrInstructor) {
-            // Rebuild instructor table
-            $set = [
-                'pid' => $dc->id,
-                'userId' => $arrInstructor['instructorId'],
-                'tstamp' => time(),
-                'isMainInstructor' => $i < 1 ? 1 : 0,
-            ];
-
-            $this->connection->insert('tl_calendar_events_instructor', $set);
-
-            ++$i;
-        }
-        // End child insert
-
-        if (\count($arrInstructors) > 0) {
-            $intInstructor = $arrInstructors[0]['instructorId'];
-
-            if (null !== $this->userModel->findById($intInstructor)) {
-                $set = ['mainInstructor' => $intInstructor];
-
-                $this->connection->update('tl_calendar_events', $set, ['id' => $dc->id]);
-
-                return $varValue;
-            }
+        // Remove instructors that are no longer present
+        if (!empty($instructorIds)) {
+            $this->connection->executeStatement(
+                'DELETE FROM tl_calendar_events_instructor WHERE pid = ? AND userId NOT IN (?)',
+                [
+                    $dc->id,
+                    $instructorIds,
+                ],
+                [
+                    ParameterType::INTEGER,
+                    ArrayParameterType::INTEGER,
+                ],
+            );
+        } else {
+            // No instructors → remove all
+            $this->connection->delete('tl_calendar_events_instructor', ['pid' => (int) $dc->id]);
         }
 
-        $set = ['mainInstructor' => 0];
+        // Upsert instructors → userid_pid unique key must be configured on tl_calendar_events_instructor!
+        foreach ($instructorIds as $i => $userId) {
+            $sql = '
+            INSERT INTO tl_calendar_events_instructor (pid, userId, tstamp, isMainInstructor)
+            VALUES (?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                tstamp = VALUES(tstamp),
+                isMainInstructor = VALUES(isMainInstructor)
+             ';
 
-        $this->connection->update('tl_calendar_events', $set, ['id' => $dc->id]);
+            $this->connection->executeStatement($sql, [
+                (int) $dc->id,
+                (int) $userId,
+                time(),
+                0 === $i ? 1 : 0,
+            ]);
+        }
+
+        // Update mainInstructor field in parent table
+        $mainInstructor = $instructorIds[0] ?? 0;
+
+        $this->connection->update(
+            'tl_calendar_events',
+            ['mainInstructor' => $mainInstructor],
+            ['id' => $dc->id],
+        );
 
         return $varValue;
     }

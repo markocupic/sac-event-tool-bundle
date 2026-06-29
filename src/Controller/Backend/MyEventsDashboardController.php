@@ -23,6 +23,7 @@ use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
 use Contao\System;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
@@ -127,19 +128,21 @@ class MyEventsDashboardController
         }
 
         $sql = match ($timeframe) {
-            'upcoming' => 'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN(%s) AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate > ? ORDER BY t1.startDate',
-            'past' => 'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN (%s) AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate <= ? ORDER BY t1.startDate DESC',
-            'default' => '',
+            'upcoming' => 'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN(?) AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startTime > ? ORDER BY t1.startTime',
+            'past' => 'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN (?) AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startTime <= ? ORDER BY t1.startTime DESC',
+            default => throw new \InvalidArgumentException(\sprintf('Invalid timeframe "%s". Expected "upcoming" or "past".', $timeframe)),
         };
 
         $result = $this->connection->executeQuery(
-            \sprintf($sql, implode(',', array_map('intval', $arrAllowedCalIds))),
+            $sql,
             [
+                $arrAllowedCalIds,
                 $user->id,
                 $user->id,
                 $timeCut,
             ],
             [
+                ArrayParameterType::INTEGER,
                 Types::INTEGER,
                 Types::INTEGER,
                 Types::INTEGER,
@@ -157,6 +160,7 @@ class MyEventsDashboardController
             $eventModel = $this->calendarEventsModelAdapter->findById($row['id']);
             $title = $this->stringUtilAdapter->decodeEntities($eventModel->title);
             $title = $this->stringUtilAdapter->restoreBasicEntities($title);
+            $title = empty($title) ? 'Neuer Event' : $title;
 
             $event = [];
             $event['href_event'] = $this->router->generate('contao_backend', [
