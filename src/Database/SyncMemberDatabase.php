@@ -222,7 +222,7 @@ class SyncMemberDatabase
      */
     protected function getCsvFilesFromTempDir(): array
     {
-        $arrFiles = [];
+        $files = [];
 
         foreach ($this->getSectionIds() as $sectionId) {
             $sectionIdPadded = str_pad($sectionId, 8, '0', STR_PAD_LEFT);
@@ -243,10 +243,10 @@ class SyncMemberDatabase
                 throw new \RuntimeException(\sprintf('The CSV file "%s" seems to be empty or incomplete.', $targetPath));
             }
 
-            $arrFiles[$sectionId] = $splFileInfo;
+            $files[$sectionId] = $splFileInfo;
         }
 
-        return $arrFiles;
+        return $files;
     }
 
     protected function getSectionIds(): array
@@ -285,9 +285,9 @@ class SyncMemberDatabase
         $this->connection->beginTransaction();
 
         try {
-            $arrFiles = $this->getCsvFilesFromTempDir();
+            $files = $this->getCsvFilesFromTempDir();
 
-            foreach ($arrFiles as $splFileInfo) {
+            foreach ($files as $splFileInfo) {
                 $stream = fopen($splFileInfo->getRealPath(), 'r');
 
                 if (!$stream) {
@@ -295,46 +295,46 @@ class SyncMemberDatabase
                 }
 
                 while (!feof($stream)) {
-                    if (false !== ($arrLine = fgetcsv($stream, null, static::FTP_DB_DUMP_FIELD_DELIMITER))) {
-                        if (empty($arrLine) || empty($arrLine[0])) {
+                    if (false !== ($dataLine = fgetcsv($stream, null, static::FTP_DB_DUMP_FIELD_DELIMITER))) {
+                        if (empty($dataLine) || empty($dataLine[0])) {
                             continue;
                         }
 
-                        $arrLine[0] = (int) $arrLine[0];
+                        $dataLine[0] = (int) $dataLine[0];
 
                         // The first column must contain the sac member id (e.g., 134100)
-                        if ($arrLine[0] < 1) {
+                        if ($dataLine[0] < 1) {
                             continue;
                         }
 
-                        $this->insertOrUpdateTempMember($this->parseLine($arrLine));
+                        $this->insertOrUpdateTempMember($this->parseLine($dataLine));
                     }
                 }
                 fclose($stream);
             }
 
-            $arrAllTemp = $this->connection->fetchAllAssociative('SELECT * FROM '.self::TEMP_TABLE_NAME);
+            $tempRecords = $this->connection->fetchAllAssociative('SELECT * FROM '.self::TEMP_TABLE_NAME);
 
-            foreach ($arrAllTemp as $rowTemp) {
-                unset($rowTemp['id']);
+            foreach ($tempRecords as $tempRecord) {
+                unset($tempRecord['id']);
 
-                $sacMemberId = $rowTemp['sacMemberId'];
+                $sacMemberId = $tempRecord['sacMemberId'];
 
                 // Insert new member
                 if (false === $this->connection->fetchOne('SELECT id FROM tl_member WHERE sacMemberId = ?', [$sacMemberId], [Types::INTEGER])) {
-                    $rowTemp['dateAdded'] = time();
-                    $rowTemp['tstamp'] = time();
-                    $rowTemp['isSacMember'] = 1;
-                    $rowTemp['login'] = 1;
-                    $rowTemp['disable'] = 0;
-                    $rowTemp['password'] = $this->getRandomPasswordHash();
+                    $tempRecord['dateAdded'] = time();
+                    $tempRecord['tstamp'] = time();
+                    $tempRecord['isSacMember'] = 1;
+                    $tempRecord['login'] = 1;
+                    $tempRecord['disable'] = 0;
+                    $tempRecord['password'] = $this->getRandomPasswordHash();
 
-                    if ($this->connection->insert('tl_member', $rowTemp)) {
+                    if ($this->connection->insert('tl_member', $tempRecord)) {
                         $log = \sprintf(
                             'Inserted new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.',
-                            $rowTemp['firstname'],
-                            $rowTemp['lastname'],
-                            $rowTemp['sacMemberId'],
+                            $tempRecord['firstname'],
+                            $tempRecord['lastname'],
+                            $tempRecord['sacMemberId'],
                         );
 
                         $this->contaoGeneralLogger?->info($log, ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER)]);
@@ -344,20 +344,20 @@ class SyncMemberDatabase
                     }
                 } else {
                     // Update member if necessary
-                    $rowTemp['login'] = 1;
-                    $rowTemp['disable'] = 0;
-                    $rowTemp['isSacMember'] = 1;
+                    $tempRecord['login'] = 1;
+                    $tempRecord['disable'] = 0;
+                    $tempRecord['isSacMember'] = 1;
 
                     // Update record if there was a change
-                    if ($this->connection->update('tl_member', $rowTemp, ['sacMemberId' => $sacMemberId], ['sacMemberId' => Types::INTEGER])) {
+                    if ($this->connection->update('tl_member', $tempRecord, ['sacMemberId' => $sacMemberId], ['sacMemberId' => Types::INTEGER])) {
                         // update tstamp
                         $this->connection->update('tl_member', ['tstamp' => time()], ['sacMemberId' => $sacMemberId], ['sacMemberId' => Types::INTEGER]);
 
                         $log = \sprintf(
                             'Updated SAC-member "%s %s" with SAC-User-ID: %s in tl_member.',
-                            $rowTemp['firstname'],
-                            $rowTemp['lastname'],
-                            $rowTemp['sacMemberId'],
+                            $tempRecord['firstname'],
+                            $tempRecord['lastname'],
+                            $tempRecord['sacMemberId'],
                         );
 
                         $this->contaoGeneralLogger?->info($log);
@@ -372,7 +372,7 @@ class SyncMemberDatabase
             $this->disableAllNonMemberAccounts();
 
             // Set password where is none.
-            $this->setPassword(20);
+            $this->populateMissingPasswords(20);
 
             $this->connection->commit();
         } catch (\Exception $e) {
@@ -394,7 +394,7 @@ class SyncMemberDatabase
         // https://www.woltlab.com/community/thread/292971-php-8-there-is-no-active-transaction/?postID=1872216#post1872216
         $this->dropTempTable();
 
-        $this->syncLog['processed'] = \count($arrAllTemp);
+        $this->syncLog['processed'] = \count($tempRecords);
     }
 
     /**
@@ -409,9 +409,9 @@ class SyncMemberDatabase
      * :beitragskategorie, :s_info_1, :s_info_2, :s_info_3, :bemerkungen, :saldo,
      * :empty, :anzahl_die_alpen, :anzahl_sektionsbulletin
      */
-    protected function parseLine(array $arrLine): array
+    protected function parseLine(array $dataLine): array
     {
-        $arrLine = array_map(
+        $dataLine = array_map(
             static function ($value) {
                 if (empty($value) || is_numeric($value) || !\is_string($value)) {
                     return $value;
@@ -419,76 +419,75 @@ class SyncMemberDatabase
 
                 return mb_convert_encoding(trim($value), 'UTF-8', 'ISO-8859-1');
             },
-            $arrLine,
+            $dataLine,
         );
 
         $defaultCountry = 'CH';
-        $rowUser = [];
-        $rowUser['sacMemberId'] = (int) $arrLine[0]; // int
-        $rowUser['username'] = (string) $arrLine[0]; // string
+        $dataMember = [];
+        $dataMember['sacMemberId'] = (int) $dataLine[0]; // int
+        $dataMember['username'] = (string) $dataLine[0]; // string
         // Remove leading zeros 00004253 -> 4253
-        $rowUser['sectionId'] = [ltrim((string) $arrLine[1], '0')]; // array => allow multi membership
-        $rowUser['firstname'] = $arrLine[3]; // string
-        $rowUser['lastname'] = $arrLine[2]; // string
-        $rowUser['addressExtra'] = $arrLine[4]; // string
-        $rowUser['street'] = trim($arrLine[5]); // string
-        $rowUser['streetExtra'] = $arrLine[6]; // string
-        $rowUser['postal'] = $arrLine[7]; // string
-        $rowUser['city'] = $arrLine[8]; // string
-        $rowUser['country'] = empty($arrLine[9]) ? $defaultCountry : strtoupper($arrLine[9]); // string
-        $rowUser['dateOfBirth'] = (string) strtotime($arrLine[10]); // string!
-        $rowUser['phone'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $arrLine[12]); // string
-        $rowUser['mobile'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $arrLine[14]); // string
-        $rowUser['email'] = $arrLine[16]; // string
-        $rowUser['gender'] = match ($arrLine[17]) {
+        $dataMember['sectionId'] = [ltrim((string) $dataLine[1], '0')]; // array => allow multi membership
+        $dataMember['firstname'] = $dataLine[3]; // string
+        $dataMember['lastname'] = $dataLine[2]; // string
+        $dataMember['addressExtra'] = $dataLine[4]; // string
+        $dataMember['street'] = trim($dataLine[5]); // string
+        $dataMember['streetExtra'] = $dataLine[6]; // string
+        $dataMember['postal'] = $dataLine[7]; // string
+        $dataMember['city'] = $dataLine[8]; // string
+        $dataMember['country'] = empty($dataLine[9]) ? $defaultCountry : strtoupper($dataLine[9]); // string
+        $dataMember['dateOfBirth'] = (string) strtotime($dataLine[10]); // string!
+        $dataMember['phone'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $dataLine[12]); // string
+        $dataMember['mobile'] = preg_replace('/[^\\d\\+\\s]/', '', (string) $dataLine[14]); // string
+        $dataMember['email'] = $dataLine[16]; // string
+        $dataMember['gender'] = match ($dataLine[17]) {
             'Weiblich' => 'female',
             'Männlich' => 'male', // Be sure the string has already been converted from ISO-8859-1 to UTF-8
             default => 'other',
         };
-        $rowUser['profession'] = $arrLine[18]; // string
-        $rowUser['language'] = 'd' === strtolower($arrLine[19]) ? $this->sacevtLocale : strtolower($arrLine[19]); // string
-        $rowUser['entryYear'] = $arrLine[20]; // string
-        $rowUser['membershipType'] = $arrLine[23]; // string
-        $rowUser['sectionInfo1'] = $arrLine[24]; // string
-        $rowUser['sectionInfo2'] = $arrLine[25]; // string
-        $rowUser['sectionInfo3'] = $arrLine[26]; // string
-        $rowUser['sectionInfo4'] = $arrLine[27]; // string
-        $rowUser['debit'] = $arrLine[28]; // string
-        $rowUser['memberStatus'] = $arrLine[29]; // string
+        $dataMember['profession'] = $dataLine[18]; // string
+        $dataMember['language'] = 'd' === strtolower($dataLine[19]) ? $this->sacevtLocale : strtolower($dataLine[19]); // string
+        $dataMember['entryYear'] = $dataLine[20]; // string
+        $dataMember['membershipType'] = $dataLine[23]; // string
+        $dataMember['sectionInfo1'] = $dataLine[24]; // string
+        $dataMember['sectionInfo2'] = $dataLine[25]; // string
+        $dataMember['sectionInfo3'] = $dataLine[26]; // string
+        $dataMember['sectionInfo4'] = $dataLine[27]; // string
+        $dataMember['debit'] = $dataLine[28]; // string
+        $dataMember['memberStatus'] = $dataLine[29]; // string
 
-        return $rowUser;
+        return $dataMember;
     }
 
-    protected function insertOrUpdateTempMember(array $arrData): void
+    protected function insertOrUpdateTempMember(array $dataMember): void
     {
-        if (empty($arrData['sacMemberId'])) {
+        if (empty($dataMember['sacMemberId'])) {
             return;
         }
 
-        $dataActiveMember = $this->connection
-            ->fetchAssociative(
-                \sprintf('SELECT id,sectionId FROM %s WHERE sacMemberId = ?', self::TEMP_TABLE_NAME),
-                [$arrData['sacMemberId']],
-                [Types::INTEGER],
-            )
-        ;
+        $dataTempMember = $this->connection->fetchAssociative(
+            \sprintf('SELECT id,sectionId FROM %s WHERE sacMemberId = ?', self::TEMP_TABLE_NAME),
+            [$dataMember['sacMemberId']],
+            [Types::INTEGER],
+        );
 
-        if (false === $dataActiveMember) {
+        if (false === $dataTempMember) {
             // Insert new temp member
-            $arrData['sectionId'] = serialize($this->formatSectionId($arrData['sectionId']));
-            $arrData['phone'] = PhoneNumberFormatter::format($arrData['phone']);
-            $arrData['mobile'] = PhoneNumberFormatter::format($arrData['mobile']);
+            $dataMember['sectionId'] = serialize($this->formatSectionId($dataMember['sectionId']));
+            $dataMember['phone'] = PhoneNumberFormatter::format($dataMember['phone']);
+            $dataMember['mobile'] = PhoneNumberFormatter::format($dataMember['mobile']);
 
-            $this->connection->insert(self::TEMP_TABLE_NAME, $arrData);
+            $this->connection->insert(self::TEMP_TABLE_NAME, $dataMember);
         } else {
             // The user is a member of multiple sections and already exists in the temp-table.
             // Then we append the section id only.
-            $sectionIds = array_filter(array_unique(array_merge(unserialize($dataActiveMember['sectionId']), $arrData['sectionId'])));
+            $sectionIds = array_filter(array_unique(array_merge(unserialize($dataTempMember['sectionId']), $dataMember['sectionId'])));
+
             $set = [
                 'sectionId' => serialize($this->formatSectionId($sectionIds)),
             ];
 
-            $this->connection->update(self::TEMP_TABLE_NAME, $set, ['id' => $dataActiveMember['id']], ['id' => Types::INTEGER]);
+            $this->connection->update(self::TEMP_TABLE_NAME, $set, ['id' => $dataTempMember['id']], ['id' => Types::INTEGER]);
         }
     }
 
@@ -507,9 +506,9 @@ class SyncMemberDatabase
      */
     protected function disableAllNonMemberAccounts(): void
     {
-        $totalMembers = $this->connection->fetchOne('SELECT COUNT(*) FROM tl_member');
+        $memberCount = $this->connection->fetchOne('SELECT COUNT(*) FROM tl_member');
 
-        if (0 === $totalMembers) {
+        if (0 === $memberCount) {
             return;
         }
 
@@ -520,7 +519,7 @@ class SyncMemberDatabase
 
         $disabledMemberIds = $this->connection->fetchFirstColumn($sql);
 
-        $percentDisabledAccounts = round(\count($disabledMemberIds) / $totalMembers * 100, 1);
+        $percentDisabledAccounts = round(\count($disabledMemberIds) / $memberCount * 100, 1);
 
         if ($percentDisabledAccounts > self::DISABLE_THRESHOLD_PERCENT) {
             throw new \RuntimeException(\sprintf('Should disable %d%% of the members, which could indicate an error. Aborting sync process.', $percentDisabledAccounts));
@@ -539,14 +538,14 @@ class SyncMemberDatabase
                 ];
 
                 $this->connection->update('tl_member', $set, ['id' => $memberId], ['id' => Types::INTEGER]);
-                $rowDisabledMember = $this->connection->fetchAssociative('SELECT * FROM tl_member WHERE id = ?', [$memberId], [Types::INTEGER]);
+                $disabledMember = $this->connection->fetchAssociative('SELECT * FROM tl_member WHERE id = ?', [$memberId], [Types::INTEGER]);
 
-                if (false !== $rowDisabledMember) {
+                if (false !== $disabledMember) {
                     $log = \sprintf(
                         'Disable SAC-Member "%s %s" SAC-User-ID: %s during the sync process. User not found in the CSV dump from SAC Zentralverband Bern.',
-                        $rowDisabledMember['firstname'],
-                        $rowDisabledMember['lastname'],
-                        $rowDisabledMember['sacMemberId'],
+                        $disabledMember['firstname'],
+                        $disabledMember['lastname'],
+                        $disabledMember['sacMemberId'],
                     );
 
                     $this->contaoGeneralLogger?->info($log, ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DATABASE_SYNC_DISABLE_MEMBER)]);
@@ -577,7 +576,7 @@ class SyncMemberDatabase
      * Correctly format the section ids (the key and the order is important!): e.g. [0
      * => '4250', 2 => '4252'] -> user is a member of two SAC sektions/ortsgruppen.
      */
-    protected function formatSectionId(array $arrValue): array
+    protected function formatSectionId(array $sectionIds): array
     {
         $availableSections = array_map('strval', array_keys($this->util->listSacSections()));
 
@@ -585,7 +584,7 @@ class SyncMemberDatabase
             $availableSections,
             static fn (string $sectionId) => \in_array(
                 $sectionId,
-                $arrValue,
+                $sectionIds,
                 true,
             ),
             ARRAY_FILTER_USE_BOTH,
@@ -658,9 +657,9 @@ class SyncMemberDatabase
      * field is empty. The IDs are then iterated over to set a new password and update
      * the timestamp.
      */
-    protected function setPassword(int $limit = 20): void
+    protected function populateMissingPasswords(int $limit = 20): void
     {
-        $arrIds = $this->connection->fetchFirstColumn(
+        $ids = $this->connection->fetchFirstColumn(
             'SELECT id FROM tl_member WHERE password = ? LIMIT ?',
             [
                 '',
@@ -672,7 +671,7 @@ class SyncMemberDatabase
             ],
         );
 
-        foreach ($arrIds as $id) {
+        foreach ($ids as $id) {
             $this->connection->update(
                 'tl_member',
                 [
