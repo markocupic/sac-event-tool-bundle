@@ -26,6 +26,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
@@ -69,6 +70,7 @@ class SyncMemberDatabase
 
     public function __construct(
         private readonly Connection $connection,
+        private readonly LockFactory $lockFactory,
         private readonly PasswordHasherFactory $passwordHasherFactory,
         private readonly Util $util,
         #[\SensitiveParameter]
@@ -87,22 +89,29 @@ class SyncMemberDatabase
     public function run(): void
     {
         $stopWatchEvent = $this->stopWatchStart();
-        $this->resetSyncLog();
-        $this->fetchFilesFromFtp();
-        $this->syncContaoDatabase();
-        $this->syncLog['duration'] = round($stopWatchEvent->stop()->getDuration() / 1000);
+        $lock = $this->lockFactory->createLock(self::class);
+        $lock->acquire(true);
 
-        $log = \sprintf(
-            'Successfully synced members from SAC Zentralverband database (Bern) to the Contao database (tl_member). Processed: %d, Inserts: %d, Updates: %d, Disabled: %d, Duration: %d s',
-            $this->syncLog['processed'],
-            $this->syncLog['inserts'],
-            $this->syncLog['updates'],
-            $this->syncLog['disabled'],
-            $this->syncLog['duration'],
-        );
+        try {
+            $this->resetSyncLog();
+            $this->fetchFilesFromFtp();
+            $this->syncContaoDatabase();
+            $this->syncLog['duration'] = round($stopWatchEvent->stop()->getDuration() / 1000);
 
-        $this->contaoGeneralLogger?->info($log, ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DATABASE_SYNC_SUCCESS)]);
-        $this->syncLog['log'][] = $log;
+            $log = \sprintf(
+                'Successfully synced members from SAC Zentralverband database (Bern) to the Contao database (tl_member). Processed: %d, Inserts: %d, Updates: %d, Disabled: %d, Duration: %d s',
+                $this->syncLog['processed'],
+                $this->syncLog['inserts'],
+                $this->syncLog['updates'],
+                $this->syncLog['disabled'],
+                $this->syncLog['duration'],
+            );
+
+            $this->contaoGeneralLogger?->info($log, ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DATABASE_SYNC_SUCCESS)]);
+            $this->syncLog['log'][] = $log;
+        } finally {
+            $lock->release();
+        }
     }
 
     public function getSyncLog(): array
@@ -156,7 +165,7 @@ class SyncMemberDatabase
         ;
 
         if (!$finder->hasResults()) {
-            throw new \RuntimeException(\sprintf('Could not load CSV from "%s". Database sync failed.', $this->ftp_hostname));
+            throw new \RuntimeException(\sprintf('Could find any CSV files at "%s". Database sync failed.', $this->ftp_hostname));
         }
 
         $fileMap = [];
@@ -185,10 +194,10 @@ class SyncMemberDatabase
                 throw new \Exception($errMsg);
             }
 
-            $objSplFile = $fileMap[$sectionId];
+            $splFileInfo = $fileMap[$sectionId];
 
             try {
-                $fs->copy($objSplFile->getPathname(), $targetPath);
+                $fs->copy($splFileInfo->getPathname(), $targetPath);
             } catch (FileNotFoundException $e) {
                 $errMsg = \sprintf('Could not find the CSV file "%s" at "%s".', basename($targetPath), $this->ftp_hostname);
                 $this->contaoErrorLogger?->error($errMsg);
@@ -207,7 +216,7 @@ class SyncMemberDatabase
      * Retrieves a list of CSV files from the temporary directory and validates their
      * existence, readability, and size.
      *
-     * @return array<\SplFileObject>
+     * @return array<\SplFileInfo>
      *
      * @throws \RuntimeException
      */
@@ -224,17 +233,17 @@ class SyncMemberDatabase
                 throw new \RuntimeException(\sprintf('Could not find the CSV file "%s".', $targetPath));
             }
 
-            $objSplFile = new \SplFileObject($targetPath);
+            $splFileInfo = new \SplFileInfo($targetPath);
 
-            if (!$objSplFile->isReadable()) {
+            if (!$splFileInfo->isReadable()) {
                 throw new \RuntimeException(\sprintf('Could not read the CSV file "%s".', $targetPath));
             }
 
-            if (!str_contains(file_get_contents($targetPath), self::FTP_DB_DUMP_END_OF_FILE_STRING) || $objSplFile->getSize() < 1000) {
+            if (!str_contains(file_get_contents($targetPath), self::FTP_DB_DUMP_END_OF_FILE_STRING) || $splFileInfo->getSize() < 1000) {
                 throw new \RuntimeException(\sprintf('The CSV file "%s" seems to be empty or incomplete.', $targetPath));
             }
 
-            $arrFiles[$sectionId] = $objSplFile;
+            $arrFiles[$sectionId] = $splFileInfo;
         }
 
         return $arrFiles;
@@ -278,11 +287,11 @@ class SyncMemberDatabase
         try {
             $arrFiles = $this->getCsvFilesFromTempDir();
 
-            foreach ($arrFiles as $objSplFile) {
-                $stream = fopen($objSplFile->getRealPath(), 'r');
+            foreach ($arrFiles as $splFileInfo) {
+                $stream = fopen($splFileInfo->getRealPath(), 'r');
 
                 if (!$stream) {
-                    throw new \RuntimeException(\sprintf('Could not open file "%s".', $objSplFile->getRealPath()));
+                    throw new \RuntimeException(\sprintf('Could not open file "%s".', $splFileInfo->getRealPath()));
                 }
 
                 while (!feof($stream)) {
@@ -293,7 +302,7 @@ class SyncMemberDatabase
 
                         $arrLine[0] = (int) $arrLine[0];
 
-                        // First column must contain the sac member id (e.g. 134100)
+                        // The first column must contain the sac member id (e.g., 134100)
                         if ($arrLine[0] < 1) {
                             continue;
                         }
@@ -404,7 +413,7 @@ class SyncMemberDatabase
     {
         $arrLine = array_map(
             static function ($value) {
-                if (empty($value) || is_numeric($value) || \is_array($value) || !\is_string($value)) {
+                if (empty($value) || is_numeric($value) || !\is_string($value)) {
                     return $value;
                 }
 
@@ -434,7 +443,6 @@ class SyncMemberDatabase
         $rowUser['gender'] = match ($arrLine[17]) {
             'Weiblich' => 'female',
             'Männlich' => 'male', // Be sure the string has already been converted from ISO-8859-1 to UTF-8
-            'Andere' => 'other',
             default => 'other',
         };
         $rowUser['profession'] = $arrLine[18]; // string
@@ -457,7 +465,7 @@ class SyncMemberDatabase
             return;
         }
 
-        $existingMember = $this->connection
+        $dataActiveMember = $this->connection
             ->fetchAssociative(
                 \sprintf('SELECT id,sectionId FROM %s WHERE sacMemberId = ?', self::TEMP_TABLE_NAME),
                 [$arrData['sacMemberId']],
@@ -465,7 +473,7 @@ class SyncMemberDatabase
             )
         ;
 
-        if (false === $existingMember) {
+        if (false === $dataActiveMember) {
             // Insert new temp member
             $arrData['sectionId'] = serialize($this->formatSectionId($arrData['sectionId']));
             $arrData['phone'] = PhoneNumberFormatter::format($arrData['phone']);
@@ -473,14 +481,14 @@ class SyncMemberDatabase
 
             $this->connection->insert(self::TEMP_TABLE_NAME, $arrData);
         } else {
-            // The user is a member of multiple sections and already exists in the temp table
+            // The user is a member of multiple sections and already exists in the temp-table.
             // Then we append the section id only.
-            $arrSectionIds = array_filter(array_unique(array_merge(unserialize($existingMember['sectionId']), $arrData['sectionId'])));
+            $sectionIds = array_filter(array_unique(array_merge(unserialize($dataActiveMember['sectionId']), $arrData['sectionId'])));
             $set = [
-                'sectionId' => serialize($this->formatSectionId($arrSectionIds)),
+                'sectionId' => serialize($this->formatSectionId($sectionIds)),
             ];
 
-            $this->connection->update(self::TEMP_TABLE_NAME, $set, ['id' => $existingMember['id']], ['id' => Types::INTEGER]);
+            $this->connection->update(self::TEMP_TABLE_NAME, $set, ['id' => $dataActiveMember['id']], ['id' => Types::INTEGER]);
         }
     }
 
@@ -506,7 +514,7 @@ class SyncMemberDatabase
         }
 
         $sql = \sprintf(
-            'SELECT id FROM tl_member WHERE disable = 0 AND sacMemberId NOT IN (SELECT sacMemberId FROM %s)',
+            'SELECT m.id FROM tl_member AS m WHERE disable = 0 AND NOT EXISTS (SELECT 1 FROM %s AS t WHERE t.sacMemberId = m.sacMemberId)',
             self::TEMP_TABLE_NAME,
         );
 
@@ -567,7 +575,7 @@ class SyncMemberDatabase
 
     /**
      * Correctly format the section ids (the key and the order is important!): e.g. [0
-     * => '4250', 2 => '4252'] -> user is member of two SAC Sektionen/Ortsgruppen.
+     * => '4250', 2 => '4252'] -> user is a member of two SAC sektions/ortsgruppen.
      */
     protected function formatSectionId(array $arrValue): array
     {
