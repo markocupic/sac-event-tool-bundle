@@ -61,14 +61,14 @@ readonly class MemberDatabaseSyncCron
 
         if (!empty($errors)) {
             foreach ($errors as $error) {
-                $this->contaoErrorLogger->error($error);
+                $this->contaoErrorLogger?->error($error);
             }
 
             return;
         }
 
         $message = \sprintf(
-            'Successfully synced members from SAC Zentralverband database (Bern) to the Contao database (tl_member). Processed: %d, Inserts: %d, Updates: %d, Disabled: %d, Duration: %s',
+            'Successfully synced members from SAC Zentralverband database (Bern) to the Contao database (tl_member). Processed: %d, Inserts: %d, Updates: %d, Disabled: %d, Duration: %d s',
             $syncLogger->getCountProcessedRecords(),
             \count($syncLogger->getInsertMessages()),
             \count($syncLogger->getUpdateMessages()),
