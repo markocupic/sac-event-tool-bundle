@@ -34,7 +34,7 @@ class Log
     /**
      * MEMBER_DATABASE_SYNC: Log type when a new member has been updated.
      */
-    public const string MEMBER_DATABASE_SYNC_UPDATE_NEW_MEMBER = 'MEMBER_DB_SYNC_UPDATE';
+    public const string MEMBER_DATABASE_SYNC_UPDATE_MEMBER = 'MEMBER_DB_SYNC_UPDATE';
 
     /**
      * MEMBER_DATABASE_SYNC: Log type when a new member has been disabled.

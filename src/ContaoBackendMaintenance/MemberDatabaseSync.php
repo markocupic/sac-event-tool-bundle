@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\ContaoBackendMaintenance;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\Exception\ResponseException;
 use Contao\MaintenanceModuleInterface;
+use Markocupic\SacEventToolBundle\Database\SyncMember\SyncLogger;
 use Markocupic\SacEventToolBundle\Database\SyncMemberDatabase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,8 +58,9 @@ readonly class MemberDatabaseSync implements MaintenanceModuleInterface
         }
 
         if ($this->getRequest()->isXmlHttpRequest()) {
-            $this->syncMemberDatabase->run();
-            $arrSyncLog = $this->syncMemberDatabase->getSyncLog();
+            $syncLogger = new SyncLogger();
+            $this->syncMemberDatabase->run($syncLogger);
+            $arrSyncLog = $syncLogger->toArray();
             $response = new JsonResponse($arrSyncLog);
 
             throw new ResponseException($response);

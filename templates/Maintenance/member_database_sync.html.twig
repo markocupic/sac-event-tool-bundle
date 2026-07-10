@@ -13,8 +13,10 @@
                                 Bleiben Sie auf der Seite und schliessen Sie das Fenster erst, wenn Sie dazu aufgefordert werden.
                             </p>
                         </div>
-                        <div v-if="isSuccess" class="tl_message">
-                            <p class="tl_confirm">Die Datenbank Synchronisierung konnte erfolgreich abgeschlossen werden. Sie können das Fenster jetzt schliessen.</p>
+                        <div v-if="hasResponse" class="tl_message">
+                            <p v-if="hasError==false" class="tl_confirm">Die Datenbank Synchronisierung konnte erfolgreich abgeschlossen werden. Sie können das Fenster jetzt schliessen.</p>
+                            <p v-if="hasError==true" class="tl_error">Die Datenbank Synchronisierung konnte leider nicht erfolgreich abgeschlossen werden.</p>
+
                             <p></p>
                             <div class="tl_tbox">
                                 <table v-if="log" class="with-border with-padding">
@@ -25,21 +27,25 @@
                                     </tr>
                                     <tr>
                                         <td>Anz. verarbeiteter Datensätze:</td>
-                                        <td>[[ log.processed ]]</td>
+                                        <td>[[ log.countProcessed ]]</td>
                                     </tr>
                                     <tr>
                                         <td>Deaktiviert:</td>
-                                        <td>[[ log.disabled ]]</td>
+                                        <td>[[ log.countDisabled ]]</td>
                                     </tr>
                                     <tr>
                                         <td>Updates:</td>
-                                        <td>[[ log.updates ]]</td>
+                                        <td>[[ log.countUpdates ]]</td>
                                     </tr>
                                     <tr>
                                         <td>Inserts:</td>
-                                        <td>[[ log.inserts ]]</td>
+                                        <td>[[ log.countInserts ]]</td>
                                     </tr>
-                                    <tr v-for="(message, index) in log.log">
+                                    <tr v-for="(message, index) in log.errors">
+                                        <td>#[[ index ]]</td>
+                                        <td>[[ message ]]</td>
+                                    </tr>
+                                    <tr v-for="(message, index) in log.messages">
                                         <td>#[[ index ]]</td>
                                         <td>[[ message ]]</td>
                                     </tr>
@@ -47,7 +53,7 @@
                                 </table>
                             </div>
                         </div>
-                        <div v-if="isError" class="tl_message">
+                        <div v-if="!hasResponse && hasError" class="tl_message">
                             <p class="tl_error">Datenbank Synchronisierung konnte nicht erfolgreich abgeschlossen werden. Bitte öffnen Sie das System-Log für weitere Details.</p>
                         </div>
                         <div>
@@ -60,82 +66,82 @@
         </div>
         {% set attributes = attrs()
             .setIfExists('nonce', csp_nonce('script-src'))
-            .set('src', asset('vue/dist/vue.global.prod.js', 'markocupic_sac_event_tool'))
-        %}
+            .set('src', asset('vue/dist/vue.global.prod.js', 'markocupic_sac_event_tool')) %}
         <script{{ attributes }}></script>
         <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-            document.addEventListener('DOMContentLoaded', () => {
-                new MemberDatabaseSyncMaintenance('#memberDatabaseSyncApp');
-            });
+          document.addEventListener('DOMContentLoaded', () => {
+            new MemberDatabaseSyncMaintenance('#memberDatabaseSyncApp');
+          });
 
-            MemberDatabaseSyncMaintenance = class {
-                constructor(appId) {
-                    const {createApp} = Vue
+          MemberDatabaseSyncMaintenance = class {
+            constructor(appId) {
+              const {createApp} = Vue
 
-                    let app = createApp({
-                        data() {
-                            return {
-                                timer: null,
-                                time: 0,
-                                isRunning: false,
-                                isError: false,
-                                isSuccess: false,
-                                log: null,
-                            };
+              let app = createApp({
+                data() {
+                  return {
+                    timer: null,
+                    time: 0,
+                    isRunning: false,
+                    hasResponse: false,
+                    hasError: false,
+                    log: null,
+                  };
+                },
+                mounted() {
+                  this.run();
+                },
+                methods: {
+                  run: async function run() {
+                    this.startTimer();
+                    this.isRunning = true;
+                    const url = window.location.href;
+
+                    try {
+                      const response = await fetch(url, {
+                        headers: {
+                          "X-Requested-With": "XMLHttpRequest",
                         },
-                        mounted() {
-                            this.run();
-                        },
-                        methods: {
-                            run: async function run() {
-                                this.startTimer();
-                                this.isRunning = true;
-                                const url = window.location.href;
+                      });
 
-                                try {
-                                    const response = await fetch(url, {
-                                        headers: {
-                                            "X-Requested-With": "XMLHttpRequest",
-                                        },
-                                    });
+                      if (!response.ok) {
+                        this.isRunning = false;
+                        this.hasError = true;
+                        this.resetTimer();
+                        throw new Error(`Response status: ${response.status}`);
+                      }
 
-                                    if (!response.ok) {
-                                        this.isRunning = false;
-                                        this.isError = true;
-                                        this.resetTimer();
-                                        throw new Error(`Response status: ${response.status}`);
-                                    }
+                      this.hasResponse = true;
+                      this.log = await response.json();
+                      this.hasError = this.log.hasError;
+                      this.isRunning = false;
+                      this.stopTimer();
+                    } catch (error) {
+                      this.resetTimer();
+                    }
+                  },
+                  startTimer: function startTimer() {
+                    this.resetTimer();
 
-                                    this.log = await response.json();
-                                    this.isSuccess = true;
-                                    this.isRunning = false;
-                                    this.stopTimer();
-                                } catch (error) {
-                                    this.resetTimer();
-                                }
-                            },
-                            startTimer: function startTimer() {
-                                this.resetTimer();
-
-                                this.timer = window.setInterval(() => {
-                                    this.time++;
-                                }, 1000);
-                            },
-                            resetTimer: function resetTimer() {
-                                clearInterval(this.timer);
-                                this.timer = null;
-                                this.timer = 0;
-                            },
-                            stopTimer: function resetTimer() {
-                                clearInterval(this.timer);
-                                this.timer = null;
-                            },
-                        }
-                    });
-                    app.config.compilerOptions.delimiters = ['[[ ', ' ]]'];
-                    app.mount(appId);
+                    this.timer = window.setInterval(() => {
+                      this.time++;
+                    }, 1000);
+                  },
+                  resetTimer: function resetTimer() {
+                    clearInterval(this.timer);
+                    this.timer = null;
+                    this.timer = 0;
+                  },
+                  stopTimer: function resetTimer() {
+                    clearInterval(this.timer);
+                    this.timer = null;
+                  },
                 }
+              });
+              app.config.compilerOptions.delimiters = ['[[ ', ' ]]'];
+              app.mount(appId);
             }
+          }
         </script>
     {% else %}
         <form class="tl_form" method="get">

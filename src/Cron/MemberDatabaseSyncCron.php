@@ -16,8 +16,12 @@ namespace Markocupic\SacEventToolBundle\Cron;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCronJob;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Monolog\ContaoContext;
+use Markocupic\SacEventToolBundle\Config\Log;
+use Markocupic\SacEventToolBundle\Database\SyncMember\SyncLogger;
 use Markocupic\SacEventToolBundle\Database\SyncMemberDatabase;
 use Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser;
+use Psr\Log\LoggerInterface;
 
 #[AsCronJob('1 5 * * *')]
 readonly class MemberDatabaseSyncCron
@@ -26,6 +30,8 @@ readonly class MemberDatabaseSyncCron
         private ContaoFramework $framework,
         private SyncMemberDatabase $syncMemberDatabase,
         private SyncMemberWithUser $syncMemberWithUser,
+        private LoggerInterface|null $contaoGeneralLogger = null,
+        private LoggerInterface|null $contaoErrorLogger = null,
     ) {
     }
 
@@ -48,7 +54,41 @@ readonly class MemberDatabaseSyncCron
 
     private function syncMemberDatabase(): void
     {
-        $this->syncMemberDatabase->run();
+        $syncLogger = new SyncLogger();
+        $this->syncMemberDatabase->run($syncLogger);
+
+        $errors = $syncLogger->getErrors();
+
+        if (!empty($errors)) {
+            foreach ($errors as $error) {
+                $this->contaoErrorLogger->error($error);
+            }
+
+            return;
+        }
+
+        $message = \sprintf(
+            'Successfully synced members from SAC Zentralverband database (Bern) to the Contao database (tl_member). Processed: %d, Inserts: %d, Updates: %d, Disabled: %d, Duration: %s',
+            $syncLogger->getCountProcessedRecords(),
+            \count($syncLogger->getInsertMessages()),
+            \count($syncLogger->getUpdateMessages()),
+            \count($syncLogger->getDisabledMessages()),
+            $syncLogger->getDuration(),
+        );
+
+        $this->contaoGeneralLogger?->info($message, ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DATABASE_SYNC_SUCCESS)]);
+
+        foreach ($syncLogger->getInsertMessages() as $message) {
+            $this->contaoGeneralLogger?->info($message, ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER)]);
+        }
+
+        foreach ($syncLogger->getUpdateMessages() as $message) {
+            $this->contaoGeneralLogger?->info($message, ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DATABASE_SYNC_UPDATE_MEMBER)]);
+        }
+
+        foreach ($syncLogger->getDisabledMessages() as $message) {
+            $this->contaoGeneralLogger?->info($message, ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DATABASE_SYNC_DISABLE_MEMBER)]);
+        }
     }
 
     private function syncMemberWithUser(): void

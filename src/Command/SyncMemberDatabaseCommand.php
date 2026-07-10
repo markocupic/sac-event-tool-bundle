@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Command;
 
+use Markocupic\SacEventToolBundle\Database\SyncMember\SyncLogger;
 use Markocupic\SacEventToolBundle\Database\SyncMemberDatabase;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -48,41 +49,39 @@ class SyncMemberDatabaseCommand extends Command
 
         try {
             // Run the database sync
-            $this->syncMemberDatabase->run();
+            $syncLogger = new SyncLogger();
+            $this->syncMemberDatabase->run($syncLogger);
+
+            $e = $syncLogger->getException();
+
+            if ($e) {
+                throw $e;
+            }
         } catch (\Throwable $e) {
             $io->error(\sprintf('The member database sync failed: %s', $e->getMessage()));
 
             return Command::FAILURE;
         }
 
-        // Get the log
-        $arrLog = $this->syncMemberDatabase->getSyncLog();
-
         // Optionally print the detailed log lines (-v)
-        if ($output->isVerbose() && !empty($arrLog['log'])) {
+        if ($output->isVerbose() && $syncLogger->hasMessages()) {
             $io->section('Log');
-            $io->listing((array) $arrLog['log']);
+            $io->listing($syncLogger->getUpdateMessages());
+            $io->listing($syncLogger->getInsertMessages());
+            $io->listing($syncLogger->getDisabledMessages());
         }
 
         $io->section('Summary');
         $io->table(
             ['Metric', 'Value'],
             [
-                ['Processed', (string) ($arrLog['processed'] ?? 0)],
-                ['Inserts', (string) ($arrLog['inserts'] ?? 0)],
-                ['Updates', (string) ($arrLog['updates'] ?? 0)],
-                ['Duration', ($arrLog['duration'] ?? 0).' s'],
+                ['Processed', (string) $syncLogger->toArray()['countProcessed']],
+                ['Updates', (string) $syncLogger->toArray()['countUpdates']],
+                ['Inserts', (string) $syncLogger->toArray()['countInserts']],
+                ['Disabled', (string) $syncLogger->toArray()['countDisabled']],
+                ['Duration', $syncLogger->getDuration().' s'],
             ],
         );
-
-        if (!empty($arrLog['with_error'])) {
-            $io->error(\sprintf(
-                'The db sync finished with errors: %s',
-                $arrLog['exception'] ?? 'Unknown error.',
-            ));
-
-            return Command::FAILURE;
-        }
 
         $io->success('Successfully executed the db sync.');
 
