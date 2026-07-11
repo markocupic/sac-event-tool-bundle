@@ -307,9 +307,7 @@ class EventFilterFormControllerTest extends TestCase
 
     private function invokeSanitizeUrl(Request $request): string
     {
-        $reflection = new \ReflectionMethod(EventFilterFormController::class, 'sanitizeUrl');
-        $reflection->setAccessible(true);
-
-        return $reflection->invoke($this->controller, $request);
+        // Since PHP 8.1 protected members are reflection-accessible without setAccessible().
+        return (new \ReflectionMethod(EventFilterFormController::class, 'sanitizeUrl'))->invoke($this->controller, $request);
     }
 }

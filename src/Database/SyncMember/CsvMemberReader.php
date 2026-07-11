@@ -19,9 +19,17 @@ final class CsvMemberReader
     public const string DELIMITER = '$';
 
     /**
-     * @param resource $stream
+     * Reads a CSV stream and yields a CsvMemberDto for every valid line.
+     *
+     * Blank lines and lines without a positive member id (column 0) are skipped.
+     *
+     * @param resource $stream         An open, readable stream resource
+     * @param string   $defaultLocale  Locale to use when the CSV field is empty (e.g. 'de')
+     * @param string   $defaultCountry Country code to use when the CSV field is empty (e.g. 'CH')
      *
      * @return \Generator<CsvMemberDto>
+     *
+     * @throws \InvalidArgumentException When $stream is not a valid resource
      */
     public function readStream($stream, string $defaultLocale, string $defaultCountry): \Generator
     {
@@ -30,7 +38,8 @@ final class CsvMemberReader
         }
 
         while (!feof($stream)) {
-            $line = fgetcsv($stream, null, self::DELIMITER);
+            // Pass an explicit $escape ('' disables escaping) — omitting it is deprecated since PHP 8.4.
+            $line = fgetcsv($stream, null, self::DELIMITER, '"', '');
 
             if (false === $line) {
                 continue;

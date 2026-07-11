@@ -605,7 +605,7 @@ readonly class CalendarEventsUtil
             return null;
         }
 
-        return $this->getAdapter(UserModel::class)?->findByPk($id);
+        return $this->getAdapter(UserModel::class)?->findById($id);
     }
 
     public function getMainInstructorName(CalendarEventsModel $objEvent): string

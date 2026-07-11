@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 // Manipulate palette default
 PaletteManipulator::create()
+    ->addField(['addressExtra', 'poBox'], 'street', PaletteManipulator::POSITION_AFTER)
     ->addLegend('food_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
     ->addLegend('section_info_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
     ->addLegend('section_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
@@ -28,7 +29,7 @@ PaletteManipulator::create()
     ->addLegend('education_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
     ->addField(['avatar'], 'avatar_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['foodHabits'], 'food_legend', PaletteManipulator::POSITION_AFTER)
-    ->addField(['isSacMember', 'sacMemberId', 'ahvNumber', 'uuid', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'], 'section_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['isSacMember', 'sacMemberId', 'ahvNumber', 'uuid', 'sectionId', 'profession', 'entryYear', 'honoraryMember', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'debit'], 'section_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['emergencyPhone', 'emergencyPhoneName'], 'emergency_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['hasLeadClimbingEducation'], 'education_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_member');
@@ -94,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['ahvNumber'] = [
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval' => ['mandatory' => false, 'maxlength' => 16, 'rgxp' => 'ahv', 'placeholder' => '756.7086.3589.03', 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+    'eval'      => ['mandatory' => false, 'maxlength' => 16, 'rgxp' => 'ahv', 'placeholder' => '756.7086.3589.03', 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
     'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
@@ -124,7 +125,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['addressExtra'] = [
     'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
-$GLOBALS['TL_DCA']['tl_member']['fields']['streetExtra'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['poBox'] = [
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
@@ -138,6 +139,14 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['entryYear'] = [
     'inputType' => 'text',
     'eval'      => ['tl_class' => 'w50'],
     'sql'       => "varchar(5) NOT NULL default ''",
+];
+
+$GLOBALS['TL_DCA']['tl_member']['fields']['honoraryMember'] = [
+    'exclude'   => true,
+    'filter'    => true,
+    'inputType' => 'checkbox',
+    'eval'      => ['tl_class' => 'clr'],
+    'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['membershipType'] = [
@@ -172,23 +181,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo3'] = [
     'sql'       => "varchar(256) NOT NULL default ''",
 ];
 
-$GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo4'] = [
-    'exclude'   => true,
-    'filter'    => true,
-    'inputType' => 'text',
-    'eval'      => ['tl_class' => 'w50'],
-    'sql'       => "varchar(256) NOT NULL default ''",
-];
-
 $GLOBALS['TL_DCA']['tl_member']['fields']['debit'] = [
-    'exclude'   => true,
-    'filter'    => true,
-    'inputType' => 'text',
-    'eval'      => ['tl_class' => 'w50'],
-    'sql'       => "varchar(256) NOT NULL default ''",
-];
-
-$GLOBALS['TL_DCA']['tl_member']['fields']['memberStatus'] = [
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'text',
@@ -234,17 +227,16 @@ if ($user instanceof BackendUser && !$user->admin) {
         $GLOBALS['TL_DCA']['tl_member']['fields']['firstname']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['lastname']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['street']['eval']['readonly'] = 'readonly';
-        $GLOBALS['TL_DCA']['tl_member']['fields']['streetExtra']['eval']['readonly'] = 'readonly';
+        $GLOBALS['TL_DCA']['tl_member']['fields']['poBox']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['addressExtra']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['postal']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['city']['eval']['readonly'] = 'readonly';
-        $GLOBALS['TL_DCA']['tl_member']['fields']['memberStatus']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['debit']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo1']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo2']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo3']['eval']['readonly'] = 'readonly';
-        $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo4']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['entryYear']['eval']['readonly'] = 'readonly';
+        $GLOBALS['TL_DCA']['tl_member']['fields']['honoraryMember']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['membershipType']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['phone']['eval']['readonly'] = 'readonly';
         $GLOBALS['TL_DCA']['tl_member']['fields']['mobile']['eval']['readonly'] = 'readonly';

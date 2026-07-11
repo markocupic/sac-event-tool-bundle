@@ -16,49 +16,42 @@ namespace Markocupic\SacEventToolBundle\Database\SyncMember;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\Finder;
 
+/**
+ * Provides the member CSV dumps for the requested SAC sections.
+ *
+ * The remote lookup is delegated to a {@see RemoteCsvFileFinderInterface}; the
+ * matching files are copied into the project's temp directory and validated.
+ */
 final class CsvFileProvider
 {
     public const string FTP_DB_DUMP_TARGET_PATH = '%s/system/tmp/Adressen_%s.csv';
 
-    private const string FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
-
-    private string $ftpHostname;
-
-    private string $ftpUsername;
-
-    private string $ftpPassword;
+    public const string FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
 
     public function __construct(
         private readonly string $projectDir,
-        #[\SensitiveParameter]
-        array $sacevtMemberSyncCredentials,
+        private readonly RemoteCsvFileFinderInterface $csvFileFinder,
+        private readonly Filesystem $filesystem = new Filesystem(),
     ) {
-        $this->ftpHostname = (string) $sacevtMemberSyncCredentials['hostname'];
-        $this->ftpUsername = (string) $sacevtMemberSyncCredentials['username'];
-        $this->ftpPassword = (string) $sacevtMemberSyncCredentials['password'];
     }
 
     /**
-     * @return array<\SplFileInfo>
+     * Copies and validates the CSV file of every requested section.
      *
-     * @throws \Throwable
+     * @param array<int|string> $sectionIds The SAC section ids to fetch
+     *
+     * @return array<\SplFileInfo> The validated local CSV files, one per section id
+     *
+     * @throws \RuntimeException When no files are available or a section file is missing/incomplete
+     * @throws \Throwable        Any error is logged to the SyncLogger and re-thrown
      */
     public function provide(array $sectionIds, SyncLogger $syncLogger): array
     {
-        $fs = new Filesystem();
-        $ftpUrl = \sprintf('ftp://%s:%s@%s/', $this->ftpUsername, $this->ftpPassword, $this->ftpHostname);
-
-        $fileMap = [];
-
-        foreach (new Finder()->files()->in($ftpUrl)->name('*.csv') as $file) {
-            $sectionId = (int) filter_var($file->getBasename(), FILTER_SANITIZE_NUMBER_INT);
-            $fileMap[$sectionId] = $file;
-        }
+        $fileMap = $this->csvFileFinder->findCsvFiles();
 
         if (empty($fileMap)) {
-            throw new \RuntimeException(\sprintf('Could not find any CSV files at "%s". Database sync failed.', $this->ftpHostname));
+            throw new \RuntimeException(\sprintf('Could not find any CSV files at "%s". Database sync failed.', $this->csvFileFinder->getSourceName()));
         }
 
         $files = [];
@@ -68,12 +61,12 @@ final class CsvFileProvider
 
             try {
                 if (!isset($fileMap[$sectionId])) {
-                    $error = \sprintf('Could not find the CSV file "%s" at "%s".', basename($targetPath), $this->ftpHostname);
+                    $error = \sprintf('Could not find the CSV file "%s" at "%s".', basename($targetPath), $this->csvFileFinder->getSourceName());
 
                     throw new \RuntimeException($error);
                 }
 
-                $fs->copy($fileMap[$sectionId]->getPathname(), $targetPath, true);
+                $this->filesystem->copy($fileMap[$sectionId]->getPathname(), $targetPath, true);
 
                 $file = new \SplFileInfo($targetPath);
 
@@ -81,7 +74,7 @@ final class CsvFileProvider
 
                 $files[] = $file;
             } catch (\Throwable $e) {
-                $error = \sprintf('Could not find the CSV file "%s" at "%s".', basename($targetPath), $this->ftpHostname);
+                $error = \sprintf('Could not find the CSV file "%s" at "%s".', basename($targetPath), $this->csvFileFinder->getSourceName());
                 $syncLogger->addError($error);
 
                 throw $e;

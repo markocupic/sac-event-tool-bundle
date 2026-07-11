@@ -29,7 +29,7 @@ final readonly class CsvMemberDto
         public string $lastname,
         public string $addressExtra,
         public string $street,
-        public string $streetExtra,
+        public string $poBox,
         public string $postal,
         public string $city,
         public string $country,
@@ -41,27 +41,49 @@ final readonly class CsvMemberDto
         public string $profession,
         public string $language,
         public string $entryYear,
+        public int $honoraryMember,
         public string $membershipType,
         public string $sectionInfo1,
         public string $sectionInfo2,
         public string $sectionInfo3,
-        public string $sectionInfo4,
         public string $debit,
-        public string $memberStatus,
     ) {
     }
 
     /**
-     * Parses a SAC CSV export line according to the Hitobito field layout
-     * and returns a normalized CsvMemberDto.
+     * Parses a single SAC member CSV export line (Hitobito "sac_mitglieder" layout)
+     * into a normalized CsvMemberDto. Values are trimmed and converted from
+     * ISO-8859-1 to UTF-8 before mapping.
      *
-     * @see https://github.com/hitobito/hitobito_sac_cas/blob/6507d29ce25346bbc84b9820c162a1fb384f8460/app/domain/export/tabular/people/sac_mitglieder.rb#L23
-     * :id, :layer_navision_id_padded, :last_name, :first_name, :adresszusatz,
-     * :address, :postfach, :zip_code, :town, :country, :birthday, :empty,
-     * :phone_number_landline, :empty, :phone_number_mobile, :empty, :email, :gender,
-     * :empty, :language, :eintrittsjahr, :begünstigt, :ehrenmitglied,
-     * :beitragskategorie, :s_info_1, :s_info_2, :s_info_3, :bemerkungen, :saldo,
-     * :empty, :anzahl_die_alpen, :anzahl_sektionsbulletin
+     * Column index => target property (only the columns actually consumed are listed):
+     *   0 id => sacMemberId, username
+     *   1 layer_id_padded => sectionId (leading zeros stripped)
+     *   2 last_name => lastname
+     *   3 first_name => firstname
+     *   4 adresszusatz => addressExtra
+     *   5 address => street
+     *   6 postfach => poBox
+     *   7 zip_code => postal
+     *   8 town => city
+     *   9 country => country (falls back to $defaultCountry when empty)
+     *   10 birthday => dateOfBirth (unix timestamp as string, '' when empty)
+     *   12 phone_number_landline => phone
+     *   14 phone_number_mobile => mobile
+     *   16 email => email
+     *   17 gender => gender (Weiblich=female, Männlich=male, else other)
+     *   19 language => language ('d' maps to $defaultLocale)
+     *   20 eintrittsjahr => entryYear
+     *   22 ehrenmitglied => honoraryMember (Yes => 1, else 0)
+     *   23 beitragskategorie => membershipType
+     *   24 s_info_1 => sectionInfo1
+     *   25 s_info_2 => sectionInfo2
+     *   26 s_info_3 => sectionInfo3
+     *   27 bemerkungen => profession (actually holds the profession)
+     *   28 saldo => debit
+     *
+     * @see https://github.com/hitobito/hitobito_sac_cas/blob/8cc963b20ddf746e746be1d8afe13e81083c2217/app/domain/export/tabular/people/sac_mitglieder.rb#L25
+     *
+     * @param array<int, scalar|null> $line
      */
     public static function fromCsv(array $line, string $defaultCountry = 'CH', string $defaultLocale = 'de'): self
     {
@@ -85,7 +107,7 @@ final readonly class CsvMemberDto
             lastname: $line[2],
             addressExtra: $line[4],
             street: trim($line[5]),
-            streetExtra: $line[6],
+            poBox: $line[6],
             postal: $line[7],
             city: $line[8],
             country: empty($line[9]) ? $defaultCountry : strtoupper($line[9]),
@@ -98,21 +120,23 @@ final readonly class CsvMemberDto
                 'Männlich' => 'male',
                 default => 'other',
             },
-            profession: $line[18],
+            profession: $line[27],
             language: 'd' === strtolower($line[19])
                 ? $defaultLocale
                 : strtolower($line[19]),
             entryYear: $line[20],
+            honoraryMember: 'Yes' === $line[22] ? 1 : 0,
             membershipType: $line[23],
             sectionInfo1: $line[24],
             sectionInfo2: $line[25],
             sectionInfo3: $line[26],
-            sectionInfo4: $line[27],
             debit: $line[28],
-            memberStatus: $line[29],
         );
     }
 
+    /**
+     * @return array<string, mixed> all public properties keyed by their name
+     */
     public function toArray(): array
     {
         return get_object_vars($this);

@@ -45,7 +45,9 @@
     },
     "require-dev": {
         "contao/manager-plugin": "^2.12",
-        "markocupic/easy-coding-standard": "^13.0"
+        "markocupic/easy-coding-standard": "^13.0",
+        "contao/test-case": "^5.3",
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {

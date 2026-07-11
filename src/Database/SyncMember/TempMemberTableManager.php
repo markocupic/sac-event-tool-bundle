@@ -15,8 +15,13 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Database\SyncMember;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\Table;
 
+/**
+ * Manages the temporary table (tl_member_sync_temp) that buffers the imported
+ * member data while the sync is running.
+ */
 final class TempMemberTableManager
 {
     public const string TABLE_NAME = 'tl_member_sync_temp';
@@ -26,6 +31,11 @@ final class TempMemberTableManager
     ) {
     }
 
+    /**
+     * Drops a leftover temp table and (re)creates a fresh one.
+     *
+     * @throws Exception
+     */
     public function create(): void
     {
         $this->drop();
@@ -40,7 +50,7 @@ final class TempMemberTableManager
         $table->addColumn('lastname', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('addressExtra', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('street', 'string', ['length' => 256, 'default' => '']);
-        $table->addColumn('streetExtra', 'string', ['length' => 256, 'default' => '']);
+        $table->addColumn('poBox', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('postal', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('city', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('country', 'string', ['length' => 256, 'default' => '']);
@@ -52,13 +62,12 @@ final class TempMemberTableManager
         $table->addColumn('profession', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('language', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('entryYear', 'string', ['length' => 256, 'default' => '']);
+        $table->addColumn('honoraryMember', 'integer', ['notnull' => true, 'unsigned' => true, 'default' => 0]);
         $table->addColumn('membershipType', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('sectionInfo1', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('sectionInfo2', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('sectionInfo3', 'string', ['length' => 256, 'default' => '']);
-        $table->addColumn('sectionInfo4', 'string', ['length' => 256, 'default' => '']);
         $table->addColumn('debit', 'string', ['length' => 256, 'default' => '']);
-        $table->addColumn('memberStatus', 'string', ['length' => 256, 'default' => '']);
 
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['username']);
@@ -70,11 +79,16 @@ final class TempMemberTableManager
         ;
     }
 
+    /**
+     * Drops the temp table if it exists.
+     *
+     * @throws Exception
+     */
     public function drop(): void
     {
         $schema = $this->connection->createSchemaManager();
 
-        if ($schema->tablesExist(self::TABLE_NAME)) {
+        if ($schema->tablesExist([self::TABLE_NAME])) {
             $schema->dropTable(self::TABLE_NAME);
         }
     }

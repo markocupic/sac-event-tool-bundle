@@ -48,6 +48,8 @@ class ContaoUpdateEventDispatcher
      * the callbacks are triggered as late as possible.
      *
      * @param array $updatedFields the modifications to be applied to the record
+     *
+     * @return array the (potentially modified) fields to be written to the database
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onbeforesubmit', priority: -99999)]
     #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onbeforesubmit', priority: -99999)]

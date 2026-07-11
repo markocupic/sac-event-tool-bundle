@@ -20,14 +20,29 @@ final class SyncLogger
 
     private int $duration = 0;
 
+    /**
+     * @var list<string>
+     */
     private array $updateMessages = [];
 
+    /**
+     * @var list<string>
+     */
     private array $insertMessages = [];
 
+    /**
+     * @var list<string>
+     */
     private array $disabledMessages = [];
 
+    /**
+     * @var list<string>
+     */
     private array $messages = [];
 
+    /**
+     * @var list<string>
+     */
     private array $errors = [];
 
     private \Throwable|null $exception = null;
@@ -87,16 +102,25 @@ final class SyncLogger
         return $this->duration;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getInsertMessages(): array
     {
         return $this->insertMessages;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getUpdateMessages(): array
     {
         return $this->updateMessages;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getDisabledMessages(): array
     {
         return $this->disabledMessages;
@@ -107,16 +131,38 @@ final class SyncLogger
         return !empty($this->toArray()['messages']);
     }
 
+    /**
+     * @return list<string>
+     */
     public function getMessages(): array
     {
         return $this->messages;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getErrors(): array
     {
         return $this->errors;
     }
 
+    /**
+     * @return array{
+     *     countProcessed: int,
+     *     countInserts: int,
+     *     countUpdates: int,
+     *     countDisabled: int,
+     *     inserts: list<string>,
+     *     updates: list<string>,
+     *     disabled: list<string>,
+     *     messages: list<string>,
+     *     errors: list<string>,
+     *     duration: int,
+     *     hasError: bool,
+     *     exception: string|null
+     * }
+     */
     public function toArray(): array
     {
         return [

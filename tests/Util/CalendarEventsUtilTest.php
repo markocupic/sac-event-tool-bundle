@@ -15,343 +15,200 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Tests\Util;
 
 use Contao\CalendarEventsModel;
-use Contao\CalendarModel;
-use Contao\CoreBundle\Routing\ContentUrlGenerator;
-use Contao\FilesModel;
-use Contao\FrontendUser;
-use Contao\PageModel;
-use Contao\System;
 use Contao\TestCase\ContaoTestCase;
-use Contao\UserModel;
-use Doctrine\DBAL\Connection;
-use Markocupic\SacEventToolBundle\Avatar\Avatar;
-use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Filesystem\Filesystem;
-use Twig\Environment;
 
 class CalendarEventsUtilTest extends ContaoTestCase
 {
-    public static function tearDownAfterClass(): void
+    public function testGetPublicTransportBadgeReturnsTheBadgeMarkup(): void
     {
-        // The temporary directory would not be removed without this call!
-        parent::tearDownAfterClass();
+        $badge = $this->util()->getPublicTransportBadge();
 
-        unset($GLOBALS['TL_MODELS']['tl_user']);
+        $this->assertStringStartsWith('<span', $badge);
+        $this->assertStringContainsString('bg-success', $badge);
+        $this->assertStringContainsString('>ÖV</span>', $badge);
     }
 
-    protected function setUp(): void
+    /**
+     * @param array<int, string> $expected
+     *
+     * @dataProvider coordsProvider
+     */
+    public function testGetCoordsCH1903AsArray(string $raw, array $expected): void
     {
-        $tempDir = $this->getTempDir();
-        $fs = new Filesystem();
-        $fs->mkdir($tempDir.'/var/cache');
+        $event = $this->mockEvent(['coordsCH1903' => $raw]);
 
-        $GLOBALS['TL_MODELS']['tl_user'] = UserModel::class;
+        $this->assertSame($expected, $this->util()->getCoordsCH1903AsArray($event));
     }
 
-    public function testIsPublicTransportEvent(): void
+    public static function coordsProvider(): iterable
     {
-        $connection = $this->createMock(Connection::class);
-        $connection
-            ->method('fetchOne')
-            ->willReturn(1)
-        ;
+        return [
+            'CH1903+ pair' => ['2600000, 1200000', ['2600000', '1200000']],
+            'CH1903 pair' => ['600000, 200000', ['600000', '200000']],
+            'strips quotes and spaces' => ['"2600000" , "1200000"', ['2600000', '1200000']],
+            'empty string' => ['', []],
+            'single value is rejected' => ['2600000', []],
+        ];
+    }
 
-        $container = $this->getContainerWithContaoConfiguration();
-        $container->set('database_connection', $connection);
-        System::setContainer($container);
-
-        $systemAdapter = $this->mockAdapter(['getContainer']);
-        $systemAdapter
-            ->method('getContainer')
-            ->willReturn($container)
-        ;
-
-        $framework = $this->mockContaoFramework([
-            System::class => $systemAdapter,
+    public function testGetStartTstampReturnsFirstRepeat(): void
+    {
+        $event = $this->mockEvent([
+            'eventDates' => serialize([
+                ['new_repeat' => 1000],
+                ['new_repeat' => 2000],
+                ['new_repeat' => 3000],
+            ]),
         ]);
 
-        $objEventMock = $this->mockClassWithProperties(CalendarEventsModel::class);
-        $objEventMock->journey = 1;
-        $calendarEventsUtil = new CalendarEventsUtil($framework);
-        $this->assertTrue($calendarEventsUtil->isPublicTransportEvent($objEventMock));
-
-        $calendarEventsUtil = new CalendarEventsUtil($framework);
-        $objEventMock->journey = 2;
-        $this->assertFalse($calendarEventsUtil->isPublicTransportEvent($objEventMock));
+        $this->assertSame(1000, $this->util()->getStartTstamp($event));
     }
 
-    public function testGenerateInstructorContactBoxes(): void
+    public function testGetEndTstampReturnsLastRepeat(): void
     {
-        $container = $this->getContainerWithContaoConfiguration();
-
-        $objCalendarMock = $this->mockClassWithProperties(CalendarModel::class);
-        $objCalendarMock->userPortraitJumpTo = 1;
-
-        $objEventMock = $this->mockClassWithProperties(CalendarEventsModel::class);
-        $objEventMock->pid = 1;
-
-        $objEventMock
-            ->method('getRelated')
-            ->with('pid')
-            ->willReturn($objCalendarMock)
-        ;
-
-        $options = [
-            'includeDisabled' => true,
-            'includeHidden' => true,
-        ];
-
-        $connection = $this->createMock(Connection::class);
-        $connection
-            ->expects($this->exactly(1))
-            ->method('fetchFirstColumn')
-            ->willReturn([1])
-        ;
-        $container->set('database_connection', $connection);
-
-        $contentUrlGeneratorMock = $this->createMock(ContentUrlGenerator::class);
-        $contentUrlGeneratorMock
-            ->expects($this->once())
-            ->method('generate')
-            ->willReturn('profile_page')
-        ;
-        $container->set('contao.routing.content_url_generator', $contentUrlGeneratorMock);
-
-        $backendUserModel = $this->mockClassWithProperties(UserModel::class, ['id' => 1, 'username' => 'johndoe', 'firstname' => 'John', 'lastname' => 'Doe', 'phone' => '041 999 99 99', 'mobile' => '041 999 99 99', 'email' => 'john.doe@foo.bar', 'gender' => 'male', 'disable' => false, 'hideUser' => false, 'start' => '', 'stop' => '']);
-        $userAdapter = $this->mockAdapter(['findById']);
-        $userAdapter
-            ->method('findById')
-            ->willReturn($backendUserModel)
-        ;
-
-        $filesAdapter = $this->mockAdapter(['findByUuid']);
-
-        $pageModel = $this->mockClassWithProperties(PageModel::class);
-        $pageAdapter = $this->mockAdapter(['findById']);
-        $pageAdapter
-            ->method('findById')
-            ->willReturn($pageModel)
-        ;
-
-        $systemAdapter = $this->mockAdapter(['getContainer']);
-        $systemAdapter
-            ->method('getContainer')
-            ->willReturn($container)
-        ;
-
-        $framework = $this->mockContaoFramework([
-            PageModel::class => $pageAdapter,
-            UserModel::class => $userAdapter,
-            FilesModel::class => $filesAdapter,
-            System::class => $systemAdapter,
+        $event = $this->mockEvent([
+            'eventDates' => serialize([
+                ['new_repeat' => 1000],
+                ['new_repeat' => 2000],
+                ['new_repeat' => 3000],
+            ]),
         ]);
 
-        $projectDir = $this->getTempDir();
-        $avatarFemale = 'folder/female.jpg';
-        $avatarMale = 'folder/male.jpg';
-        $avatarOther = 'folder/other.jpg';
-        $container->set(Avatar::class, new Avatar($framework, $projectDir, $avatarFemale, $avatarMale, $avatarOther));
-
-        $twig = $this->createMock(Environment::class);
-        $twig
-            ->expects($this->once())
-            ->method('render')
-            ->willReturnCallback(
-                function ($template, $context) {
-                    $expectedContext = [
-                        'instructors' => [
-                            [
-                                'id' => 1,
-                                'username' => 'johndoe',
-                                'firstname' => 'John',
-                                'lastname' => 'Doe',
-                                'phone' => '041 999 99 99',
-                                'mobile' => '041 999 99 99',
-                                'email' => 'john.doe@foo.bar',
-                                'gender' => 'male',
-                                'disable' => false,
-                                'hideUser' => false,
-                                'start' => '',
-                                'stop' => '',
-                                'href' => 'profile_page?getUpcoming=1&username=johndoe',
-                                'has_link' => true,
-                                'avatar_path' => 'folder/male.jpg',
-                                'main_qualification' => '',
-                                'contact_options' => [
-                                    'phone' => '041 999 99 99',
-                                    'mobile' => '041 999 99 99',
-                                    'email' => 'john.doe@foo.bar',
-                                ],
-                            ],
-                        ],
-                    ];
-                    $this->assertSame($expectedContext, $context);
-
-                    return '';
-                },
-            )
-        ;
-        $container->set('twig', $twig);
-
-        System::setContainer($container);
-
-        $calendarEventsUtil = new CalendarEventsUtil($framework);
-
-        // We will not check the output but the $context of Twig::render($template, $context)
-        $this->assertSame('', $calendarEventsUtil->generateInstructorContactBoxes($objEventMock, $options));
+        $this->assertSame(3000, $this->util()->getEndTstamp($event));
     }
 
-    public function testGetInstructorsAsArray(): void
+    public function testStartAndEndTstampReturnZeroForEmptyDates(): void
     {
-        $userModels = [
-            $this->mockClassWithProperties(UserModel::class, ['id' => 1, 'disable' => false, 'hideUser' => false, 'start' => '', 'stop' => '']),
-            $this->mockClassWithProperties(UserModel::class, ['id' => 2, 'disable' => false, 'hideUser' => false, 'start' => '', 'stop' => '']),
-            $this->mockClassWithProperties(UserModel::class, ['id' => 3, 'disable' => true, 'hideUser' => false, 'start' => '', 'stop' => '']),
-            $this->mockClassWithProperties(UserModel::class, ['id' => 4, 'disable' => false, 'hideUser' => false, 'start' => strtotime('+1 day'), 'stop' => '']),
-            $this->mockClassWithProperties(UserModel::class, ['id' => 5, 'disable' => false, 'hideUser' => false, 'start' => '', 'stop' => strtotime('-1 day')]),
-            $this->mockClassWithProperties(UserModel::class, ['id' => 6, 'disable' => false, 'hideUser' => true, 'start' => '', 'stop' => '']),
-        ];
+        $event = $this->mockEvent(['eventDates' => '']);
 
-        $container = $this->getContainerWithContaoConfiguration();
-
-        $systemAdapter = $this->mockAdapter(['getContainer']);
-        $systemAdapter
-            ->method('getContainer')
-            ->willReturn($container)
-        ;
-
-        $userAdapter = $this->mockAdapter(['findById']);
-        $userAdapter
-            ->expects($this->exactly(18))
-            ->method('findById')
-            ->willReturn(...$userModels, ...$userModels, ...$userModels)
-        ;
-
-        $framework = $this->mockContaoFramework([
-            UserModel::class => $userAdapter,
-            System::class => $systemAdapter,
-        ]);
-
-        $framework
-            ->expects($this->atLeastOnce())
-            ->method('initialize')
-        ;
-
-        $connection = $this->createMock(Connection::class);
-        $connection
-            ->expects($this->exactly(3))
-            ->method('fetchFirstColumn')
-            ->willReturn([1, 2, 3, 4, 5, 6])
-        ;
-
-        $container->set('database_connection', $connection);
-        $container->set('contao.framework', $framework);
-
-        (new Filesystem())->mkdir($this->getTempDir().'/languages/en');
-        $container->setParameter('contao.resources_paths', $this->getTempDir());
-
-        System::setContainer($container);
-
-        $eventModel = $this->mockClassWithProperties(CalendarEventsModel::class);
-        $eventModel->id = 1;
-
-        $calendarEventsUtil = new CalendarEventsUtil($framework);
-
-        $options = [
-            'includeDisabled' => true,
-            'includeHidden' => true,
-        ];
-        $this->assertSame([1, 2, 3, 4, 5, 6], $calendarEventsUtil->getInstructorsAsArray($eventModel, $options));
-
-        $options = [
-            'includeDisabled' => false,
-            'includeHidden' => true,
-        ];
-        $this->assertSame([1, 2, 6], $calendarEventsUtil->getInstructorsAsArray($eventModel, $options));
-
-        $options = [
-            'includeDisabled' => false,
-            'includeHidden' => false,
-        ];
-        $this->assertSame([1, 2], $calendarEventsUtil->getInstructorsAsArray($eventModel, $options));
+        $this->assertSame(0, $this->util()->getStartTstamp($event));
+        $this->assertSame(0, $this->util()->getEndTstamp($event));
     }
 
-    public function testGetEventState(): void
+    public function testGetEventTimestampsReturnsAllRepeats(): void
     {
-        $container = $this->getContainerWithContaoConfiguration();
-
-        $systemAdapter = $this->mockAdapter(['getContainer']);
-        $systemAdapter
-            ->method('getContainer')
-            ->willReturn($container)
-        ;
-
-        $framework = $this->mockContaoFramework([
-            System::class => $systemAdapter,
+        $event = $this->mockEvent([
+            'eventDates' => serialize([
+                ['new_repeat' => 1000],
+                ['new_repeat' => 2000],
+            ]),
         ]);
 
-        $framework
-            ->expects($this->atLeastOnce())
-            ->method('initialize')
-        ;
-        $container->set('contao.framework', $framework);
+        $this->assertSame([1000, 2000], $this->util()->getEventTimestamps($event));
+    }
 
-        $registrationCount = 5;
-        $database = $this->createMock(Connection::class);
-        $database
-            ->expects($this->atLeastOnce())
-            ->method('fetchOne')
-            ->willReturn($registrationCount)
-        ;
-        $container->set('database_connection', $database);
+    public function testGetEventDurationPrefersDurationInfo(): void
+    {
+        $event = $this->mockEvent([
+            'durationInfo' => '2 Tage (Wochenende)',
+            'eventDates' => serialize([['new_repeat' => 1000]]),
+        ]);
 
-        $regStartTimeOffset = 6 * 60 * 60;
-        $container->setParameter('sacevt.event_registration.config.reg_start_time_offset', $regStartTimeOffset); // 6h
+        $this->assertSame('2 Tage (Wochenende)', $this->util()->getEventDuration($event));
+    }
 
-        System::setContainer($container);
-        $calendarEventsUtil = new CalendarEventsUtil($framework);
+    public function testGetEventDurationFallsBackToDateCount(): void
+    {
+        $event = $this->mockEvent([
+            'durationInfo' => '',
+            'eventDates' => serialize([
+                ['new_repeat' => 1000],
+                ['new_repeat' => 2000],
+                ['new_repeat' => 3000],
+            ]),
+        ]);
 
-        $objEvent = $this->mockClassWithProperties(CalendarEventsModel::class);
-        $objEvent->eventState = EventState::STATE_CANCELED;
-        $this->assertSame('event_status_4', $calendarEventsUtil->getEventState($objEvent));
+        $this->assertSame('3 Tage', $this->util()->getEventDuration($event));
+    }
 
-        $objEvent = $this->mockClassWithProperties(CalendarEventsModel::class);
-        $objEvent->eventState = EventState::STATE_RESCHEDULED;
-        $this->assertSame('event_status_6', $calendarEventsUtil->getEventState($objEvent));
+    public function testGetEventDurationReturnsEmptyStringWhenNothingIsSet(): void
+    {
+        $event = $this->mockEvent(['durationInfo' => '', 'eventDates' => '']);
 
-        $objEvent = $this->mockClassWithProperties(CalendarEventsModel::class);
-        $objEvent->eventState = EventState::STATE_FULLY_BOOKED;
-        $this->assertSame('event_status_3', $calendarEventsUtil->getEventState($objEvent));
+        $this->assertSame('', $this->util()->getEventDuration($event));
+    }
 
-        $objEvent = $this->mockClassWithProperties(CalendarEventsModel::class, ['startDate' => time() - 1]);
-        $this->assertSame('event_status_2', $calendarEventsUtil->getEventState($objEvent));
+    public function testGetTourProfileAsArrayReturnsEmptyArrayWithoutProfile(): void
+    {
+        $event = $this->mockEvent(['tourProfile' => '']);
 
-        $objEvent = $this->mockClassWithProperties(CalendarEventsModel::class, ['endDate' => time() - 1]);
-        $this->assertSame('event_status_2', $calendarEventsUtil->getEventState($objEvent));
+        $this->assertSame([], $this->util()->getTourProfileAsArray($event));
+    }
 
-        $objEvent = $this->mockClassWithProperties(CalendarEventsModel::class, ['setRegistrationPeriod' => true, 'registrationEndDate' => time() - 1]);
-        $this->assertSame('event_status_2', $calendarEventsUtil->getEventState($objEvent));
+    public function testGetTourProfileAsArraySkipsEmptyDays(): void
+    {
+        $event = $this->mockEvent([
+            'tourProfile' => serialize([
+                [
+                    'tourProfileAscentMeters' => '',
+                    'tourProfileAscentTime' => '',
+                    'tourProfileDescentMeters' => '',
+                    'tourProfileDescentTime' => '',
+                ],
+            ]),
+        ]);
 
-        $objEvent = $this->mockClassWithProperties(CalendarEventsModel::class, ['startDate' => strtotime('+7 days'), 'endDate' => strtotime('+8 days')]);
-        $objEvent->maxMembers = $registrationCount;
-        $this->assertSame('event_status_8', $calendarEventsUtil->getEventState($objEvent));
+        $this->assertSame([], $this->util()->getTourProfileAsArray($event));
+    }
 
-        $objEvent = $this->mockClassWithProperties(CalendarEventsModel::class, ['startDate' => strtotime('+7 days'), 'endDate' => strtotime('+8 days')]);
-        $objEvent->maxMembers = $registrationCount - 1;
-        $this->assertSame('event_status_8', $calendarEventsUtil->getEventState($objEvent));
+    public function testGetTourProfileAsArrayForSingleDay(): void
+    {
+        $event = $this->mockEvent([
+            'tourProfile' => serialize([
+                [
+                    'tourProfileAscentMeters' => '1200',
+                    'tourProfileAscentTime' => '4',
+                    'tourProfileDescentMeters' => '1000',
+                    'tourProfileDescentTime' => '3',
+                ],
+            ]),
+        ]);
 
-        $objEvent = $this->mockClassWithProperties(CalendarEventsModel::class, ['setRegistrationPeriod' => true, 'registrationStartDate' => time() - $regStartTimeOffset + 10, 'registrationEndDate' => strtotime('+6 days'), 'startDate' => strtotime('+7 days'), 'endDate' => strtotime('+8 days')]);
-        $this->assertSame('event_status_5', $calendarEventsUtil->getEventState($objEvent));
+        $this->assertSame(
+            ['Aufst: 1200 Hm/4 h, Abst: 1000 Hm/3 h'],
+            $this->util()->getTourProfileAsArray($event),
+        );
+    }
 
-        $objEvent = $this->mockClassWithProperties(CalendarEventsModel::class, ['setRegistrationPeriod' => true, 'registrationStartDate' => time() - $regStartTimeOffset - 10, 'registrationEndDate' => strtotime('+7 days'), 'startDate' => strtotime('+7 days'), 'endDate' => strtotime('+8 days')]);
-        $this->assertSame('event_status_1', $calendarEventsUtil->getEventState($objEvent));
+    public function testGetTourProfileAsArrayForMultipleDaysAddsDayPrefix(): void
+    {
+        $event = $this->mockEvent([
+            'tourProfile' => serialize([
+                [
+                    'tourProfileAscentMeters' => '1200',
+                    'tourProfileAscentTime' => '4',
+                    'tourProfileDescentMeters' => '1000',
+                    'tourProfileDescentTime' => '3',
+                ],
+                [
+                    'tourProfileAscentMeters' => '800',
+                    'tourProfileAscentTime' => '2',
+                    'tourProfileDescentMeters' => '600',
+                    'tourProfileDescentTime' => '1',
+                ],
+            ]),
+        ]);
 
-        $objEvent = $this->mockClassWithProperties(CalendarEventsModel::class, ['disableOnlineRegistration' => true, 'startDate' => strtotime('+7 days'), 'endDate' => strtotime('+8 days')]);
-        $this->assertSame('event_status_7', $calendarEventsUtil->getEventState($objEvent));
+        $this->assertSame(
+            [
+                '1. Tag: Aufst: 1200 Hm/4 h, Abst: 1000 Hm/3 h',
+                '2. Tag: Aufst: 800 Hm/2 h, Abst: 600 Hm/1 h',
+            ],
+            $this->util()->getTourProfileAsArray($event),
+        );
+    }
 
-        $objEvent = $this->mockClassWithProperties(CalendarEventsModel::class, ['startDate' => strtotime('+7 days'), 'endDate' => strtotime('+8 days')]);
-        $this->assertSame('event_status_1', $calendarEventsUtil->getEventState($objEvent));
+    private function util(): CalendarEventsUtil
+    {
+        return new CalendarEventsUtil($this->mockContaoFramework());
+    }
+
+    /**
+     * @param array<string, mixed> $properties
+     */
+    private function mockEvent(array $properties): CalendarEventsModel
+    {
+        return $this->mockClassWithProperties(CalendarEventsModel::class, $properties);
     }
 }

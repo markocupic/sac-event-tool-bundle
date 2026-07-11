@@ -27,7 +27,7 @@ class PhoneNumberFormatterTest extends TestCase
         $this->assertSame($expected, PhoneNumberFormatter::format($input));
     }
 
-    public static function validNumberProvider(): array
+    public static function validNumberProvider(): iterable
     {
         return [
             // National format
@@ -67,7 +67,7 @@ class PhoneNumberFormatterTest extends TestCase
         $this->assertSame($input, PhoneNumberFormatter::format($input));
     }
 
-    public static function invalidNumberProvider(): array
+    public static function invalidNumberProvider(): iterable
     {
         return [
             'empty' => [''],

@@ -429,6 +429,9 @@ class CalendarEvents
         }
     }
 
+    /**
+     * @throws \RuntimeException
+     */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 60)]
     public function modifyEventReleaseLevel(DataContainer $dc): void
     {
@@ -499,9 +502,6 @@ class CalendarEvents
         $this->controller->redirect($this->system->getReferer());
     }
 
-    /**
-     * @throws \Exception
-     */
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.upgradeEventReleaseLevel.button', priority: 100)]
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.downgradeEventReleaseLevel.button', priority: 100)]
     public function downOrUpgradeEventReleaseLevelIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
