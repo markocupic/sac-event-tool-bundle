@@ -91,11 +91,10 @@ final class ContaoMemberWriter
                 'disable' => 1,
                 'isSacMember' => 0,
                 'login' => 0,
+                'tstamp' => time(),
             ];
 
             if ($this->connection->update('tl_member', $set, ['id' => $memberId], ['id' => Types::INTEGER])) {
-                $this->connection->update('tl_member', ['tstamp' => time()], ['id' => $memberId], ['id' => Types::INTEGER]);
-
                 $disabledMember = $this->connection->fetchAssociative('SELECT * FROM tl_member WHERE id = ?', [$memberId], [Types::INTEGER]);
 
                 if (false !== $disabledMember) {
