@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\StepHandler;
 
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\FrontendUser;
@@ -68,10 +69,14 @@ class ConfirmStep implements StepHandlerInterface
         $user = $this->security->getUser();
 
         if (!$user instanceof FrontendUser) {
-            throw new \Exception('No logged in user found.');
+            throw new AccessDeniedException('No logged in user found.');
         }
 
         $memberModel = $this->framework->getAdapter(MemberModel::class)->findById($user->id);
+
+        if (null === $memberModel) {
+            throw new AccessDeniedException('The logged in Contao Frontend User could not be matched to a member record.');
+        }
 
         $registrationModel = $this->framework
             ->getAdapter(CalendarEventsMemberModel::class)
@@ -79,7 +84,7 @@ class ConfirmStep implements StepHandlerInterface
         ;
 
         if (null === $registrationModel) {
-            throw new \Exception('No registration found for member '.$memberModel->id.' and event '.$eventModel->id);
+            throw new \RuntimeException('No registration found for member '.$memberModel->id.' and event '.$eventModel->id);
         }
 
         $arrEvent = $eventModel->row();
