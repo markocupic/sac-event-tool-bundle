@@ -41,7 +41,7 @@ class SacBackendUserRolesExportController extends AbstractBackendController
 
     private const string EXPORT_TYPE = 'user_role_export';
 
-	// IMPORTANT: The filter column (userRole) MUST be the last entry.
+    // IMPORTANT: The filter column (userRole) MUST be the last entry.
     private const array COLUMNS = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'leiterQualifikation', 'lastLogin', 'userRole'];
 
     private const string TABLE_NAME = 'tl_user';
