@@ -37,6 +37,10 @@ readonly class StepManager
             $action = array_key_first($this->getSteps());
         }
 
+        if (null === $action) {
+            throw new \LogicException('No event registration step handler has been registered. At least one service tagged "sacevt.event_registration.step_handler" is required.');
+        }
+
         return $this->stepHandlers->get($action);
     }
 
