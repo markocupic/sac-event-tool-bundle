@@ -1,0 +1,38 @@
+{% extends "@Contao/be_main" %}
+
+{% block main_content %}
+    <div class="tl_listing_container sac-pilatus-user-role-export">
+        <h3 class="sac-pilatus-user-role-export--headline">Export Vereinsfunktionen</h3>
+        {{ form|raw }}
+    </div>
+    <style{{ attrs().setIfExists('nonce', csp_nonce('style-src')) }}>
+        .sac-pilatus-user-role-export .widget {
+            display: flex;
+            flex-direction: column;
+            margin-top: 16px;
+        }
+
+        .sac-pilatus-user-role-export .widget .checkbox_container legend {
+            display: none;
+        }
+
+        .sac-pilatus-user-role-export .widget > label {
+            margin-bottom: 4px;
+        }
+    </style>
+    <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector(' .sac-pilatus-user-role-export .widget button')?.classList.add('tl_submit');
+        });
+
+        const form = document.querySelector('.hasteform_form-user-export');
+
+        if (form) form.addEventListener('submit', (e) => {
+            const button = form.querySelector('button[type="submit"]');
+            if (button) {
+                window.setTimeout(() => button.disabled = false, 100);
+            }
+        });
+    </script>
+{% endblock %}
+

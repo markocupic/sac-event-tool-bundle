@@ -53,6 +53,7 @@ $GLOBALS['TL_LANG']['tl_user']['sectionId'] = ['Sektions-Mitgliedschaft', 'Geben
 $GLOBALS['TL_LANG']['tl_user']['disableOnlineRegistration'] = ['Online Anmeldungen standardmässig ausschalten', 'Geben Sie an, ob bei diesem User die Online Anmeldung bei Events, bei denen dieser Autor ist, standarmässig deaktiviert sein soll.'];
 $GLOBALS['TL_LANG']['tl_user']['generateMainInstructorContactDataFromDb'] = ['Kontaktdaten standardmässig aus der Datenbank generieren', 'Die Kontaktdaten werden im Frontend im Feld "Anmeldungen" (auch für nicht eingeloggte Mitglieder) ausgegeben.'];
 $GLOBALS['TL_LANG']['tl_user']['rescissionCause'] = ['Deaktivierungs-Grund', 'Geben Sie einen Grund an, weshalb der Benutzer deaktiviert wurde.'];
+$GLOBALS['TL_LANG']['tl_user']['lastLogin'] = ['Letzter Loginzeitpunkt', 'Geben Sie den Zeitpunkt des letzten Logins an.'];
 
 // References
 $GLOBALS['TL_LANG']['tl_user']['section']['4250'] = 'SAC PILATUS';

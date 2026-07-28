@@ -12,6 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Controller\BackendModule\SacBackendUserRolesExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvEventMemberExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvUserExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventDeregistrationController;
@@ -44,6 +45,7 @@ $GLOBALS['TL_LANG']['MOD']['sac_tour_difficulty_tool'] = ['Schwierigkeitsgrade f
 $GLOBALS['TL_LANG']['MOD']['sac_tour_type_tool'] = ['Tourentypen'];
 $GLOBALS['TL_LANG']['MOD']['sac_user_role_tool'] = ['Vereinsfunktionen-Tool'];
 $GLOBALS['TL_LANG']['MOD']['sac_permission_tool'] = ['Permission-Tool'];
+$GLOBALS['TL_LANG']['MOD'][SacBackendUserRolesExportController::BACKEND_MODULE_TYPE] = ['Export Vereinsfunktionen'];
 
 // Contao legacy frontend modules
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'] = ['Event Reader Vorschau'];

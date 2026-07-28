@@ -9,18 +9,57 @@ This is the base template for
     {% add to head %}
         {% set attributes = attrs()
             .setIfExists('nonce', csp_nonce('script-src'))
-            .set('src', asset('choices.js/scripts/choices.min.js', 'markocupic_sac_event_tool'))
-        %}
+            .set('src', asset('choices.js/scripts/choices.min.js', 'markocupic_sac_event_tool')) %}
 
         <script{{ attributes }}></script>
         <link rel="stylesheet" href="{{ asset('choices.js/styles/choices.min.css', 'markocupic_sac_event_tool') }}">
     {% endadd %}
     {{ form|raw }}
     <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-        const element = document.querySelector('#ctrl_user-roles');
-        const choices = new Choices(element, {
-            removeItems: true,
-            removeItemButton: true,
+        function handleWidgetVisibility(exportType) {
+            if (exportType === 'user-role-export') {
+                document.getElementById('ctrl_user-roles').closest('.widget').style.display = 'block';
+                document.getElementById('ctrl_user-groups').closest('.widget').style.display = 'none';
+                document.getElementById('ctrl_member-groups').closest('.widget').style.display = 'none';
+            } else if (exportType === 'user-group-export') {
+                document.getElementById('ctrl_user-groups').closest('.widget').style.display = 'block';
+                document.getElementById('ctrl_user-roles').closest('.widget').style.display = 'none';
+                document.getElementById('ctrl_member-groups').closest('.widget').style.display = 'none';
+            } else if (exportType === 'member-group-export') {
+                document.getElementById('ctrl_member-groups').closest('.widget').style.display = 'block';
+                document.getElementById('ctrl_user-roles').closest('.widget').style.display = 'none';
+                document.getElementById('ctrl_user-groups').closest('.widget').style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('#ctrl_user-roles, #ctrl_user-groups, #ctrl_member-groups');
+
+            for (const element of elements) {
+                const choices = new Choices(element, {
+                    removeItems: true,
+                    removeItemButton: true,
+                });
+            }
+
+            const exportType = document.getElementById('ctrl_export-type').value;
+            handleWidgetVisibility(exportType);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('ctrl_export-type').addEventListener('change', (event) => {
+                const exportType = event.target.value;
+                handleWidgetVisibility(exportType);
+            });
+        });
+
+        const form = document.querySelector('.hasteform_form-user-export');
+
+        if (form) form.addEventListener('submit', (e) => {
+            const button = form.querySelector('button[type="submit"]');
+            if (button) {
+                window.setTimeout(() => button.disabled = false, 100);
+            }
         });
     </script>
 {% endblock %}
