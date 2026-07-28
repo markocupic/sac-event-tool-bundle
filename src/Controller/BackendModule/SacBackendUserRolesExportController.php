@@ -83,7 +83,7 @@ class SacBackendUserRolesExportController extends AbstractBackendController
             return;
         }
 
-        if ($this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, 'sac_pilatus_user_role_export')) {
+        if ($this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, self::BACKEND_MODULE_TYPE)) {
             return;
         }
 
