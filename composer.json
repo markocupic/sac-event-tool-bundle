@@ -57,6 +57,11 @@
             "contao/modules"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Markocupic\\SacEventToolBundle\\Tests\\": "tests/"
+        }
+    },
     "extra": {
         "contao-manager-plugin": "Markocupic\\SacEventToolBundle\\ContaoManager\\Plugin",
         "composer-file-copier-plugin": [
