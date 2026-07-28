@@ -101,6 +101,10 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
 
         $memberModel = $this->framework->getAdapter(MemberModel::class)->findById($user->id);
 
+        if (null === $memberModel) {
+            return false;
+        }
+
         if ($this->framework->getAdapter(CalendarEventsMemberModel::class)->isRegistered($memberModel->id, $eventModel->id)) {
             return true;
         }
@@ -119,6 +123,11 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         }
 
         $memberModel = $this->framework->getAdapter(MemberModel::class)->findById($user->id);
+
+        if (null === $memberModel) {
+            throw new AccessDeniedException('The logged in Contao Frontend User could not be matched to a member record.');
+        }
+
         $mainInstructorModel = $this->framework->getAdapter(UserModel::class)->findById($eventModel->mainInstructor);
 
         $lock = $this->lockFactory->createLock(resource: self::class.'-'.$eventModel->id, ttl: 30);
@@ -180,6 +189,53 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         return $template;
     }
 
+    /**
+     * Test seam: returns the current UNIX timestamp.
+     * Override in tests to make time-dependent logic deterministic.
+     */
+    protected function getCurrentTimestamp(): int
+    {
+        return time();
+    }
+
+    /**
+     * Test seam: generates a new UUID (v4) string.
+     */
+    protected function generateUuid(): string
+    {
+        return Uuid::uuid4()->toString();
+    }
+
+    /**
+     * Test seam: creates the Haste form instance.
+     */
+    protected function createForm(string $id, string $method): Form
+    {
+        return new Form($id, $method);
+    }
+
+    /**
+     * Test seam: creates an empty registration model.
+     */
+    protected function createRegistrationModel(): CalendarEventsMemberModel
+    {
+        return new CalendarEventsMemberModel();
+    }
+
+    /**
+     * Test seam: notifies the member that their contact data has been synced.
+     */
+    protected function notifyContactDataUpdated(FrontendUser $user): void
+    {
+        new DefaultFrontendUserNotification(
+            $user,
+            'event_registration_controller::update_contact_data',
+            'Mitteilung',
+            'All deine persönlichen Daten (Adresse, Tel.-Nr., Notfallangaben, Essgewohnheiten etc.) wurden anhand deiner Eingaben bei deinen laufenden Anmeldungen aktualisiert.',
+            $this->getCurrentTimestamp() + 60,
+        );
+    }
+
     private function validateEventRegistrationEligibility(CalendarEventsModel $eventModel, MemberModel $memberModel, UserModel|null $mainInstructorModel = null, $options = []): void
     {
         $resolver = new OptionsResolver();
@@ -215,18 +271,20 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             throw new EventRegistrationException('The event you are trying to register for has been deferred.', EventRegistrationException::LEVEL_INFO, 'ERR.evt_reg_eventDeferred', []);
         }
 
-        if ($eventModel->setRegistrationPeriod && $eventModel->registrationStartDate + $options['regStartTimeOffset'] > strtotime('now')) {
+        $now = $this->getCurrentTimestamp();
+
+        if ($eventModel->setRegistrationPeriod && $eventModel->registrationStartDate + $options['regStartTimeOffset'] > $now) {
             throw new EventRegistrationException('Subscribing for the event is not possible yet.', EventRegistrationException::LEVEL_INFO, 'ERR.evt_reg_registrationPossibleOn', [$eventModel->title, date('d.m.Y H:i', (int) $eventModel->registrationStartDate + $options['regStartTimeOffset'])]);
         }
 
-        if ($eventModel->setRegistrationPeriod && $eventModel->registrationEndDate < strtotime('now')) {
+        if ($eventModel->setRegistrationPeriod && $eventModel->registrationEndDate < $now) {
             $strEndDate = date('d.m.Y', (int) $eventModel->registrationEndDate);
             $strEndTime = date('H:i', (int) $eventModel->registrationEndDate);
 
             throw new EventRegistrationException('The registration deadline for this event has expired.', EventRegistrationException::LEVEL_INFO, 'ERR.evt_reg_registrationDeadlineExpired', [$strEndDate, $strEndTime]);
         }
 
-        if (!$eventModel->setRegistrationPeriod && strtotime('+1 day') > $eventModel->startDate) {
+        if (!$eventModel->setRegistrationPeriod && $now + 86400 > $eventModel->startDate) {
             throw new EventRegistrationException('If no registration time has been set, online registration is only possible up to 24 h before the event start date.', EventRegistrationException::LEVEL_INFO, 'ERR.evt_reg_registrationPossible24HoursBeforeEventStart', []);
         }
 
@@ -249,7 +307,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
 
     private function generateForm(CalendarEventsModel $eventModel, MemberModel $memberModel, ModuleModel $moduleModel, Request $request): Form
     {
-        $objForm = new Form(
+        $objForm = $this->createForm(
             'form-event-registration',
             'POST',
         );
@@ -425,12 +483,14 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             unset($arrData['ahvNumber']);
         }
 
+        $now = $this->getCurrentTimestamp();
+
         $arrData['contaoMemberId'] = $memberModel->id;
         $arrData['eventName'] = $eventModel->title;
         $arrData['eventId'] = $eventModel->id;
-        $arrData['dateAdded'] = strtotime('now');
-        $arrData['tstamp'] = strtotime('now');
-        $arrData['uuid'] = Uuid::uuid4()->toString();
+        $arrData['dateAdded'] = $now;
+        $arrData['tstamp'] = $now;
+        $arrData['uuid'] = $this->generateUuid();
         $arrData['stateOfSubscription'] = $this->resolveSubscriptionsState($eventModel);
         $arrData['bookingType'] = BookingType::ONLINE_FORM;
         $arrData['sectionId'] = $memberModel->sectionId;
@@ -457,7 +517,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
 
         unset($arrData['id']);
 
-        $registrationModel = new CalendarEventsMemberModel();
+        $registrationModel = $this->createRegistrationModel();
         $registrationModel->setRow($arrData);
         $registrationModel->save();
 
@@ -466,13 +526,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         if ($this->syncEventRegistrationDatabase->syncMember($memberModel->id)) {
             /** @var FrontendUser $user */
             $user = $this->security->getUser();
-            new DefaultFrontendUserNotification(
-                $user,
-                'event_registration_controller::update_contact_data',
-                'Mitteilung',
-                'All deine persönlichen Daten (Adresse, Tel.-Nr., Notfallangaben, Essgewohnheiten etc.) wurden anhand deiner Eingaben bei deinen laufenden Anmeldungen aktualisiert.',
-                time() + 60,
-            );
+            $this->notifyContactDataUpdated($user);
         }
 
         return $registrationModel;
