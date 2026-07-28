@@ -64,7 +64,7 @@ class CsvMemberDtoTest extends TestCase
         $this->assertSame($expected, $dto->honoraryMember);
     }
 
-    public static function honoraryMemberProvider(): array
+    public static function honoraryMemberProvider(): iterable
     {
         return [
             'yes' => ['Yes', 1],
@@ -76,7 +76,7 @@ class CsvMemberDtoTest extends TestCase
     public function testProfessionIsReadFromColumn27(): void
     {
         $line = $this->baseLine();
-        $line[18] = 'ignored';        // upstream ":empty" column, must NOT be used
+        $line[18] = 'ignored'; // upstream ":empty" column, must NOT be used
         $line[27] = 'Sekundarlehrer'; // real profession column
 
         $dto = CsvMemberDto::fromCsv($line);
