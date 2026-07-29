@@ -113,7 +113,6 @@ class CsvUserExportController extends AbstractFrontendModuleController
 
                 if ('user-role-export' === $exportType) {
                     $tableName = 'tl_user';
-                    // IMPORTANT: The filter column (userRole) MUST be the last entry.
                     $columns = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'leiterQualifikation', 'lastLogin', 'userRole'];
                     $filterKey = 'userRole';
                     $filterModelFQCN = UserRoleModel::class;
@@ -136,7 +135,6 @@ class CsvUserExportController extends AbstractFrontendModuleController
 
                 if ('user-group-export' === $exportType) {
                     $tableName = 'tl_user';
-                    // IMPORTANT: The filter column (groups) MUST be the last entry.
                     $columns = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'lastLogin', 'groups'];
                     $filterKey = 'groups';
                     $filterModelFQCN = UserGroupModel::class;
@@ -159,7 +157,6 @@ class CsvUserExportController extends AbstractFrontendModuleController
 
                 if ('member-group-export' === $exportType) {
                     $tableName = 'tl_member';
-                    // IMPORTANT: The filter column (groups) MUST be the last entry.
                     $columns = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'sacMemberId', 'login', 'lastLogin', 'groups'];
                     $filterKey = 'groups';
                     $filterModelFQCN = MemberGroupModel::class;
