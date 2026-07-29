@@ -67,11 +67,13 @@ class SacBackendUserRolesExportController extends AbstractBackendController
 
         $this->framework->initialize();
 
-        // $this->framework->getAdapter(Controller::class)->loadLanguageFile('default');
         $this->framework->getAdapter(Controller::class)->loadLanguageFile('modules');
 
+        $headline = $this->translator->trans('MOD.'.self::BACKEND_MODULE_TYPE.'.0', [], 'contao_default');
+
         $response = $this->render('@MarkocupicSacEventTool/Backend/SacBackendUserRolesExport/sac_backend_user_roles_export.html.twig', [
-            'headline' => $this->translator->trans('MOD.'.self::BACKEND_MODULE_TYPE.'.0', [], 'contao_default'),
+            'title' => $headline,
+            'headline' => $headline,
             'form' => $this->getForm($this->requestStack->getCurrentRequest())->generate(),
         ]);
 
