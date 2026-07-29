@@ -392,6 +392,37 @@ class UserExportHelperTest extends ContaoTestCase
         $this->assertSame(['7', 'Role1, Role2'], $this->dataRows($records)[0]);
     }
 
+    public function testBuildRecordsSortsRolesAlphabeticallyWhenJoiningInOneLine(): void
+    {
+        // Role IDs are in an order whose resolved names are NOT alphabetical, so the sort
+        // has to actually reorder them.
+        $resolver = static fn (int $id): string => [
+            1 => 'Zulauf',
+            2 => 'Amsler',
+            3 => 'Meier',
+        ][$id];
+
+        $helper = $this->getHelper(
+            null,
+            $this->frameworkForBuildRecords($resolver),
+            $this->fallbackTranslator(),
+        );
+
+        $records = $helper->buildRecords(
+            [
+                ['id' => 7, 'userRole' => serialize([1, 2, 3])],
+            ],
+            'tl_user',
+            ['id', 'userRole'],
+            'userRole',
+            [],
+            UserRoleModel::class,
+            true,
+        );
+
+        $this->assertSame(['7', 'Amsler, Meier, Zulauf'], $this->dataRows($records)[0]);
+    }
+
     public function testBuildRecordsWritesOneRowPerRole(): void
     {
         $helper = $this->getHelper(

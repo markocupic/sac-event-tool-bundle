@@ -221,15 +221,16 @@ class UserExportHelper
 
             // Write all groups/roles into a single line.
             if ($keepRolesInOneLine) {
-                $baseRecord[$filterColumnIndex] = implode(
-                    ', ',
-                    array_filter(
-                        array_map(
-                            fn ($roleId) => $this->getRoleName(roleId: $roleId, filterModelAdapter: $filterModelAdapter),
-                            $rolesUser,
-                        ),
+                $items = array_filter(
+                    array_map(
+                        fn ($roleId) => $this->getRoleName(roleId: $roleId, filterModelAdapter: $filterModelAdapter),
+                        $rolesUser,
                     ),
                 );
+
+                sort($items);
+
+                $baseRecord[$filterColumnIndex] = implode(', ', $items);
 
                 $records[] = $baseRecord;
                 continue;
