@@ -75,59 +75,59 @@ class UserExportHelper
         );
     }
 
-    public function getHeadline(array $arrFields, string $tableName): array
+    public function getHeadline(array $columns, string $tableName): array
     {
         /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         $controllerAdapter->loadLanguageFile($tableName);
 
-        $arrHeadline = [];
+        $headline = [];
 
-        foreach ($arrFields as $field) {
-            $arrHeadline[] = match ($field) {
+        foreach ($columns as $columnName) {
+            $headline[] = match ($columnName) {
                 'id' => 'ID',
-                default => $this->getTranslatedHeadline($tableName, $field),
+                default => $this->getTranslatedHeadline(tableName: $tableName, columnName: $columnName),
             };
         }
 
-        return $arrHeadline;
+        return $headline;
     }
 
-    public function getFormattedFieldValue(string $fieldName, string $tableName, array $record): string
+    public function getFormattedFieldValue(string $columnName, string $tableName, array $record): string
     {
-        if (!\array_key_exists($fieldName, $record)) {
-            throw new \Exception('Field '.$fieldName.' does not exist in table '.$tableName);
+        if (!\array_key_exists($columnName, $record)) {
+            throw new \Exception('Field '.$columnName.' does not exist in table '.$tableName);
         }
 
-        if ('password' === $fieldName) {
+        if ('password' === $columnName) {
             return '#######';
         }
 
-        if ('lastLogin' === $fieldName) {
+        if ('lastLogin' === $columnName) {
             return empty($record['lastLogin'])
                 ? ''
                 : $this->framework->getAdapter(Date::class)->parse('Y-m-d', $record['lastLogin']);
         }
 
-        if ('leiterQualifikation' === $fieldName) {
+        if ('leiterQualifikation' === $columnName) {
             $this->framework->getAdapter(Controller::class)->loadLanguageFile($tableName);
             $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-            $arrQuali = $stringUtilAdapter->deserialize($record[$fieldName] ?? '', true);
-            $arrQuali = array_map(fn ($item) => $this->translator->trans($tableName.'.refLeiterQualifikation.'.((int) $item), [], 'contao_default'), $arrQuali);
+            $qualifications = $stringUtilAdapter->deserialize($record[$columnName] ?? '', true);
+            $qualifications = array_map(fn ($item) => $this->translator->trans($tableName.'.refLeiterQualifikation.'.((int) $item), [], 'contao_default'), $qualifications);
 
-            return implode(', ', $arrQuali);
+            return implode(', ', $qualifications);
         }
 
-        if ('rescissionCause' === $fieldName && '' !== $record['rescissionCause']) {
-            return $this->translator->trans('tl_user.rescissionCauseOptions.'.$record[$fieldName], [], 'contao_default');
+        if ('rescissionCause' === $columnName && '' !== $record['rescissionCause']) {
+            return $this->translator->trans('tl_user.rescissionCauseOptions.'.$record[$columnName], [], 'contao_default');
         }
 
-        return (string) $record[$fieldName];
+        return (string) $record[$columnName];
     }
 
     /**
-     * IMPORTANT: The filter column ($filterKey, i.e. the roles/groups column) MUST be the
+     * IMPORTANT: The filter column ($filterKey, i.e., the roles/groups column) MUST be the
      * last entry in $columns.
      *
      * When $keepRolesInOneLine is false, one record is written per role while iterating over
@@ -138,16 +138,16 @@ class UserExportHelper
     public function exportTable(string $exportType, string $tableName, array $columns, string $filterKey, array $filterRoles, Result $dbalResult, string $filterModelFQCN, bool $keepRolesInOneLine = false): StreamedResponse
     {
         $records = $this->buildRecords(
-            $this->iterateRows($dbalResult),
-            $tableName,
-            $columns,
-            $filterKey,
-            $filterRoles,
-            $filterModelFQCN,
-            $keepRolesInOneLine,
+            rows: $this->iterateRows(dbalResult: $dbalResult),
+            tableName: $tableName,
+            columns: $columns,
+            filterKey: $filterKey,
+            filterRoles: $filterRoles,
+            filterModelFQCN: $filterModelFQCN,
+            keepRolesInOneLine: $keepRolesInOneLine,
         );
 
-        $filename = $exportType.'_'.$this->framework->getAdapter(Date::class)->parse('Y-m-d_H-i-s').'.csv';
+        $filename = \sprintf('%s_%s.csv', $exportType, $this->framework->getAdapter(Date::class)->parse('Y-m-d_H-i-s'));
 
         // Download data as a CSV spreadsheet
         return $this->sendToBrowser(records: $records, filename: $filename);
@@ -156,15 +156,9 @@ class UserExportHelper
     /**
      * Builds the CSV record matrix (headline + data rows) from the given rows.
      *
-     * This is the pure, side effect free part of the export: it takes an iterable of
+     * This is the pure, side effect-free part of the export: it takes an iterable of
      * associative row arrays and returns the finished record matrix. No DBAL Result, no HTTP
-     * response and no output are involved, which makes it fully unit-testable.
-     *
-     * @param iterable<array<string, mixed>> $rows
-     * @param array<int, string>             $columns
-     * @param array<int, int|string>         $filterRoles
-     *
-     * @return array<int, array<int, string>>
+     * response, and no output are involved, which makes it fully unit-testable.
      */
     public function buildRecords(iterable $rows, string $tableName, array $columns, string $filterKey, array $filterRoles, string $filterModelFQCN, bool $keepRolesInOneLine = false): array
     {
@@ -175,12 +169,12 @@ class UserExportHelper
         $filterModelAdapter = $this->framework->getAdapter($filterModelFQCN);
 
         // Filter by user role
-        $hasUserRoleFilter = !empty($filterRoles) ? true : false;
+        $hasUserRoleFilter = !empty($filterRoles);
 
         $records = [];
 
         // Write headline
-        $records[] = $this->getHeadline($columns, $tableName);
+        $records[] = $this->getHeadline(columns: $columns, tableName: $tableName);
 
         // Write rows
         foreach ($rows as $rowUser) {
@@ -198,7 +192,7 @@ class UserExportHelper
 
             foreach ($columns as $columnName) {
                 if ($columnName !== $filterKey) {
-                    $record[] = $this->getFormattedFieldValue($columnName, $tableName, $rowUser);
+                    $record[] = $this->getFormattedFieldValue(columnName: $columnName, tableName: $tableName, record: $rowUser);
                 } else {
                     $rolesUser = $stringUtilAdapter->deserialize($rowUser[$columnName], true);
                     $rolesUser = array_map('intval', $rolesUser);
@@ -214,7 +208,7 @@ class UserExportHelper
                                     array_map(
                                         function ($roleId) use ($filterModelAdapter) {
                                             // Handle different model types
-                                            return $this->getRoleName($roleId, $filterModelAdapter);
+                                            return $this->getRoleName(roleId: $roleId, filterModelAdapter: $filterModelAdapter);
                                         },
                                         $rolesUser,
                                     ),
@@ -233,7 +227,7 @@ class UserExportHelper
                                 }
 
                                 // Handle different model types
-                                $record[] = $this->getRoleName($roleId, $filterModelAdapter);
+                                $record[] = $this->getRoleName(roleId: $roleId, filterModelAdapter: $filterModelAdapter);
 
                                 $records[] = $record;
                                 $hasWrittenRecords = true;
@@ -256,8 +250,6 @@ class UserExportHelper
     /**
      * Thin I/O wrapper around the (unmockable, final) DBAL Result so that buildRecords() can
      * work on a plain iterable.
-     *
-     * @return \Generator<array<string, mixed>>
      */
     private function iterateRows(Result $dbalResult): \Generator
     {
@@ -290,14 +282,14 @@ class UserExportHelper
         return new CsvDownload();
     }
 
-    private function getTranslatedHeadline(string $tableName, string $field): string
+    private function getTranslatedHeadline(string $tableName, string $columnName): string
     {
-        $key = \sprintf('%s.%s.0', $tableName, $field);
+        $key = \sprintf('%s.%s.0', $tableName, $columnName);
         $translated = $this->translator->trans($key, [], 'contao_default');
 
         // Fallback
         if ($translated === $key) {
-            return ucfirst($field);
+            return ucfirst($columnName);
         }
 
         return $translated;
