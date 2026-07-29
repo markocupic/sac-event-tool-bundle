@@ -25,6 +25,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'keys' => [
                 'id'  => 'primary',
                 'pid' => 'index',
+				'title' => 'unique',
             ],
         ],
     ],
