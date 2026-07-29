@@ -20,7 +20,6 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Twig\FragmentTemplate;
-use Contao\Environment;
 use Contao\MemberGroupModel;
 use Contao\ModuleModel;
 use Contao\UserGroupModel;
@@ -32,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AsFrontendModule(CsvUserExportController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_csv_user_export')]
+#[AsFrontendModule(self::TYPE, category: 'sac_event_tool_frontend_modules')]
 class CsvUserExportController extends AbstractFrontendModuleController
 {
     public const string TYPE = 'csv_user_export';
@@ -56,18 +55,15 @@ class CsvUserExportController extends AbstractFrontendModuleController
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        /** @var Environment $environmentAdapter */
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-
-        $objForm = $this->createFormInstance(
-            'form-user-export',
-            'POST',
+        $form = $this->createFormInstance(
+            formId: 'form-user-export',
+            method: 'POST',
         );
 
-        $objForm->setAction($environmentAdapter->get('uri'));
+        $form->setAction($request->getUri());
 
         // Now let's add form fields:
-        $objForm->addFormField('export-type', [
+        $form->addFormField('export-type', [
             'label' => ['Export auswählen', ''],
             'inputType' => 'select',
             'options' => [
@@ -77,39 +73,39 @@ class CsvUserExportController extends AbstractFrontendModuleController
             ],
         ]);
 
-        $objForm->addFormField('user-roles', [
+        $form->addFormField('user-roles', [
             'label' => ['Benutzerrollen-Filter (ODER-Verknüpfung)', ''],
             'inputType' => 'select',
             'options' => $this->userExportHelper->getAvailableUserRoles(),
             'eval' => ['multiple' => true],
         ]);
 
-        $objForm->addFormField('user-groups', [
+        $form->addFormField('user-groups', [
             'label' => ['Backend-Benutzergruppen-Filter (ODER-Verknüpfung)', ''],
             'inputType' => 'select',
             'options' => $this->userExportHelper->getAvailableUserGroups(),
             'eval' => ['multiple' => true],
         ]);
 
-        $objForm->addFormField('member-groups', [
+        $form->addFormField('member-groups', [
             'label' => ['Frontend-Benutzergruppen-Filter (ODER-Verknüpfung)', ''],
             'inputType' => 'select',
             'options' => $this->userExportHelper->getAvailableMemberGroups(),
             'eval' => ['multiple' => true],
         ]);
 
-        $objForm->addFormField('keep-groups-in-one-line', [
+        $form->addFormField('keep-groups-in-one-line', [
             'label' => ['', 'Rollen einzeilig darstellen'],
             'inputType' => 'checkbox',
         ]);
 
         // Add the submit-button
-        $objForm->addFormField('submit', [
+        $form->addFormField('submit', [
             'label' => 'Export starten',
             'inputType' => 'submit',
         ]);
 
-        if ($objForm->validate()) {
+        if ($form->validate()) {
             if ('form-user-export' === $request->request->get('FORM_SUBMIT')) {
                 $keepRolesInOneLine = !empty($request->request->get('keep-groups-in-one-line'));
 
@@ -184,7 +180,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
             }
         }
 
-        return $objForm;
+        return $form;
     }
 
     private function createFormInstance(string $formId, string $method): Form

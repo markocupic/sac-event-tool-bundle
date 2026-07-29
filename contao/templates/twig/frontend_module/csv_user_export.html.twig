@@ -1,9 +1,6 @@
-{#
-This is the base template for
-- backend user Export in the frontend
-- frontend user Export in the frontend
-#}
-{% extends '@Contao/block_unsearchable' %}
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% set searchable = false %}
 
 {% block content %}
     {% add to head %}
