@@ -58,10 +58,6 @@ class NotifyEventRegistrationStateController
     private array|null $configuration;
 
     // Adapters
-    private Adapter $events;
-
-    private Adapter $stringUtil;
-
     private Adapter $calendarEvents;
 
     private Adapter $calendarEventsMember;
@@ -70,9 +66,13 @@ class NotifyEventRegistrationStateController
 
     private Adapter $controller;
 
+    private Adapter $events;
+
     private Adapter $member;
 
     private Adapter $message;
+
+    private Adapter $stringUtil;
 
     private Adapter $validator;
 
@@ -93,7 +93,6 @@ class NotifyEventRegistrationStateController
         private readonly string $sacevtEventRegistrationConfigEmailRefuseTemplPath,
         private readonly string $sacevtEventRegistrationConfigEmailWaitinglistTemplPath,
     ) {
-        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->config = $this->framework->getAdapter(Config::class);
@@ -101,6 +100,7 @@ class NotifyEventRegistrationStateController
         $this->events = $this->framework->getAdapter(Events::class);
         $this->member = $this->framework->getAdapter(MemberModel::class);
         $this->message = $this->framework->getAdapter(Message::class);
+        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->validator = $this->framework->getAdapter(Validator::class);
     }
 
