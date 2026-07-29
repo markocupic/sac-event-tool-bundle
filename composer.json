@@ -71,6 +71,13 @@
                 "options": {
                     "OVERRIDE": true
                 }
+            },
+            {
+                "source": "translations/messages.en.yaml",
+                "target": "translations/messages.de.yaml",
+                "options": {
+                    "OVERRIDE": true
+                }
             }
         ]
     },

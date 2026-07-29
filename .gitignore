@@ -10,6 +10,7 @@
 /.php-cs-fixer.cache
 /tools/phpunit/.phpunit.result.cache
 /contao/languages/de/*
+/translations/**/*.de.yaml
 
 # Webpack
 /node_modules/
