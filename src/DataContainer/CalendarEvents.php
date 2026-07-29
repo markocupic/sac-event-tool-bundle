@@ -390,7 +390,7 @@ class CalendarEvents
             $fileName = $this->stringUtil->revertInputEncoding($objCalendar->title).'.csv';
             $fileName = $this->stringUtil->sanitizeFileName($fileName);
 
-            throw new ResponseException($csv->createResponse($fileName));
+            throw new ResponseException($csv->createStreamedResponse($fileName)->send());
         }
     }
 

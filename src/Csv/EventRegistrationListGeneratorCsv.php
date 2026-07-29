@@ -114,7 +114,7 @@ class EventRegistrationListGeneratorCsv
         $eventTitle = $slugger->slug($event->title, '_')->lower()->toString();
         $filename = \sprintf($this->sacevtEventMemberListFileNamePattern, $eventTitle, 'csv');
 
-        return $csv->createResponse($filename);
+        return $csv->createStreamedResponse($filename)->send();
     }
 
     private function buildHeadlineRow(array $eventTimestamps): array

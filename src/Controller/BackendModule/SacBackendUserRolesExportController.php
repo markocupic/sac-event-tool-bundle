@@ -42,8 +42,7 @@ class SacBackendUserRolesExportController extends AbstractBackendController
 
     private const string EXPORT_TYPE = 'user_role_export';
 
-    // IMPORTANT: The filter column (userRole) MUST be the last entry.
-    private const array COLUMNS = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'leiterQualifikation', 'lastLogin', 'userRole'];
+    private const array COLUMNS = ['userRole', 'lastname', 'firstname', 'hideUser', 'disable', 'rescissionCause', 'leiterQualifikation', 'sacMemberId', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sectionId', 'emergencyPhone', 'emergencyPhoneName', 'lastLogin', 'id'];
 
     private const string TABLE_NAME = 'tl_user';
 
@@ -79,6 +78,38 @@ class SacBackendUserRolesExportController extends AbstractBackendController
         $response->headers->set('Turbo-Visit', 'false');
 
         return $response;
+    }
+
+    private function sortByUserRoleCallback(): callable
+    {
+        return static function (array $records): array {
+            // Keep the headline (row 0) in place while sorting the data rows.
+            $headline = array_shift($records);
+
+            usort(
+                $records,
+                static function (array $a, array $b): int {
+                    // 1. userRole
+                    $cmp = strcmp($a[0], $b[0]);
+                    if (0 !== $cmp) {
+                        return $cmp;
+                    }
+
+                    // 2. lastname
+                    $cmp = strcmp($a[1], $b[1]);
+                    if (0 !== $cmp) {
+                        return $cmp;
+                    }
+
+                    // 3. firstname
+                    return strcmp($a[2], $b[2]);
+                },
+            );
+
+            array_unshift($records, $headline);
+
+            return $records;
+        };
     }
 
     private function checkPermission(): void
@@ -138,7 +169,7 @@ class SacBackendUserRolesExportController extends AbstractBackendController
                 ],
             );
 
-            throw new ResponseException($this->userExportHelper->exportTable(exportType: self::EXPORT_TYPE, tableName: $tableName, columns: $columns, filterKey: $filterKey, filterRoles: $filterRoles, dbalResult: $dbalResult, filterModelFQCN: $filterModelFQCN, keepRolesInOneLine: $keepRolesInOneLine));
+            throw new ResponseException($this->userExportHelper->exportTable(exportType: self::EXPORT_TYPE, tableName: $tableName, columns: $columns, filterKey: $filterKey, filterRoles: $filterRoles, dbalResult: $dbalResult, filterModelFQCN: $filterModelFQCN, keepRolesInOneLine: $keepRolesInOneLine, sortCallback: $this->sortByUserRoleCallback()));
         }
 
         return $form;

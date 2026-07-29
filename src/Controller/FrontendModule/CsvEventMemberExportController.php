@@ -296,6 +296,6 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $csv->setOutputBOM(CsvDownload::BOM_UTF8);
         $csv->setRecords($arrFinal);
 
-        return $csv->createResponse($filename);
+        return $csv->createStreamedResponse($filename)->send();
     }
 }

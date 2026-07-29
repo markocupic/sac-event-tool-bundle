@@ -22,6 +22,7 @@ use Contao\TestCase\ContaoTestCase;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Export\UserExportHelper;
+use Markocupic\SacEventToolBundle\Model\SacSectionModel;
 use Markocupic\SacEventToolBundle\Model\UserRoleModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -246,6 +247,70 @@ class UserExportHelperTest extends ContaoTestCase
         );
     }
 
+    public function testGetFormattedFieldValueResolvesSectionIdsToNames(): void
+    {
+        $stringUtil = $this->mockAdapter(['deserialize']);
+        $stringUtil
+            ->method('deserialize')
+            ->willReturn([4250, 4251])
+        ;
+
+        $sectionModel = $this->mockAdapter(['findBySectionId']);
+        $sectionModel
+            ->method('findBySectionId')
+            ->willReturnCallback(
+                fn (int $sectionId) => $this->mockClassWithProperties(
+                    SacSectionModel::class,
+                    ['name' => 'SAC Sektion '.$sectionId],
+                ),
+            )
+        ;
+
+        $framework = $this->mockContaoFramework([
+            StringUtil::class => $stringUtil,
+            SacSectionModel::class => $sectionModel,
+        ]);
+
+        $helper = $this->getHelper(null, $framework);
+
+        $this->assertSame(
+            'SAC Sektion 4250, SAC Sektion 4251',
+            $helper->getFormattedFieldValue('sectionId', 'tl_user', ['sectionId' => serialize([4250, 4251])]),
+        );
+    }
+
+    public function testGetFormattedFieldValueSkipsUnknownSections(): void
+    {
+        $stringUtil = $this->mockAdapter(['deserialize']);
+        $stringUtil
+            ->method('deserialize')
+            ->willReturn([4250, 9999])
+        ;
+
+        $sectionModel = $this->mockAdapter(['findBySectionId']);
+        $sectionModel
+            ->method('findBySectionId')
+            ->willReturnCallback(
+                fn (int $sectionId) => 4250 === $sectionId
+                    ? $this->mockClassWithProperties(SacSectionModel::class, ['name' => 'SAC Pilatus'])
+                    : null,
+            )
+        ;
+
+        $framework = $this->mockContaoFramework([
+            StringUtil::class => $stringUtil,
+            SacSectionModel::class => $sectionModel,
+        ]);
+
+        $helper = $this->getHelper(null, $framework);
+
+        // The unknown section (findBySectionId returns null) is filtered out.
+        $this->assertSame(
+            'SAC Pilatus',
+            $helper->getFormattedFieldValue('sectionId', 'tl_user', ['sectionId' => serialize([4250, 9999])]),
+        );
+    }
+
     public function testGetFormattedFieldValueTranslatesRescissionCause(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
@@ -440,6 +505,64 @@ class UserExportHelperTest extends ContaoTestCase
         );
     }
 
+    public function testBuildRecordsKeepsColumnsAfterTheFilterColumn(): void
+    {
+        // Filter column is NOT last: firstname and id come after it and must be preserved
+        // in every emitted per-role row.
+        $helper = $this->getHelper(
+            null,
+            $this->frameworkForBuildRecords(static fn (int $id): string => 'Role'.$id),
+            $this->fallbackTranslator(),
+        );
+
+        $records = $helper->buildRecords(
+            [
+                ['id' => 7, 'firstname' => 'John', 'userRole' => serialize([1, 2])],
+            ],
+            'tl_user',
+            ['userRole', 'firstname', 'id'],
+            'userRole',
+            [],
+            UserRoleModel::class,
+        );
+
+        $this->assertSame(
+            [
+                ['Role1', 'John', '7'],
+                ['Role2', 'John', '7'],
+            ],
+            $this->dataRows($records),
+        );
+    }
+
+    public function testBuildRecordsKeepsTrailingColumnsWhenJoiningRolesInOneLine(): void
+    {
+        $helper = $this->getHelper(
+            null,
+            $this->frameworkForBuildRecords(static fn (int $id): string => 'Role'.$id),
+            $this->fallbackTranslator(),
+        );
+
+        $records = $helper->buildRecords(
+            [
+                ['id' => 7, 'firstname' => 'John', 'userRole' => serialize([1, 2])],
+            ],
+            'tl_user',
+            ['userRole', 'firstname', 'id'],
+            'userRole',
+            [],
+            UserRoleModel::class,
+            true,
+        );
+
+        $this->assertSame(
+            [
+                ['Role1, Role2', 'John', '7'],
+            ],
+            $this->dataRows($records),
+        );
+    }
+
     /**
      * @param array<int, array<int, string>> $records
      *
@@ -514,7 +637,7 @@ class UserExportHelperTest extends ContaoTestCase
         ]);
     }
 
-    private function getHelper(Connection|null $connection = null, ContaoFramework|null $framework = null, TranslatorInterface|null $translator = null,): UserExportHelper
+    private function getHelper(Connection|null $connection = null, ContaoFramework|null $framework = null, TranslatorInterface|null $translator = null): UserExportHelper
     {
         return new UserExportHelper(
             $connection ?? $this->createMock(Connection::class),

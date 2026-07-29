@@ -19,6 +19,7 @@ use League\Csv\CharsetConverter;
 use League\Csv\Writer;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Symfony\Component\HttpFoundation\HeaderUtils;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -151,15 +152,28 @@ class CsvDownload
         return $this;
     }
 
-    public function createResponse(string $filename, int $status = 200, $headers = []): StreamedResponse
+    public function createResponse(string $filename, int $status = 200, array $headers = []): Response
     {
         $this->writer->insertAll($this->getRecords(true));
 
-        $response = new StreamedResponse();
+        // Build the whole CSV in memory. Unlike the streamed variant, the body exists as a
+        // string before any header is sent, which makes the response testable and lets
+        // exceptions surface normally instead of mid-stream (after a 200 was already sent).
+        $response = new Response($this->writer->toString(), $status);
+        $this->configureResponseHeaders($response, $filename, $headers);
+
+        return $response;
+    }
+
+    public function createStreamedResponse(string $filename, int $status = 200, array $headers = []): StreamedResponse
+    {
+        $this->writer->insertAll($this->getRecords(true));
+
+        $response = new StreamedResponse(status: $status);
         $this->configureResponseHeaders($response, $filename, $headers);
         $response->setCallback($this->createContentCallback());
 
-        return $response->send();
+        return $response;
     }
 
     private function createContentCallback(): callable
@@ -184,7 +198,7 @@ class CsvDownload
         return \in_array($encoding, mb_list_encodings(), true);
     }
 
-    private function configureResponseHeaders(StreamedResponse $response, string $filename, array $customHeaders): void
+    private function configureResponseHeaders(Response|StreamedResponse $response, string $filename, array $customHeaders): void
     {
         $disposition = HeaderUtils::makeDisposition(
             HeaderUtils::DISPOSITION_ATTACHMENT,

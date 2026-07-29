@@ -25,8 +25,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Download\CsvDownload;
+use Markocupic\SacEventToolBundle\Model\SacSectionModel;
 use Markocupic\SacEventToolBundle\Model\UserRoleModel;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserExportHelper
@@ -104,6 +105,13 @@ class UserExportHelper
             return '#######';
         }
 
+        if ('sectionId' === $columnName) {
+            $sectionIds = $this->framework->getAdapter(StringUtil::class)->deserialize($record[$columnName], true);
+            $sectionIds = array_map(fn ($item) => $this->framework->getAdapter(SacSectionModel::class)->findBySectionId($item)?->name, $sectionIds);
+
+            return implode(', ', array_filter($sectionIds));
+        }
+
         if ('lastLogin' === $columnName) {
             return empty($record['lastLogin'])
                 ? ''
@@ -126,16 +134,7 @@ class UserExportHelper
         return (string) $record[$columnName];
     }
 
-    /**
-     * IMPORTANT: The filter column ($filterKey, i.e., the roles/groups column) MUST be the
-     * last entry in $columns.
-     *
-     * When $keepRolesInOneLine is false, one record is written per role while iterating over
-     * $columns. Any column that comes AFTER $filterKey has not been appended to the record at
-     * that point and would therefore be missing from the exported rows. So $filterKey has to
-     * be positioned last.
-     */
-    public function exportTable(string $exportType, string $tableName, array $columns, string $filterKey, array $filterRoles, Result $dbalResult, string $filterModelFQCN, bool $keepRolesInOneLine = false): StreamedResponse
+    public function exportTable(string $exportType, string $tableName, array $columns, string $filterKey, array $filterRoles, Result $dbalResult, string $filterModelFQCN, bool $keepRolesInOneLine = false, callable|null $sortCallback = null): Response
     {
         $records = $this->buildRecords(
             rows: $this->iterateRows(dbalResult: $dbalResult),
@@ -150,7 +149,7 @@ class UserExportHelper
         $filename = \sprintf('%s_%s.csv', $exportType, $this->framework->getAdapter(Date::class)->parse('Y-m-d_H-i-s'));
 
         // Download data as a CSV spreadsheet
-        return $this->sendToBrowser(records: $records, filename: $filename);
+        return $this->sendToBrowser(records: $records, filename: $filename, sortCallback: $sortCallback);
     }
 
     /**
@@ -159,6 +158,11 @@ class UserExportHelper
      * This is the pure, side effect-free part of the export: it takes an iterable of
      * associative row arrays and returns the finished record matrix. No DBAL Result, no HTTP
      * response, and no output are involved, which makes it fully unit-testable.
+     *
+     * The filter column ($filterKey) may appear at any position in $columns: each data row is
+     * first built for all columns (with a placeholder at the filter column's position) and the
+     * placeholder is filled in afterwards. When $keepRolesInOneLine is false, the fully built
+     * row is cloned once per role, so all other columns are preserved regardless of ordering.
      */
     public function buildRecords(iterable $rows, string $tableName, array $columns, string $filterKey, array $filterRoles, string $filterModelFQCN, bool $keepRolesInOneLine = false): array
     {
@@ -180,67 +184,77 @@ class UserExportHelper
         foreach ($rows as $rowUser) {
             // Filter by user role
             if ($hasUserRoleFilter) {
-                $userRoles = $stringUtilAdapter->deserialize($rowUser[$filterKey], true);
+                $userRoles = $stringUtilAdapter->deserialize($rowUser[$filterKey] ?? '', true);
 
                 if (\count(array_intersect($filterRoles, $userRoles)) < 1) {
                     continue;
                 }
             }
 
-            $record = [];
-            $hasWrittenRecords = false;
+            // Build the base record for ALL columns, remembering where the filter column sits.
+            // The filter column gets a placeholder that is resolved further down.
+            $baseRecord = [];
+            $filterColumnIndex = null;
 
             foreach ($columns as $columnName) {
-                if ($columnName !== $filterKey) {
-                    $record[] = $this->getFormattedFieldValue(columnName: $columnName, tableName: $tableName, record: $rowUser);
+                if ($columnName === $filterKey) {
+                    $filterColumnIndex = \count($baseRecord);
+                    $baseRecord[] = '';
                 } else {
-                    $rolesUser = $stringUtilAdapter->deserialize($rowUser[$columnName], true);
-                    $rolesUser = array_map('intval', $rolesUser);
-
-                    if (empty($rolesUser)) {
-                        $record[] = '';
-                    } else {
-                        // Write all groups/roles into a single line
-                        if ($keepRolesInOneLine) {
-                            $record[] = implode(
-                                ', ',
-                                array_filter(
-                                    array_map(
-                                        function ($roleId) use ($filterModelAdapter) {
-                                            // Handle different model types
-                                            return $this->getRoleName(roleId: $roleId, filterModelAdapter: $filterModelAdapter);
-                                        },
-                                        $rolesUser,
-                                    ),
-                                ),
-                            );
-                        } else {
-                            // Create a row for each group/role.
-                            // NOTE: This relies on $filterKey being the LAST column (see method
-                            // doc block) - the record is flushed here before any later columns
-                            // could be appended.
-                            foreach ($rolesUser as $roleId) {
-                                if ($hasUserRoleFilter && \count($filterRoles) > 0) {
-                                    if (!\in_array($roleId, $filterRoles, false)) {
-                                        continue;
-                                    }
-                                }
-
-                                // Handle different model types
-                                $record[] = $this->getRoleName(roleId: $roleId, filterModelAdapter: $filterModelAdapter);
-
-                                $records[] = $record;
-                                $hasWrittenRecords = true;
-
-                                array_pop($record);
-                            }
-                        }
-                    }
+                    $baseRecord[] = $this->getFormattedFieldValue(columnName: $columnName, tableName: $tableName, record: $rowUser);
                 }
             }
 
-            if (!$hasWrittenRecords) {
+            // No filter column selected -> a single row, nothing to expand.
+            if (null === $filterColumnIndex) {
+                $records[] = $baseRecord;
+                continue;
+            }
+
+            $rolesUser = array_map('intval', $stringUtilAdapter->deserialize($rowUser[$filterKey] ?? '', true));
+
+            // User without any group/role -> keep the row, leave the filter cell empty.
+            if (empty($rolesUser)) {
+                $records[] = $baseRecord;
+                continue;
+            }
+
+            // Write all groups/roles into a single line.
+            if ($keepRolesInOneLine) {
+                $baseRecord[$filterColumnIndex] = implode(
+                    ', ',
+                    array_filter(
+                        array_map(
+                            fn ($roleId) => $this->getRoleName(roleId: $roleId, filterModelAdapter: $filterModelAdapter),
+                            $rolesUser,
+                        ),
+                    ),
+                );
+
+                $records[] = $baseRecord;
+                continue;
+            }
+
+            // Create a row for each group/role by cloning the fully built base record and only
+            // replacing the filter cell. Column order no longer matters.
+            $hasWrittenRecords = false;
+
+            foreach ($rolesUser as $roleId) {
+                if ($hasUserRoleFilter && !\in_array($roleId, $filterRoles, false)) {
+                    continue;
+                }
+
+                $record = $baseRecord;
+                $record[$filterColumnIndex] = $this->getRoleName(roleId: $roleId, filterModelAdapter: $filterModelAdapter);
+
                 $records[] = $record;
+                $hasWrittenRecords = true;
+            }
+
+            // Safety net (unreachable when a row-level filter matched): emit the row with an
+            // empty filter cell so no user silently disappears from the export.
+            if (!$hasWrittenRecords) {
+                $records[] = $baseRecord;
             }
         }
 
@@ -258,7 +272,7 @@ class UserExportHelper
         }
     }
 
-    private function sendToBrowser(array $records, string $filename): StreamedResponse
+    private function sendToBrowser(array $records, string $filename, callable|null $sortCallback = null): Response
     {
         $finalRecords = [];
 
@@ -268,6 +282,12 @@ class UserExportHelper
                 $record,
             );
             $finalRecords[] = $finalRecord;
+        }
+
+        // Let the caller sort the record matrix. Nothing to sort when there is only the
+        // headline (or headline + a single data row), so the callback is skipped.
+        if (null !== $sortCallback && \count($finalRecords) >= 3) {
+            $finalRecords = $sortCallback($finalRecords);
         }
 
         $csv = $this->createCsvDownloadInstance();
