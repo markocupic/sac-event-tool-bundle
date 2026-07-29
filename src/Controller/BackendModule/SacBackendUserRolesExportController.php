@@ -31,6 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/%contao.backend.route_prefix%/sac_backend_user_roles_export', name: self::class, defaults: ['_scope' => 'backend'])]
 class SacBackendUserRolesExportController extends AbstractBackendController
@@ -53,6 +54,7 @@ class SacBackendUserRolesExportController extends AbstractBackendController
         private readonly ContaoFramework $framework,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
+        private readonly TranslatorInterface $translator,
         private readonly UserExportHelper $userExportHelper,
     ) {
     }
@@ -66,9 +68,11 @@ class SacBackendUserRolesExportController extends AbstractBackendController
 
         $this->framework->initialize();
 
-        $this->framework->getAdapter(Controller::class)->loadLanguageFile('default');
+        // $this->framework->getAdapter(Controller::class)->loadLanguageFile('default');
+        $this->framework->getAdapter(Controller::class)->loadLanguageFile('modules');
 
         $response = $this->render('@MarkocupicSacEventTool/Backend/SacBackendUserRolesExport/sac_backend_user_roles_export.html.twig', [
+            'headline' => $this->translator->trans('MOD.'.self::BACKEND_MODULE_TYPE.'.0', [], 'contao_default'),
             'form' => $this->getForm($this->requestStack->getCurrentRequest())->generate(),
         ]);
 
