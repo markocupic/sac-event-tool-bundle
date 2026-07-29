@@ -65,7 +65,7 @@ use Twig\Environment as Twig;
  * vendor/markocupic/sac-event-tool-bundle/contao/languages/en/default.php
  * vendor/markocupic/sac-event-tool-bundle/public/css/be_stylesheet.css
  */
-#[Route('/contao/event_participant_email', name: EventParticipantEmailController::class, defaults: ['_scope' => 'backend', '_token_check' => true])]
+#[Route('/contao/event_participant_email', name: self::class, defaults: ['_scope' => 'backend', '_token_check' => true])]
 class EventParticipantEmailController extends AbstractBackendController
 {
     public const string SESSION_BAG_KEY = 'sacevt_event_participant_email';
