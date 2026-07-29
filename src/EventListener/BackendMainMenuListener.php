@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-readonly class BackendMenuListener
+readonly class BackendMainMenuListener
 {
     public function __construct(
         private RequestStack $requestStack,
@@ -37,19 +37,20 @@ readonly class BackendMenuListener
     #[AsEventListener(ContaoCoreEvents::BACKEND_MENU_BUILD, priority: -255)]
     public function addUserRolesExportMenuItem(MenuEvent $event): void
     {
+        if (!$this->isBackendMainMenuTree($event)) {
+            return;
+        }
+
         if (!$this->checkPermission(SacBackendUserRolesExportController::BACKEND_MODULE_TYPE)) {
             return;
         }
 
-        $factory = $event->getFactory();
         $tree = $event->getTree();
-
-        if ('mainMenu' !== $tree->getName()) {
-            return;
-        }
 
         // Add an entry to the Contao backend menu
         $contentNode = $tree->getChild(SacBackendUserRolesExportController::BACKEND_MODULE_CATEGORY);
+
+        $factory = $event->getFactory();
 
         $node = $factory
             ->createItem(SacBackendUserRolesExportController::BACKEND_MODULE_TYPE)
@@ -71,5 +72,12 @@ readonly class BackendMenuListener
         }
 
         return $this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, $moduleType);
+    }
+
+    private function isBackendMainMenuTree(MenuEvent $event): bool
+    {
+        $tree = $event->getTree();
+
+        return 'mainMenu' === $tree->getName();
     }
 }
