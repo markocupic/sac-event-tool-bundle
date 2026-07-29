@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsEventListener(ContaoCoreEvents::BACKEND_MENU_BUILD, priority: -255)]
 readonly class BackendMenuListener
 {
     public function __construct(
@@ -35,9 +34,10 @@ readonly class BackendMenuListener
     ) {
     }
 
-    public function __invoke(MenuEvent $event): void
+    #[AsEventListener(ContaoCoreEvents::BACKEND_MENU_BUILD, priority: -255)]
+    public function addUserRolesExportMenuItem(MenuEvent $event): void
     {
-        if (!$this->checkPermission()) {
+        if (!$this->checkPermission(SacBackendUserRolesExportController::BACKEND_MODULE_TYPE)) {
             return;
         }
 
@@ -64,16 +64,12 @@ readonly class BackendMenuListener
         $contentNode->addChild($node);
     }
 
-    private function checkPermission(): bool
+    private function checkPermission(string $moduleType): bool
     {
         if ($this->security->isGranted('ROLE_ADMIN')) {
             return true;
         }
 
-        if ($this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, SacBackendUserRolesExportController::BACKEND_MODULE_TYPE)) {
-            return true;
-        }
-
-        return false;
+        return $this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, $moduleType);
     }
 }
