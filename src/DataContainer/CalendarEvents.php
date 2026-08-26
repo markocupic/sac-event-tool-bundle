@@ -38,6 +38,7 @@ use Contao\System;
 use Contao\User;
 use Contao\UserGroupModel;
 use Contao\UserModel;
+use Contao\Versions;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
@@ -55,6 +56,7 @@ use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyPackageModel;
 use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
+use Markocupic\SacEventToolBundle\String\Validator\DateValidator;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -551,36 +553,61 @@ class CalendarEvents
             return;
         }
 
-        $arrDates = $this->stringUtil->deserialize($dc->activeRecord->eventDates);
+        $repeats = $this->connection->fetchOne('SELECT eventDates FROM tl_calendar_events WHERE id = ?', [$dc->id]);
+
+        $arrDates = $this->stringUtil->deserialize($repeats);
 
         if (!\is_array($arrDates) || empty($arrDates)) {
             return;
         }
 
-        $aNew = [];
+        $repeats = [];
 
         foreach ($arrDates as $v) {
-            $objDate = new Date($v['new_repeat']);
-            $aNew[$objDate->timestamp] = $objDate->timestamp;
+            $timestamp = $v['new_repeat'] ?? null;
+
+            // eventDates is written by self::validateEventDates() only,
+            // which guarantees ascending integer timestamps > 0.
+            \assert(DateValidator::isValidTimestamp($timestamp) && (int) $timestamp > 0);
+
+            if (!DateValidator::isValidTimestamp($timestamp) || (int) $timestamp < 1) {
+                $this->message->addError($this->translator->trans('ERR.eventDatesCorrupt', [], 'contao_default'));
+
+                return;
+            }
+
+            $repeats[] = (int) $timestamp;
         }
 
-        ksort($aNew);
+        $repeats = array_unique($repeats);
+
+        sort($repeats);
 
         $arrDates = [];
 
-        foreach ($aNew as $v) {
+        foreach ($repeats as $timestamp) {
             // Save as a timestamp
-            $arrDates[] = ['new_repeat' => $v];
+            $arrDates[] = ['new_repeat' => $timestamp];
         }
 
+        $start = array_first($arrDates);
+        $end = array_last($arrDates);
+
+        $startTime = $start['new_repeat'] ?? 0;
+        $endTime = $end['new_repeat'] ?? 0;
+
         $set = [];
-        $startTime = !empty($arrDates[0]['new_repeat']) ? $arrDates[0]['new_repeat'] : 0;
-        $endTime = !empty($arrDates[\count($arrDates) - 1]['new_repeat']) ? $arrDates[\count($arrDates) - 1]['new_repeat'] : 0;
+        $set['startDate'] = $startTime;
+        $set['startTime'] = $startTime;
+        $set['endDate'] = $endTime;
+        $set['endTime'] = $endTime;
+        $set['eventDates'] = serialize($arrDates);
 
-        $set['startDate'] = $set['startTime'] = $dc->activeRecord->startDate = $dc->activeRecord->startTime = $startTime;
-        $set['endDate'] = $set['endTime'] = $dc->activeRecord->endDate = $dc->activeRecord->endTime = $endTime;
-
-        $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
+        $affected = $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
+        if ($affected > 0) {
+            DataContainer::clearCurrentRecordCache($dc->id, 'tl_calendar_events');
+            new Versions('tl_calendar_events', $dc->id);
+        }
     }
 
     /**
@@ -1306,8 +1333,16 @@ class CalendarEvents
             throw new \Exception($this->translator->trans('ERR.eventDatesCannotBeEmpty', [], 'contao_default'));
         }
 
-        foreach ($arrDates as $arrDate) {
-            if (isset($arrDate['new_repeat']) && !$arrDate['new_repeat'] > 0) {
+        foreach ($arrDates as $k => $arrDate) {
+            $value = $arrDate['new_repeat'] ?? 0;
+
+            if (DateValidator::isValidDate($value, $this->config->get('dateFormat'))) {
+                $arrDates[$k]['new_repeat'] = (new Date($value, $this->config->get('dateFormat')))->tstamp;
+            } elseif (DateValidator::isValidTimestamp($value)) {
+                $arrDates[$k]['new_repeat'] = $value;
+            }
+
+            if (!\is_int($arrDates[$k]['new_repeat']) || !$arrDates[$k]['new_repeat'] > 0) {
                 throw new \Exception($this->translator->trans('ERR.eventDatesCannotBeEmpty', [], 'contao_default'));
             }
         }
@@ -1322,7 +1357,7 @@ class CalendarEvents
             $tstampPrev = $arrDate['new_repeat'];
         }
 
-        return $varValue;
+        return serialize($arrDates);
     }
 
     /**
