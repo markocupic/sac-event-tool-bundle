@@ -177,7 +177,7 @@ PaletteManipulator::create()
 
 // Global operations
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year'] = [
-	'href'                   => 'transformDates=+52weeks',
+	'href'                   => 'transformDates=plus52weeks',
 	'class'                  => 'global_op_icon_class',
 	'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/calendar-plus-regular.svg', 'markocupic_sac_event_tool'),
 	'attributes'             => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
@@ -186,7 +186,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1year'] = [
-	'href'                   => 'transformDates=-52weeks',
+	'href'                   => 'transformDates=minus52weeks',
 	'class'                  => 'global_op_icon_class',
 	'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/calendar-minus-regular.svg', 'markocupic_sac_event_tool'),
 	'attributes'             => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()" accesskey="e"',

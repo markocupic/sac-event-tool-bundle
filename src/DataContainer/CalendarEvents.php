@@ -408,41 +408,67 @@ class CalendarEvents
         $request = $this->requestStack->getCurrentRequest();
 
         if ($request->query->get('transformDates')) {
-            // $mode may be "+52weeks" or "+1year"
-            $mode = $request->query->get('transformDates');
+            $transform = $request->query->get('transformDates');
 
-            if (false !== strtotime($mode)) {
-                $calendarId = $request->query->get('id');
+            if (!\in_array($transform, ['plus52weeks', 'minus52weeks'], true)) {
+                throw new \InvalidArgumentException('Invalid transform mode. Use "plus52weeks" or "minus52weeks"!');
+            }
 
-                $stmt = $this->connection->executeQuery('SELECT * FROM tl_calendar_events WHERE pid = ?', [$calendarId]);
+            // $_GET['transformDates'] can be "plus52weeks" or "minus52weeks"
+            $mode = match ($transform) {
+                'plus52weeks' => '+52 weeks',
+                'minus52weeks' => '-52 weeks',
+                default => null,
+            };
 
-                while (false !== ($row = $stmt->fetchAssociative())) {
-                    $set['startTime'] = strtotime($mode, (int) $row['startTime']);
-                    $set['endTime'] = strtotime($mode, (int) $row['endTime']);
-                    $set['startDate'] = strtotime($mode, (int) $row['startDate']);
-                    $set['endDate'] = strtotime($mode, (int) $row['endDate']);
+            $calendarId = $request->query->get('id');
 
-                    if ($row['registrationStartDate'] > 0) {
-                        $set['registrationStartDate'] = strtotime($mode, (int) $row['registrationStartDate']);
+            $rows = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events WHERE pid = ?', [$calendarId]);
+
+            foreach ($rows as $row) {
+                $set = [];
+
+                $set['startTime'] = strtotime($mode, (int) $row['startTime']);
+                $set['endTime'] = strtotime($mode, (int) $row['endTime']);
+                $set['startDate'] = strtotime($mode, (int) $row['startDate']);
+                $set['endDate'] = strtotime($mode, (int) $row['endDate']);
+
+                if ($row['registrationStartDate'] > 0) {
+                    $set['registrationStartDate'] = strtotime($mode, (int) $row['registrationStartDate']);
+                }
+
+                if ($row['registrationEndDate'] > 0) {
+                    $set['registrationEndDate'] = strtotime($mode, (int) $row['registrationEndDate']);
+                }
+
+                $repeats = $this->stringUtil->deserialize($row['eventDates'], true);
+                $newRepeats = [];
+
+                foreach ($repeats as $repeat) {
+                    $repeat['new_repeat'] = strtotime($mode, (int) $repeat['new_repeat']);
+
+                    if (!DateValidator::isValidTimestamp($repeat['new_repeat'])) {
+                        // Show error message
+                        $this->message->addError(
+                            $this->translator->trans('ERR.eventDatesInvalid', [$row['id']], 'contao_default'),
+                        );
+
+                        // Skip this event
+                        continue 2;
                     }
 
-                    if ($row['registrationEndDate'] > 0) {
-                        $set['registrationEndDate'] = strtotime($mode, (int) $row['registrationEndDate']);
-                    }
+                    $newRepeats[] = $repeat;
+                }
 
-                    $arrRepeats = $this->stringUtil->deserialize($row['eventDates'], true);
-                    $newArrRepeats = [];
+                if ([] !== $newRepeats) {
+                    $set['eventDates'] = serialize($newRepeats);
+                }
 
-                    if (\count($arrRepeats) > 0) {
-                        foreach ($arrRepeats as $repeat) {
-                            $repeat['new_repeat'] = strtotime($mode, (int) $repeat['new_repeat']);
-                            $newArrRepeats[] = $repeat;
-                        }
+                $affected = $this->connection->update('tl_calendar_events', $set, ['id' => $row['id']]);
 
-                        $set['eventDates'] = serialize($newArrRepeats);
-                    }
-
-                    $this->connection->update('tl_calendar_events', $set, ['id' => $row['id']]);
+                if ($affected > 0) {
+                    $versions = new Versions('tl_calendar_events', $row['id']);
+                    $versions->create();
                 }
             }
 
@@ -553,60 +579,47 @@ class CalendarEvents
             return;
         }
 
-        $repeats = $this->connection->fetchOne('SELECT eventDates FROM tl_calendar_events WHERE id = ?', [$dc->id]);
+        $row = $this->connection->fetchOne('SELECT eventDates FROM tl_calendar_events WHERE id = ?', [$dc->id]);
 
-        $arrDates = $this->stringUtil->deserialize($repeats);
+        $repeats = $this->stringUtil->deserialize($row, true);
 
-        if (!\is_array($arrDates) || empty($arrDates)) {
+        if (empty($repeats)) {
             return;
         }
 
-        $repeats = [];
+        $timestamps = [];
 
-        foreach ($arrDates as $v) {
+        foreach ($repeats as $v) {
             $timestamp = $v['new_repeat'] ?? null;
 
-            // eventDates is written by self::validateEventDates() only,
-            // which guarantees ascending integer timestamps > 0.
-            \assert(DateValidator::isValidTimestamp($timestamp) && (int) $timestamp > 0);
-
-            if (!DateValidator::isValidTimestamp($timestamp) || (int) $timestamp < 1) {
-                $this->message->addError($this->translator->trans('ERR.eventDatesCorrupt', [], 'contao_default'));
-
-                return;
+            if (!DateValidator::isValidTimestamp($timestamp)) {
+                $this->message->addError($this->translator->trans('ERR.eventDatesInvalid', [$dc->id], 'contao_default'));
+                continue;
             }
 
-            $repeats[] = (int) $timestamp;
+            $timestamps[] = (int) $timestamp;
         }
 
-        $repeats = array_unique($repeats);
+        $timestamps = array_unique($timestamps);
 
-        sort($repeats);
+        sort($timestamps);
 
-        $arrDates = [];
+        $firstTimestamp = array_first($timestamps);
+        $lastTimestamp = array_last($timestamps);
 
-        foreach ($repeats as $timestamp) {
-            // Save as a timestamp
-            $arrDates[] = ['new_repeat' => $timestamp];
-        }
-
-        $start = array_first($arrDates);
-        $end = array_last($arrDates);
-
-        $startTime = $start['new_repeat'] ?? 0;
-        $endTime = $end['new_repeat'] ?? 0;
+        $startTime = $firstTimestamp > 0 ? $firstTimestamp : 0;
+        $endTime = $lastTimestamp > 0 ? $lastTimestamp : 0;
 
         $set = [];
         $set['startDate'] = $startTime;
         $set['startTime'] = $startTime;
         $set['endDate'] = $endTime;
         $set['endTime'] = $endTime;
-        $set['eventDates'] = serialize($arrDates);
 
         $affected = $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
+
         if ($affected > 0) {
             DataContainer::clearCurrentRecordCache($dc->id, 'tl_calendar_events');
-            new Versions('tl_calendar_events', $dc->id);
         }
     }
 
@@ -987,20 +1000,17 @@ class CalendarEvents
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventDates.load', priority: 100)]
-    public function transformTimestampsToDates(string|null $varValue, DataContainer $dc): array
+    public function sanitizeEventDates(string|null $varValue, DataContainer $dc): string
     {
-        $arrValues = $this->stringUtil->deserialize($varValue, true);
+        $repeats = $this->stringUtil->deserialize($varValue, true);
 
-        if (isset($arrValues[0])) {
-            if ($arrValues[0]['new_repeat'] <= 0) {
-                // Replace the invalid date with an empty array
-                $arrValues = [];
-            }
-        } else {
-            $arrValues = [];
+        $firstTimestamp = $repeats[0]['new_repeat'] ?? null;
+
+        if (null === $firstTimestamp || $firstTimestamp < 0 || !DateValidator::isValidTimestamp($firstTimestamp)) {
+            $repeats = [];
         }
 
-        return $arrValues;
+        return serialize($repeats);
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'edit.buttons', priority: 100)]
@@ -1320,44 +1330,54 @@ class CalendarEvents
     }
 
     /**
-     * - Event date fields cannot be empty,
-     * - must contain one or more valid dates
-     * - and must be correctly sorted.
+     * - Event date fields cannot be empty
+     * - Must contain one or more valid dates
+     * - Bust be correctly sorted
+     * - Formatted dates are converted to unix timestamps.
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventDates.save', priority: 100)]
     public function validateEventDates(string $varValue, DataContainer $dc): string
     {
-        $arrDates = $this->stringUtil->deserialize($varValue, true);
+        $repeats = $this->stringUtil->deserialize($varValue, true);
 
-        if (!\count($arrDates)) {
+        if (empty($repeats)) {
             throw new \Exception($this->translator->trans('ERR.eventDatesCannotBeEmpty', [], 'contao_default'));
         }
 
-        foreach ($arrDates as $k => $arrDate) {
-            $value = $arrDate['new_repeat'] ?? 0;
+        foreach ($repeats as $k => $item) {
+            $value = $item['new_repeat'] ?? null;
 
+            // Convert date string to timestamp
             if (DateValidator::isValidDate($value, $this->config->get('dateFormat'))) {
-                $arrDates[$k]['new_repeat'] = (new Date($value, $this->config->get('dateFormat')))->tstamp;
-            } elseif (DateValidator::isValidTimestamp($value)) {
-                $arrDates[$k]['new_repeat'] = $value;
+                $repeats[$k]['new_repeat'] = new Date($value, $this->config->get('dateFormat'))->tstamp;
+            }
+            // Timestamp
+            elseif (DateValidator::isValidTimestamp($value)) {
+                $repeats[$k]['new_repeat'] = (int) $value;
+            }
+            // Invalid
+            else {
+                throw new \Exception($this->translator->trans('ERR.eventDatesInvalid', [], 'contao_default'));
             }
 
-            if (!\is_int($arrDates[$k]['new_repeat']) || !$arrDates[$k]['new_repeat'] > 0) {
-                throw new \Exception($this->translator->trans('ERR.eventDatesCannotBeEmpty', [], 'contao_default'));
+            // 4. Timestamp must be > 0
+            if ($repeats[$k]['new_repeat'] <= 0) {
+                throw new \Exception($this->translator->trans('ERR.eventDatesInvalid', [], 'contao_default'));
             }
         }
 
-        // Check the correct date order.
-        $tstampPrev = 0;
+        // Check sorted order
+        $previousTstamp = 0;
 
-        foreach ($arrDates as $arrDate) {
-            if ($tstampPrev >= $arrDate['new_repeat']) {
+        foreach ($repeats as $item) {
+            if ($previousTstamp >= $item['new_repeat']) {
                 throw new \Exception($this->translator->trans('ERR.eventDatesNotCorrectlySorted', [], 'contao_default'));
             }
-            $tstampPrev = $arrDate['new_repeat'];
+
+            $previousTstamp = $item['new_repeat'];
         }
 
-        return serialize($arrDates);
+        return serialize($repeats);
     }
 
     /**
