@@ -63,7 +63,7 @@ class MaintainBackendUserPermissions
 
         if (false !== $arrUserProps) {
             // Contao core permissions
-            $arrInherit = ['modules', 'themes', 'elements', 'fields', 'pagemounts', 'alpty', 'filemounts', 'fop', 'forms', 'formp', 'imageSizes', 'amg'];
+            $arrInherit = ['modules', 'themes', 'elements', 'frontendModules', 'fields', 'pagemounts', 'alpty', 'filemounts', 'fop', 'forms', 'formp', 'imageSizes', 'amg'];
 
             // Custom permissions like:
             // faqs,faqp,news,newp,newsfeeds,newsfeedp,calendars,calendarp,calendarfeeds,calendarfeedp,newsletters,newsletterp,calendar_containers,calendar_containerp
