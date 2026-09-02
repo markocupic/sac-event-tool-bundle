@@ -2,22 +2,22 @@
   "entrypoints": {
     "stimulus_backend": {
       "js": [
-        "/bundles/markocupicsaceventtool/stimulus_backend.982cac58.js"
+        "/bundles/markocupicsaceventtool/stimulus_backend.9995f93c.js"
       ]
     },
     "stimulus_frontend": {
       "js": [
-        "/bundles/markocupicsaceventtool/stimulus_frontend.a8e845e4.js"
+        "/bundles/markocupicsaceventtool/stimulus_frontend.12e5bf51.js"
       ]
     },
     "swisstopo_map": {
       "js": [
-        "/bundles/markocupicsaceventtool/swisstopo_map.3c20e2d6.js"
+        "/bundles/markocupicsaceventtool/swisstopo_map.78663e93.js"
       ]
     },
     "js/avatar_uploader": {
       "js": [
-        "/bundles/markocupicsaceventtool/js/avatar_uploader.e12723b9.js"
+        "/bundles/markocupicsaceventtool/js/avatar_uploader.d70fb22c.js"
       ]
     },
     "css/be_stylesheet": {
