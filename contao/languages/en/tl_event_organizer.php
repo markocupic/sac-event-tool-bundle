@@ -40,6 +40,7 @@ $GLOBALS['TL_LANG']['tl_event_organizer']['emergencyConcept'] = ['Notfallkonzept
 $GLOBALS['TL_LANG']['tl_event_organizer']['addLogo'] = ['Logo hinzufügen', 'Weisen Sie dem Veranstalter ein Logo zu.'];
 $GLOBALS['TL_LANG']['tl_event_organizer']['singleSRC'] = ['Quelldatei', 'Bitte wählen Sie eine Datei aus der Dateiübersicht.'];
 $GLOBALS['TL_LANG']['tl_event_organizer']['notifyWebmasterOnNewEventBlog'] = ['Kontrollperson bei neuen Tourenberichten', 'Bitte wählen Sie eine oder mehrere Personen aus der Liste aus.'];
+$GLOBALS['TL_LANG']['tl_event_organizer']['codeOfConductSRC'] = ['Datei mit Verhaltenskodex/Pflichten für Teilnehmer bei Events', 'Teilnehmer willigen dem Inhalt der Datei ein, wenn sie sich zu einem Event anmelden. Siehe Modul "Event-Registrierung".'];
 $GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationExtract'] = ['Ausschnitt aus dem Tourenreglement', 'Bitte schreiben Sie hier die wichtigsten Ausschnitte aus dem Tourenreglement.'];
 $GLOBALS['TL_LANG']['tl_event_organizer']['courseRegulationExtract'] = ['Ausschnitt aus dem Kursreglement', 'Bitte schreiben Sie hier die wichtigsten Ausschnitte aus dem Kursreglement.'];
 $GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationSRC'] = ['Tourenreglement Datei', 'Bitte wählen Sie die Datei aus.'];

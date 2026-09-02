@@ -41,8 +41,6 @@ class JobController extends AbstractController
     {
         $this->framework->initialize();
 
-        // die(md5_file($this->projectDir. '/files/file.docx'));
-
         $splFile = new \SplFileObject($this->projectDir.'/files/file.docx');
         $this->upload($splFile);
 

@@ -80,6 +80,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['sectionId'] = ['Sektionszugeh�
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['hasPaid'] = ['Teilnahmekosten beglichen', 'Geben Sie an, ob dieser Teilnehmer die Teilnahmekosten beglichen hat.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['paymentMethod'] = ['Zahlungsart', 'Geben Sie die Zahlungsart an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['agb'] = ['AGB akzeptiert', 'Der Teilnehmer hat die AGB bei Event Anmeldung akzeptiert.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['hasAcknowledgedEventRequirements'] = ['Anforderungen des Events gelesen und verstanden', 'Der Teilnehmer bestätigt, dass er die genannten Anforderungen des Events gelesen und verstanden hat und dass seine aktuellen Fähigkeiten diesen entsprechen.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['avbSbv'] = ['AVB SBV akzeptiert', 'Der Teilnehmer hat die AVB des SBV bei Event Anmeldung akzeptiert.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['hasAcceptedPrivacyRules'] = ['Datenschutzrichtline zum Umgang mit Foto und Videomaterial akzeptiert', 'Der Teilnehmer hat die Datenschutzrichtline zu Bildmedien bei der Event Anmeldung akzeptiert.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['deregistrationCause'] = ['Grund für Abmeldung', 'Geben Sie einen Grund für die Abmeldung ein.'];

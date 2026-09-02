@@ -10,11 +10,13 @@ use Contao\Controller;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\FrontendUser;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\ModuleModel;
+use Contao\StringUtil;
 use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
@@ -59,6 +61,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly InsertTagParser $insertTagParser,
         private readonly LockFactory $lockFactory,
         private readonly Security $security,
         private readonly SyncEventRegistrationDatabase $syncEventRegistrationDatabase,
@@ -345,6 +348,12 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
             $objForm->addFormField('agb', $this->getFormFieldConfig('agb', $eventModel));
         }
 
+        // The participant must confirm that they have read and understood the event requirements above
+        // and possess the necessary skills.
+        if ($this->getCodeOfConductSRC($eventModel)) {
+            $objForm->addFormField('hasAcknowledgedEventRequirements', $this->getFormFieldConfig('hasAcknowledgedEventRequirements', $eventModel));
+        }
+
         $objForm->addFormField('hasAcceptedPrivacyRules', $this->getFormFieldConfig('hasAcceptedPrivacyRules', $eventModel));
 
         $objForm->addFormField('submit', $this->getFormFieldConfig('submit', $eventModel));
@@ -404,7 +413,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         return $objForm;
     }
 
-    private function getFormFieldConfig(string $field, CalendarEventsModel $eventsModel): array
+    private function getFormFieldConfig(string $field, CalendarEventsModel $eventModel): array
     {
         $formFields = [
             'ticketInfo' => [
@@ -456,7 +465,12 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
                 'eval' => ['mandatory' => true],
             ],
             'avbSbv' => [
-                'label' => ['', $this->translator->trans('FORM.evt_reg_avbSbv', [$this->getAvbSvbUrl($eventsModel)], 'contao_default')],
+                'label' => ['', $this->translator->trans('FORM.evt_reg_avbSbv', [$this->getAvbSvbUrl($eventModel)], 'contao_default')],
+                'inputType' => 'checkbox',
+                'eval' => ['mandatory' => true],
+            ],
+            'hasAcknowledgedEventRequirements' => [
+                'label' => ['', $this->translator->trans('FORM.evt_reg_hasAcknowledgedEventRequirements', [$this->getCodeOfConductSRC($eventModel)], 'contao_default')],
                 'inputType' => 'checkbox',
                 'eval' => ['mandatory' => true],
             ],
@@ -610,5 +624,16 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         }
 
         return $organizers[0]->avbSvbUrl;
+    }
+
+    private function getCodeOfConductSRC(CalendarEventsModel $eventModel): string
+    {
+        $organizers = $this->calendarEventsUtil->getEventOrganizerModels($eventModel);
+
+        if (empty($organizers) || empty($organizers[0]->codeOfConductSRC)) {
+            return '';
+        }
+
+        return StringUtil::binToUuid($organizers[0]->codeOfConductSRC);
     }
 }

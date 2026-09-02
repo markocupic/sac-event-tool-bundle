@@ -49,7 +49,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
 		{title_legend},title,titlePrint,belongsToOrganization,sorting;
 		{eventList_legend},ignoreFilterInEventList,hideInEventFilter;
 		{event_rapport_legend},enableRapportNotification;
-		{event_regulation_legend},tourRegulationExtract,tourRegulationSRC,courseRegulationExtract,courseRegulationSRC,avbSvbUrl;
+		{event_regulation_legend},codeOfConductSRC,tourRegulationExtract,tourRegulationSRC,courseRegulationExtract,courseRegulationSRC,avbSvbUrl;
 		{event_blog_legend},notifyWebmasterOnNewEventBlog;
 		{emergency_concept_legend},emergencyConcept;
 		{logo_legend},addLogo;{annual_program_legend},annualProgramShowHeadline,annualProgramShowTeaser,annualProgramShowDetails
@@ -144,6 +144,12 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
 			'sql'       => 'binary(16) NULL',
 		],
 		'courseRegulationSRC'                => [
+			'exclude'   => true,
+			'inputType' => 'fileTree',
+			'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
+			'sql'       => 'binary(16) NULL',
+		],
+		'codeOfConductSRC'               => [
 			'exclude'   => true,
 			'inputType' => 'fileTree',
 			'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],

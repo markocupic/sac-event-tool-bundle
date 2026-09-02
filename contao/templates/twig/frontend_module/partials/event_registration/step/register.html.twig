@@ -130,6 +130,12 @@
                                 </div>
                             {% endif %}
 
+                            {% if form.hasFormField('hasAcknowledgedEventRequirements') %}
+                                <div class="mt-4 mb-0" data-reg-widget="hasAcknowledgedEventRequirements">
+                                    {{ form.getWidget('hasAcknowledgedEventRequirements').parse()|raw }}
+                                </div>
+                            {% endif %}
+
                             {% if form.hasFormField('avbSbv') %}
                                 <div class="mt-4 mb-0" data-reg-widget="avbSbv">
                                     {{ form.getWidget('avbSbv').parse()|raw }}

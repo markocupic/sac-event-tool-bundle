@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\Tests\Controller\FrontendModule\EventReg
 
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\FrontendUser;
 use Contao\MemberModel;
 use Contao\ModuleModel;
@@ -379,6 +380,7 @@ class RegisterStepTest extends ContaoTestCase
             $this->createMock(Connection::class),
             $framework,
             $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(InsertTagParser::class),
             $this->createMock(LockFactory::class),
             $security ?? $this->createMock(Security::class),
             $this->createMock(SyncEventRegistrationDatabase::class),
