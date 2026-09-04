@@ -22,9 +22,8 @@ use Twig\TwigFilter;
 
 class TwigScssManager extends AbstractExtension
 {
-    public function __construct(
-        private readonly CacheInterface $cache,
-    ) {
+    public function __construct(private readonly CacheInterface $cache)
+    {
     }
 
     public function getFilters(): array

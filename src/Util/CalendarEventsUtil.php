@@ -63,9 +63,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 #[Autoconfigure(public: true)]
 readonly class CalendarEventsUtil
 {
-    public function __construct(
-        private ContaoFramework $framework,
-    ) {
+    public function __construct(private ContaoFramework $framework)
+    {
     }
 
     public function getEventData(CalendarEventsModel $objEvent, string $strProperty, Template|null $objTemplate = null): mixed

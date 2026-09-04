@@ -22,9 +22,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 readonly class CalendarContainer
 {
-    public function __construct(
-        private AuthorizationCheckerInterface $authorizationChecker,
-    ) {
+    public function __construct(private AuthorizationCheckerInterface $authorizationChecker)
+    {
     }
 
     /**

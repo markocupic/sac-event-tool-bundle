@@ -16,9 +16,8 @@ namespace Markocupic\SacEventToolBundle\Config;
 
 class CourseLevels
 {
-    public function __construct(
-        private readonly array $sacevtEventCourseLevels,
-    ) {
+    public function __construct(private readonly array $sacevtEventCourseLevels)
+    {
     }
 
     public function getAll(): array

@@ -23,9 +23,8 @@ class EventDeregistrationNotificationType implements NotificationTypeInterface
 {
     public const NAME = 'event_deregistration';
 
-    public function __construct(
-        private readonly TokenDefinitionFactoryInterface $factory,
-    ) {
+    public function __construct(private readonly TokenDefinitionFactoryInterface $factory)
+    {
     }
 
     public function getName(): string

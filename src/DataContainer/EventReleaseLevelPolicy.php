@@ -19,9 +19,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventReleaseLevelPolicy
 {
-    public function __construct(
-        private readonly TranslatorInterface $translator,
-    ) {
+    public function __construct(private readonly TranslatorInterface $translator)
+    {
     }
 
     #[AsCallback(table: 'tl_event_release_level_policy', target: 'list.sorting.child_record', priority: 100)]

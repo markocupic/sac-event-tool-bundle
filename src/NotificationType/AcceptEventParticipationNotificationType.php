@@ -23,9 +23,8 @@ class AcceptEventParticipationNotificationType implements NotificationTypeInterf
 {
     public const NAME = 'accept_event_participation';
 
-    public function __construct(
-        private readonly TokenDefinitionFactoryInterface $factory,
-    ) {
+    public function __construct(private readonly TokenDefinitionFactoryInterface $factory)
+    {
     }
 
     public function getName(): string

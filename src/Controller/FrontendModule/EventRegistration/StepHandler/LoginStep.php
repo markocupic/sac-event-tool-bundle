@@ -30,9 +30,8 @@ class LoginStep implements StepHandlerInterface, ValidationStepInterface
 
     private const int PRIORITY = 300;
 
-    public function __construct(
-        private readonly Security $security,
-    ) {
+    public function __construct(private readonly Security $security)
+    {
     }
 
     public static function getName(): string

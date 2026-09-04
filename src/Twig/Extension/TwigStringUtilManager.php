@@ -23,9 +23,8 @@ use Twig\TwigFunction;
 
 class TwigStringUtilManager extends AbstractExtension
 {
-    public function __construct(
-        private readonly ContaoFramework $framework,
-    ) {
+    public function __construct(private readonly ContaoFramework $framework)
+    {
     }
 
     public function getFilters(): array

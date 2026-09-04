@@ -22,9 +22,8 @@ final readonly class InvoicePolicy
     /**
      * @param array<InvoicePolicyRule> $rules
      */
-    public function __construct(
-        private array $rules,
-    ) {
+    public function __construct(private array $rules)
+    {
     }
 
     public function allows(int $userId, CalendarEventsInstructorInvoiceModel|CalendarEventsModel $model, array $eventInstructorIds, string $requiredFlag): bool

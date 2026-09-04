@@ -23,9 +23,8 @@ class EventRegistrationNotificationType implements NotificationTypeInterface
 {
     public const NAME = 'event_registration';
 
-    public function __construct(
-        private readonly TokenDefinitionFactoryInterface $factory,
-    ) {
+    public function __construct(private readonly TokenDefinitionFactoryInterface $factory)
+    {
     }
 
     public function getName(): string

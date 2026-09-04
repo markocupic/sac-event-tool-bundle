@@ -20,9 +20,8 @@ use Twig\TwigFunction;
 
 class TwigCsrfTokenManager extends AbstractExtension
 {
-    public function __construct(
-        private readonly ContaoCsrfTokenManager $csrfTokenManager,
-    ) {
+    public function __construct(private readonly ContaoCsrfTokenManager $csrfTokenManager)
+    {
     }
 
     public function getFunctions(): array

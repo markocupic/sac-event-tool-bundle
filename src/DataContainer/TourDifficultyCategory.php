@@ -23,9 +23,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 
 class TourDifficultyCategory
 {
-    public function __construct(
-        private readonly Security $security,
-    ) {
+    public function __construct(private readonly Security $security)
+    {
     }
 
     /**

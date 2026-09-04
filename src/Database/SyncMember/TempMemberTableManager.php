@@ -26,9 +26,8 @@ final class TempMemberTableManager
 {
     public const string TABLE_NAME = 'tl_member_sync_temp';
 
-    public function __construct(
-        private readonly Connection $connection,
-    ) {
+    public function __construct(private readonly Connection $connection)
+    {
     }
 
     /**

@@ -23,9 +23,8 @@ class SubscriptionStateChangeNotificationType implements NotificationTypeInterfa
 {
     public const NAME = 'onchange_state_of_subscription';
 
-    public function __construct(
-        private readonly TokenDefinitionFactoryInterface $factory,
-    ) {
+    public function __construct(private readonly TokenDefinitionFactoryInterface $factory)
+    {
     }
 
     public function getName(): string

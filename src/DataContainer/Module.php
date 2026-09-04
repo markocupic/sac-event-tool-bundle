@@ -21,9 +21,8 @@ use Contao\System;
 
 class Module
 {
-    public function __construct(
-        private readonly FinderFactory $finderFactory,
-    ) {
+    public function __construct(private readonly FinderFactory $finderFactory)
+    {
     }
 
     #[AsCallback(table: 'tl_module', target: 'fields.eventFilterBoardFields.options', priority: 100)]

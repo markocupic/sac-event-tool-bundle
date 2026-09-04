@@ -20,9 +20,8 @@ use Markocupic\SacEventToolBundle\Database\SyncEventRegistrationDatabase;
 #[AsCronJob('40 4 * * *')]
 readonly class EventRegistrationDatabaseSyncCron
 {
-    public function __construct(
-        private SyncEventRegistrationDatabase $syncEventRegistrationDatabase,
-    ) {
+    public function __construct(private SyncEventRegistrationDatabase $syncEventRegistrationDatabase)
+    {
     }
 
     public function __invoke(): void

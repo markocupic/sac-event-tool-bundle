@@ -35,9 +35,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class SyncMemberDatabaseCommand extends Command
 {
-    public function __construct(
-        private readonly SyncMemberDatabase $syncMemberDatabase,
-    ) {
+    public function __construct(private readonly SyncMemberDatabase $syncMemberDatabase)
+    {
         parent::__construct();
     }
 
