@@ -1331,6 +1331,9 @@ class CalendarEvents
         );
     }
 
+    /**
+     * Return the Swisstopo coordinates in a more human‑readable format, e.g. "2'600'000, 2'000'000".
+     */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.coordsCH1903.load', priority: 100)]
     public function formatSwissTopoCoords(string $value, DataContainer $dc): string
     {
