@@ -26,13 +26,47 @@ import {boundingExtent} from 'ol/extent.js';
 
 
 const DEFAULT_MARKER_SRC = 'bundles/markocupicsaceventtool/icons/swisstopo/map-marker-red.svg';
-const DEFAULT_BUBBLE_SRC = 'bundles/markocupicsaceventtool/icons/swisstopo/tourtypes/bubble.svg';
+
+// ---------------------------------------------------------------------------
+// Marker appearance - adjust here.
+// ---------------------------------------------------------------------------
+
+// Speech bubble holding the tour type icon.
+const BUBBLE_FILL = '#D62828';          // background
+const BUBBLE_STROKE = '#D62828';        // border
+const BUBBLE_STROKE_WIDTH = 1.6;        // border width
 
 // Speech bubble geometry (px). The tail tip is the anchor that sits on the coordinate.
 const BUBBLE_WIDTH = 56;
 const BUBBLE_HEIGHT = 66;   // 56 body + 10 tail
 const BUBBLE_BODY = 56;
 const TOUR_TYPE_ICON_SIZE = 40;
+
+// Outline of the bubble: rounded body plus the tail, drawn in one path so the
+// border does not cut across the tail.
+const BUBBLE_PATH = 'M10 1 H46 A9 9 0 0 1 55 10 V46 A9 9 0 0 1 46 55 H34 L28 64.6 L22 55 '
+    + 'H10 A9 9 0 0 1 1 46 V10 A9 9 0 0 1 10 1 Z';
+
+/**
+ * Builds the speech bubble as an inline SVG data URI. An external SVG loaded
+ * through Icon({src}) cannot be recoloured, so it is generated here instead.
+ *
+ * @param {string} fill
+ * @param {string} stroke
+ * @param {number} strokeWidth
+ * @return {string}
+ */
+function buildBubbleSrc(fill, stroke, strokeWidth) {
+  // width/height are required: without an intrinsic size the browser cannot
+  // scale the data URI correctly and the bubble is drawn distorted.
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg"'
+      + ' width="' + BUBBLE_WIDTH + '" height="' + BUBBLE_HEIGHT + '"'
+      + ' viewBox="0 0 ' + BUBBLE_WIDTH + ' ' + BUBBLE_HEIGHT + '">'
+      + '<path d="' + BUBBLE_PATH + '" fill="' + fill + '" stroke="' + stroke
+      + '" stroke-width="' + strokeWidth + '" stroke-linejoin="round"/></svg>';
+
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
 
 // Cluster bubble.
 const CLUSTER_COLOR = 'rgba(214, 40, 40, 0.92)';
@@ -50,6 +84,9 @@ class SwisstopoMap {
    * @param {number[]} center
    * @param {{
    *   tourTypeIcons?: Object<number, string>,
+   *   bubbleFill?: string,
+   *   bubbleStroke?: string,
+   *   bubbleStrokeWidth?: number,
    *   bubbleSrc?: string,
    *   cluster?: boolean,
    *   clusterDistance?: number,
@@ -64,7 +101,13 @@ class SwisstopoMap {
    */
   constructor(elementId, zoom = 5, center = [2600000, 1200000], options = {}) {
     this.map = null;
-    this.bubbleSrc = options.bubbleSrc ?? DEFAULT_BUBBLE_SRC;
+    // A ready-made image may still be handed in via bubbleSrc; otherwise the
+    // bubble is generated from the colours above.
+    this.bubbleSrc = options.bubbleSrc ?? buildBubbleSrc(
+        options.bubbleFill ?? BUBBLE_FILL,
+        options.bubbleStroke ?? BUBBLE_STROKE,
+        options.bubbleStrokeWidth ?? BUBBLE_STROKE_WIDTH,
+    );
     this.tourTypeIcons = options.tourTypeIcons ?? {};
     this.clusterEnabled = options.cluster ?? true;
     this.clusterMaxResolution = options.clusterMaxResolution ?? 20;
