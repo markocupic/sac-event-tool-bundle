@@ -56,7 +56,9 @@ use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyPackageModel;
 use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
+use Markocupic\SacEventToolBundle\String\Normalizer\SwissTopoLV95Normalizer;
 use Markocupic\SacEventToolBundle\String\Validator\DateValidator;
+use Markocupic\SacEventToolBundle\String\Validator\SwissTopoLV95Validator;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -1327,6 +1329,46 @@ class CalendarEvents
             $strAuthor,
             $strRegistrations,
         );
+    }
+
+    /**
+     * Return the Swisstopo coordinates in a more human‑readable format, e.g. "2'600'000, 2'000'000".
+     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.coordsCH1903.load', priority: 100)]
+    public function formatSwissTopoCoords(string $value, DataContainer $dc): string
+    {
+        if ('' === $value) {
+            return '';
+        }
+
+        if (!SwissTopoLV95Validator::isValid($value)) {
+            return $value;
+        }
+
+        [$north, $east] = explode(',', $value);
+
+        $east = number_format((float) $east, 0, '.', "'");
+        $north = number_format((float) $north, 0, '.', "'");
+
+        return $east.', '.$north;
+    }
+
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.coordsCH1903.save', priority: 100)]
+    public function validateSwissTopoCoords(string $input, DataContainer $dc): string
+    {
+        $coords = preg_replace('/\s+/', '', $input);
+
+        if ('' === $coords) {
+            return '';
+        }
+
+        $coords = SwissTopoLV95Normalizer::normalize($coords);
+
+        if (SwissTopoLV95Validator::isValid($coords)) {
+            return $coords;
+        }
+
+        return '';
     }
 
     /**

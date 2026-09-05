@@ -21,8 +21,10 @@ use Contao\Widget;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
+use Markocupic\SacEventToolBundle\String\Normalizer\SwissTopoLV95Normalizer;
 use Markocupic\SacEventToolBundle\String\Validator\AhvValidator;
 use Markocupic\SacEventToolBundle\String\Validator\CashAmountValidator;
+use Markocupic\SacEventToolBundle\String\Validator\SwissTopoLV95Validator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -49,6 +51,30 @@ readonly class AddCustomRegexpListener
         }
 
         return true;
+    }
+
+    #[AsHook('addCustomRegexp', priority: 100)]
+    public function isValidLV95Coords(string $regexp, $input, Widget $widget): bool
+    {
+        if ('swissTopoCoords' !== $regexp) {
+            return false;
+        }
+
+        $coords = preg_replace('/\s+/', '', (string) $input);
+
+        if ('' === $coords) {
+            return true;
+        }
+
+        $coords = SwissTopoLV95Normalizer::normalize($coords);
+
+        if (SwissTopoLV95Validator::isValid($coords)) {
+            return true;
+        }
+
+        $widget->addError($this->translator->trans('ERR.invalidSwissTopoCoords', [], 'contao_default'));
+
+        return false;
     }
 
     #[AsHook('addCustomRegexp', priority: 100)]
