@@ -19,10 +19,21 @@
             // Tour type ID => icon URL, built by the controller from the file
             // names in public/icons/swisstopo/tourtypes/svg (prefix = tour type ID).
             tourTypeIcons: {{ tour_type_icons|json_encode|raw }},
+
+            // Bundle overlapping markers into a red counter bubble (as on the
+            // SAC tour portal). Set to false to always draw every marker.
+            cluster: true,
+
+            // Once the view is zoomed in past this resolution (m/px) bundling
+            // stops, so every icon is guaranteed to be visible on its own.
+            // Smaller value = you have to zoom in further before they split up.
+            clusterMaxResolution: 20,
         }
 
         const swisstopoMap = new SwisstopoMap(mapConfig.elementId, mapConfig.zoom, mapConfig.center, {
             tourTypeIcons: mapConfig.tourTypeIcons,
+            cluster: mapConfig.cluster,
+            clusterMaxResolution: mapConfig.clusterMaxResolution,
         });
 
         document.addEventListener("DOMContentLoaded", async () => {
