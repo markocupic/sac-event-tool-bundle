@@ -1,0 +1,95 @@
+{% extends "@Contao/content_element/_base.html.twig" %}
+
+{% block content %}
+    {# CSS #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
+
+    {# Map Container #}
+    <div id="map" style="width: 100%; height: 500px;"></div>
+
+    <script src="{{ asset('swisstopo_map.js', 'markocupic_sac_event_tool') }}"></script>
+
+    <script>
+        const mapConfig = {
+            elementId: 'map',
+            center: [2662199, 1203479],
+            zoom: 3,
+            apiUrl: 'eventApi/events?dateStart={{ date_start }}&dateEnd={{ date_end }}&fields[]=coordsCH1903&fields[]=tourType&fields[]=title&fields[]=location&fields[]=id&limit={{ limit }}',
+
+            // Tour type ID => icon URL, built by the controller from the file
+            // names in public/icons/swisstopo/tourtypes/svg (prefix = tour type ID).
+            tourTypeIcons: {{ tour_type_icons|json_encode|raw }},
+        }
+
+        const swisstopoMap = new SwisstopoMap(mapConfig.elementId, mapConfig.zoom, mapConfig.center, {
+            tourTypeIcons: mapConfig.tourTypeIcons,
+        });
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const res = await fetch(mapConfig.apiUrl, {});
+
+            const json = await res.json();
+
+            if (!json.data ?? false) return;
+
+            json.data = json.data.map(item => ({
+                ...item,
+                title: contaoDecode(item.title)
+            }));
+
+            for (const data of json.data) {
+                let xCoord = data.coordsCH1903[0] ?? 0;
+                let yCoord = data.coordsCH1903[1] ?? 0;
+
+                if (xCoord && yCoord) {
+                    xCoord = parseInt(xCoord);
+                    yCoord = parseInt(yCoord);
+                    xCoord = xCoord < 2000000 ? xCoord + 2000000 : xCoord;
+                    yCoord = yCoord < 1000000 ? yCoord + 1000000 : yCoord;
+                    const url = `https://www.sac-pilatus.ch/touren-detailansicht/event-${data.id}.html`;
+
+                    swisstopoMap.addMarker(xCoord, yCoord, data.title, url, data.tourType);
+                }
+            }
+
+            function contaoDecode(str) {
+                if (!str) return "";
+
+                // 1) HTML-Entities decodieren (zweimal, falls doppelt encodiert)
+                const textarea = document.createElement("textarea");
+                textarea.innerHTML = str;
+                let decoded = textarea.value;
+
+                textarea.innerHTML = decoded;
+                decoded = textarea.value;
+
+                // 2) UTF‑8 Mojibake reparieren (Contao Klassiker)
+                const replacements = {
+                    "Ã¤": "ä",
+                    "Ã„": "Ä",
+                    "Ã¶": "ö",
+                    "Ã–": "Ö",
+                    "Ã¼": "ü",
+                    "Ãœ": "Ü",
+                    "ÃŸ": "ß",
+                    "â€“": "–",
+                    "â€”": "—",
+                    "â€ž": "„",
+                    "â€œ": "“",
+                    "â€": "”",
+                    "â€˜": "‘",
+                    "â€™": "’",
+                    "â€¢": "•",
+                    "â€¦": "…",
+                    "â‚¬": "€"
+                };
+
+                Object.keys(replacements).forEach(bad => {
+                    decoded = decoded.replaceAll(bad, replacements[bad]);
+                });
+
+                return decoded;
+            }
+        });
+    </script>
+{% endblock %}

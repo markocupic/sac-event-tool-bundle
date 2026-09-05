@@ -13,12 +13,13 @@ declare(strict_types=1);
  */
 
 use Contao\System;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentButtonGroupController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentUserPortraitListGroupController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentWrapperDivController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\PurgeEventFavoritesLinkController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\SwissTopoEventMapController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentUserPortraitListGroupController;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentButtonGroupController;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentWrapperDivController;
 
 // Palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes'][PurgeEventFavoritesLinkController::TYPE] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
@@ -28,6 +29,7 @@ $GLOBALS['TL_DCA']['tl_content']['palettes'][UserPortraitListController::TYPE] =
 $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentUserPortraitListGroupController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentButtonGroupController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentWrapperDivController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes'][SwissTopoEventMapController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
 	'exclude'    => true,

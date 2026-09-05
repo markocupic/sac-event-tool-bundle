@@ -17,12 +17,13 @@ use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentButtonGroupController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentUserPortraitListGroupController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentWrapperDivController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\PurgeEventFavoritesLinkController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\SwissTopoEventMapController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentUserPortraitListGroupController;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentButtonGroupController;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentWrapperDivController;
 
 // Content elements
 $GLOBALS['TL_LANG']['CTE']['sac_event_tool_content_elements'] = ['SAC Pilatus Inhalts-Elemente'];
@@ -32,6 +33,7 @@ $GLOBALS['TL_LANG']['CTE'][PurgeEventFavoritesLinkController::TYPE] = ['Vorgemer
 $GLOBALS['TL_LANG']['CTE'][NestedFragmentUserPortraitListGroupController::TYPE] = ['Nested Fragment - User-Portrait-Liste Inhaltselemente horizonal aufreihen'];
 $GLOBALS['TL_LANG']['CTE'][NestedFragmentButtonGroupController::TYPE] = ['Nested Fragment - Buttons horizontal aufreihen'];
 $GLOBALS['TL_LANG']['CTE'][NestedFragmentWrapperDivController::TYPE] = ['Nested Fragment - Wrapper DIV-Element'];
+$GLOBALS['TL_LANG']['CTE'][SwissTopoEventMapController::TYPE] = ['SwissTopo-Event-Karte'];
 
 // Override defaults
 $request = System::getContainer()->get('request_stack')->getCurrentRequest();

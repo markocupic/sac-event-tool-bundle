@@ -18,41 +18,13 @@ import VectorLayer from 'ol/layer/Vector.js';
 import VectorSource from 'ol/source/Vector.js';
 
 
-const DEFAULT_MARKER_SRC = 'bundles/markocupicsaceventtool/icons/swisstopo/map-marker-red.svg';
-const DEFAULT_BUBBLE_SRC = 'bundles/markocupicsaceventtool/icons/swisstopo/tourtypes/bubble.svg';
-
-// Speech bubble geometry (px). The tail tip is the anchor that sits on the coordinate.
-const BUBBLE_WIDTH = 56;
-const BUBBLE_HEIGHT = 66;   // 56 body + 10 tail
-const BUBBLE_BODY = 56;
-const TOUR_TYPE_ICON_SIZE = 40;
-
 class SwisstopoMap {
-    /**
-     * @param {string} elementId
-     * @param {number} zoom
-     * @param {number[]} center
-     * @param {{bubbleSrc?: string, tourTypeIcons?: Object<number, string>}} options
-     *        tourTypeIcons maps a tour type ID to the URL of its icon.
-     */
-    constructor(elementId, zoom = 5, center = [2600000, 1200000], options = {}) {
+    constructor(elementId, zoom = 5, center = [2600000, 1200000]) {
         this.map = null;
-        this.bubbleSrc = options.bubbleSrc ?? DEFAULT_BUBBLE_SRC;
-        this.tourTypeIcons = options.tourTypeIcons ?? {};
         this.#init(elementId, zoom, center);
     }
 
-    /**
-     * @param {number}                x
-     * @param {number}                y
-     * @param {string}                title
-     * @param {string}                url
-     * @param {number|string|Style|Style[]} tourType  Tour type ID (resolved via the
-     *        tourTypeIcons option), an icon URL, or a ready-made style.
-     */
-    addMarker(x, y, title, url, tourType = null) {
-
-        const style = this.#resolveMarkerStyle(tourType);
+    addMarker(x, y, title, url, style = this.#getDefaultMarkerStyle()) {
 
         const feature = new Feature({
             geometry: new Point([x, y]),
@@ -105,6 +77,15 @@ class SwisstopoMap {
             extent: [2420000, 1030000, 2900000, 1350000],
         });
 
+        // --- 3. MARKER STYLE ---
+        const markerStyle = new Style({
+            image: new Icon({
+                src: 'bundles/markocupicsaceventtool/icons/swisstopo/map-marker-red.svg',
+                anchor: [0.5, 1],
+                width: 38,
+                height: 40,
+            })
+        });
 
         // --- 4. MAP ---
         this.map = new Map({
@@ -188,85 +169,10 @@ class SwisstopoMap {
         });
     }
 
-    #resolveMarkerStyle(tourType) {
-
-        // A ready-made style (keeps the previous API working). Careful: the API
-        // delivers tourType as an array of IDs, so only an array *of styles*
-        // may be passed straight through.
-        if (tourType instanceof Style) {
-            return tourType;
-        }
-
-        if (Array.isArray(tourType) && tourType[0] instanceof Style) {
-            return tourType;
-        }
-
-        const iconSrc = this.getTourTypeIcon(tourType);
-
-        // No icon for this tour type -> fall back to the plain marker.
-        return iconSrc ? this.#getTourTypeMarkerStyle(iconSrc) : this.#getDefaultMarkerStyle();
-    }
-
-    /**
-     * Resolves a tour type to an icon URL. Accepts the ID itself, an array of
-     * IDs (the API delivers tourType as an array) or a ready-made URL.
-     *
-     * @param {number|string|Array} tourType
-     * @return {string|null}
-     */
-    getTourTypeIcon(tourType) {
-
-        if (Array.isArray(tourType)) {
-            tourType = tourType[0] ?? null;
-        }
-
-        if (null === tourType || '' === tourType) {
-            return null;
-        }
-
-        // A path or URL was passed in directly.
-        if (typeof tourType === 'string' && !/^\d+$/.test(tourType)) {
-            return tourType;
-        }
-
-        return this.tourTypeIcons[parseInt(tourType, 10)] ?? null;
-    }
-
-    /**
-     * A light grey speech bubble with the tour type icon centred in its body.
-     * Both layers share the same anchor point: the tip of the tail.
-     */
-    #getTourTypeMarkerStyle(iconSrc) {
-
-        // Distance from the tail tip up to the centre of the bubble body.
-        const iconOffsetY = BUBBLE_HEIGHT - (BUBBLE_BODY / 2);
-
-        return [
-            new Style({
-                image: new Icon({
-                    src: this.bubbleSrc,
-                    anchor: [0.5, 1],
-                    width: BUBBLE_WIDTH,
-                    height: BUBBLE_HEIGHT,
-                }),
-            }),
-            new Style({
-                image: new Icon({
-                    src: iconSrc,
-                    anchor: [0.5, 0.5],
-                    width: TOUR_TYPE_ICON_SIZE,
-                    height: TOUR_TYPE_ICON_SIZE,
-                    // Positive y shifts the icon upwards, into the bubble body.
-                    displacement: [0, iconOffsetY],
-                }),
-            }),
-        ];
-    }
-
     #getDefaultMarkerStyle() {
         return new Style({
             image: new Icon({
-                src: DEFAULT_MARKER_SRC,
+                src: 'bundles/markocupicsaceventtool/icons/swisstopo/map-marker-red.svg',
                 anchor: [0.5, 1],
                 width: 38,
                 height: 40,
