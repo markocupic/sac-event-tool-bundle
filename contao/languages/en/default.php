@@ -53,6 +53,7 @@ $GLOBALS['TL_LANG']['MSC']['level'] = 'Stufe';
 
 // tl_calendar_events
 $GLOBALS['TL_LANG']['ERR']['autoConfirm_and_addIban_not_allowed'] = 'Die Felder "IBAN-Nummer anzeigen" und "Online-Anmeldungen automatisch bestätigen" dürfen nicht beide aktiviert sein. Das Feld "Online-Anmeldungen automatisch bestätigen" wurde deshalb deaktiviert. Bitte überprüfen Sie Ihre Einstellungen.';
+$GLOBALS['TL_LANG']['ERR']['invalidSwissTopoCoords'] = 'Bitte geben Sie die Koordinaten in der Form "2\'600\'000,1\'200\'000" ein.';
 
 // tl_calendar_events_member
 $GLOBALS['TL_LANG']['ERR']['accessDenied'] = 'Zutritt verweigert.';

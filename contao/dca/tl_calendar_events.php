@@ -849,7 +849,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['coordsCH1903'] = [
 	'search'    => true,
 	'sorting'   => true,
 	'inputType' => 'text',
-	'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'm12 clr'],
+	'eval'      => ['mandatory' => false, 'maxlength' => 255, 'decodeEntities' => true, 'preserveTags' => true, 'rgxp' => 'swissTopoCoords', 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
