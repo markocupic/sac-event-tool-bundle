@@ -1345,7 +1345,7 @@ class CalendarEvents
             return $value;
         }
 
-        [$north, $east] = explode(',', $value);
+        [$east, $north] = explode(',', $value);
 
         $east = number_format((float) $east, 0, '.', "'");
         $north = number_format((float) $north, 0, '.', "'");
