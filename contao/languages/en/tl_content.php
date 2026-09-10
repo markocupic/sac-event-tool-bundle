@@ -15,6 +15,7 @@ declare(strict_types=1);
 // Legends
 $GLOBALS['TL_LANG']['tl_content']['jumpTo_legend'] = 'Weiterleitungs-Einstellungen';
 $GLOBALS['TL_LANG']['tl_content']['config_legend'] = 'Element-Einstellungen';
+$GLOBALS['TL_LANG']['tl_content']['swisstopo_map_legend'] = 'Swisstopo-Karte';
 
 // Fields
 $GLOBALS['TL_LANG']['tl_content']['userList_selectMode'] = ['Auswahltyp', 'Wählen Sie einen Auswahltyp aus.'];
@@ -25,6 +26,8 @@ $GLOBALS['TL_LANG']['tl_content']['userList_queryType'] = ['Abfragetyp (UND/ODER
 $GLOBALS['TL_LANG']['tl_content']['userList_showFieldsToGuests'] = ['Zeige Felder unangemeldeten Gästen', 'Zeige diese Felder unangemeldeten Gästen'];
 $GLOBALS['TL_LANG']['tl_content']['imgSize'] = ['Bildgrösse', 'Wählen Sie eine Bildgrösse aus.'];
 $GLOBALS['TL_LANG']['tl_content']['jumpTo'] = ['Weiterleitungsseite', 'Wählen Sie eine Weiterleitungsseite aus.'];
+$GLOBALS['TL_LANG']['tl_content']['swisstopoCenter'] = ['Karten-Mittelpunkt', 'Wählen Sie den Karten-Mittelpunkt aus bei Domready. z.B: 2600000,1200000.'];
+$GLOBALS['TL_LANG']['tl_content']['swisstopoZoom'] = ['Karten-Zoom', 'Wählen Sie das Karten-Zoom aus bei Domready. z.B: 250'];
 
 // References
 $GLOBALS['TL_LANG']['tl_content']['selectUserRoles'] = 'Anhand Benutzer-Rollen';

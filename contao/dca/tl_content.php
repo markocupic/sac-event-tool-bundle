@@ -13,12 +13,13 @@ declare(strict_types=1);
  */
 
 use Contao\System;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentButtonGroupController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentUserPortraitListGroupController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentWrapperDivController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\PurgeEventFavoritesLinkController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\SwisstopoEventMapController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentUserPortraitListGroupController;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentButtonGroupController;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\NestedFragmentWrapperDivController;
 
 // Palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes'][PurgeEventFavoritesLinkController::TYPE] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
@@ -28,6 +29,7 @@ $GLOBALS['TL_DCA']['tl_content']['palettes'][UserPortraitListController::TYPE] =
 $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentUserPortraitListGroupController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentButtonGroupController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentWrapperDivController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes'][SwisstopoEventMapController::TYPE] = 'name,type,headline;{swisstopo_map_legend},swisstopoCenter,swisstopoZoom;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
 	'exclude'    => true,
@@ -102,4 +104,22 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['imgSize'] = [
 	'eval'             => ['rgxp' => 'natural', 'includeBlankOption' => true, 'nospace' => true, 'helpwizard' => true, 'tl_class' => 'w50'],
 	'options_callback' => static fn() => System::getContainer()->get('contao.image.sizes')->getAllOptions(),
 	'sql'              => "varchar(64) NOT NULL default ''",
+];
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['swisstopoCenter'] = [
+	'exclude'   => true,
+	'search'    => true,
+	'sorting'   => true,
+	'inputType' => 'text',
+	'eval'      => ['mandatory' => true, 'maxlength' => 16, 'decodeEntities' => true, 'preserveTags' => true, 'rgxp' => 'swisstopoCoords', 'tl_class' => 'w50'],
+	'sql'       => "varchar(255) NOT NULL default '2600000,1200000'",
+];
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['swisstopoZoom'] = [
+	'exclude'   => true,
+	'search'    => true,
+	'sorting'   => true,
+	'inputType' => 'text',
+	'eval'      => ['mandatory' => true, 'maxlength' => 4, 'rgxp' => 'natural', 'tl_class' => 'w50'],
+	'sql'       => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 255],
 ];

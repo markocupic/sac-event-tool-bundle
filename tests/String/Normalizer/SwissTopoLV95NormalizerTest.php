@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Tests\String\Normalizer;
 
-use Markocupic\SacEventToolBundle\String\Normalizer\SwissTopoLV95Normalizer;
+use Markocupic\SacEventToolBundle\String\Normalizer\SwisstopoLV95Normalizer;
 use PHPUnit\Framework\TestCase;
 
-final class SwissTopoLV95NormalizerTest extends TestCase
+final class SwisstopoLV95NormalizerTest extends TestCase
 {
     /**
      * A valid (or normalizable) input is returned as a clean "easting,northing" string.
@@ -26,7 +26,7 @@ final class SwissTopoLV95NormalizerTest extends TestCase
      */
     public function testNormalizeReturnsNormalizedCoords(string $input, string $expected): void
     {
-        $this->assertSame($expected, SwissTopoLV95Normalizer::normalize($input));
+        $this->assertSame($expected, SwisstopoLV95Normalizer::normalize($input));
     }
 
     /**
@@ -36,7 +36,7 @@ final class SwissTopoLV95NormalizerTest extends TestCase
      */
     public function testNormalizeReturnsEmptyStringForInvalidInput(string $input): void
     {
-        $this->assertSame('', SwissTopoLV95Normalizer::normalize($input));
+        $this->assertSame('', SwisstopoLV95Normalizer::normalize($input));
     }
 
     public static function provideNormalizableCoords(): iterable

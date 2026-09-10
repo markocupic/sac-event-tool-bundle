@@ -47,6 +47,8 @@ class BackendAssetsSubscriber implements EventSubscriberInterface
             // Add backend javascript
             $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('js/backend_edit_all_navbar_helper.js', 'markocupic_sac_event_tool');
 
+            $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('js/backend_swisstopo_location_search.js', 'markocupic_sac_event_tool');
+
             // Load Font Awesome Free GLOBALS['TL_JAVASCRIPT'][] =
             // $this->packages->getUrl('fontawesomefree/js/all.js',
             // 'markocupic/contao-component-fontawesome-free');

@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\String\Validator;
 
-final class SwissTopoLV95Validator
+final class SwisstopoLV95Validator
 {
     public const int EASTING_MIN = 2420000;
 

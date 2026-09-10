@@ -1,0 +1,529 @@
+{% extends "@Contao/content_element/_base.html.twig" %}
+
+{% block content %}
+    {# CSS #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
+    <style>
+        #swisstopoEventMap {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            max-height: 70vh;
+        }
+
+        /* On a phone 16/9 leaves too little height: the popup of a marker
+           would not fit above it any more. */
+        @media (max-width: 575.98px) {
+            #swisstopoEventMap {
+                aspect-ratio: 4 / 5;
+            }
+        }
+
+        /* Bootstrap's reboot already does this - kept as a fallback so the
+           tour type filter stays hidden even without Bootstrap. */
+        .swisstopo-event-map-filter[hidden],
+        .swisstopo-event-map-filter [hidden] {
+            display: none !important;
+        }
+    </style>
+
+    {# Map Container #}
+    <div id="swisstopoEventMap"></div>
+
+    {# Filter #}
+    <div id="mapFilter" class="swisstopo-event-map-filter row gx-3 gy-3 align-items-end mt-3" hidden>
+        <div class="col-12">
+            <div class="d-flex justify-content-end mb-3"><span id="filterCount" class="text-muted small"></span></div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <label class="form-label mb-1" for="filterYear">Jahr</label>
+            <select id="filterYear" class="form-select">
+                {# An empty value is the default: every upcoming event. #}
+                <option value="">Alle zukünftigen Events</option>
+                {% set year = "now"|date("Y") + 1 %}
+                {% for i in range(year, 2017) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <label class="form-label mb-1" for="filterEventType">Event-Typ</label>
+            <select id="filterEventType" class="form-select"></select>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3" id="filterTourTypeField" hidden>
+            <label class="form-label mb-1" for="filterTourType">Tourentyp</label>
+            <select id="filterTourType" class="form-select"></select>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <label class="form-label mb-1" for="filterOrganizer">Organisierende Gruppe</label>
+            <select id="filterOrganizer" class="form-select"></select>
+        </div>
+
+        <div class="col-12 d-flex flex-wrap justify-content-start gap-3 mt-3">
+            <button type="button" id="filterReset" class="btn btn-sm btn-primary">Filter zurücksetzen</button>
+        </div>
+    </div>
+
+    <script src="{{ asset('swisstopo_event_map.js', 'markocupic_sac_event_tool') }}"></script>
+
+    <script>
+        const mapConfig = {
+            elementId: 'swisstopoEventMap',
+
+            // The map is centered on this coordinate.
+            center: [{{ swisstopoCenter }}],
+
+            // The zoom level in m/px
+            zoom: {{ swisstopoZoom }},
+
+            // The api url
+            apiUrl: 'eventApi/events?dateStart={{ date_start }}&dateEnd={{ date_end }}&fields[]=organizers&fields[]=eventDates&fields[]=coordsCH1903&fields[]=tourType&fields[]=eventType&fields[]=title&fields[]=location&fields[]=id&limit={{ limit }}',
+
+            // Tour type ID => icon URL, built by the controller from the file
+            // names in public/icons/swisstopo/tourtypes/svg (prefix = tour type ID).
+            tourTypeIcons: {{ tour_type_icons|json_encode|raw }},
+
+            // Foreign key => title, used by the tooltip and the filter.
+            tourTypeNames: {{ tour_type_names|json_encode|raw }},
+
+            // Event organizer ID => title, used by the tooltip and the filter.
+            eventOrganizerNames: {{ event_organizer_names|json_encode|raw }},
+
+            // Event type alias (course, tour, ...) => title, from tl_event_type.
+            eventTypeNames: {{ event_type_names|json_encode|raw }},
+
+            // Only for these event types does the tour type filter appear -
+            // and only if the selection actually contains tour types.
+            tourTypeFilterEventTypes: ['tour', 'lastMinuteTour', 'course'],
+
+            // One finger scrolls the page, two fingers move the map; the mouse
+            // wheel only zooms together with Ctrl/Cmd. false = as before.
+            cooperativeGestures: true,
+
+            // Briefly shows the current zoom level in the corner of the map
+            // whenever it changes. Set to false to switch it off.
+            zoomIndicator: true,
+            zoomIndicatorTimeout: 1500,
+
+            // Wanderwege and Skitouren are only drawn once the view is zoomed
+            // in further than this resolution (m/px) - same unit as zoom above.
+            // 0 shows them at every zoom level.
+            trailLayerMaxResolution: 3,
+
+            // With a single event left, the map centres on that marker and
+            // zooms in to this resolution (m/px). Set to 0 to switch it off.
+            singleMarkerResolution: 5,
+
+            // The last filter selection is kept per browser under this key.
+            // Change it to give a second map its own memory.
+            filterStorageKey: 'swisstopo_event_map_filter',
+
+            // How long a stored selection stays valid (ms). After that the
+            // filter starts empty again. One day.
+            filterStorageMaxAge: 24 * 60 * 60 * 1000,
+
+            // Marker colour per event type. Only the entries given here are
+            // overridden, the rest keeps its default (course = blue,
+            // tour / lastMinuteTour = red, generalEvent = green).
+            eventTypeColors: {
+                course: {fill: '#1B6FD6', stroke: '#1B6FD6'},
+                tour: {fill: '#D62828', stroke: '#D62828'},
+                lastMinuteTour: {fill: '#D62828', stroke: '#D62828'},
+            },
+
+            // Bundle overlapping markers into a counter bubble (as on the
+            // SAC tour portal). Set to false to always draw every marker.
+            cluster: true,
+
+            // Once the view is zoomed in past this resolution (m/px) bundling
+            // stops, so every icon is guaranteed to be visible on its own.
+            // Smaller value = you have to zoom in further before they split up.
+            clusterMaxResolution: 20,
+        }
+
+        const swisstopoEventMap = new SwisstopoEventMap(mapConfig.elementId, mapConfig.zoom, mapConfig.center, {
+            tourTypeIcons: mapConfig.tourTypeIcons,
+            tourTypeNames: mapConfig.tourTypeNames,
+            eventOrganizerNames: mapConfig.eventOrganizerNames,
+            eventTypeColors: mapConfig.eventTypeColors,
+            cluster: mapConfig.cluster,
+            clusterMaxResolution: mapConfig.clusterMaxResolution,
+            trailLayerMaxResolution: mapConfig.trailLayerMaxResolution,
+            cooperativeGestures: mapConfig.cooperativeGestures,
+            zoomIndicator: mapConfig.zoomIndicator,
+            zoomIndicatorTimeout: mapConfig.zoomIndicatorTimeout,
+        });
+
+        // Already fetched periods, so switching back and forth between the
+        // years does not ask the API again.
+        const eventCache = new Map();
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            // The year decides which period is fetched, so a stored selection
+            // has to be known before the first request.
+            const stored = loadSelection();
+            const initialYear = configuredYears().includes(stored.year) ? stored.year : '';
+
+            // The events currently loaded. Changing the year reloads them.
+            let events = await loadEvents(initialYear);
+
+            if (!events) return;
+
+            renderMarkers(events);
+            initFilter();
+
+            /**
+             * Draws the given events. Called again on every filter change, so
+             * the markers always match the current selection.
+             */
+            function renderMarkers(events) {
+                swisstopoEventMap.clearMarkers();
+
+                let count = 0;
+
+                for (const data of events) {
+                    let xCoord = data.coordsCH1903[0] ?? 0;
+                    let yCoord = data.coordsCH1903[1] ?? 0;
+
+                    if (xCoord && yCoord) {
+                        xCoord = parseInt(xCoord);
+                        yCoord = parseInt(yCoord);
+                        xCoord = xCoord < 2000000 ? xCoord + 2000000 : xCoord;
+                        yCoord = yCoord < 1000000 ? yCoord + 1000000 : yCoord;
+                        const url = `https://www.sac-pilatus.ch/touren-detailansicht/event-${data.id}.html`;
+
+                        swisstopoEventMap.addMarker(xCoord, yCoord, data.title, url, data.tourType, data.eventType, {
+                            eventDates: data.eventDates,
+                            organizers: data.organizers,
+                        });
+
+                        ++count;
+                    }
+                }
+
+                // Move the view to the event closest to the configured centre,
+                // so the result of a filter change is never off screen. With a
+                // single event left, zoom in on it as well.
+                swisstopoEventMap.centerOnNearestMarker(mapConfig.center, {
+                    resolution: 1 === count ? mapConfig.singleMarkerResolution : 0,
+                });
+
+                return count;
+            }
+
+            /**
+             * Filter below the map. The options are built from the loaded
+             * events only, so nothing can be selected that yields no result.
+             */
+            function initFilter() {
+                const wrapper = document.getElementById('mapFilter');
+                const elYear = document.getElementById('filterYear');
+                const elEventType = document.getElementById('filterEventType');
+                const elTourType = document.getElementById('filterTourType');
+                const elTourTypeField = document.getElementById('filterTourTypeField');
+                const elOrganizer = document.getElementById('filterOrganizer');
+                const elCount = document.getElementById('filterCount');
+                const elReset = document.getElementById('filterReset');
+
+                // Always an array of strings, whatever the API delivered.
+                const toIds = value => (Array.isArray(value) ? value : [value])
+                    .filter(v => v !== null && v !== undefined && v !== '')
+                    .map(v => String(v));
+
+                const byLabel = (a, b) => a[1].localeCompare(b[1], 'de');
+
+                // The timestamps (seconds) of an event, as the repeat wizard
+                // delivers them: [{new_repeat: 1772668800}, ...].
+                const toTimestamps = event => (Array.isArray(event.eventDates) ? event.eventDates : [])
+                    .map(entry => (entry && typeof entry === 'object' ? entry.new_repeat ?? entry.value : entry))
+                    .map(timestamp => parseInt(timestamp, 10))
+                    .filter(Boolean);
+
+                const eventYears = event => toTimestamps(event)
+                    .map(timestamp => String(new Date(timestamp * 1000).getFullYear()));
+
+                // An event counts as upcoming until the end of its last day.
+                const isUpcoming = event => {
+                    const timestamps = toTimestamps(event);
+
+                    if (!timestamps.length) {
+                        return true;
+                    }
+
+                    const today = new Date();
+
+                    today.setHours(0, 0, 0, 0);
+
+                    return Math.max(...timestamps) * 1000 >= today.getTime();
+                };
+
+                const saveSelection = () => {
+                    try {
+                        window.localStorage.setItem(mapConfig.filterStorageKey, JSON.stringify({
+                            // Each change extends the lifetime by another day.
+                            expires: Date.now() + mapConfig.filterStorageMaxAge,
+                            selection: {
+                                year: elYear.value,
+                                eventType: elEventType.value,
+                                tourType: elTourTypeField.hidden ? '' : elTourType.value,
+                                organizer: elOrganizer.value,
+                            },
+                        }));
+                    } catch (e) {
+                        // Nothing to do - the filter just does not survive the reload.
+                    }
+                };
+
+                // Only selects a value that really exists as an option.
+                const selectIfAvailable = (select, value) => {
+                    if (value && [...select.options].some(option => option.value === value)) {
+                        select.value = value;
+                    }
+                };
+
+                const fillSelect = (select, entries, placeholder) => {
+                    const previous = select.value;
+
+                    select.innerHTML = '';
+                    select.appendChild(new Option(placeholder, ''));
+
+                    for (const [value, label] of entries) {
+                        select.appendChild(new Option(label, value));
+                    }
+
+                    // Keep the selection if it still exists.
+                    select.value = entries.some(([v]) => v === previous) ? previous : '';
+                };
+
+                // Event types occurring in the loaded events.
+                const eventTypeOptions = () => [...new Set(events.map(e => e.eventType).filter(Boolean))]
+                    .map(type => [type, mapConfig.eventTypeNames[type] ?? type])
+                    .sort(byLabel);
+
+                // Tour types / organizers are limited to the chosen event type.
+                const optionsFor = (key, names, eventType) => {
+                    const ids = new Set();
+
+                    events
+                        .filter(e => !eventType || e.eventType === eventType)
+                        .forEach(e => toIds(e[key]).forEach(id => ids.add(id)));
+
+                    return [...ids]
+                        .map(id => [id, names[id] ?? id])
+                        .sort(byLabel);
+                };
+
+                // After a year change the events are different ones, so the
+                // event type list has to be rebuilt as well.
+                const rebuildFilters = () => {
+                    fillSelect(elEventType, eventTypeOptions(), 'Alle');
+                    rebuildDependentFilters();
+                };
+
+                const rebuildDependentFilters = () => {
+                    const eventType = elEventType.value;
+                    const tourTypes = optionsFor('tourType', mapConfig.tourTypeNames, eventType);
+
+                    // The tour type filter only makes sense for these event
+                    // types, and only if there is something to choose from.
+                    const showTourType = mapConfig.tourTypeFilterEventTypes.includes(eventType)
+                        && tourTypes.length > 0;
+
+                    elTourTypeField.hidden = !showTourType;
+
+                    if (showTourType) {
+                        fillSelect(elTourType, tourTypes, 'Alle');
+                    } else {
+                        elTourType.value = '';
+                    }
+
+                    fillSelect(elOrganizer, optionsFor('organizers', mapConfig.eventOrganizerNames, eventType), 'Alle');
+                };
+
+                const apply = () => {
+                    const year = elYear.value;
+                    const eventType = elEventType.value;
+                    const tourType = elTourTypeField.hidden ? '' : elTourType.value;
+                    const organizer = elOrganizer.value;
+
+                    const filtered = events.filter(event => {
+                        // No year chosen -> only what is still ahead of us.
+                        if (year ? !eventYears(event).includes(year) : !isUpcoming(event)) {
+                            return false;
+                        }
+
+                        if (eventType && event.eventType !== eventType) {
+                            return false;
+                        }
+
+                        if (tourType && !toIds(event.tourType).includes(tourType)) {
+                            return false;
+                        }
+
+                        return !(organizer && !toIds(event.organizers).includes(organizer));
+                    });
+
+                    const count = renderMarkers(filtered);
+
+                    elCount.textContent = count === events.length
+                        ? `${count} Events`
+                        : `${count} von ${events.length} Events`;
+                };
+
+                const applyAndSave = () => {
+                    apply();
+                    saveSelection();
+                };
+
+                elEventType.addEventListener('change', () => {
+                    rebuildDependentFilters();
+                    applyAndSave();
+                });
+
+                elYear.addEventListener('change', async () => {
+                    events = await loadEvents(elYear.value);
+
+                    rebuildFilters();
+                    applyAndSave();
+                });
+                elTourType.addEventListener('change', applyAndSave);
+                elOrganizer.addEventListener('change', applyAndSave);
+
+                elReset.addEventListener('click', async () => {
+                    elYear.value = '';
+                    elEventType.value = '';
+                    elTourType.value = '';
+                    elOrganizer.value = '';
+
+                    events = await loadEvents('');
+
+                    rebuildFilters();
+                    applyAndSave();
+                });
+
+                // Restore the last selection. The year is already applied (its
+                // events were fetched above), the event type comes next because
+                // the other two filters are built from it.
+                selectIfAvailable(elYear, initialYear);
+                fillSelect(elEventType, eventTypeOptions(), 'Alle');
+                selectIfAvailable(elEventType, stored.eventType);
+                rebuildDependentFilters();
+                selectIfAvailable(elTourType, stored.tourType);
+                selectIfAvailable(elOrganizer, stored.organizer);
+
+                apply();
+
+                wrapper.hidden = false;
+            }
+
+            /**
+             * The selectable years, taken from the options in the template.
+             */
+            function configuredYears() {
+                return [...document.getElementById('filterYear').options]
+                    .map(option => option.value)
+                    .filter(Boolean);
+            }
+
+            /**
+             * Without a year the API is asked from today on (as configured in
+             * apiUrl). With a year the period is exactly that year, so a past
+             * year delivers something at all and the answer stays small.
+             */
+            function buildApiUrl(year) {
+                if (!year) {
+                    return mapConfig.apiUrl;
+                }
+
+                const url = new URL(mapConfig.apiUrl, window.location.href);
+
+                url.searchParams.set('dateStart', year + '-01-01');
+                url.searchParams.set('dateEnd', year + '-12-31');
+
+                return url.pathname + url.search;
+            }
+
+            async function loadEvents(year) {
+                const cacheKey = year || '';
+
+                if (eventCache.has(cacheKey)) {
+                    return eventCache.get(cacheKey);
+                }
+
+                const res = await fetch(buildApiUrl(year), {});
+                const json = await res.json();
+
+                const data = (json.data ?? []).map(item => ({
+                    ...item,
+                    title: contaoDecode(item.title),
+                }));
+
+                eventCache.set(cacheKey, data);
+
+                return data;
+            }
+
+            // The selection survives a reload, but expires after
+            // filterStorageMaxAge. Storage can be unavailable (private mode,
+            // disabled cookies), so never let it throw.
+            function loadSelection() {
+                try {
+                    const stored = JSON.parse(window.localStorage.getItem(mapConfig.filterStorageKey));
+
+                    // Expired, or written before the expiry date existed.
+                    if (!stored || !(stored.expires > Date.now())) {
+                        window.localStorage.removeItem(mapConfig.filterStorageKey);
+
+                        return {};
+                    }
+
+                    return stored.selection || {};
+                } catch (e) {
+                    return {};
+                }
+            }
+
+            function contaoDecode(str) {
+                if (!str) return "";
+
+                // 1) HTML-Entities decodieren (zweimal, falls doppelt encodiert)
+                const textarea = document.createElement("textarea");
+                textarea.innerHTML = str;
+                let decoded = textarea.value;
+
+                textarea.innerHTML = decoded;
+                decoded = textarea.value;
+
+                // 2) UTF‑8 Mojibake reparieren (Contao Klassiker)
+                const replacements = {
+                    "Ã¤": "ä",
+                    "Ã„": "Ä",
+                    "Ã¶": "ö",
+                    "Ã–": "Ö",
+                    "Ã¼": "ü",
+                    "Ãœ": "Ü",
+                    "ÃŸ": "ß",
+                    "â€“": "–",
+                    "â€”": "—",
+                    "â€ž": "„",
+                    "â€œ": "“",
+                    "â€": "”",
+                    "â€˜": "‘",
+                    "â€™": "’",
+                    "â€¢": "•",
+                    "â€¦": "…",
+                    "â‚¬": "€"
+                };
+
+                Object.keys(replacements).forEach(bad => {
+                    decoded = decoded.replaceAll(bad, replacements[bad]);
+                });
+
+                return decoded;
+            }
+        });
+    </script>
+{% endblock %}

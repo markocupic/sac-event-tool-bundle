@@ -14,25 +14,25 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Tests\String\Validator;
 
-use Markocupic\SacEventToolBundle\String\Validator\SwissTopoLV95Validator;
+use Markocupic\SacEventToolBundle\String\Validator\SwisstopoLV95Validator;
 use PHPUnit\Framework\TestCase;
 
-final class SwissTopoLV95ValidatorTest extends TestCase
+final class SwisstopoLV95ValidatorTest extends TestCase
 {
     /**
      * @dataProvider provideValidCoords
      */
-    public function testIsValidSwissTopoCoordsWithValidValues(string $coords): void
+    public function testIsValidSwisstopoCoordsWithValidValues(string $coords): void
     {
-        $this->assertTrue(SwissTopoLV95Validator::isValid($coords));
+        $this->assertTrue(SwisstopoLV95Validator::isValid($coords));
     }
 
     /**
      * @dataProvider provideInvalidCoords
      */
-    public function testIsValidSwissTopoCoordsWithInvalidValues(string $coords): void
+    public function testIsValidSwisstopoCoordsWithInvalidValues(string $coords): void
     {
-        $this->assertFalse(SwissTopoLV95Validator::isValid($coords));
+        $this->assertFalse(SwisstopoLV95Validator::isValid($coords));
     }
 
     public static function provideValidCoords(): iterable

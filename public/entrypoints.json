@@ -10,9 +10,9 @@
         "/bundles/markocupicsaceventtool/stimulus_frontend.12e5bf51.js"
       ]
     },
-    "swisstopo_map": {
+    "swisstopo_event_map": {
       "js": [
-        "/bundles/markocupicsaceventtool/swisstopo_map.78663e93.js"
+        "/bundles/markocupicsaceventtool/swisstopo_event_map.01670117.js"
       ]
     },
     "js/avatar_uploader": {
@@ -22,7 +22,7 @@
     },
     "css/be_stylesheet": {
       "css": [
-        "/bundles/markocupicsaceventtool/css/be_stylesheet.3ac8e784.css"
+        "/bundles/markocupicsaceventtool/css/be_stylesheet.eab917a0.css"
       ]
     }
   }

@@ -56,9 +56,9 @@ use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyPackageModel;
 use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
-use Markocupic\SacEventToolBundle\String\Normalizer\SwissTopoLV95Normalizer;
+use Markocupic\SacEventToolBundle\String\Normalizer\SwisstopoLV95Normalizer;
 use Markocupic\SacEventToolBundle\String\Validator\DateValidator;
-use Markocupic\SacEventToolBundle\String\Validator\SwissTopoLV95Validator;
+use Markocupic\SacEventToolBundle\String\Validator\SwisstopoLV95Validator;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -1335,13 +1335,13 @@ class CalendarEvents
      * Return the Swisstopo coordinates in a more human‑readable format, e.g. "2'600'000, 2'000'000".
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.coordsCH1903.load', priority: 100)]
-    public function formatSwissTopoCoords(string $value, DataContainer $dc): string
+    public function formatSwisstopoCoords(string $value, DataContainer $dc): string
     {
         if ('' === $value) {
             return '';
         }
 
-        if (!SwissTopoLV95Validator::isValid($value)) {
+        if (!SwisstopoLV95Validator::isValid($value)) {
             return $value;
         }
 
@@ -1354,7 +1354,7 @@ class CalendarEvents
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.coordsCH1903.save', priority: 100)]
-    public function validateSwissTopoCoords(string $input, DataContainer $dc): string
+    public function validateSwisstopoCoords(string $input, DataContainer $dc): string
     {
         $coords = preg_replace('/\s+/', '', $input);
 
@@ -1362,9 +1362,9 @@ class CalendarEvents
             return '';
         }
 
-        $coords = SwissTopoLV95Normalizer::normalize($coords);
+        $coords = SwisstopoLV95Normalizer::normalize($coords);
 
-        if (SwissTopoLV95Validator::isValid($coords)) {
+        if (SwisstopoLV95Validator::isValid($coords)) {
             return $coords;
         }
 

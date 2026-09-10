@@ -21,10 +21,10 @@ use Contao\Widget;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
-use Markocupic\SacEventToolBundle\String\Normalizer\SwissTopoLV95Normalizer;
+use Markocupic\SacEventToolBundle\String\Normalizer\SwisstopoLV95Normalizer;
 use Markocupic\SacEventToolBundle\String\Validator\AhvValidator;
 use Markocupic\SacEventToolBundle\String\Validator\CashAmountValidator;
-use Markocupic\SacEventToolBundle\String\Validator\SwissTopoLV95Validator;
+use Markocupic\SacEventToolBundle\String\Validator\SwisstopoLV95Validator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -56,7 +56,7 @@ readonly class AddCustomRegexpListener
     #[AsHook('addCustomRegexp', priority: 100)]
     public function isValidLV95Coords(string $regexp, $input, Widget $widget): bool
     {
-        if ('swissTopoCoords' !== $regexp) {
+        if ('swisstopoCoords' !== $regexp) {
             return false;
         }
 
@@ -66,13 +66,13 @@ readonly class AddCustomRegexpListener
             return true;
         }
 
-        $coords = SwissTopoLV95Normalizer::normalize($coords);
+        $coords = SwisstopoLV95Normalizer::normalize($coords);
 
-        if (SwissTopoLV95Validator::isValid($coords)) {
+        if (SwisstopoLV95Validator::isValid($coords)) {
             return true;
         }
 
-        $widget->addError($this->translator->trans('ERR.invalidSwissTopoCoords', [], 'contao_default'));
+        $widget->addError($this->translator->trans('ERR.invalidSwisstopoCoords', [], 'contao_default'));
 
         return false;
     }

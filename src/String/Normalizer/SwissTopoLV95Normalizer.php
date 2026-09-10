@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\String\Normalizer;
 
-use Markocupic\SacEventToolBundle\String\Validator\SwissTopoLV95Validator;
+use Markocupic\SacEventToolBundle\String\Validator\SwisstopoLV95Validator;
 
-final class SwissTopoLV95Normalizer
+final class SwisstopoLV95Normalizer
 {
     public static function normalize(mixed $coords): string
     {
@@ -64,7 +64,7 @@ final class SwissTopoLV95Normalizer
         $coords = $east.','.$north;
 
         // Validate final coordinate format and range
-        if (!SwissTopoLV95Validator::isValid($coords)) {
+        if (!SwisstopoLV95Validator::isValid($coords)) {
             return '';
         }
 
