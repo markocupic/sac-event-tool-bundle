@@ -25,7 +25,6 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardAvata
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardDeleteProfileController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEditProfileController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardPastEventsController;
-use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardUpcomingEventsController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\PrintTourListButtonController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListController;
@@ -63,7 +62,6 @@ $GLOBALS['TL_LANG']['FMD'][MemberDashboardAvatarUploadController::TYPE] = ['SAC 
 $GLOBALS['TL_LANG']['FMD'][MemberDashboardDeleteProfileController::TYPE] = ['SAC Mitgliederkonto Dashboard - Profil löschen'];
 $GLOBALS['TL_LANG']['FMD'][MemberDashboardEditProfileController::TYPE] = ['SAC Mitgliederkonto Dashboard - Profil bearbeiten'];
 $GLOBALS['TL_LANG']['FMD'][MemberDashboardPastEventsController::TYPE] = ['SAC Mitgliederkonto Dashboard - Meine absolvierten Events'];
-$GLOBALS['TL_LANG']['FMD'][MemberDashboardUpcomingEventsController::TYPE] = ['SAC Mitgliederkonto Dashboard - Meine nächsten Events'];
 $GLOBALS['TL_LANG']['FMD'][PilatusExportController::TYPE] = ['SAC Event-Export 2021 für Monatszeitschrift'];
 $GLOBALS['TL_LANG']['FMD'][TourDifficultyListController::TYPE] = ['Schwierigkeitsgrade Tabelle mit Erklärungen als Modalfenster'];
 $GLOBALS['TL_LANG']['FMD'][PrintTourListButtonController::TYPE] = ['Tour-Liste drucken button'];

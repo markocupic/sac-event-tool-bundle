@@ -16,6 +16,7 @@ declare(strict_types=1);
 $GLOBALS['TL_LANG']['tl_content']['jumpTo_legend'] = 'Weiterleitungs-Einstellungen';
 $GLOBALS['TL_LANG']['tl_content']['config_legend'] = 'Element-Einstellungen';
 $GLOBALS['TL_LANG']['tl_content']['swisstopo_map_legend'] = 'Swisstopo-Karte';
+$GLOBALS['TL_LANG']['tl_content']['member_dashboard_my_events_legend'] = 'Member Dashboard: Meine Events';
 
 // Fields
 $GLOBALS['TL_LANG']['tl_content']['userList_selectMode'] = ['Auswahltyp', 'Wählen Sie einen Auswahltyp aus.'];
@@ -28,6 +29,7 @@ $GLOBALS['TL_LANG']['tl_content']['imgSize'] = ['Bildgrösse', 'Wählen Sie eine
 $GLOBALS['TL_LANG']['tl_content']['jumpTo'] = ['Weiterleitungsseite', 'Wählen Sie eine Weiterleitungsseite aus.'];
 $GLOBALS['TL_LANG']['tl_content']['swisstopoCenter'] = ['Karten-Mittelpunkt', 'Wählen Sie den Karten-Mittelpunkt aus bei Domready. z.B: 2600000,1200000.'];
 $GLOBALS['TL_LANG']['tl_content']['swisstopoZoom'] = ['Karten-Zoom', 'Wählen Sie das Karten-Zoom aus bei Domready. z.B: 250'];
+$GLOBALS['TL_LANG']['tl_content']['eventUnsubscribePage'] = ['Seite mit dem Event Stornierungsmodul', 'Wählen Sie die Seite aus, auf der das Event Stornierungsmodul angezeigt wird.'];
 
 // References
 $GLOBALS['TL_LANG']['tl_content']['selectUserRoles'] = 'Anhand Benutzer-Rollen';

@@ -15,7 +15,6 @@ declare(strict_types=1);
 // Legends
 $GLOBALS['TL_LANG']['tl_module']['eventRegloginModule_legend'] = 'Login-Module-Einstellungen';
 $GLOBALS['TL_LANG']['tl_module']['member_dashboard_event_type_filter_legend'] = 'Member Dashboard: Event-Filter-Einstellungen';
-$GLOBALS['TL_LANG']['tl_module']['member_dashboard_upcoming_events_legend'] = 'Member Dashboard: Zukünftige Events';
 
 // Fields
 $GLOBALS['TL_LANG']['tl_module']['applyCalFilter'] = ['Kalender Filter anwenden', 'Wenn der Filter deaktiviert bleibt, werden alle Kalender berücksichtigt.'];
@@ -31,4 +30,3 @@ $GLOBALS['TL_LANG']['tl_module']['imageClass'] = ['Bild CSS Klasse', 'Geben Sie 
 $GLOBALS['TL_LANG']['tl_module']['print_export_allowedEventTypes'] = ['Anzuzeigende Event-Typen', 'Geben Sie die anzuzeigenden Event-Typen an.'];
 $GLOBALS['TL_LANG']['tl_module']['eventDeregistrationNotification'] = ['Benachrichtigung bei Eventstornierung', 'Wählen Sie eine Benachrichtigung aus, die versendet wird, wenn ein Mitglied sich von einem Event abmeldet.'];
 $GLOBALS['TL_LANG']['tl_module']['watchEventListModule'] = ['Bezug zu Event-List-Modul', 'Geben Sie an zu welchem Event-List-Modul Bezug hergestellt werden soll.'];
-$GLOBALS['TL_LANG']['tl_module']['eventDeregistrationPage'] = ['Seite mit dem Event Stornierungsmodul', 'Wählen Sie die Seite aus, auf der das Event Stornierungsmodul angezeigt wird.'];

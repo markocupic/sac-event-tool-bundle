@@ -1,5 +1,5 @@
 {% trans_default_domain 'contao_default' %}
-{% extends "@Contao/frontend_module/_base.html.twig" %}
+{% extends "@Contao/content_element/_base.html.twig" %}
 
 {% set searchable = false %}
 
@@ -18,33 +18,37 @@
     {% endif %}
     <div class="table-responsive">
         <table class="table">
-            <tr>
-                <th>Datum</th>
-                <th>Event</th>
-                <th>Anmeldestatus</th>
-                <th>&nbsp;</th>
-            </tr>
+            <thead>
+                <tr>
+                    <th scope="col">Datum</th>
+                    <th scope="col">Event</th>
+                    <th scope="col">Anmeldestatus</th>
+                    <th scope="col"><span class="visually-hidden">Aktionen</span></th>
+                </tr>
+            </thead>
+            <tbody>
             {% for event in arrUpcomingEvents|default([]) %}
                 {% set stateOfSubscription = ('MSC.' ~ event.eventRegistrationModel.stateOfSubscription)|trans %}
                 <tr>
                     <td>{{ event.dateSpan|raw }}</td>
                     <td>
-                        {% if  constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_RESCHEDULED') == event.eventState %}
-                            <small><span style="color:red">Event verschoben!</span></small><br>
+                        {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_RESCHEDULED') == event.eventState %}
+                            <small class="text-danger">Event verschoben!</small><br>
                         {% endif %}
                         {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_CANCELED') == event.eventState %}
-                            <small><span style="color:red">Event abgesagt!</span></small><br>
+                            <small class="text-danger">Event abgesagt!</small><br>
                         {% endif %}
                         <a href="{{ event.eventUrl }}" title="zum Event">{{ event.eventModel.title }}</a>
                     </td>
                     <td><span class="badge bg-primary">{{ stateOfSubscription }}</span></td>
                     <td class="text-center">
                         {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::USER_HAS_UNSUBSCRIBED') != event.eventRegistrationModel.stateOfSubscription %}
-                            <a href="{{ event.deregistrationUrl }}" role="button" title="Anmeldung stornieren" class="sign-out-from-event-button btn btn-sm btn-danger">stornieren</a>
+                            <a href="{{ event.unsubscribeUrl }}" role="button" title="Anmeldung stornieren" class="sign-out-from-event-button btn btn-sm btn-danger">stornieren</a>
                         {% endif %}
                     </td>
                 </tr>
             {% endfor %}
+            </tbody>
         </table>
     </div>
 {% endblock %}

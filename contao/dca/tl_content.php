@@ -20,6 +20,7 @@ use Markocupic\SacEventToolBundle\Controller\ContentElement\PurgeEventFavoritesL
 use Markocupic\SacEventToolBundle\Controller\ContentElement\SwisstopoEventMapController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\MemberDashboardMyEventsController;
 
 // Palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes'][PurgeEventFavoritesLinkController::TYPE] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
@@ -30,6 +31,7 @@ $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentUserPortraitListGroup
 $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentButtonGroupController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentWrapperDivController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][SwisstopoEventMapController::TYPE] = 'name,type,headline;{swisstopo_map_legend},swisstopoCenter,swisstopoZoom;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes'][MemberDashboardMyEventsController::TYPE] = '{title_legend},name,headline,type;{member_dashboard_my_events_legend},eventUnsubscribePage;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
 	'exclude'    => true,
@@ -122,4 +124,13 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['swisstopoZoom'] = [
 	'inputType' => 'text',
 	'eval'      => ['mandatory' => true, 'maxlength' => 4, 'rgxp' => 'natural', 'tl_class' => 'w50'],
 	'sql'       => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 255],
+];
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['eventUnsubscribePage'] = [
+	'exclude'    => true,
+	'inputType'  => 'pageTree',
+	'foreignKey' => 'tl_page.title',
+	'eval'       => ['mandatory' => true, 'fieldType' => 'radio'],
+	'sql'        => 'int(10) unsigned NOT NULL default 0',
+	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];
