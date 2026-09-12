@@ -1,0 +1,110 @@
+{% trans_default_domain 'contao_default' %}
+{% extends "@Contao/content_element/_base.html.twig" %}
+{% use "@Contao/component/_headline.html.twig" %}
+
+{% set searchable = false %}
+
+{% block content %}
+    {# Upcoming events #}
+    {% with { headline: { text: 'Meine nächsten Events', tag_name: 'h2' } } %}
+        {{ block('headline_component') }}
+    {% endwith %}
+
+    {% if hasInfoMessage|default %}
+        <div class="alert alert-info" role="alert">
+            {{ infoMessage|raw }}
+        </div>
+    {% endif %}
+    {% if hasErrorMessage|default %}
+        {% for message in errorMessages %}
+            <div class="alert alert-danger" role="alert">
+                {{ message|raw }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Datum</th>
+                <th scope="col">Event</th>
+                <th scope="col">Anmeldestatus</th>
+                <th scope="col"><span class="visually-hidden">Aktionen</span></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in upcomingEvents|default([]) %}
+                {% set event = item.event %}
+                {% set registration = item.registration %}
+                {% set stateOfSubscription = ('MSC.' ~ registration.stateOfSubscription)|trans %}
+                <tr>
+                    <td>{{ event.dateSpan|raw }}</td>
+                    <td>
+                        <div class="d-flex flex-column">
+                            {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_RESCHEDULED') == event.eventState %}
+                                <span class="mb-2 badge text-bg-danger">Event verschoben!</span>
+                            {% endif %}
+                            {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_CANCELED') == event.eventState %}
+                                <span class="mb-2 badge text-bg-danger">Event abgesagt!</span>
+                            {% endif %}
+                            <div>
+                                <a href="{{ event.eventUrl }}" title="zum Event">{{ event.title }}</a>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-primary">{{ stateOfSubscription }}</span></td>
+                    <td class="text-center">
+                        {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::USER_HAS_UNSUBSCRIBED') != registration.stateOfSubscription %}
+                            <a href="{{ registration.unsubscribeUrl }}" role="button" title="Anmeldung stornieren" class="sign-out-from-event-button btn btn-sm btn-danger">stornieren</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Past events #}
+    {% with { headline: { text: 'Meine vergangenen Events', tag_name: 'h2' } } %}
+        {{ block('headline_component') }}
+    {% endwith %}
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Datum</th>
+                <th scope="col">Event</th>
+                <th scope="col">Anmeldestatus</th>
+                <th scope="col">Teilnahme</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in pastEvents|default([]) %}
+                {% set event = item.event %}
+                {% set registration = item.registration %}
+
+                {% set stateOfSubscription = ('MSC.' ~ registration.stateOfSubscription)|trans %}
+                <tr>
+                    <td>{{ event.dateSpan|raw }}</td>
+                    <td>
+                        {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_RESCHEDULED') == event.eventState %}
+                            <span class="d-inline-block mb-2 badge text-bg-danger">Event verschoben!</span>
+                        {% endif %}
+                        {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_CANCELED') == event.eventState %}
+                            <span class="d-inline-block mb-2 badge text-bg-danger">Event abgesagt!</span>
+                        {% endif %}
+                        <span class="d-block">
+                            <a href="{{ event.eventUrl }}" title="zum Event">{{ event.title }}</a>
+                        </span>
+                    </td>
+                    <td><span class="badge bg-primary">{{ stateOfSubscription }}</span></td>
+                    <td class="text-center">
+                        {% if registration.hasParticipated|default %}Ja{% else %}Nein{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
