@@ -8,6 +8,7 @@ Encore
     .addEntry('stimulus_backend', './assets/stimulus_backend.js') // Register Stimulus controllers for the backend
     .addEntry('stimulus_frontend', './assets/stimulus_frontend.js') // Register Stimulus controllers for the frontend
     .addEntry('swisstopo_event_map', './assets/swisstopo_event_map.js') // Register the swisstopo map entry
+    .addEntry('member_dashboard_my_event_registrations', './assets/member_dashboard_my_event_registrations.js') // Turbo (streams only) for the "load more" button in the member dashboard
 
     .copyFiles({
       from: './assets/sounds',

@@ -1,0 +1,10 @@
+{# The wrapper is always rendered (even without a link), so a Turbo Stream can replace it by id.
+   data-turbo="true" is required because Turbo Drive is disabled globally (see assets/member_dashboard_my_event_registrations.js). #}
+<div id="member-dashboard-past-events-load-more" class="mt-2 d-flex justify-content-center" data-turbo="true">
+    {% if url|default %}
+        {# data-turbo-stream: Turbo requests the URL with "Accept: text/vnd.turbo-stream.html",
+           the controller then responds with the next rows only. Without Turbo the link
+           falls back to a regular page load showing all rows up to the new offset. #}
+        <a href="{{ url }}" data-turbo-stream class="btn btn-outline-primary btn-sm">Weitere Events laden</a>
+    {% endif %}
+</div>

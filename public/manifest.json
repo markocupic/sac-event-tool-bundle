@@ -2,6 +2,7 @@
   "stimulus_backend.js": "/bundles/markocupicsaceventtool/stimulus_backend.9995f93c.js",
   "stimulus_frontend.js": "/bundles/markocupicsaceventtool/stimulus_frontend.12e5bf51.js",
   "swisstopo_event_map.js": "/bundles/markocupicsaceventtool/swisstopo_event_map.01670117.js",
+  "member_dashboard_my_event_registrations.js": "/bundles/markocupicsaceventtool/member_dashboard_my_event_registrations.23f9efd8.js",
   "js/avatar_uploader.js": "/bundles/markocupicsaceventtool/js/avatar_uploader.d70fb22c.js",
   "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.eab917a0.css",
   "images/events/course/booklet/fallback.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/fallback.jpg",
@@ -98,6 +99,7 @@
   "stimulus_backend.9995f93c.js.map": "/bundles/markocupicsaceventtool/stimulus_backend.9995f93c.js.map",
   "stimulus_frontend.12e5bf51.js.map": "/bundles/markocupicsaceventtool/stimulus_frontend.12e5bf51.js.map",
   "swisstopo_event_map.01670117.js.map": "/bundles/markocupicsaceventtool/swisstopo_event_map.01670117.js.map",
+  "member_dashboard_my_event_registrations.23f9efd8.js.map": "/bundles/markocupicsaceventtool/member_dashboard_my_event_registrations.23f9efd8.js.map",
   "avatar_uploader.d70fb22c.js.map": "/bundles/markocupicsaceventtool/js/avatar_uploader.d70fb22c.js.map",
   "be_stylesheet.eab917a0.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.eab917a0.css.map"
 }

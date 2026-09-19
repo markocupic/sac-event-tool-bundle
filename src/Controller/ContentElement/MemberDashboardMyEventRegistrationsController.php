@@ -21,6 +21,7 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
 use Contao\CoreBundle\Exception\AccessDeniedException;
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\CoreBundle\Routing\ScopeMatcher;
@@ -37,11 +38,21 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 #[AsContentElement(MemberDashboardMyEventRegistrationsController::TYPE, category: 'sac_event_tool_content_elements')]
 class MemberDashboardMyEventRegistrationsController extends AbstractContentElementController
 {
     public const string TYPE = 'member_dashboard_my_event_registrations';
+
+    /**
+     * Number of past events shown initially and loaded per "load more" request.
+     */
+    private const int PAST_EVENTS_PAGE_SIZE = 10;
+
+    private const string PAST_EVENTS_OFFSET_PARAM = 'past_events_offset';
+
+    private const string TURBO_STREAM_FORMAT = 'text/vnd.turbo-stream.html';
 
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
@@ -49,6 +60,7 @@ class MemberDashboardMyEventRegistrationsController extends AbstractContentEleme
         private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly ScopeMatcher $scopeMatcher,
         private readonly Security $security,
+        private readonly Environment $twig,
         private readonly UriSigner $uriSigner,
         private readonly UrlParser $urlParser,
     ) {
@@ -72,6 +84,16 @@ class MemberDashboardMyEventRegistrationsController extends AbstractContentEleme
             throw new AccessDeniedException('Not authorized. Please log in as a frontend user.');
         }
 
+        // Load language
+        $this->getContaoAdapter(Controller::class)->loadLanguageFile('tl_calendar_events_member');
+
+        // "Load more" request (Turbo Stream): respond with the next past events only
+        if ($this->isTurboStreamRequest($request)) {
+            $offset = max(0, $request->query->getInt(self::PAST_EVENTS_OFFSET_PARAM));
+
+            throw new ResponseException($this->createPastEventsStreamResponse($user, $model, $request, $offset));
+        }
+
         // Handle messages
         if (empty($user->email) || !$this->getContaoAdapter(Validator::class)->isEmail($user->email)) {
             $this->getContaoAdapter(Message::class)->addInfo('Leider wurde für dieses Konto in der Datenbank keine gültige E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlege auf der Internetseite des Zentralverbands deine E-Mail-Adresse.');
@@ -80,14 +102,16 @@ class MemberDashboardMyEventRegistrationsController extends AbstractContentEleme
         // Add messages to the template
         $this->addMessagesToTemplate($template, $request);
 
-        // Load language
-        $this->getContaoAdapter(Controller::class)->loadLanguageFile('tl_calendar_events_member');
-
         // Upcoming events
         $template->set('upcomingEvents', $this->buildItems($this->fetchUpcomingEvents($user), $model, $request, true));
 
-        // Past events
-        $template->set('pastEvents', $this->buildItems($this->fetchPastEvents($user, 15), $model, $request, false));
+        // Past events: without Turbo the whole page is rendered with all rows up to offset + page size
+        // (see createPastEventsStreamResponse() for the "load more" Turbo Stream request)
+        $offset = max(0, $request->query->getInt(self::PAST_EVENTS_OFFSET_PARAM));
+        $page = $this->fetchPastEvents($user, 0, $offset + self::PAST_EVENTS_PAGE_SIZE);
+
+        $template->set('pastEvents', $this->buildItems($page['rows'], $model, $request, false));
+        $template->set('loadMorePastEventsUrl', $page['hasMore'] ? $this->buildLoadMorePastEventsUrl($request, $offset + self::PAST_EVENTS_PAGE_SIZE) : null);
 
         return $template->getResponse();
     }
@@ -110,11 +134,17 @@ class MemberDashboardMyEventRegistrationsController extends AbstractContentEleme
         ;
     }
 
-    private function fetchPastEvents(FrontendUser $user, int $limit = 10): array
+    /**
+     * Fetches one page of past events. One row more than requested is queried
+     * to find out whether there are more events without an extra COUNT query.
+     *
+     * @return array{rows: array<int, array<string, mixed>>, hasMore: bool}
+     */
+    private function fetchPastEvents(FrontendUser $user, int $offset, int $limit): array
     {
         $qb = $this->connection->createQueryBuilder();
 
-        return $qb
+        $rows = $qb
             ->select('e.id AS eventId', 'm.id AS regId')
             ->from('tl_calendar_events_member', 'm')
             ->innerJoin('m', 'tl_calendar_events', 'e', 'e.id = m.eventId')
@@ -124,9 +154,33 @@ class MemberDashboardMyEventRegistrationsController extends AbstractContentEleme
             ->setParameter('sacMemberId', $user->sacMemberId)
             ->setParameter('endDate', strtotime('today midnight'))
             ->orderBy('e.startDate', 'DESC')
-            ->setMaxResults($limit)
+            ->addOrderBy('e.id', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit + 1)
             ->fetchAllAssociative()
         ;
+
+        return [
+            'rows' => \array_slice($rows, 0, $limit),
+            'hasMore' => \count($rows) > $limit,
+        ];
+    }
+
+    private function isTurboStreamRequest(Request $request): bool
+    {
+        return str_contains((string) $request->headers->get('Accept'), self::TURBO_STREAM_FORMAT);
+    }
+
+    private function createPastEventsStreamResponse(FrontendUser $user, ContentModel $model, Request $request, int $offset): Response
+    {
+        $page = $this->fetchPastEvents($user, $offset, self::PAST_EVENTS_PAGE_SIZE);
+
+        $html = $this->twig->render('@Contao/content_element_partials/member_dashboard_my_event_registrations/_past_events_stream.html.twig', [
+            'pastEvents' => $this->buildItems($page['rows'], $model, $request, false),
+            'loadMorePastEventsUrl' => $page['hasMore'] ? $this->buildLoadMorePastEventsUrl($request, $offset + self::PAST_EVENTS_PAGE_SIZE) : null,
+        ]);
+
+        return new Response($html, Response::HTTP_OK, ['Content-Type' => self::TURBO_STREAM_FORMAT.'; charset=UTF-8']);
     }
 
     private function buildItems(array $rows, ContentModel $model, Request $request, bool $withUnsubscribeUrl): array
@@ -155,6 +209,11 @@ class MemberDashboardMyEventRegistrationsController extends AbstractContentEleme
         }
 
         return $items;
+    }
+
+    private function buildLoadMorePastEventsUrl(Request $request, int $offset): string
+    {
+        return $this->urlParser->addQueryString(self::PAST_EVENTS_OFFSET_PARAM.'='.$offset, $request->getUri());
     }
 
     private function buildUnsubscribePageUrl(ContentModel $model): string|null

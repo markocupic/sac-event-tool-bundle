@@ -15,6 +15,11 @@
         "/bundles/markocupicsaceventtool/swisstopo_event_map.01670117.js"
       ]
     },
+    "member_dashboard_my_event_registrations": {
+      "js": [
+        "/bundles/markocupicsaceventtool/member_dashboard_my_event_registrations.23f9efd8.js"
+      ]
+    },
     "js/avatar_uploader": {
       "js": [
         "/bundles/markocupicsaceventtool/js/avatar_uploader.d70fb22c.js"

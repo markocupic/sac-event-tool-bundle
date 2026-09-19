@@ -1,0 +1,26 @@
+{% trans_default_domain 'contao_default' %}
+{# Renders the table rows of the past events. Used by the content element template and by the Turbo Stream response. #}
+{% for item in pastEvents|default([]) %}
+    {% set event = item.event %}
+    {% set registration = item.registration %}
+
+    {% set stateOfSubscription = ('MSC.' ~ registration.stateOfSubscription)|trans %}
+    <tr>
+        <td>{{ event.dateSpan|raw }}</td>
+        <td>
+            {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_RESCHEDULED') == event.eventState %}
+                <span class="d-inline-block mb-2 badge text-bg-danger">Event verschoben!</span>
+            {% endif %}
+            {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_CANCELED') == event.eventState %}
+                <span class="d-inline-block mb-2 badge text-bg-danger">Event abgesagt!</span>
+            {% endif %}
+            <span class="d-block">
+                <a href="{{ event.eventUrl }}" title="zum Event">{{ event.title }}</a>
+            </span>
+        </td>
+        <td><span class="badge bg-primary">{{ stateOfSubscription }}</span></td>
+        <td class="text-center">
+            {% if registration.hasParticipated|default %}Ja{% else %}Nein{% endif %}
+        </td>
+    </tr>
+{% endfor %}
