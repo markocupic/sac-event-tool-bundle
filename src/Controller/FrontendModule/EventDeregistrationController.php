@@ -154,7 +154,7 @@ class EventDeregistrationController extends AbstractFrontendModuleController
 
     protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
     {
-        if (!$this->uriSigner->check($request->getRequestUri())) {
+        if (!$this->uriSigner->checkRequest($request)) {
             $this->getContaoAdapter(Message::class)->addError($this->translator->trans('MSC.evt_dereg_invalidRequest', [], 'contao_default'));
             $this->addMessagesToTemplate($template, $request);
 

@@ -12,6 +12,7 @@
     },
     "license": "MIT",
     "dependencies": {
+        "@hotwired/turbo": "^8.0.0",
         "@symfony/stimulus-bridge": "^4.0.1",
         "choices.js": "^11.1.0",
         "vue": "^3.5",

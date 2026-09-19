@@ -1,0 +1,11 @@
+{# Turbo Stream response for "load more": append the next rows and replace the "load more" button #}
+<turbo-stream action="append" target="member-dashboard-past-events">
+    <template>
+        {% include '@Contao/content_element_partials/member_dashboard_my_event_registrations/_past_event_rows.html.twig' with { pastEvents: pastEvents|default([]) } only %}
+    </template>
+</turbo-stream>
+<turbo-stream action="replace" target="member-dashboard-past-events-load-more">
+    <template>
+        {% include '@Contao/content_element_partials/member_dashboard_my_event_registrations/_past_events_load_more.html.twig' with { url: loadMorePastEventsUrl|default(null) } only %}
+    </template>
+</turbo-stream>

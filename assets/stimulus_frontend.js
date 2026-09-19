@@ -14,9 +14,9 @@ const context = require.context(
 
 application.load(context.keys()
     .map((key) => {
-        const identifier = identifierForContextKey(key);
-        if (identifier) {
-            return definitionForModuleAndIdentifier(context(key), `sacevt--${identifier}`);
-        }
+      const identifier = identifierForContextKey(key);
+      if (identifier) {
+        return definitionForModuleAndIdentifier(context(key), `sacevt--${identifier}`);
+      }
     }).filter((value) => value)
 );

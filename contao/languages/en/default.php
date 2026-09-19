@@ -24,7 +24,7 @@ use Markocupic\SacEventToolBundle\Controller\ContentElement\PurgeEventFavoritesL
 use Markocupic\SacEventToolBundle\Controller\ContentElement\SwisstopoEventMapController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
-use Markocupic\SacEventToolBundle\Controller\ContentElement\MemberDashboardMyEventsController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\MemberDashboardMyEventRegistrationsController;
 
 // Content elements
 $GLOBALS['TL_LANG']['CTE']['sac_event_tool_content_elements'] = ['SAC Pilatus Inhalts-Elemente'];
@@ -35,7 +35,7 @@ $GLOBALS['TL_LANG']['CTE'][NestedFragmentUserPortraitListGroupController::TYPE] 
 $GLOBALS['TL_LANG']['CTE'][NestedFragmentButtonGroupController::TYPE] = ['Nested Fragment - Buttons horizontal aufreihen'];
 $GLOBALS['TL_LANG']['CTE'][NestedFragmentWrapperDivController::TYPE] = ['Nested Fragment - Wrapper DIV-Element'];
 $GLOBALS['TL_LANG']['CTE'][SwisstopoEventMapController::TYPE] = ['Swisstopo-Event-Karte (Kartensuche)'];
-$GLOBALS['TL_LANG']['CTE'][MemberDashboardMyEventsController::TYPE] = ['SAC Mitgliederkonto Dashboard - Meine nächsten Events'];
+$GLOBALS['TL_LANG']['CTE'][MemberDashboardMyEventRegistrationsController::TYPE] = ['SAC Mitgliederkonto Dashboard - Meine Event Buchungen'];
 
 // Override defaults
 $request = System::getContainer()->get('request_stack')->getCurrentRequest();
