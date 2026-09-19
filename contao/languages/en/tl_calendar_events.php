@@ -116,6 +116,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'] = ['Zeitbeda
 $GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'] = ['Hinterlegte Kontaktdaten immer anzeigen', '<strong class="notice">!!! Wichtig, falls Online-Anmeldung deaktiviert ist !!!</strong> Die Kontaktdaten werden im Frontend im Feld "Anmeldungen" (auch für nicht eingeloggte Mitglieder) ausgegeben.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung individualisieren.', 'Hier können Sie den Text für die E-Mail-Anmeldebestätigung individualisieren.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung', 'Nutzen Sie dieses Feld, um eine individualisierte E-Mail-Bestätigungs für den Event zu erstellen. Fahren Sie mit der Maus über diesen Text, um mehr zu erfahren. Die Tags dienen als Platzhalter für eventspezifische Informationen.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['eventReminderSentAt'] = ['Event-Erinnerung versendet am', 'Zeitpunkt, an dem die Erinnerungs-E-Mail an Leiter und Teilnehmer versendet wurde.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventDurationInDays'] = ['Event-Dauer in Tagen', 'Geben Sie die Event-Dauer in Tagen an.'];
 
 // References

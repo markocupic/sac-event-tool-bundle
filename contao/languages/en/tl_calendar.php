@@ -19,6 +19,7 @@ $GLOBALS['TL_LANG']['tl_calendar']['event_type_legend'] = 'Event-Typen-Einstellu
 $GLOBALS['TL_LANG']['tl_calendar']['event_reader_legend'] = 'Event-Detailseite-Einstellungen';
 $GLOBALS['TL_LANG']['tl_calendar']['valid_time_period_legend'] = 'Einstellungen für Kalenderzeitspanne';
 $GLOBALS['TL_LANG']['tl_calendar']['event_release_level_legend'] = 'Freigabestufe-Einstellungen';
+$GLOBALS['TL_LANG']['tl_calendar']['event_reminder_legend'] = 'Event-Erinnerung-Einstellungen';
 
 // Fields
 $GLOBALS['TL_LANG']['tl_calendar']['allowedEventTypes'] = ['Erlaubte Event Typen', 'Wählen Sie die Event Typen, die im Kalender ausgewählt werden dürfen, aus.'];
@@ -30,6 +31,8 @@ $GLOBALS['TL_LANG']['tl_calendar']['validTimePeriodStart'] = ['Events ermöglich
 $GLOBALS['TL_LANG']['tl_calendar']['validTimePeriodStop'] = ['Events ermöglichen bis', 'Events bis zu diesem Zeitpunkt erlauben.'];
 $GLOBALS['TL_LANG']['tl_calendar']['enableMaxEventReleaseLevelProtection'] = ['Hochstufen auf höchste FS ab Datum ermöglichen', 'Mit dieser Einstellung kann verhindert werden, dass Nicht-Admins einen Event nicht vor einem festgelegten Datum auf die höchste Freigabestufe setzen können.'];
 $GLOBALS['TL_LANG']['tl_calendar']['maxEventReleaseLevelTimeLimit'] = ['Hochstufen auf höchste FS ab diesem Datum erlauben', 'Legen Sie ein Datum fest, ab welchem die Hochstufung auf die höchste Freigabestufe erlaubt werden soll.'];
+$GLOBALS['TL_LANG']['tl_calendar']['eventReminderOffset'] = ['Erinnerung x Tage vor Event-Start versenden', 'Anzahl Tage vor Event-Start, an denen die Erinnerung an Leiter und Teilnehmer versendet wird. 0 = keine Erinnerung.'];
+$GLOBALS['TL_LANG']['tl_calendar']['eventReminderNotification'] = ['Benachrichtigung für Event-Erinnerung', 'Wählen Sie eine Benachrichtigung vom Typ "Event-Erinnerung" aus. Pro Event wird genau eine E-Mail versendet (An/Antwort an: Hauptleiter, CC: weitere Leiter, BCC: Teilnehmer).'];
 
 // References
 $GLOBALS['TL_LANG']['tl_calendar'][EventType::COURSE] = 'SAC-Kurskalender';

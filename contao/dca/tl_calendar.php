@@ -55,10 +55,12 @@ PaletteManipulator::create()
 	->addLegend('event_release_level_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_type_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_reader_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
+	->addLegend('event_reminder_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addField(['enableEventStartDateValidation'], 'valid_time_period_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['enableMaxEventReleaseLevelProtection'], 'event_release_level_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['allowedEventTypes,notifyOnEventReleaseLevelChange,notifyOnEventPublish'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['userPortraitJumpTo'], 'event_reader_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['eventReminderOffset', 'eventReminderNotification'], 'event_reminder_legend', PaletteManipulator::POSITION_APPEND)
 	->applyToPalette('default', 'tl_calendar');
 
 // Fields
@@ -138,4 +140,22 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['maxEventReleaseLevelTimeLimit'] = [
 	'inputType' => 'text',
 	'eval'      => ['rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
 	'sql'       => 'bigint(20) unsigned NULL',
+];
+
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['eventReminderOffset'] = [
+	'exclude'   => true,
+	'inputType' => 'select',
+	'options'   => range(0, 365),
+	'eval'      => ['rgxp' => 'natural', 'tl_class' => 'w50'],
+	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 0, 'unsigned' => true],
+];
+
+// Notification (Notification Center, type "event_reminder") sent "eventReminderOffset" days before the event starts
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['eventReminderNotification'] = [
+	'exclude'    => true,
+	'inputType'  => 'select',
+	'foreignKey' => 'tl_nc_notification.title',
+	'eval'       => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
+	'sql'        => "int(10) unsigned NOT NULL default 0",
+	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];
