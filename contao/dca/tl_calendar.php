@@ -44,10 +44,12 @@ $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['disableGrouping'] = true;
 // Subpalettes
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableMaxEventReleaseLevelProtection'] = 'maxEventReleaseLevelTimeLimit';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableEventStartDateValidation'] = 'validTimePeriodStart,validTimePeriodStop';
+$GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['sendEventReminder'] = 'eventReminderOffset,eventReminderNotification';
 
 // Define selectors
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'enableMaxEventReleaseLevelProtection';
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'enableEventStartDateValidation';
+$GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'sendEventReminder';
 
 // Palettes
 PaletteManipulator::create()
@@ -60,7 +62,7 @@ PaletteManipulator::create()
 	->addField(['enableMaxEventReleaseLevelProtection'], 'event_release_level_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['allowedEventTypes,notifyOnEventReleaseLevelChange,notifyOnEventPublish'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['userPortraitJumpTo'], 'event_reader_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['eventReminderOffset', 'eventReminderNotification'], 'event_reminder_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['sendEventReminder'], 'event_reminder_legend', PaletteManipulator::POSITION_APPEND)
 	->applyToPalette('default', 'tl_calendar');
 
 // Fields
@@ -142,15 +144,30 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['maxEventReleaseLevelTimeLimit'] = [
 	'sql'       => 'bigint(20) unsigned NULL',
 ];
 
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['sendEventReminder'] = [
+	'filter'    => true,
+	'inputType' => 'checkbox',
+	'eval'      => ['submitOnChange' => true, 'tl_class' => 'm12 clr'],
+	'sql'       => ['type' => 'boolean', 'default' => false],
+];
+
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['eventReminderNotification'] = [
+	'exclude'    => true,
+	'inputType'  => 'select',
+	'foreignKey' => 'tl_nc_notification.title',
+	'eval'       => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
+	'sql'        => "int(10) unsigned NOT NULL default 0",
+	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
+];
+
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventReminderOffset'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
-	'options'   => range(0, 365),
+	'options'   => range(1, 365),
 	'eval'      => ['rgxp' => 'natural', 'tl_class' => 'w50'],
-	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 0, 'unsigned' => true],
+	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 14, 'unsigned' => true],
 ];
 
-// Notification (Notification Center, type "event_reminder") sent "eventReminderOffset" days before the event starts
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventReminderNotification'] = [
 	'exclude'    => true,
 	'inputType'  => 'select',

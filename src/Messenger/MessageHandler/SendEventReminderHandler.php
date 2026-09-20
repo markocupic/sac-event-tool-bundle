@@ -61,6 +61,11 @@ readonly class SendEventReminderHandler
         }
 
         $calendar = $this->framework->getAdapter(CalendarModel::class)->findById($event->pid);
+
+        if (!$calendar->sendEventReminder) {
+            return;
+        }
+
         $notificationId = (int) ($calendar?->eventReminderNotification ?? 0);
 
         if ($notificationId < 1) {

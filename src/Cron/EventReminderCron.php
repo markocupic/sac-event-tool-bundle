@@ -37,7 +37,7 @@ readonly class EventReminderCron
     public function __invoke(): void
     {
         $calendars = $this->connection->fetchAllAssociative(
-            'SELECT id, eventReminderOffset FROM tl_calendar WHERE eventReminderOffset > 0 AND eventReminderNotification > 0',
+            'SELECT id, eventReminderOffset FROM tl_calendar WHERE sendEventReminder = 1 AND eventReminderNotification > 0',
         );
 
         foreach ($calendars as $calendar) {
