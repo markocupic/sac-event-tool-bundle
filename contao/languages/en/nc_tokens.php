@@ -31,6 +31,7 @@ $GLOBALS['TL_LANG']['nc_tokens'][$type]['event_leistungen'] = 'Preis und Leistun
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['event_deregistration_limit'] = 'Abmeldefrist in Tagen vor Event-Start. Leer, wenn die Online-Abmeldung für den Event nicht erlaubt ist.';
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['event_link_detail'] = 'Absoluter Link zur Event-Detailseite.';
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['event_*'] = 'Weitere Event-Felder.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_raw_*'] = 'Weitere Event-Felder (Rohdaten).';
 
 // Hauptleiter
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['main_instructor_name'] = 'Name des Hauptleiters.';

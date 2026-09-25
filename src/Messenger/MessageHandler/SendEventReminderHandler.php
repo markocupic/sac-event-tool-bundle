@@ -62,7 +62,7 @@ readonly class SendEventReminderHandler
 
         $calendar = $this->framework->getAdapter(CalendarModel::class)->findById($event->pid);
 
-        if (!$calendar->sendEventReminder) {
+        if (null === $calendar || !$calendar->sendEventReminder) {
             return;
         }
 
@@ -119,13 +119,21 @@ readonly class SendEventReminderHandler
      */
     private function getParticipants(CalendarEventsModel $event): array
     {
-        return $this->connection->fetchAllAssociative(
-            'SELECT firstname, lastname, email
-             FROM tl_calendar_events_member
-             WHERE eventId = ? AND stateOfSubscription = ? AND email != ?
-             ORDER BY lastname, firstname',
-            [$event->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED, ''],
-        );
+        $qb = $this->connection->createQueryBuilder();
+        $qb
+            ->select('firstname', 'lastname', 'email')
+            ->from('tl_calendar_events_member')
+            ->where('eventId = :eventId')
+            ->andWhere('stateOfSubscription = :state')
+            ->andWhere('email != :emptyEmail')
+            ->orderBy('lastname')
+            ->addOrderBy('firstname')
+            ->setParameter('eventId', $event->id)
+            ->setParameter('state', EventSubscriptionState::SUBSCRIPTION_ACCEPTED)
+            ->setParameter('emptyEmail', '')
+        ;
+
+        return $qb->fetchAllAssociative();
     }
 
     private function getTokens(CalendarEventsModel $event, CalendarModel $calendar, array $participants): array
@@ -151,6 +159,13 @@ readonly class SendEventReminderHandler
             $mainInstructor = $instructors[0] ?? null;
         }
 
+        // If a registration coordinator is set, use it as main instructor
+        if (null !== ($regCoordinator = $userAdapter->findById($event->registrationGoesTo))) {
+            $mainInstructor = $regCoordinator;
+        }
+
+        // If $mainInstructor is null, keep all users (there is no main instructor).
+        // If $mainInstructor is set, keep only users whose ID does not match the main instructor's ID.
         $coInstructors = array_values(array_filter(
             $instructors,
             static fn (UserModel $user): bool => null === $mainInstructor || (int) $user->id !== (int) $mainInstructor->id,
@@ -161,7 +176,9 @@ readonly class SendEventReminderHandler
         $dataEvent = $event->row();
 
         foreach ($dataEvent as $key => $value) {
-            $tokens['event_'.$this->camelToSnake($key)] = $value;
+            $snake = $this->camelToSnake($key);
+            $tokens["event_$snake"] = $value;
+            $tokens["event_raw_$snake"] = $value;
         }
 
         $tokens['event_event_type_translated'] = $this->translator->trans('MSC.'.$event->eventType, [], 'contao_default');

@@ -75,6 +75,7 @@ class EventReminderNotificationType implements NotificationTypeInterface
                 'event_leistungen',
                 'event_deregistration_limit',
                 'event_link_detail',
+                'event_raw_*',
                 'event_*',
                 'main_instructor_name',
                 'main_instructor_email',
