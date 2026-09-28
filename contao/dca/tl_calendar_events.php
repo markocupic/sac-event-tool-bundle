@@ -822,6 +822,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfi
 	'sql'       => 'text NULL',
 ];
 
+// Timestamp of the sent event reminder (see EventReminderCron/SendEventReminderHandler), 0 = not sent yet
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReminderSentAt'] = [
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => ['rgxp' => 'datim', 'readonly' => true, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => 'w50'],
+	'sql'       => 'int(10) unsigned NOT NULL default 0',
+];
+
 // ****** Tour report fields **********:
 
 // Add a new field filledInEventReportForm
