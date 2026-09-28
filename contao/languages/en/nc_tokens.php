@@ -12,7 +12,6 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Markocupic\SacEventToolBundle\NotificationType\AcceptEventParticipationNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\EventDeregistrationNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\EventRegistrationNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\EventReminderNotificationType;
@@ -95,19 +94,6 @@ $GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_name'] = 'Vor- und Nachname
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_email'] = 'E-Mail-Adresse des Teilnehmers.';
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_uuid'] = 'UUID der Event-Anmeldung.';
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_state_of_subscription'] = 'Neuer Anmeldestatus des Teilnehmers (übersetzt, z.B. "Anmeldung bestätigt").';
-
-/*
- * Accept event participation
- */
-$type = AcceptEventParticipationNotificationType::NAME;
-
-$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_title'] = 'Titel des Events.';
-$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_course_id'] = 'Kursnummer (nur bei Kursen).';
-$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_name'] = 'Name des Leiters.';
-$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_email'] = 'E-Mail-Adresse des Leiters.';
-$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_name'] = 'Vor- und Nachname des Teilnehmers.';
-$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_email'] = 'E-Mail-Adresse des Teilnehmers.';
-$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_uuid'] = 'UUID der Event-Anmeldung.';
 
 /*
  * Event reminder

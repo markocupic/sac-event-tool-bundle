@@ -16,7 +16,6 @@ declare(strict_types=1);
 $GLOBALS['TL_LANG']['tl_nc_notification']['type']['sac_event_tool'] = 'SAC Event Tool';
 
 // Notification types
-$GLOBALS['TL_LANG']['tl_nc_notification']['type']['accept_event_participation'] = ['Event-Teilnahme bestätigen', 'Dieser Benachrichtigungstyp wird versandt, nachdem der Autor seinen Bericht zur Korrektur an die Redaktion freigegeben hat.'];
 $GLOBALS['TL_LANG']['tl_nc_notification']['type']['onchange_state_of_subscription'] = ['Benachrichtigung bei Änderung des Event-Anmeldestatus', 'Dieser Benachrichtigungstyp wird versandt, nachdem sich der Anmeldestatus geändert hat.'];
 $GLOBALS['TL_LANG']['tl_nc_notification']['type']['event_registration'] = ['Benachrichtigung nach dem Absenden des Event-Buchungsformulars', 'Dieser Benachrichtigungstyp wird versandt, nachdem eine Online Anmeldung eingegangen ist.'];
 $GLOBALS['TL_LANG']['tl_nc_notification']['type']['event_deregistration'] = ['Benachrichtigung bei Event-Stornierung', 'Dieser Benachrichtigungstyp wird bei der Stornierung einer Event-Teilnahme durch den Teilnehmer versandt.'];
