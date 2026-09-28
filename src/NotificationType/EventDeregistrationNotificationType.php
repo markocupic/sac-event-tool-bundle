@@ -37,11 +37,11 @@ class EventDeregistrationNotificationType implements NotificationTypeInterface
         $tokenDefinitions = [];
 
         foreach ($this->getTokenConfig()['text_token'] as $token) {
-            $tokenDefinitions[] = $this->factory->create(TextTokenDefinition::class, $token, 'event_registration.'.$token);
+            $tokenDefinitions[] = $this->factory->create(TextTokenDefinition::class, $token, self::NAME.'.'.$token);
         }
 
         foreach ($this->getTokenConfig()['email_token'] as $token) {
-            $tokenDefinitions[] = $this->factory->create(EmailTokenDefinition::class, $token, 'event_registration.'.$token);
+            $tokenDefinitions[] = $this->factory->create(EmailTokenDefinition::class, $token, self::NAME.'.'.$token);
         }
 
         return $tokenDefinitions;
@@ -57,15 +57,15 @@ class EventDeregistrationNotificationType implements NotificationTypeInterface
             'text_token' => [
                 'event_course_id',
                 'event_link_detail',
-                'event_name',
+                'event_title',
                 'event_type',
                 'instructor_email',
                 'instructor_name',
                 'participant_email',
                 'participant_name',
                 'participant_uuid',
+                'participant_sac_member_id',
                 'deregistration_cause',
-                'sac_member_id',
                 'state_of_subscription',
             ],
         ];

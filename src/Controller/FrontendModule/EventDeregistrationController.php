@@ -106,14 +106,15 @@ class EventDeregistrationController extends AbstractFrontendModuleController
         $tokens = [
             'state_of_subscription' => $this->translator->trans('MSC.'.$registration->stateOfSubscription, [], 'contao_default'),
             'event_course_id' => $calendarEvent->courseId,
-            'event_name' => $calendarEvent->title,
+            'event_title' => $calendarEvent->title,
             'event_type' => $calendarEvent->eventType,
             'instructor_name' => $instructor->name,
             'instructor_email' => $instructor->email,
             'participant_name' => $registration->firstname.' '.$registration->lastname,
             'participant_email' => $registration->email,
+            'participant_uuid' => $registration->uuid,
+            'participant_sac_member_id' => !empty($registration->sacMemberId) ? $registration->sacMemberId : 'keine',
             'event_link_detail' => $this->contentUrlGenerator->generate($calendarEvent, [], UrlGeneratorInterface::ABSOLUTE_URL),
-            'sac_member_id' => !empty($registration->sacMemberId) ? $registration->sacMemberId : 'keine',
             'deregistration_cause' => $event->getData()['deregistration_cause'],
         ];
 

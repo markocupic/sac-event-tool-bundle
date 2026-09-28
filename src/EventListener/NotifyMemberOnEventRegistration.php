@@ -107,6 +107,7 @@ final class NotifyMemberOnEventRegistration
             'instructor_email' => $delegatedInstructor['email'] ?? $instructor->email,
             'instructor_name' => $delegatedInstructor['name'] ?? $instructor->name,
             'participant_ahv_number' => $this->arrData['ahvNumber'] ?? '',
+            'participant_uuid' => $this->eventMemberModel->uuid,
             'participant_city' => $this->memberModel->city,
             'participant_contao_member_id' => $this->memberModel->id,
             'participant_date_of_birth' => $this->getDateOfBirth(),

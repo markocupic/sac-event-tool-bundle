@@ -382,7 +382,7 @@ class CalendarEventsMember
 
         $arrTokens = [
             'participant_state_of_subscription' => $this->stringUtil->revertInputEncoding((string) $GLOBALS['TL_LANG']['MSC'][$arrReg['stateOfSubscription']]),
-            'event_name' => $this->stringUtil->revertInputEncoding($objEvent->title),
+            'event_title' => $this->stringUtil->revertInputEncoding($objEvent->title),
             'participant_uuid' => $arrReg['uuid'],
             'participant_name' => $this->stringUtil->revertInputEncoding($arrReg['firstname'].' '.$arrReg['lastname']),
             'participant_email' => $arrReg['email'],

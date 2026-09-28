@@ -37,11 +37,11 @@ class AcceptEventParticipationNotificationType implements NotificationTypeInterf
         $tokenDefinitions = [];
 
         foreach ($this->getTokenConfig()['text_token'] as $token) {
-            $tokenDefinitions[] = $this->factory->create(TextTokenDefinition::class, $token, 'event_registration.'.$token);
+            $tokenDefinitions[] = $this->factory->create(TextTokenDefinition::class, $token, self::NAME.'.'.$token);
         }
 
         foreach ($this->getTokenConfig()['email_token'] as $token) {
-            $tokenDefinitions[] = $this->factory->create(EmailTokenDefinition::class, $token, 'event_registration.'.$token);
+            $tokenDefinitions[] = $this->factory->create(EmailTokenDefinition::class, $token, self::NAME.'.'.$token);
         }
 
         return $tokenDefinitions;
@@ -56,7 +56,7 @@ class AcceptEventParticipationNotificationType implements NotificationTypeInterf
             ],
             'text_token' => [
                 'event_course_id',
-                'event_name',
+                'event_title',
                 'instructor_email',
                 'instructor_name',
                 'participant_name',

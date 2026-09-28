@@ -37,11 +37,11 @@ class SubscriptionStateChangeNotificationType implements NotificationTypeInterfa
         $tokenDefinitions = [];
 
         foreach ($this->getTokenConfig()['text_token'] as $token) {
-            $tokenDefinitions[] = $this->factory->create(TextTokenDefinition::class, $token, 'event_registration.'.$token);
+            $tokenDefinitions[] = $this->factory->create(TextTokenDefinition::class, $token, self::NAME.'.'.$token);
         }
 
         foreach ($this->getTokenConfig()['email_token'] as $token) {
-            $tokenDefinitions[] = $this->factory->create(EmailTokenDefinition::class, $token, 'event_registration.'.$token);
+            $tokenDefinitions[] = $this->factory->create(EmailTokenDefinition::class, $token, self::NAME.'.'.$token);
         }
 
         return $tokenDefinitions;
@@ -55,7 +55,7 @@ class SubscriptionStateChangeNotificationType implements NotificationTypeInterfa
             ],
             'text_token' => [
                 'event_link_detail',
-                'event_name',
+                'event_title',
                 'participant_name',
                 'participant_state_of_subscription',
                 'participant_uuid',

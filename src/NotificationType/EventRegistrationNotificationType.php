@@ -37,11 +37,11 @@ class EventRegistrationNotificationType implements NotificationTypeInterface
         $tokenDefinitions = [];
 
         foreach ($this->getTokenConfig()['text_token'] as $token) {
-            $tokenDefinitions[] = $this->factory->create(TextTokenDefinition::class, $token, 'event_registration.'.$token);
+            $tokenDefinitions[] = $this->factory->create(TextTokenDefinition::class, $token, self::NAME.'.'.$token);
         }
 
         foreach ($this->getTokenConfig()['email_token'] as $token) {
-            $tokenDefinitions[] = $this->factory->create(EmailTokenDefinition::class, $token, 'event_registration.'.$token);
+            $tokenDefinitions[] = $this->factory->create(EmailTokenDefinition::class, $token, self::NAME.'.'.$token);
         }
 
         return $tokenDefinitions;
@@ -62,8 +62,7 @@ class EventRegistrationNotificationType implements NotificationTypeInterface
                 'event_id',
                 'event_leistungen',
                 'event_link_detail',
-                'event_name',
-                'event_state',
+                'event_title',
                 'event_type',
                 'event_type_translated',
                 'event_*',
@@ -81,6 +80,7 @@ class EventRegistrationNotificationType implements NotificationTypeInterface
                 'participant_mobile',
                 'participant_name',
                 'participant_notes',
+                'participant_phone',
                 'participant_postal',
                 'participant_sac_member_id',
                 'participant_section_membership',

@@ -12,8 +12,106 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\NotificationType\AcceptEventParticipationNotificationType;
+use Markocupic\SacEventToolBundle\NotificationType\EventDeregistrationNotificationType;
+use Markocupic\SacEventToolBundle\NotificationType\EventRegistrationNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\EventReminderNotificationType;
+use Markocupic\SacEventToolBundle\NotificationType\SubscriptionStateChangeNotificationType;
 
+/*
+ * Event registration
+ */
+$type = EventRegistrationNotificationType::NAME;
+
+// Event
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_id'] = 'ID des Events.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_title'] = 'Titel des Events.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_type'] = 'Event-Typ (Schlüssel, z.B. "tour" oder "course").';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_type_translated'] = 'Event-Typ (übersetzt, z.B. "Tour" oder "Kurs").';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_course_id'] = 'Kursnummer (nur bei Kursen).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_leistungen'] = 'Preis und Leistungen (Feld "Preis und Leistungen" im Event).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_add_iban'] = 'Gibt an, ob beim Event eine IBAN für die Einzahlung hinterlegt ist ("1" = ja, leer = nein).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_iban'] = 'IBAN für die Einzahlung der Event-Kosten. Leer, wenn keine IBAN hinterlegt ist.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_ibanBeneficiary'] = 'Zahlungsempfänger (Kontoinhaber) der IBAN. Leer, wenn keine IBAN hinterlegt ist.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_link_detail'] = 'Absoluter Link zur Event-Detailseite.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_*'] = 'Weitere Event-Felder.';
+
+// Instructor
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_name'] = 'Name des Leiters: Anmeldekoordinator ("Anmeldungen gehen an"), falls hinterlegt, sonst Hauptleiter.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_email'] = 'E-Mail-Adresse des Leiters: Anmeldekoordinator ("Anmeldungen gehen an"), falls hinterlegt, sonst Hauptleiter.';
+
+// Participant
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_name'] = 'Vor- und Nachname des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_email'] = 'E-Mail-Adresse des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_uuid'] = 'UUID der Event-Anmeldung.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_contao_member_id'] = 'Contao-Mitglieder-ID des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_sac_member_id'] = 'SAC-Mitgliedernummer des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_section_membership'] = 'Sektionszugehörigkeit(en) des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_state_of_subscription'] = 'Anmeldestatus des Teilnehmers (übersetzt, z.B. "Anmeldung bestätigt").';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_street'] = 'Strasse des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_postal'] = 'Postleitzahl des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_city'] = 'Wohnort des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_date_of_birth'] = 'Geburtsdatum des Teilnehmers (TT.MM.JJJJ).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_ahv_number'] = 'AHV-Nummer des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_phone'] = 'Telefonnummer des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_mobile'] = 'Mobilnummer des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_emergency_phone'] = 'Notfall-Telefonnummer des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_emergency_phone_name'] = 'Name der Notfall-Kontaktperson des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_food_habits'] = 'Essgewohnheiten des Teilnehmers (z.B. vegetarisch, Laktoseintoleranz).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_has_lead_climbing_education'] = 'Gibt an, ob der Teilnehmer eine Vorstiegsausbildung besitzt ("1" = ja, leer = nein).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_notes'] = 'Anmerkungen des Teilnehmers zur Anmeldung.';
+
+/*
+ * Event deregistration
+ */
+$type = EventDeregistrationNotificationType::NAME;
+
+// Event
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_title'] = 'Titel des Events.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_type'] = 'Event-Typ (Schlüssel, z.B. "tour" oder "course").';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_course_id'] = 'Kursnummer (nur bei Kursen).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_link_detail'] = 'Absoluter Link zur Event-Detailseite.';
+
+// Instructor
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_name'] = 'Name des Leiters: Anmeldekoordinator ("Anmeldungen gehen an"), falls hinterlegt, sonst Hauptleiter.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_email'] = 'E-Mail-Adresse des Leiters: Anmeldekoordinator ("Anmeldungen gehen an"), falls hinterlegt, sonst Hauptleiter.';
+
+// Participant
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_name'] = 'Vor- und Nachname des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_email'] = 'E-Mail-Adresse des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_uuid'] = 'UUID der Event-Anmeldung.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_sac_member_id'] = 'SAC-Mitgliedernummer des Teilnehmers ("keine", wenn nicht vorhanden).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['state_of_subscription'] = 'Anmeldestatus des Teilnehmers (übersetzt).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['deregistration_cause'] = 'Vom Teilnehmer angegebener Grund für die Abmeldung.';
+
+/*
+ * Subscription state change
+ */
+$type = SubscriptionStateChangeNotificationType::NAME;
+
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_title'] = 'Titel des Events.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_link_detail'] = 'Absoluter Link zur Event-Detailseite.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_name'] = 'Vor- und Nachname des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_email'] = 'E-Mail-Adresse des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_uuid'] = 'UUID der Event-Anmeldung.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_state_of_subscription'] = 'Neuer Anmeldestatus des Teilnehmers (übersetzt, z.B. "Anmeldung bestätigt").';
+
+/*
+ * Accept event participation
+ */
+$type = AcceptEventParticipationNotificationType::NAME;
+
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_title'] = 'Titel des Events.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_course_id'] = 'Kursnummer (nur bei Kursen).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_name'] = 'Name des Leiters.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_email'] = 'E-Mail-Adresse des Leiters.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_name'] = 'Vor- und Nachname des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_email'] = 'E-Mail-Adresse des Teilnehmers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['participant_uuid'] = 'UUID der Event-Anmeldung.';
+
+/*
+ * Event reminder
+ */
 $type = EventReminderNotificationType::NAME;
 
 // Event
