@@ -156,7 +156,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
 			'sql'       => 'binary(16) NULL',
 		],
 		'avbSvbUrl'                          => [
-			'exclude'   => false,
+			'exclude'   => true,
 			'search'    => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'url', 'decodeEntities' => true, 'maxlength' => 1022, 'tl_class' => 'w50'],
