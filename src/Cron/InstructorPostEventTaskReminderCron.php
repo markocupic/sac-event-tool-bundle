@@ -24,6 +24,7 @@ use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\ReminderSchedu
 use Markocupic\SacEventToolBundle\Messenger\Message\SendInstructorPostEventTaskReminderMessage;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * For every calendar with the instructor post-event task reminder enabled:
@@ -39,6 +40,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
 #[AsCronJob('45 3,4 * * *')]
 readonly class InstructorPostEventTaskReminderCron
 {
+    private const string STOP_WATCH_EVENT = 'instructor_post_event_task_reminder_cron';
+
     public function __construct(
         private Connection $connection,
         private ContaoFramework $framework,
@@ -51,6 +54,9 @@ readonly class InstructorPostEventTaskReminderCron
 
     public function __invoke(): void
     {
+        // Measure the whole run to see whether it gets close to max_execution_time
+        $stopwatchEvent = (new Stopwatch())->start(self::STOP_WATCH_EVENT);
+
         $this->framework->initialize();
 
         $calendarIds = $this->connection->fetchFirstColumn(
@@ -60,6 +66,7 @@ readonly class InstructorPostEventTaskReminderCron
         $calendarAdapter = $this->framework->getAdapter(CalendarModel::class);
         $now = new \DateTimeImmutable();
         $count = 0;
+        $calendarCount = 0;
 
         foreach ($calendarIds as $calendarId) {
             $calendar = $calendarAdapter->findById((int) $calendarId);
@@ -68,6 +75,7 @@ readonly class InstructorPostEventTaskReminderCron
                 continue;
             }
 
+            ++$calendarCount;
             $intervalDays = (int) $calendar->instructorPostEventTaskReminderInterval;
 
             foreach ($this->openTaskProvider->getRecipientIdsWithOpenTasks($calendar, $now) as $userId) {
@@ -80,7 +88,14 @@ readonly class InstructorPostEventTaskReminderCron
             }
         }
 
+        $duration = round($stopwatchEvent->stop()->getDuration() / 1000, 2);
+
         // The messages are handled (and the notifications sent) asynchronously by SendInstructorPostEventTaskReminderHandler
-        $this->contaoCronLogger?->info(\sprintf('Instructor post-event task reminder cron: dispatched %d message(s).', $count));
+        $this->contaoCronLogger?->info(\sprintf(
+            'Instructor post-event task reminder cron: checked %d calendar(s) and dispatched %d message(s) in %s s.',
+            $calendarCount,
+            $count,
+            $duration,
+        ));
     }
 }
