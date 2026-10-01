@@ -33,7 +33,7 @@ class TaskEvaluator
     /**
      * @param iterable<PostEventTaskInterface> $tasks sorted by priority (highest first)
      */
-    public function __construct(#[AutowireIterator(PostEventTaskInterface::TAG)] iterable $tasks,)
+    public function __construct(#[AutowireIterator(PostEventTaskInterface::TAG)] iterable $tasks)
     {
         $this->tasks = array_values([...$tasks]);
     }

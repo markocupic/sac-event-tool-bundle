@@ -17,7 +17,7 @@ Leiter (Haupt- und Hilfsleiter) sowie der Anmelde-Koordinator (`registrationGoes
 - `published = 1`
 - `eventState NOT IN ('event_canceled', 'event_rescheduled')`
 - `endDate > 0`. `endDate` ist der letzte Termin aus `eventDates`, er wird beim Speichern in `DataContainer\CalendarEvents` gesetzt.
-- Schonfrist abgelaufen: `endDate + firstOffset Tage <= heute`, gerechnet in ganzen Kalendertagen (Tagesbeginn, Zeitzone wie bei `EventReminderCron`)
+- Bearbeitungsfrist abgelaufen: `endDate + firstOffset Tage <= heute`, gerechnet in ganzen Kalendertagen (Tagesbeginn, Zeitzone wie bei `EventReminderCron`)
 - Lookback: `endDate >= heute - lookback Tage`
 
 ### Aufgaben pro Event
@@ -47,7 +47,7 @@ Jede Spalte dieser Tabelle ist eine eigene Task-Klasse (siehe «Aufgaben-Baustei
 - Erste Benachrichtigung: mindestens eine offene Aufgabe in einem fälligen Event und noch kein Log-Eintrag für (userId, calendarId)
 - Folgebenachrichtigung: weiterhin offene Aufgaben und `MAX(sentAt) + interval Tage <= jetzt`
 - Neu fällig gewordene Events durchbrechen das Intervall nicht
-- Events in der Schonfrist erscheinen nie in einer Benachrichtigung
+- Events in der Bearbeitungsfrist erscheinen nie in einer Benachrichtigung
 - Jeder Versand wird geloggt, das Log wird nicht gelöscht
 
 ## Benennung
@@ -90,7 +90,7 @@ Regeln:
 
 - Reihenfolge in der Mail über `#[AsTaggedItem(priority: …)]`, höhere Priorität zuerst.
 - Die Klasse liefert Label und Link, das Layout der Liste bleibt in den Twig-Templates (HTML und Text).
-- Die gemeinsamen Filter (`published`, `eventState`, `endDate`, Schonfrist, Lookback) gelten für alle Aufgaben und bleiben zentral im `OpenTaskProvider`. Eine Task-Klasse entscheidet nur über Eventtyp (`supports()`) und Status (`isOpen()`).
+- Die gemeinsamen Filter (`published`, `eventState`, `endDate`, Bearbeitungsfrist, Lookback) gelten für alle Aufgaben und bleiben zentral im `OpenTaskProvider`. Eine Task-Klasse entscheidet nur über Eventtyp (`supports()`) und Status (`isOpen()`).
 - Die Prüfungen laufen pro Event. Einfache, lesbare Abfragen gehen vor Optimierung. Falls nötig, kann später eine Vorlade-Methode für mehrere Events ins Interface kommen.
 - Die Aufgaben gelten für alle Empfänger gleich (Leiter und Koordinator). Das Interface kennt deshalb keine Rolle.
 
@@ -102,7 +102,7 @@ Regeln:
 |---|---|---|
 | `sendInstructorPostEventTaskReminder` | Checkbox, `submitOnChange`, Selector der Subpalette | `false` |
 | `instructorPostEventTaskReminderNotification` | Select auf `tl_nc_notification`, nur Typ `instructor_post_event_task_reminder` | `0` |
-| `instructorPostEventTaskReminderFirstOffset` | Integer, Schonfrist in Tagen nach `endDate` | `7` |
+| `instructorPostEventTaskReminderFirstOffset` | Integer, Bearbeitungsfrist in Tagen nach `endDate` | `7` |
 | `instructorPostEventTaskReminderInterval` | Integer, Tage zwischen Benachrichtigungen | `7` |
 | `instructorPostEventTaskReminderLookback` | Integer, Tage rückwirkend ab `endDate` | `365` |
 
@@ -135,7 +135,7 @@ Index: `(userId, calendarId, sentAt)`
 | `InstructorPostEventTaskReminder\ReminderSchedule` | reine Logik: Versand fällig? (lastSentAt, interval, now) |
 | `InstructorPostEventTaskReminder\OpenTaskProvider` | lädt die in Frage kommenden Events per SQL (gemeinsame Filter), prüft sie über den `TaskEvaluator`; `getOpenTasks(userId, calendar)`, `getUserIdsWithOpenTasks(calendar)`; Empfänger = Leiter ∪ Koordinator; nicht readonly (mockbar) |
 | `InstructorPostEventTaskReminder\TaskItem` | DTO einer offenen Aufgabe: name, label, url |
-| `InstructorPostEventTaskReminder\DataContainer\Calendar` | tl_calendar-Callbacks: Notification-Optionen (nur passender Typ), Validierung Lookback > Schonfrist |
+| `InstructorPostEventTaskReminder\DataContainer\Calendar` | tl_calendar-Callbacks: Notification-Optionen (nur passender Typ), Validierung Lookback > Bearbeitungsfrist |
 | `InstructorPostEventTaskReminder\ReminderLog` | `getLastSentAt(userId, calendarId)`, Log schreiben |
 | `Cron\InstructorPostEventTaskReminderCron` | `45 3,4 * * *` (zweiter Lauf fängt Verpasstes auf, das Intervall verhindert Duplikate), dispatcht Messages |
 | `Messenger\Message\SendInstructorPostEventTaskReminderMessage` | userId, calendarId; `LowPriorityMessageInterface` |
@@ -184,7 +184,7 @@ URL-Erzeugung wie im `MyEventsDashboardController`. Der Cron läuft per CLI, dah
 - `TourReportTaskTest`: `supports()` je Eventtyp, `isOpen()` mit und ohne Bericht
 - `ParticipationConfirmationTaskTest`: `supports()` je Eventtyp; keine Teilnehmer, keine Bestätigung, mindestens eine Bestätigung, hasParticipated nur bei nicht akzeptierter Anmeldung
 - `TaskEvaluatorTest`: nur unterstützte und offene Tasks, Reihenfolge nach Priorität (mit Dummy-Tasks)
-- `OpenTaskProvider`: gemeinsame Filter (abgesagt, verschoben, unveröffentlicht, Schonfrist, Lookback, `endDate = 0`), Koordinator ohne Leiterrolle, Koordinator gleichzeitig Leiter (keine Duplikate), Koordinator deaktiviert oder ohne E-Mail
+- `OpenTaskProvider`: gemeinsame Filter (abgesagt, verschoben, unveröffentlicht, Bearbeitungsfrist, Lookback, `endDate = 0`), Koordinator ohne Leiterrolle, Koordinator gleichzeitig Leiter (keine Duplikate), Koordinator deaktiviert oder ohne E-Mail
 - `ReminderScheduleTest`: erste Mail, Intervall nicht erreicht oder erreicht, Grenzen am Tageswechsel
 - `SendInstructorPostEventTaskReminderHandlerTest` mit Mocks
 - optional DB-Tests für `OpenTaskProvider` und `ReminderLog`

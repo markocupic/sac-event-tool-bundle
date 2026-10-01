@@ -169,7 +169,7 @@ $GLOBALS['TL_LANG']['nc_tokens'][$type]['open_task_count'] = 'Anzahl offener Auf
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['event_count'] = 'Anzahl Events mit offenen Aufgaben.';
 
 // Calendar settings
-$GLOBALS['TL_LANG']['nc_tokens'][$type]['first_offset_days'] = 'Schonfrist in Tagen nach Event-Ende (Einstellung im Kalender).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['first_offset_days'] = 'Bearbeitungsfrist in Tagen nach Event-Ende (Einstellung im Kalender).';
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['interval_days'] = 'Intervall in Tagen zwischen zwei Erinnerungen (Einstellung im Kalender).';
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['lookback_days'] = 'Anzahl Tage, die rückwirkend geprüft werden (Einstellung im Kalender).';
 

@@ -301,4 +301,4 @@ $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task']['tour_report'] = 'Toure
 $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task']['participation_confirmation'] = 'Teilnahme der Teilnehmenden bestätigen';
 $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_role']['instructor'] = 'als Leiter/in';
 $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_role']['registration_coordinator'] = 'als Anmelde-Koordinator/in';
-$GLOBALS['TL_LANG']['ERR']['instructorPostEventTaskReminderLookbackTooShort'] = 'Der Zeitraum für die rückwirkende Prüfung muss grösser als die Schonfrist sein.';
+$GLOBALS['TL_LANG']['ERR']['instructorPostEventTaskReminderLookbackTooShort'] = 'Der Zeitraum für die rückwirkende Prüfung muss grösser als die Bearbeitungsfrist sein.';
