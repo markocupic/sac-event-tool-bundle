@@ -45,11 +45,13 @@ $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['disableGrouping'] = true;
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableMaxEventReleaseLevelProtection'] = 'maxEventReleaseLevelTimeLimit';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableEventStartDateValidation'] = 'validTimePeriodStart,validTimePeriodStop';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['sendEventReminder'] = 'eventReminderOffset,eventReminderNotification';
+$GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['sendInstructorPostEventTaskReminder'] = 'instructorPostEventTaskReminderNotification,instructorPostEventTaskReminderFirstOffset,instructorPostEventTaskReminderInterval,instructorPostEventTaskReminderLookback';
 
 // Define selectors
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'enableMaxEventReleaseLevelProtection';
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'enableEventStartDateValidation';
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'sendEventReminder';
+$GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'sendInstructorPostEventTaskReminder';
 
 // Palettes
 PaletteManipulator::create()
@@ -58,11 +60,13 @@ PaletteManipulator::create()
 	->addLegend('event_type_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_reader_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_reminder_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
+	->addLegend('instructor_post_event_task_reminder_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addField(['enableEventStartDateValidation'], 'valid_time_period_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['enableMaxEventReleaseLevelProtection'], 'event_release_level_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['allowedEventTypes,notifyOnEventReleaseLevelChange,notifyOnEventPublish'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['userPortraitJumpTo'], 'event_reader_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['sendEventReminder'], 'event_reminder_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['sendInstructorPostEventTaskReminder'], 'instructor_post_event_task_reminder_legend', PaletteManipulator::POSITION_APPEND)
 	->applyToPalette('default', 'tl_calendar');
 
 // Fields
@@ -166,4 +170,47 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventReminderOffset'] = [
 	'options'   => range(1, 365),
 	'eval'      => ['rgxp' => 'natural', 'tl_class' => 'w50'],
 	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 14, 'unsigned' => true],
+];
+
+// Instructor post-event task reminder
+// Reminds instructors and registration coordinators of open tasks (tour report, participation confirmation) after an event.
+// See docs/features/instructor-post-event-task-reminder.md
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['sendInstructorPostEventTaskReminder'] = [
+	'exclude'   => true,
+	'filter'    => true,
+	'inputType' => 'checkbox',
+	'eval'      => ['submitOnChange' => true, 'tl_class' => 'm12 clr'],
+	'sql'       => ['type' => 'boolean', 'default' => false],
+];
+
+// Options: only notifications of type "instructor_post_event_task_reminder" (see DataContainer\Calendar)
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderNotification'] = [
+	'exclude'   => true,
+	'inputType' => 'select',
+	'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
+	'sql'       => "int(10) unsigned NOT NULL default 0",
+];
+
+// Grace period: days after tl_calendar_events.endDate before the first notification is sent
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderFirstOffset'] = [
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'minval' => 1, 'maxlength' => 4, 'tl_class' => 'w50 clr'],
+	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 7, 'unsigned' => true],
+];
+
+// Days between two notifications to the same recipient for this calendar
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderInterval'] = [
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'minval' => 1, 'maxlength' => 4, 'tl_class' => 'w50'],
+	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 7, 'unsigned' => true],
+];
+
+// Events whose endDate is more than x days in the past are no longer checked
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderLookback'] = [
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'minval' => 1, 'maxlength' => 4, 'tl_class' => 'w50'],
+	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 365, 'unsigned' => true],
 ];

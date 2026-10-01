@@ -295,3 +295,10 @@ $GLOBALS['TL_LANG']['ERR']['SACMemberIdShouldBeNumberOrZero'] = 'Das ist keine g
 $GLOBALS['TL_LANG']['ERR']['userWithThisSACMemberIdAlreadyExists'] = 'Es existiert bereits ein Benutzer mit der SAC Mitgliedernummer %s.';
 $GLOBALS['TL_LANG']['ERR']['invalidMinOrMaxMemberValue'] = 'Ungültige Eingabe! Geben Sie eine Zahl zwischen 2 und 999 ein.';
 $GLOBALS['TL_LANG']['ERR']['mustBePositiveCashAmount'] = 'Ungültige Eingabe! Geben Sie einem positiven Geldbetrag ein: z.B. 0 oder 10 oder 5.10';
+
+// Instructor post-event task reminder
+$GLOBALS['TL_LANG']['MSC']['instructor_post_event_task']['tour_report'] = 'Tourenbericht ausfüllen';
+$GLOBALS['TL_LANG']['MSC']['instructor_post_event_task']['participation_confirmation'] = 'Teilnahme der Teilnehmenden bestätigen';
+$GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_role']['instructor'] = 'als Leiter/in';
+$GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_role']['registration_coordinator'] = 'als Anmelde-Koordinator/in';
+$GLOBALS['TL_LANG']['ERR']['instructorPostEventTaskReminderLookbackTooShort'] = 'Der Zeitraum für die rückwirkende Prüfung muss grösser als die Schonfrist sein.';
