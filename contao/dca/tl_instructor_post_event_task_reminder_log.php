@@ -89,17 +89,19 @@ $GLOBALS['TL_DCA']['tl_instructor_post_event_task_reminder_log'] = [
 		],
 		'sentAt'         => [
 			'sorting' => true,
-			'flag'    => DataContainer::SORT_DAY_DESC,
+			'flag'    => DataContainer::SORT_DAY_BOTH,
 			'eval'    => ['rgxp' => 'datim'],
 			'sql'     => 'int(10) unsigned NOT NULL default 0',
 		],
 		// The how-manieth notification for this (user, calendar) pair, including this one (1 = first)
 		'reminderCount'  => [
 			'sorting' => true,
+			'flag'    => DataContainer::SORT_BOTH,
 			'sql'     => 'int(10) unsigned NOT NULL default 0',
 		],
 		'openTaskCount'  => [
 			'sorting' => true,
+			'flag'    => DataContainer::SORT_BOTH,
 			'sql'     => 'int(10) unsigned NOT NULL default 0',
 		],
 		// Comma separated list of tl_calendar_events.id
@@ -108,6 +110,8 @@ $GLOBALS['TL_DCA']['tl_instructor_post_event_task_reminder_log'] = [
 		],
 		'delivered'      => [
 			'filter'    => true,
+			'sorting'   => true,
+			'flag'      => DataContainer::SORT_BOTH,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
