@@ -55,11 +55,12 @@ class ReminderLog
     }
 
     /**
+     * @param int       $reminderCount the how-manieth notification for this (user, calendar) pair, including this one (1 = first)
      * @param list<int> $eventIds
      *
      * @return int the ID of the new log entry
      */
-    public function add(int $userId, int $calendarId, int $notificationId, int $sentAt, int $openTaskCount, array $eventIds): int
+    public function add(int $userId, int $calendarId, int $notificationId, int $sentAt, int $reminderCount, int $openTaskCount, array $eventIds): int
     {
         $this->connection->insert(self::TABLE, [
             'tstamp' => time(),
@@ -67,6 +68,7 @@ class ReminderLog
             'calendarId' => $calendarId,
             'notificationId' => $notificationId,
             'sentAt' => $sentAt,
+            'reminderCount' => $reminderCount,
             'openTaskCount' => $openTaskCount,
             'eventIds' => implode(',', $eventIds),
             'delivered' => 0,

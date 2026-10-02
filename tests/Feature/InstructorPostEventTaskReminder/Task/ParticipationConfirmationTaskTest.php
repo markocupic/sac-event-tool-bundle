@@ -39,7 +39,7 @@ final class ParticipationConfirmationTaskTest extends ContaoTestCase
         yield 'tour' => ['tour', true];
         yield 'last minute tour' => ['lastMinuteTour', true];
         yield 'course' => ['course', true];
-        yield 'general event' => ['generalEvent', false];
+        yield 'general event' => ['generalEvent', true];
     }
 
     /**

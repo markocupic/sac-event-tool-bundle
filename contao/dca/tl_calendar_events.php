@@ -267,7 +267,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId'] = [
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',
-	'eval'      => ['mandatory' => false, 'tl_class' => 'm12 clr'],
+	'eval'      => ['doNotCopy' => true, 'mandatory' => false, 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
@@ -545,7 +545,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
 	'inputType' => 'select',
 	'options'   => EventState::ALL,
 	'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-	'eval'      => ['mandatory' => false, 'submitOnChange' => true, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_calendar_events']['noSpecificEventState'], 'tl_class' => 'm12 clr'],
+	'eval'      => ['doNotCopy' => true, 'mandatory' => false, 'submitOnChange' => true, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_calendar_events']['noSpecificEventState'], 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
@@ -600,7 +600,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration'] 
 	'exclude'   => true,
 	'default'   => (int)BackendUser::getInstance()->disableOnlineRegistration,
 	'inputType' => 'checkbox',
-	'eval'      => ['tl_class' => 'm12 clr'],
+	'eval'      => ['doNotCopy' => false, 'tl_class' => 'm12 clr'],
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
@@ -626,7 +626,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['autoConfirm'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod'] = [
 	'exclude'   => true,
 	'inputType' => 'checkbox',
-	'eval'      => ['submitOnChange' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['doNotCopy' => true, 'submitOnChange' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
@@ -635,7 +635,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = [
 	'default'   => strtotime(Date::parse('Y-m-d')),
 	'exclude'   => true,
 	'inputType' => 'text',
-	'eval'      => ['rgxp' => 'date', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+	'eval'      => ['doNotCopy' => true, 'rgxp' => 'date', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
 	'sql'       => 'bigint(20) unsigned NULL',
 ];
 
@@ -644,7 +644,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate'] = [
 	'default'   => strtotime(Date::parse('Y-m-d')) + (2 * 24 * 3600) - 60,
 	'exclude'   => true,
 	'inputType' => 'text',
-	'eval'      => ['rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+	'eval'      => ['doNotCopy' => true, 'rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
 	'sql'       => 'bigint(20) unsigned NULL',
 ];
 
@@ -796,7 +796,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = [
 	'inputType'  => 'select',
 	'foreignKey' => 'tl_event_release_level_policy.title',
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
-	'eval'       => ['mandatory' => true, 'tl_class' => 'm12 clr'],
+	'eval'       => ['doNotCopy' => false, 'mandatory' => true, 'tl_class' => 'm12 clr'],
 	'sql'        => "int(10) unsigned NOT NULL default 0",
 ];
 
@@ -836,7 +836,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReminderSentAt'] = [
 // This field is autofilled if a user has filled in the event report
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm'] = [
 	'exclude' => false,
-	'eval'    => ['doNotShow' => true, 'tl_class' => 'm12 clr'],
+	'eval'    => ['doNotCopy' => true, 'doNotShow' => true, 'tl_class' => 'm12 clr'],
 	'sql'     => ['type' => 'boolean', 'default' => false],
 ];
 
@@ -847,7 +847,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
 	'inputType' => 'select',
 	'options'   => EventExecutionState::ALL,
 	'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-	'eval'      => ['submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => true, 'tl_class' => 'm12 clr', 'mandatory' => true],
+	'eval'      => ['doNotCopy' => true, 'submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => true, 'tl_class' => 'm12 clr', 'mandatory' => true],
 	'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
@@ -886,7 +886,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['linkSacRoutePortal'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
-	'eval'      => ['maxlength' => 128, 'tl_class' => 'm12 clr'],
+	'eval'      => ['doNotCopy' => true, 'maxlength' => 128, 'tl_class' => 'm12 clr'],
 	'sql'       => 'text NULL',
 ];
 
@@ -894,7 +894,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
-	'eval'      => ['mandatory' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['doNotCopy' => true, 'mandatory' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => 'text NULL',
 ];
 
@@ -904,7 +904,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = 
 	'inputType' => 'select',
 	'options'   => System::getContainer()->get(AvalancheLevel::class)->getAll(),
 	'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-	'eval'      => ['multiple' => false, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'm12 clr'],
+	'eval'      => ['doNotCopy' => true, 'multiple' => false, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
@@ -912,7 +912,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
-	'eval'      => ['tl_class' => 'm12 clr', 'mandatory' => false],
+	'eval'      => ['doNotCopy' => true, 'tl_class' => 'm12 clr', 'mandatory' => false],
 	'sql'       => 'text NULL',
 ];
 
@@ -920,7 +920,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReportAdditionalNotices'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
-	'eval'      => ['tl_class' => 'm12 clr', 'mandatory' => false],
+	'eval'      => ['doNotCopy' => true, 'tl_class' => 'm12 clr', 'mandatory' => false],
 	'sql'       => 'text NULL',
 ];
 
@@ -978,3 +978,4 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText']['eva
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReportAdditionalNotices']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration']['eval']['doNotCopy'] = false;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['rescheduledEventDate']['eval']['doNotCopy'] = true;

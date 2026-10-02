@@ -80,7 +80,6 @@ class InstructorPostEventTaskReminderNotificationType implements NotificationTyp
                 'event_count',
                 'first_offset_days',
                 'interval_days',
-                'lookback_days',
                 'reminder_count',
                 'link_my_events_dashboard',
             ],

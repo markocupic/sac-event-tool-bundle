@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['disableGrouping'] = true;
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableMaxEventReleaseLevelProtection'] = 'maxEventReleaseLevelTimeLimit';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableEventStartDateValidation'] = 'validTimePeriodStart,validTimePeriodStop';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['sendEventReminder'] = 'eventReminderOffset,eventReminderNotification';
-$GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['sendInstructorPostEventTaskReminder'] = 'instructorPostEventTaskReminderNotification,instructorPostEventTaskReminderFirstOffset,instructorPostEventTaskReminderInterval,instructorPostEventTaskReminderLookback';
+$GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['sendInstructorPostEventTaskReminder'] = 'instructorPostEventTaskReminderNotification,instructorPostEventTaskReminderEventTypes,instructorPostEventTaskReminderFirstOffset,instructorPostEventTaskReminderInterval';
 
 // Define selectors
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'enableMaxEventReleaseLevelProtection';
@@ -191,6 +191,18 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderNoti
 	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
+// Only events of these types are checked for open tasks.
+// Which tasks apply to an event type is decided by the task classes (PostEventTaskInterface::supports()).
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderEventTypes'] = [
+	'exclude'   => true,
+	'inputType' => 'select',
+	'options'   => EventType::ALL,
+	'reference' => &$GLOBALS['TL_LANG']['MSC'],
+	'default'   => [EventType::TOUR, EventType::LAST_MINUTE_TOUR, EventType::COURSE],
+	'eval'      => ['mandatory' => true, 'multiple' => true, 'chosen' => true, 'tl_class' => 'w50'],
+	'sql'       => 'blob NULL',
+];
+
 // Completion period: days after tl_calendar_events.endDate before the first notification is sent
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderFirstOffset'] = [
 	'exclude'   => true,
@@ -207,12 +219,4 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderInte
 	'options' => range(1, 30),
 	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'tl_class' => 'w50'],
 	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 7, 'unsigned' => true],
-];
-
-// Events whose endDate is more than x days in the past are no longer checked
-$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderLookback'] = [
-	'exclude'   => true,
-	'inputType' => 'text',
-	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'minval' => 1, 'maxlength' => 4, 'tl_class' => 'w50'],
-	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 365, 'unsigned' => true],
 ];

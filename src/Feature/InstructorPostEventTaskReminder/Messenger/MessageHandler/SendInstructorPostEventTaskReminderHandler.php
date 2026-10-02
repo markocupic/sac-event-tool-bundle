@@ -117,7 +117,7 @@ readonly class SendInstructorPostEventTaskReminderHandler
             $tokens = $this->getTokens($user, $calendar, $openTasks, $openTaskCount, $reminderCount);
 
             // Log first: better one missing reminder than a duplicate one
-            $logId = $this->reminderLog->add($userId, $calendarId, $notificationId, $now->getTimestamp(), $openTaskCount, $eventIds);
+            $logId = $this->reminderLog->add($userId, $calendarId, $notificationId, $now->getTimestamp(), $reminderCount, $openTaskCount, $eventIds);
 
             $receipts = $this->notificationCenter->sendNotification($notificationId, $tokens, $this->sacevtLocale);
 
@@ -167,7 +167,6 @@ readonly class SendInstructorPostEventTaskReminderHandler
             'event_count' => \count($openTasks),
             'first_offset_days' => (int) $calendar->instructorPostEventTaskReminderFirstOffset,
             'interval_days' => (int) $calendar->instructorPostEventTaskReminderInterval,
-            'lookback_days' => (int) $calendar->instructorPostEventTaskReminderLookback,
             'reminder_count' => $reminderCount,
             'link_my_events_dashboard' => $this->router->generate('contao_backend', [], UrlGeneratorInterface::ABSOLUTE_URL),
         ];

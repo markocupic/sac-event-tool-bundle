@@ -127,7 +127,7 @@ final class SendInstructorPostEventTaskReminderHandlerTest extends ContaoTestCas
         $this->reminderLog
             ->expects($this->once())
             ->method('add')
-            ->with(self::USER_ID, self::CALENDAR_ID, self::NOTIFICATION_ID, $this->greaterThan(0), 3, [10, 11])
+            ->with(self::USER_ID, self::CALENDAR_ID, self::NOTIFICATION_ID, $this->greaterThan(0), 2, 3, [10, 11])
             ->willReturnCallback(
                 function (): int {
                     $this->calls[] = 'log';
@@ -153,7 +153,7 @@ final class SendInstructorPostEventTaskReminderHandlerTest extends ContaoTestCas
                         $this->assertSame(2, $tokens['reminder_count']);
                         $this->assertSame(7, $tokens['first_offset_days']);
                         $this->assertSame(7, $tokens['interval_days']);
-                        $this->assertSame(365, $tokens['lookback_days']);
+                        $this->assertArrayNotHasKey('lookback_days', $tokens);
                         $this->assertSame('<html-list>', $tokens['task_list_html']);
                         $this->assertSame('text-list', $tokens['task_list_text']);
                         $this->assertSame('https://example.org/contao', $tokens['link_my_events_dashboard']);
@@ -209,7 +209,6 @@ final class SendInstructorPostEventTaskReminderHandlerTest extends ContaoTestCas
             'instructorPostEventTaskReminderNotification' => self::NOTIFICATION_ID,
             'instructorPostEventTaskReminderFirstOffset' => 7,
             'instructorPostEventTaskReminderInterval' => 7,
-            'instructorPostEventTaskReminderLookback' => 365,
         ], $calendarProperties));
 
         $calendarAdapter = $this->mockAdapter(['findById']);

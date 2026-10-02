@@ -18,16 +18,23 @@ use Contao\DataContainer;
 /*
  * Log of the instructor post-event task reminder notifications.
  * One row per sent notification. Used to determine when the last notification
- * for a (user, calendar) pair was sent. No back end module, the log is kept as history.
+ * for a (user, calendar) pair was sent. The log is kept as history.
+ *
+ * Back end module "sac_instructor_post_event_task_reminder_log": READ ONLY.
+ * Records can only be listed and shown, never created, edited, copied, moved or deleted.
+ * The list columns are formatted in Feature\InstructorPostEventTaskReminder\DataContainer\ReminderLogTable.
  *
  * See docs/features/instructor-post-event-task-reminder.md
  */
 $GLOBALS['TL_DCA']['tl_instructor_post_event_task_reminder_log'] = [
 	'config' => [
 		'dataContainer'    => DC_Table::class,
-		'notCopyable'      => true,
-		'notEditable'      => true,
 		'closed'           => true,
+		'notCreatable'     => true,
+		'notEditable'      => true,
+		'notDeletable'     => true,
+		'notCopyable'      => true,
+		'notSortable'      => true,
 		'doNotCopyRecords' => true,
 		'sql'              => [
 			'keys' => [
@@ -37,13 +44,21 @@ $GLOBALS['TL_DCA']['tl_instructor_post_event_task_reminder_log'] = [
 		],
 	],
 	'list'   => [
-		'sorting' => [
-			'mode'   => DataContainer::MODE_SORTED,
-			'fields' => ['sentAt DESC'],
+		'sorting'           => [
+			'mode'        => DataContainer::MODE_SORTABLE,
+			'fields'      => ['sentAt'],
+			'flag'        => DataContainer::SORT_DAY_DESC,
+			'panelLayout' => 'filter;sort,limit',
 		],
-		'label'   => [
-			'fields'      => ['sentAt', 'userId', 'calendarId', 'openTaskCount', 'delivered'],
+		'label'             => [
+			'fields'      => ['sentAt', 'userId', 'calendarId', 'reminderCount', 'openTaskCount', 'eventIds', 'delivered'],
 			'showColumns' => true,
+		],
+		// Read only: no global operations ("Edit multiple" etc.)
+		'global_operations' => [],
+		// Read only: only the "show" operation
+		'operations'        => [
+			'show',
 		],
 	],
 	'fields' => [
@@ -55,31 +70,46 @@ $GLOBALS['TL_DCA']['tl_instructor_post_event_task_reminder_log'] = [
 		],
 		// tl_user.id of the recipient (instructor or registration coordinator)
 		'userId'         => [
+			'filter'     => true,
 			'foreignKey' => 'tl_user.name',
 			'sql'        => 'int(10) unsigned NOT NULL default 0',
 			'relation'   => ['type' => 'belongsTo', 'load' => 'lazy'],
 		],
 		'calendarId'     => [
+			'filter'     => true,
+			'sorting'    => true,
 			'foreignKey' => 'tl_calendar.title',
 			'sql'        => 'int(10) unsigned NOT NULL default 0',
 			'relation'   => ['type' => 'belongsTo', 'load' => 'lazy'],
 		],
 		'notificationId' => [
-			'sql' => 'int(10) unsigned NOT NULL default 0',
+			'foreignKey' => 'tl_nc_notification.title',
+			'sql'        => 'int(10) unsigned NOT NULL default 0',
+			'relation'   => ['type' => 'belongsTo', 'load' => 'lazy'],
 		],
 		'sentAt'         => [
-			'eval' => ['rgxp' => 'datim'],
-			'sql'  => 'int(10) unsigned NOT NULL default 0',
+			'sorting' => true,
+			'flag'    => DataContainer::SORT_DAY_DESC,
+			'eval'    => ['rgxp' => 'datim'],
+			'sql'     => 'int(10) unsigned NOT NULL default 0',
+		],
+		// The how-manieth notification for this (user, calendar) pair, including this one (1 = first)
+		'reminderCount'  => [
+			'sorting' => true,
+			'sql'     => 'int(10) unsigned NOT NULL default 0',
 		],
 		'openTaskCount'  => [
-			'sql' => 'int(10) unsigned NOT NULL default 0',
+			'sorting' => true,
+			'sql'     => 'int(10) unsigned NOT NULL default 0',
 		],
 		// Comma separated list of tl_calendar_events.id
 		'eventIds'       => [
 			'sql' => 'text NULL',
 		],
 		'delivered'      => [
-			'sql' => ['type' => 'boolean', 'default' => false],
+			'filter'    => true,
+			'inputType' => 'checkbox',
+			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
 	],
 ];

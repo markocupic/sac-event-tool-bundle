@@ -57,20 +57,30 @@ final class ReminderScheduleTest extends TestCase
     }
 
     /**
-     * @dataProvider lookbackProvider
+     * @dataProvider effectiveEndDateProvider
      */
-    public function testLookbackEndDateMin(string $endDate, string $now, int $lookback, bool $expectedChecked): void
+    public function testEffectiveEndDate(string $start, string $end, string $eventState, string|null $rescheduled, string|null $expected): void
     {
-        $min = ReminderSchedule::getLookbackEndDateMin($lookback, new \DateTimeImmutable($now));
+        $result = ReminderSchedule::getEffectiveEndDate(
+            strtotime($start),
+            strtotime($end),
+            $eventState,
+            null === $rescheduled ? null : strtotime($rescheduled),
+        );
 
-        $this->assertSame($expectedChecked, strtotime($endDate) >= $min);
+        $this->assertSame(null === $expected ? null : strtotime($expected), $result);
     }
 
-    public static function lookbackProvider(): iterable
+    public static function effectiveEndDateProvider(): iterable
     {
-        yield 'within lookback' => ['2026-01-01 12:00', '2026-10-08 03:45', 365, true];
-        yield 'first day of lookback' => ['2025-10-08 00:00', '2026-10-08 03:45', 365, true];
-        yield 'one day too old' => ['2025-10-07 23:59', '2026-10-08 03:45', 365, false];
+        yield 'normal event: endDate' => ['2026-01-10', '2026-01-11', '', null, '2026-01-11'];
+        yield 'fully booked event: endDate' => ['2026-01-10', '2026-01-11', 'event_fully_booked', null, '2026-01-11'];
+        yield 'rescheduled without new date: skipped' => ['2026-01-10', '2026-01-11', 'event_rescheduled', null, null];
+        yield 'one-day event rescheduled' => ['2026-01-10', '2026-01-10', 'event_rescheduled', '2026-01-24', '2026-01-24'];
+        yield 'two-day event rescheduled' => ['2026-01-10', '2026-01-11', 'event_rescheduled', '2026-01-24', '2026-01-25'];
+        yield 'two weekends rescheduled' => ['2026-01-10', '2026-01-18', 'event_rescheduled', '2026-02-07', '2026-02-15'];
+        yield 'rescheduled across DST change' => ['2026-03-21', '2026-03-22', 'event_rescheduled', '2026-03-28', '2026-03-29'];
+        yield 'original period across DST change' => ['2026-10-24', '2026-10-26', 'event_rescheduled', '2026-11-07', '2026-11-09'];
     }
 
     /**

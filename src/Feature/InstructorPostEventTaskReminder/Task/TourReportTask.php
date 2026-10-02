@@ -23,6 +23,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Tours: the tour report has to be filled in.
+ * Not for general events: the back end offers the tour report form only for tours.
  * tl_calendar_events.filledInEventReportForm is set when the report form is submitted.
  */
 #[AsTaggedItem(priority: 20)]

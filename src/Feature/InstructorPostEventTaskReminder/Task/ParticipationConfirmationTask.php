@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Tours and courses: the participation of the accepted participants has to be confirmed.
+ * Tours, courses and general events: the participation of the accepted participants has to be confirmed.
  *
  * The task only exists if there is at least one accepted registration.
  * It is done as soon as at least one ACCEPTED registration has hasParticipated = 1.
@@ -50,7 +50,7 @@ class ParticipationConfirmationTask implements PostEventTaskInterface
 
     public function supports(CalendarEventsModel $event): bool
     {
-        return \in_array($event->eventType, [EventType::TOUR, EventType::LAST_MINUTE_TOUR, EventType::COURSE], true);
+        return \in_array($event->eventType, [EventType::TOUR, EventType::LAST_MINUTE_TOUR, EventType::COURSE, EventType::GENERAL_EVENT], true);
     }
 
     public function isOpen(CalendarEventsModel $event): bool

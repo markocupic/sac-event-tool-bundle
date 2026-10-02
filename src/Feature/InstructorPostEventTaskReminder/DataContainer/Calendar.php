@@ -15,22 +15,16 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\DataContainer;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
-use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\NotificationType\InstructorPostEventTaskReminderNotificationType;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * tl_calendar callbacks for the instructor post-event task reminder settings.
  */
 readonly class Calendar
 {
-    public function __construct(
-        private Connection $connection,
-        private RequestStack $requestStack,
-        private TranslatorInterface $translator,
-    ) {
+    public function __construct(private Connection $connection)
+    {
     }
 
     /**
@@ -53,24 +47,5 @@ readonly class Calendar
         }
 
         return $options;
-    }
-
-    /**
-     * The lookback period must be longer than the completion period,
-     * otherwise no event could ever become due.
-     */
-    #[AsCallback(table: 'tl_calendar', target: 'fields.instructorPostEventTaskReminderLookback.save')]
-    public function validateLookback(mixed $value, DataContainer $dc): mixed
-    {
-        $request = $this->requestStack->getCurrentRequest();
-
-        // The completion period is submitted with the same form; fall back to the stored value
-        $firstOffset = $request?->request->get('instructorPostEventTaskReminderFirstOffset') ?? $dc->activeRecord?->instructorPostEventTaskReminderFirstOffset;
-
-        if (null !== $firstOffset && (int) $value <= (int) $firstOffset) {
-            throw new \RuntimeException($this->translator->trans('ERR.instructorPostEventTaskReminderLookbackTooShort', [], 'contao_default'));
-        }
-
-        return $value;
     }
 }

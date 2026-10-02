@@ -171,7 +171,6 @@ $GLOBALS['TL_LANG']['nc_tokens'][$type]['event_count'] = 'Anzahl Events mit offe
 // Calendar settings
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['first_offset_days'] = 'Bearbeitungsfrist in Tagen nach Event-Ende (Einstellung im Kalender).';
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['interval_days'] = 'Intervall in Tagen zwischen zwei Erinnerungen (Einstellung im Kalender).';
-$GLOBALS['TL_LANG']['nc_tokens'][$type]['lookback_days'] = 'Anzahl Tage, die rückwirkend geprüft werden (Einstellung im Kalender).';
 
 // Notification
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['reminder_count'] = 'Die wievielte Erinnerung für diesen Empfänger und Kalender (1 = erste Erinnerung).';

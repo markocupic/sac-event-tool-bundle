@@ -27,8 +27,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests the assignment of open tasks to recipients.
- * The SQL filters of findDueEventIds() (published, canceled/rescheduled, completion period, lookback)
- * need a database and are not covered here; the date boundaries are tested in ReminderScheduleTest.
+ * The SQL query of fetchCandidateEvents() needs a database and is not covered here.
+ * The due check in PHP (incl. rescheduled events) is covered via findDueEvents();
+ * the date boundaries are tested in ReminderScheduleTest.
  */
 final class OpenTaskProviderTest extends ContaoTestCase
 {
@@ -123,13 +124,90 @@ final class OpenTaskProviderTest extends ContaoTestCase
         $this->assertSame([OpenTask::ROLE_INSTRUCTOR, OpenTask::ROLE_REGISTRATION_COORDINATOR], array_map(static fn (OpenTask $t): string => $t->role, $result));
     }
 
+    public function testRescheduledEventIsCheckedWithShiftedEndDate(): void
+    {
+        $now = new \DateTimeImmutable('2026-02-20 03:45');
+
+        $provider = $this->createProvider(
+            events: [
+                // Rescheduled from 10./11.01. to 24.01. → new end 25.01., due on 01.02. (completion period 7 days)
+                10 => ['startDate' => strtotime('2026-01-10'), 'endDate' => strtotime('2026-01-11'), 'eventState' => 'event_rescheduled', 'rescheduledEventDate' => strtotime('2026-01-24')],
+                // Rescheduled to 14./15.02. → new end 15.02., not yet due on 20.02.
+                11 => ['startDate' => strtotime('2026-01-10'), 'endDate' => strtotime('2026-01-11'), 'eventState' => 'event_rescheduled', 'rescheduledEventDate' => strtotime('2026-02-14')],
+                // Rescheduled, but no new date yet → not checked
+                12 => ['startDate' => strtotime('2026-01-10'), 'endDate' => strtotime('2026-01-11'), 'eventState' => 'event_rescheduled', 'rescheduledEventDate' => null],
+            ],
+            instructors: [10 => [self::ANNA], 11 => [self::ANNA], 12 => [self::ANNA]],
+        );
+
+        $result = $provider->getOpenTasks(self::ANNA, $this->createCalendar(), $now);
+
+        $this->assertSame([10], array_map(static fn (OpenTask $t): int => $t->eventId, $result));
+        $this->assertSame(strtotime('2026-01-25'), $result[0]->endDate, 'The notification shows the shifted end date');
+    }
+
+    public function testEventsAreOrderedByEffectiveEndDate(): void
+    {
+        $provider = $this->createProvider(
+            events: [
+                10 => ['endDate' => strtotime('2026-01-20')],
+                11 => ['startDate' => strtotime('2025-12-01'), 'endDate' => strtotime('2025-12-01'), 'eventState' => 'event_rescheduled', 'rescheduledEventDate' => strtotime('2026-01-05')],
+            ],
+            instructors: [10 => [self::ANNA], 11 => [self::ANNA]],
+        );
+
+        $result = $provider->getOpenTasks(self::ANNA, $this->createCalendar(), new \DateTimeImmutable('2026-02-20 03:45'));
+
+        $this->assertSame([11, 10], array_map(static fn (OpenTask $t): int => $t->eventId, $result));
+    }
+
+    public function testNothingIsCheckedWithoutSelectedEventTypes(): void
+    {
+        $provider = $this->createProvider(
+            events: [10 => []],
+            instructors: [10 => [self::ANNA]],
+            expectedEventTypes: null,
+        );
+
+        $calendar = $this->createCalendar(['instructorPostEventTaskReminderEventTypes' => null]);
+
+        $this->assertSame([], $provider->getOpenTasksByRecipient($calendar, new \DateTimeImmutable()));
+    }
+
+    public function testSelectedEventTypesArePassedToTheQuery(): void
+    {
+        $provider = $this->createProvider(
+            events: [10 => []],
+            instructors: [10 => [self::ANNA]],
+            expectedEventTypes: ['course', 'generalEvent'],
+        );
+
+        $calendar = $this->createCalendar(['instructorPostEventTaskReminderEventTypes' => serialize(['course', 'generalEvent'])]);
+
+        $this->assertSame([self::ANNA], array_keys($provider->getOpenTasksByRecipient($calendar, new \DateTimeImmutable())));
+    }
+
     /**
      * @param array<int, array<string, mixed>> $events      eventId => properties
      * @param array<int, list<int>>            $instructors eventId => instructor user IDs
      * @param list<int>|null                   $eventsWithOpenTasks
+     * @param list<string>|null                $expectedEventTypes  event types expected in the query; null: the query must not run
      */
-    private function createProvider(array $events, array $instructors, array|null $eventsWithOpenTasks = null): OpenTaskProvider&MockObject
+    private function createProvider(array $events, array $instructors, array|null $eventsWithOpenTasks = null, array|null $expectedEventTypes = ['tour', 'lastMinuteTour', 'course']): OpenTaskProvider&MockObject
     {
+        // Database rows: default is a normal event that ended long ago (due)
+        $rows = [];
+
+        foreach ($events as $id => $properties) {
+            $rows[$id] = array_merge([
+                'id' => $id,
+                'startDate' => 1759000000 + $id,
+                'endDate' => 1759000000 + $id,
+                'eventState' => '',
+                'rescheduledEventDate' => null,
+            ], array_intersect_key($properties, array_flip(['startDate', 'endDate', 'eventState', 'rescheduledEventDate'])));
+        }
+
         $eventAdapter = $this->mockAdapter(['findById']);
         $eventAdapter
             ->method('findById')
@@ -138,9 +216,8 @@ final class OpenTaskProviderTest extends ContaoTestCase
                     'id' => $id,
                     'title' => 'Event '.$id,
                     'eventType' => 'tour',
-                    'endDate' => 1759000000 + $id,
                     'registrationGoesTo' => 0,
-                ], $events[$id])),
+                ], $rows[$id], $events[$id])),
             )
         ;
 
@@ -185,24 +262,35 @@ final class OpenTaskProviderTest extends ContaoTestCase
 
         $provider = $this->getMockBuilder(OpenTaskProvider::class)
             ->setConstructorArgs([$connection, $framework, $taskEvaluator])
-            ->onlyMethods(['findDueEventIds'])
+            ->onlyMethods(['fetchCandidateEvents'])
             ->getMock()
         ;
 
-        $provider
-            ->method('findDueEventIds')
-            ->willReturn(array_keys($events))
-        ;
+        if (null === $expectedEventTypes) {
+            $provider
+                ->expects($this->never())
+                ->method('fetchCandidateEvents')
+            ;
+        } else {
+            $provider
+                ->method('fetchCandidateEvents')
+                ->with($this->anything(), $expectedEventTypes, $this->anything())
+                ->willReturn(array_values($rows))
+            ;
+        }
 
         return $provider;
     }
 
-    private function createCalendar(): CalendarModel
+    /**
+     * @param array<string, mixed> $properties
+     */
+    private function createCalendar(array $properties = []): CalendarModel
     {
-        return $this->mockClassWithProperties(CalendarModel::class, [
+        return $this->mockClassWithProperties(CalendarModel::class, array_merge([
             'id' => 7,
+            'instructorPostEventTaskReminderEventTypes' => serialize(['tour', 'lastMinuteTour', 'course']),
             'instructorPostEventTaskReminderFirstOffset' => 7,
-            'instructorPostEventTaskReminderLookback' => 365,
-        ]);
+        ], $properties));
     }
 }
