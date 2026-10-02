@@ -67,7 +67,7 @@ class TourReportReviewerMigration extends AbstractMigration
 
         $columns = $schemaManager->listTableColumns('tl_event_organizer');
 
-        if (!isset($columns['id']) || !isset($columns['notifywebmasteroneweventblog'])) {
+        if (!isset($columns['id']) || !isset($columns[strtolower('notifyWebmasterOnNewEventBlog')])) {
             return false;
         }
 
