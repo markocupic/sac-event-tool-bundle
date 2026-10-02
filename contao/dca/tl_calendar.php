@@ -183,7 +183,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['sendInstructorPostEventTaskReminder
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
-// Options: only notifications of type "instructor_post_event_task_reminder" (see DataContainer\Calendar)
+// Options: only notifications of type "instructor_post_event_task_reminder" (see Feature\InstructorPostEventTaskReminder\DataContainer\Calendar)
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderNotification'] = [
 	'exclude'   => true,
 	'inputType' => 'select',

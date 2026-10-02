@@ -54,12 +54,14 @@ Jede Spalte dieser Tabelle ist eine eigene Task-Klasse (siehe «Aufgaben-Baustei
 
 Präfix überall: `InstructorPostEventTaskReminder` bzw. `instructor_post_event_task_reminder`
 
+Ort im Bundle: `src/Feature/InstructorPostEventTaskReminder/` (Namespace `Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder`), Tests unter `tests/Feature/InstructorPostEventTaskReminder/`. Konvention: jedes Feature liegt in einem eigenen Ordner unter `src/Feature/`.
+
 ## Aufgaben-Bausteine (Task-Klassen)
 
 Jede Aufgabe ist eine eigene Klasse, die `PostEventTaskInterface` implementiert. Eine neue Aufgabe = eine neue Klasse, kein bestehender Code wird angefasst, kein Eintrag in `services.yaml`.
 
 ```php
-namespace Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\Task;
+namespace Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\Task;
 
 #[AutoconfigureTag('sacevt.instructor_post_event_task')]
 interface PostEventTaskInterface
@@ -127,20 +129,20 @@ Index: `(userId, calendarId, sentAt)`
 
 | Klasse | Aufgabe |
 |---|---|
-| `InstructorPostEventTaskReminder\Task\PostEventTaskInterface` | Interface der Aufgaben-Bausteine |
-| `InstructorPostEventTaskReminder\Task\TourReportTask` | Aufgabe Tourenbericht |
-| `InstructorPostEventTaskReminder\Task\ParticipationConfirmationTask` | Aufgabe Teilnahmebestätigung |
-| `InstructorPostEventTaskReminder\OpenTask` | DTO: eventId, title, eventType, endDate, role (`instructor` oder `registration_coordinator`), tasks (Liste aus name, label, url) |
-| `InstructorPostEventTaskReminder\TaskEvaluator` | erhält alle Tasks per `#[AutowireIterator('sacevt.instructor_post_event_task')]`, liefert die offenen Aufgaben eines Events |
-| `InstructorPostEventTaskReminder\ReminderSchedule` | reine Logik: Versand fällig? (lastSentAt, interval, now) |
-| `InstructorPostEventTaskReminder\OpenTaskProvider` | lädt die in Frage kommenden Events per SQL (gemeinsame Filter, `findDueEventIds()`), prüft sie über den `TaskEvaluator` und ordnet sie den Empfängern zu (Leiter ∪ Koordinator). Öffentlich: `getOpenTasksByRecipient(calendar, now)`, `getOpenTasks(userId, calendar, now)`, `getRecipientIdsWithOpenTasks(calendar, now)`, `getRecipient(userId)` (aktiv, mit E-Mail). Nicht readonly (mockbar) |
-| `InstructorPostEventTaskReminder\TaskItem` | DTO einer offenen Aufgabe: name, label, url |
-| `InstructorPostEventTaskReminder\DataContainer\Calendar` | tl_calendar-Callbacks: Notification-Optionen (nur passender Typ), Validierung Lookback > Bearbeitungsfrist |
-| `InstructorPostEventTaskReminder\ReminderLog` | `getLastSentAt(userId, calendarId)`, `countSent(userId, calendarId)`, `add(...)` (gibt die Log-ID zurück), `markAsDelivered(logId)` |
-| `InstructorPostEventTaskReminder\Cron\InstructorPostEventTaskReminderCron` | `45 3,4 * * *` (zweiter Lauf fängt Verpasstes auf, das Intervall verhindert Duplikate), dispatcht Messages. Misst die Laufzeit mit der Symfony Stopwatch und schreibt sie ins Contao-Systemlog (siehe «Laufzeit») |
-| `InstructorPostEventTaskReminder\Messenger\Message\SendInstructorPostEventTaskReminderMessage` | userId, calendarId; `LowPriorityMessageInterface` |
-| `InstructorPostEventTaskReminder\Messenger\MessageHandler\SendInstructorPostEventTaskReminderHandler` | prüft, loggt, versendet |
-| `InstructorPostEventTaskReminder\NotificationType\InstructorPostEventTaskReminderNotificationType` | `NAME = 'instructor_post_event_task_reminder'` |
+| `Feature\InstructorPostEventTaskReminder\Task\PostEventTaskInterface` | Interface der Aufgaben-Bausteine |
+| `Feature\InstructorPostEventTaskReminder\Task\TourReportTask` | Aufgabe Tourenbericht |
+| `Feature\InstructorPostEventTaskReminder\Task\ParticipationConfirmationTask` | Aufgabe Teilnahmebestätigung |
+| `Feature\InstructorPostEventTaskReminder\OpenTask` | DTO: eventId, title, eventType, endDate, role (`instructor` oder `registration_coordinator`), tasks (Liste aus name, label, url) |
+| `Feature\InstructorPostEventTaskReminder\TaskEvaluator` | erhält alle Tasks per `#[AutowireIterator('sacevt.instructor_post_event_task')]`, liefert die offenen Aufgaben eines Events |
+| `Feature\InstructorPostEventTaskReminder\ReminderSchedule` | reine Logik: Versand fällig? (lastSentAt, interval, now) |
+| `Feature\InstructorPostEventTaskReminder\OpenTaskProvider` | lädt die in Frage kommenden Events per SQL (gemeinsame Filter, `findDueEventIds()`), prüft sie über den `TaskEvaluator` und ordnet sie den Empfängern zu (Leiter ∪ Koordinator). Öffentlich: `getOpenTasksByRecipient(calendar, now)`, `getOpenTasks(userId, calendar, now)`, `getRecipientIdsWithOpenTasks(calendar, now)`, `getRecipient(userId)` (aktiv, mit E-Mail). Nicht readonly (mockbar) |
+| `Feature\InstructorPostEventTaskReminder\TaskItem` | DTO einer offenen Aufgabe: name, label, url |
+| `Feature\InstructorPostEventTaskReminder\DataContainer\Calendar` | tl_calendar-Callbacks: Notification-Optionen (nur passender Typ), Validierung Lookback > Bearbeitungsfrist |
+| `Feature\InstructorPostEventTaskReminder\ReminderLog` | `getLastSentAt(userId, calendarId)`, `countSent(userId, calendarId)`, `add(...)` (gibt die Log-ID zurück), `markAsDelivered(logId)` |
+| `Feature\InstructorPostEventTaskReminder\Cron\InstructorPostEventTaskReminderCron` | `45 3,4 * * *` (zweiter Lauf fängt Verpasstes auf, das Intervall verhindert Duplikate), dispatcht Messages. Misst die Laufzeit mit der Symfony Stopwatch und schreibt sie ins Contao-Systemlog (siehe «Laufzeit») |
+| `Feature\InstructorPostEventTaskReminder\Messenger\Message\SendInstructorPostEventTaskReminderMessage` | userId, calendarId; `LowPriorityMessageInterface` |
+| `Feature\InstructorPostEventTaskReminder\Messenger\MessageHandler\SendInstructorPostEventTaskReminderHandler` | prüft, loggt, versendet |
+| `Feature\InstructorPostEventTaskReminder\NotificationType\InstructorPostEventTaskReminderNotificationType` | `NAME = 'instructor_post_event_task_reminder'` |
 
 Eine Benachrichtigung entspricht genau einer Message. Die Message trägt nur IDs.
 
@@ -149,7 +151,7 @@ Eine Benachrichtigung entspricht genau einer Message. Die Message trägt nur IDs
 Alle Klassen des Features liegen in einem Ordner. Nur DCA, Sprachdateien und Templates bleiben an ihren Contao- bzw. Symfony-Pfaden.
 
 ```
-src/InstructorPostEventTaskReminder/
+src/Feature/InstructorPostEventTaskReminder/
 ├── Cron/InstructorPostEventTaskReminderCron.php
 ├── DataContainer/Calendar.php
 ├── Messenger/
@@ -168,7 +170,7 @@ src/InstructorPostEventTaskReminder/
 └── TaskItem.php
 ```
 
-Die Tests liegen spiegelbildlich unter `tests/InstructorPostEventTaskReminder/`.
+Die Tests liegen spiegelbildlich unter `tests/Feature/InstructorPostEventTaskReminder/`.
 
 ## Laufzeit
 

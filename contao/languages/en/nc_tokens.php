@@ -15,7 +15,7 @@ declare(strict_types=1);
 use Markocupic\SacEventToolBundle\NotificationType\EventDeregistrationNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\EventRegistrationNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\EventReminderNotificationType;
-use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\NotificationType\InstructorPostEventTaskReminderNotificationType;
+use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\NotificationType\InstructorPostEventTaskReminderNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\SubscriptionStateChangeNotificationType;
 
 /*
