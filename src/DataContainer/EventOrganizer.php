@@ -36,4 +36,23 @@ class EventOrganizer
 
         return $arrOptions;
     }
+
+    #[AsCallback(table: 'tl_event_organizer', target: 'fields.notifyWebmasterOnNewEventBlog.options', priority: 100)]
+    public function getTourReportReviewers(): array
+    {
+        $arrOptions = [];
+
+        $roles = $this->connection->fetchAllAssociative('SELECT * FROM tl_user_role WHERE email != "" ORDER BY title', []);
+        $users = $this->connection->fetchAllAssociative('SELECT * FROM tl_user WHERE disable = 0 ORDER BY name', []);
+
+        foreach ($roles as $role) {
+            $arrOptions['user_role_id:'.$role['id']] = \sprintf('%s [%s]', $role['title'], $role['email']);
+        }
+
+        foreach ($users as $user) {
+            $arrOptions['user_id:'.$user['id']] = \sprintf('%s [%s]', $user['name'], $user['email']);
+        }
+
+        return $arrOptions;
+    }
 }
