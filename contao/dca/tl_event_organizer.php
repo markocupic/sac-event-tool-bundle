@@ -149,7 +149,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
 			'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
 			'sql'       => 'binary(16) NULL',
 		],
-		'codeOfConductSRC'               => [
+		'codeOfConductSRC'                   => [
 			'exclude'   => true,
 			'inputType' => 'fileTree',
 			'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
@@ -163,13 +163,11 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
 			'sql'       => "varchar(1022) NOT NULL default ''"
 		],
 		'notifyWebmasterOnNewEventBlog'      => [
-			'exclude'    => true,
-			'filter'     => true,
-			'inputType'  => 'select',
-			'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
-			'foreignKey' => 'tl_user.name',
-			'eval'       => ['multiple' => true, 'chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'clr'],
-			'sql'        => 'blob NULL',
+			'exclude'   => true,
+			'filter'    => true,
+			'inputType' => 'select',
+			'eval'      => ['multiple' => true, 'chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'clr'],
+			'sql'       => 'blob NULL',
 		],
 		'emergencyConcept'                   => [
 			'exclude'   => true,
