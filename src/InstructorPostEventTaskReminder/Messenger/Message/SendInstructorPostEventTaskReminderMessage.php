@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Messenger\Message;
+namespace Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\Messenger\Message;
 
 use Contao\CoreBundle\Messenger\Message\LowPriorityMessageInterface;
 

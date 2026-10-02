@@ -27,7 +27,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests the assignment of open tasks to recipients.
- * The SQL filters of findDueEventIds() (published, canceled/rescheduled, grace period, lookback)
+ * The SQL filters of findDueEventIds() (published, canceled/rescheduled, completion period, lookback)
  * need a database and are not covered here; the date boundaries are tested in ReminderScheduleTest.
  */
 final class OpenTaskProviderTest extends ContaoTestCase

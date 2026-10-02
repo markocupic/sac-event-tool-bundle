@@ -48,9 +48,9 @@ final class ReminderScheduleTest extends TestCase
 
     public static function dueEndDateProvider(): iterable
     {
-        yield 'grace period not yet over (6 days)' => ['2026-10-01 18:00', '2026-10-07 03:45', 7, false];
-        yield 'grace period over exactly on day 7, early end' => ['2026-10-01 08:00', '2026-10-08 03:45', 7, true];
-        yield 'grace period over exactly on day 7, late end' => ['2026-10-01 23:59', '2026-10-08 03:45', 7, true];
+        yield 'completion period not yet over (6 days)' => ['2026-10-01 18:00', '2026-10-07 03:45', 7, false];
+        yield 'completion period over exactly on day 7, early end' => ['2026-10-01 08:00', '2026-10-08 03:45', 7, true];
+        yield 'completion period over exactly on day 7, late end' => ['2026-10-01 23:59', '2026-10-08 03:45', 7, true];
         yield 'event ended long ago' => ['2026-01-01 12:00', '2026-10-08 03:45', 7, true];
         yield 'event ended today' => ['2026-10-08 01:00', '2026-10-08 03:45', 7, false];
         yield 'across DST change' => ['2026-10-20 12:00', '2026-10-27 03:45', 7, true];

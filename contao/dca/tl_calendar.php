@@ -191,19 +191,21 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderNoti
 	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
-// Grace period: days after tl_calendar_events.endDate before the first notification is sent
+// Completion period: days after tl_calendar_events.endDate before the first notification is sent
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderFirstOffset'] = [
 	'exclude'   => true,
-	'inputType' => 'text',
-	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'minval' => 1, 'maxlength' => 4, 'tl_class' => 'w50 clr'],
+	'inputType' => 'select',
+	'options' => range(1, 30),
+	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'tl_class' => 'w50 clr'],
 	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 7, 'unsigned' => true],
 ];
 
 // Days between two notifications to the same recipient for this calendar
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderInterval'] = [
 	'exclude'   => true,
-	'inputType' => 'text',
-	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'minval' => 1, 'maxlength' => 4, 'tl_class' => 'w50'],
+	'inputType' => 'select',
+	'options' => range(1, 30),
+	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'tl_class' => 'w50'],
 	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 7, 'unsigned' => true],
 ];
 

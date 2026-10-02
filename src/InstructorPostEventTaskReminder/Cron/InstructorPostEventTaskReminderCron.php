@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Cron;
+namespace Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\Cron;
 
 use Contao\CalendarModel;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCronJob;
@@ -21,7 +21,7 @@ use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\OpenTaskProvider;
 use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\ReminderLog;
 use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\ReminderSchedule;
-use Markocupic\SacEventToolBundle\Messenger\Message\SendInstructorPostEventTaskReminderMessage;
+use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\Messenger\Message\SendInstructorPostEventTaskReminderMessage;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Stopwatch\Stopwatch;

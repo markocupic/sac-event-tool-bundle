@@ -17,7 +17,7 @@ namespace Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\DataCont
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
-use Markocupic\SacEventToolBundle\NotificationType\InstructorPostEventTaskReminderNotificationType;
+use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\NotificationType\InstructorPostEventTaskReminderNotificationType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -56,7 +56,7 @@ readonly class Calendar
     }
 
     /**
-     * The lookback period must be longer than the grace period,
+     * The lookback period must be longer than the completion period,
      * otherwise no event could ever become due.
      */
     #[AsCallback(table: 'tl_calendar', target: 'fields.instructorPostEventTaskReminderLookback.save')]
@@ -64,7 +64,7 @@ readonly class Calendar
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        // The grace period is submitted with the same form; fall back to the stored value
+        // The completion period is submitted with the same form; fall back to the stored value
         $firstOffset = $request?->request->get('instructorPostEventTaskReminderFirstOffset') ?? $dc->activeRecord?->instructorPostEventTaskReminderFirstOffset;
 
         if (null !== $firstOffset && (int) $value <= (int) $firstOffset) {

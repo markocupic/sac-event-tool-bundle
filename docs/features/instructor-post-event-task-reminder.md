@@ -133,25 +133,59 @@ Index: `(userId, calendarId, sentAt)`
 | `InstructorPostEventTaskReminder\OpenTask` | DTO: eventId, title, eventType, endDate, role (`instructor` oder `registration_coordinator`), tasks (Liste aus name, label, url) |
 | `InstructorPostEventTaskReminder\TaskEvaluator` | erhält alle Tasks per `#[AutowireIterator('sacevt.instructor_post_event_task')]`, liefert die offenen Aufgaben eines Events |
 | `InstructorPostEventTaskReminder\ReminderSchedule` | reine Logik: Versand fällig? (lastSentAt, interval, now) |
-| `InstructorPostEventTaskReminder\OpenTaskProvider` | lädt die in Frage kommenden Events per SQL (gemeinsame Filter), prüft sie über den `TaskEvaluator`; `getOpenTasks(userId, calendar)`, `getUserIdsWithOpenTasks(calendar)`; Empfänger = Leiter ∪ Koordinator; nicht readonly (mockbar) |
+| `InstructorPostEventTaskReminder\OpenTaskProvider` | lädt die in Frage kommenden Events per SQL (gemeinsame Filter, `findDueEventIds()`), prüft sie über den `TaskEvaluator` und ordnet sie den Empfängern zu (Leiter ∪ Koordinator). Öffentlich: `getOpenTasksByRecipient(calendar, now)`, `getOpenTasks(userId, calendar, now)`, `getRecipientIdsWithOpenTasks(calendar, now)`, `getRecipient(userId)` (aktiv, mit E-Mail). Nicht readonly (mockbar) |
 | `InstructorPostEventTaskReminder\TaskItem` | DTO einer offenen Aufgabe: name, label, url |
 | `InstructorPostEventTaskReminder\DataContainer\Calendar` | tl_calendar-Callbacks: Notification-Optionen (nur passender Typ), Validierung Lookback > Bearbeitungsfrist |
-| `InstructorPostEventTaskReminder\ReminderLog` | `getLastSentAt(userId, calendarId)`, Log schreiben |
-| `Cron\InstructorPostEventTaskReminderCron` | `45 3,4 * * *` (zweiter Lauf fängt Verpasstes auf, das Intervall verhindert Duplikate), dispatcht Messages |
-| `Messenger\Message\SendInstructorPostEventTaskReminderMessage` | userId, calendarId; `LowPriorityMessageInterface` |
-| `Messenger\MessageHandler\SendInstructorPostEventTaskReminderHandler` | prüft, loggt, versendet |
-| `NotificationType\InstructorPostEventTaskReminderNotificationType` | `NAME = 'instructor_post_event_task_reminder'` |
+| `InstructorPostEventTaskReminder\ReminderLog` | `getLastSentAt(userId, calendarId)`, `countSent(userId, calendarId)`, `add(...)` (gibt die Log-ID zurück), `markAsDelivered(logId)` |
+| `InstructorPostEventTaskReminder\Cron\InstructorPostEventTaskReminderCron` | `45 3,4 * * *` (zweiter Lauf fängt Verpasstes auf, das Intervall verhindert Duplikate), dispatcht Messages. Misst die Laufzeit mit der Symfony Stopwatch und schreibt sie ins Contao-Systemlog (siehe «Laufzeit») |
+| `InstructorPostEventTaskReminder\Messenger\Message\SendInstructorPostEventTaskReminderMessage` | userId, calendarId; `LowPriorityMessageInterface` |
+| `InstructorPostEventTaskReminder\Messenger\MessageHandler\SendInstructorPostEventTaskReminderHandler` | prüft, loggt, versendet |
+| `InstructorPostEventTaskReminder\NotificationType\InstructorPostEventTaskReminderNotificationType` | `NAME = 'instructor_post_event_task_reminder'` |
 
 Eine Benachrichtigung entspricht genau einer Message. Die Message trägt nur IDs.
 
+## Ordnerstruktur
+
+Alle Klassen des Features liegen in einem Ordner. Nur DCA, Sprachdateien und Templates bleiben an ihren Contao- bzw. Symfony-Pfaden.
+
+```
+src/InstructorPostEventTaskReminder/
+├── Cron/InstructorPostEventTaskReminderCron.php
+├── DataContainer/Calendar.php
+├── Messenger/
+│   ├── Message/SendInstructorPostEventTaskReminderMessage.php
+│   └── MessageHandler/SendInstructorPostEventTaskReminderHandler.php
+├── NotificationType/InstructorPostEventTaskReminderNotificationType.php
+├── Task/
+│   ├── PostEventTaskInterface.php
+│   ├── ParticipationConfirmationTask.php
+│   └── TourReportTask.php
+├── OpenTask.php
+├── OpenTaskProvider.php
+├── ReminderLog.php
+├── ReminderSchedule.php
+├── TaskEvaluator.php
+└── TaskItem.php
+```
+
+Die Tests liegen spiegelbildlich unter `tests/InstructorPostEventTaskReminder/`.
+
+## Laufzeit
+
+Der Cron misst den ganzen Lauf (Suche über alle aktivierten Kalender und Dispatch der Messages) mit der Symfony Stopwatch und schreibt ins Contao-Systemlog, z. B.:
+
+`Instructor post-event task reminder cron: checked 4 calendar(s) and dispatched 12 message(s) in 1.83 s.`
+
+Der Mailversand selbst läuft getrennt im Messenger-Worker und ist nicht enthalten. Die Laufzeit wächst mit der Anzahl fälliger Events (pro Event eine Abfrage für die Teilnahmebestätigung und eine für die Leiter). Der Cron sollte per CLI (`contao:cron`) laufen, dort gilt standardmässig keine `max_execution_time`.
+
 ## Ablauf Handler
 
-1. Kalender aktiv, Notification gesetzt, Leiter aktiv mit E-Mail? Sonst return.
-2. Aufgaben neu berechnen über `OpenTaskProvider`. Keine Aufgaben → return.
-3. Intervall erneut gegen das Log prüfen (Schutz vor doppeltem Cron-Lauf).
-4. Symfony-Lock auf `userId-calendarId` rund um Prüfen, Loggen und Senden.
+1. Kalender aktiv, Notification gesetzt, Empfänger aktiv mit E-Mail? Sonst return.
+2. Symfony-Lock auf `userId-calendarId` holen. Ist er belegt, arbeitet ein anderer Worker daran → return.
+3. Intervall erneut gegen das Log prüfen (Schutz vor doppeltem Cron-Lauf). Nicht abgelaufen → return.
+4. Aufgaben neu berechnen über `OpenTaskProvider`. Keine Aufgaben → return.
 5. Log-Eintrag vor dem Senden schreiben (lieber eine Mail zu wenig als doppelt).
-6. `NotificationCenter::sendNotification($id, $tokens, $sacevtLocale)`, `delivered` nachführen, Fehler an `contaoErrorLogger`.
+6. `NotificationCenter::sendNotification($id, $tokens, $sacevtLocale)`; bei Erfolg `delivered` setzen, sonst Fehler an `contaoErrorLogger`. Lock freigeben.
 
 ## Notification-Tokens
 
@@ -184,17 +218,18 @@ URL-Erzeugung wie im `MyEventsDashboardController`. Der Cron läuft per CLI, dah
 - `TourReportTaskTest`: `supports()` je Eventtyp, `isOpen()` mit und ohne Bericht
 - `ParticipationConfirmationTaskTest`: `supports()` je Eventtyp; keine Teilnehmer, keine Bestätigung, mindestens eine Bestätigung, hasParticipated nur bei nicht akzeptierter Anmeldung
 - `TaskEvaluatorTest`: nur unterstützte und offene Tasks, Reihenfolge nach Priorität (mit Dummy-Tasks)
-- `OpenTaskProvider`: gemeinsame Filter (abgesagt, verschoben, unveröffentlicht, Bearbeitungsfrist, Lookback, `endDate = 0`), Koordinator ohne Leiterrolle, Koordinator gleichzeitig Leiter (keine Duplikate), Koordinator deaktiviert oder ohne E-Mail
-- `ReminderScheduleTest`: erste Mail, Intervall nicht erreicht oder erreicht, Grenzen am Tageswechsel
-- `SendInstructorPostEventTaskReminderHandlerTest` mit Mocks
-- optional DB-Tests für `OpenTaskProvider` und `ReminderLog`
+- `OpenTaskProviderTest`: Zuordnung zu den Empfängern: Leiter, Koordinator ohne Leiterrolle, Koordinator gleichzeitig Leiter (keine Duplikate), deaktivierte User und User ohne E-Mail, Events ohne offene Aufgaben, mehrere Events pro Empfänger
+- `ReminderScheduleTest`: Bearbeitungsfrist und Lookback an den Tagesgrenzen (inkl. Zeitumstellung), erste Mail, Intervall nicht erreicht oder erreicht
+- `SendInstructorPostEventTaskReminderHandlerTest` (Mocks): Feature deaktiviert, keine Notification, ungültiger Empfänger, Intervall nicht abgelaufen, alles erledigt, Lock belegt, Log vor Versand und Tokens
+- `InstructorPostEventTaskReminderCronTest`: eine Message pro fälligem Empfänger und Kalender, Intervall wird beachtet
 
-## Umsetzungsreihenfolge
+Nicht durch Unit-Tests abgedeckt: die SQL-Filter in `OpenTaskProvider::findDueEventIds()` (veröffentlicht, abgesagt/verschoben, `endDate`, Bearbeitungsfrist, Lookback) und die Abfrage in `ParticipationConfirmationTask::isOpen()` gegen eine echte Datenbank. Die Datumsgrenzen dazu prüft `ReminderScheduleTest`. Optional: DB-Tests für `OpenTaskProvider` und `ReminderLog` nach dem Muster von `CalendarEventsUtilDatabaseTest`.
 
-1. `PostEventTaskInterface`, `TourReportTask`, `ParticipationConfirmationTask`, `TaskEvaluator`, `ReminderSchedule` mit Tests
-2. DCA `tl_calendar`, Log-Tabelle, Sprachdateien
-3. `OpenTaskProvider`, `ReminderLog`
-4. Notification-Typ, Twig-Templates
-5. Message, Handler und Tests
-6. Cron
-7. Manueller Test auf sac-pilatus (`contao:cron`, Worker, Log prüfen)
+## Inbetriebnahme
+
+1. `contao:migrate` (neue Kalenderfelder, Log-Tabelle)
+2. Im Notification Center eine Benachrichtigung vom Typ «Leiter-Erinnerung an offene Aufgaben nach dem Event» anlegen: Empfänger `##recipient_email##`, Text mit `##task_list_text##` bzw. `##task_list_html##`
+3. Im Kalender das Feature aktivieren, Benachrichtigung wählen, Bearbeitungsfrist, Intervall und Rückwirkung prüfen
+4. `framework.router.default_uri` setzen, damit die Links in den vom Cron versandten Mails auf die richtige Domain zeigen
+5. Cron per CLI laufen lassen und Messenger-Worker betreiben (bzw. `messenger:consume`)
+6. Kontrolle: Systemlog (Laufzeit, Anzahl Messages) und `tl_instructor_post_event_task_reminder_log` (pro Empfänger und Kalender höchstens ein Eintrag pro Intervall)

@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Tests\Messenger\MessageHandler;
+namespace Markocupic\SacEventToolBundle\Tests\InstructorPostEventTaskReminder\Messenger\MessageHandler;
 
 use Contao\CalendarModel;
 use Contao\TestCase\ContaoTestCase;
@@ -21,8 +21,8 @@ use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\OpenTask;
 use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\OpenTaskProvider;
 use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\ReminderLog;
 use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\TaskItem;
-use Markocupic\SacEventToolBundle\Messenger\Message\SendInstructorPostEventTaskReminderMessage;
-use Markocupic\SacEventToolBundle\Messenger\MessageHandler\SendInstructorPostEventTaskReminderHandler;
+use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\Messenger\Message\SendInstructorPostEventTaskReminderMessage;
+use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\Messenger\MessageHandler\SendInstructorPostEventTaskReminderHandler;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;

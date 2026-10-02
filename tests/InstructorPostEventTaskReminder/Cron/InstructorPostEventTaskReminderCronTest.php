@@ -12,15 +12,15 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Tests\Cron;
+namespace Markocupic\SacEventToolBundle\Tests\InstructorPostEventTaskReminder\Cron;
 
 use Contao\CalendarModel;
 use Contao\TestCase\ContaoTestCase;
 use Doctrine\DBAL\Connection;
-use Markocupic\SacEventToolBundle\Cron\InstructorPostEventTaskReminderCron;
+use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\Cron\InstructorPostEventTaskReminderCron;
 use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\OpenTaskProvider;
 use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\ReminderLog;
-use Markocupic\SacEventToolBundle\Messenger\Message\SendInstructorPostEventTaskReminderMessage;
+use Markocupic\SacEventToolBundle\InstructorPostEventTaskReminder\Messenger\Message\SendInstructorPostEventTaskReminderMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 

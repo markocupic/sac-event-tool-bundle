@@ -25,7 +25,7 @@ final readonly class ReminderSchedule
 {
     /**
      * Latest endDate an event may have to be "due":
-     * its grace period of $firstOffsetDays days after the end day has expired.
+     * its completion period of $firstOffsetDays days after the end day has expired.
      *
      * Example: firstOffset = 7, today = 08.10. → events ending on 01.10. (any time) or earlier are due.
      */

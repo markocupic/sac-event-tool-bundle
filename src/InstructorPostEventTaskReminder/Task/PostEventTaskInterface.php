@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
  * The order in the notification is defined via #[AsTaggedItem(priority: ...)]
  * on the implementing class (higher priority first).
  *
- * Filters that apply to all tasks (published, canceled/rescheduled, grace period, lookback)
+ * Filters that apply to all tasks (published, canceled/rescheduled, completion period, lookback)
  * are NOT the concern of a task. They are applied centrally by the OpenTaskProvider.
  */
 #[AutoconfigureTag('sacevt.instructor_post_event_task')]

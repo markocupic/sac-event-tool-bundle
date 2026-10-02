@@ -26,7 +26,7 @@ use Markocupic\SacEventToolBundle\Config\EventState;
  * Finds the open post-event tasks of a calendar and assigns them to the recipients.
  *
  * Applies the filters that are common to all tasks:
- * published, not canceled/rescheduled, valid endDate, grace period expired, within lookback.
+ * published, not canceled/rescheduled, valid endDate, completion period expired, within lookback.
  * Whether a task applies to an event type and whether it is still open
  * is decided by the task building blocks (via TaskEvaluator).
  *
@@ -128,7 +128,7 @@ class OpenTaskProvider
 
     /**
      * IDs of the published events of the calendar that ended within the lookback period
-     * and whose grace period has expired. Ordered by endDate.
+     * and whose completion period has expired. Ordered by endDate.
      *
      * The event type is deliberately not filtered here: that is up to the tasks (supports()).
      *
