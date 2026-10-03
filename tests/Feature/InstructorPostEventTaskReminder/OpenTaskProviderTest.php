@@ -188,8 +188,8 @@ final class OpenTaskProviderTest extends ContaoTestCase
     }
 
     /**
-     * @param array<int, array<string, mixed>> $events      eventId => properties
-     * @param array<int, list<int>>            $instructors eventId => instructor user IDs
+     * @param array<int, array<string, mixed>> $events              eventId => properties
+     * @param array<int, list<int>>            $instructors         eventId => instructor user IDs
      * @param list<int>|null                   $eventsWithOpenTasks
      * @param list<string>|null                $expectedEventTypes  event types expected in the query; null: the query must not run
      */
@@ -199,13 +199,16 @@ final class OpenTaskProviderTest extends ContaoTestCase
         $rows = [];
 
         foreach ($events as $id => $properties) {
-            $rows[$id] = array_merge([
-                'id' => $id,
-                'startDate' => 1759000000 + $id,
-                'endDate' => 1759000000 + $id,
-                'eventState' => '',
-                'rescheduledEventDate' => null,
-            ], array_intersect_key($properties, array_flip(['startDate', 'endDate', 'eventState', 'rescheduledEventDate'])));
+            $rows[$id] = array_merge(
+                [
+                    'id' => $id,
+                    'startDate' => 1759000000 + $id,
+                    'endDate' => 1759000000 + $id,
+                    'eventState' => '',
+                    'rescheduledEventDate' => null,
+                ],
+                array_intersect_key($properties, array_flip(['startDate', 'endDate', 'eventState', 'rescheduledEventDate'])),
+            );
         }
 
         $eventAdapter = $this->mockAdapter(['findById']);

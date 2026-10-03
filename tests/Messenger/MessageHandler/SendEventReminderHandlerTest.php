@@ -174,7 +174,7 @@ final class SendEventReminderHandlerTest extends ContaoTestCase
                     $this->calls[] = 'update';
 
                     return 1;
-                }
+                },
             )
         ;
 
@@ -196,7 +196,7 @@ final class SendEventReminderHandlerTest extends ContaoTestCase
                         $this->assertSame(14, $tokens['reminder_offset_days']);
 
                         return true;
-                    }
+                    },
                 ),
                 'de',
             )
@@ -205,7 +205,7 @@ final class SendEventReminderHandlerTest extends ContaoTestCase
                     $this->calls[] = 'send';
 
                     return new ReceiptCollection([]);
-                }
+                },
             )
         ;
 
@@ -312,9 +312,9 @@ final class SendEventReminderHandlerTest extends ContaoTestCase
         $personProvider
             ->method('getParticipants')
             ->willReturn($participants ?? [
-            new Participant('Petra', 'Eins', 'p1@example.org'),
-            new Participant('Paul', 'Zwei', 'p2@example.org'),
-        ])
+                new Participant('Petra', 'Eins', 'p1@example.org'),
+                new Participant('Paul', 'Zwei', 'p2@example.org'),
+            ])
         ;
 
         $translator = $this->createMock(TranslatorInterface::class);

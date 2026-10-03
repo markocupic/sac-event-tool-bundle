@@ -17,12 +17,12 @@ namespace Markocupic\SacEventToolBundle\Tests\Feature\InstructorPostEventTaskRem
 use Contao\CalendarModel;
 use Contao\TestCase\ContaoTestCase;
 use Contao\UserModel;
+use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\Messenger\Message\SendInstructorPostEventTaskReminderMessage;
+use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\Messenger\MessageHandler\SendInstructorPostEventTaskReminderHandler;
 use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\OpenTask;
 use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\OpenTaskProvider;
 use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\ReminderLog;
 use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\TaskItem;
-use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\Messenger\Message\SendInstructorPostEventTaskReminderMessage;
-use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\Messenger\MessageHandler\SendInstructorPostEventTaskReminderHandler;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
@@ -133,7 +133,7 @@ final class SendInstructorPostEventTaskReminderHandlerTest extends ContaoTestCas
                     $this->calls[] = 'log';
 
                     return 99;
-                }
+                },
             )
         ;
 
@@ -159,7 +159,7 @@ final class SendInstructorPostEventTaskReminderHandlerTest extends ContaoTestCas
                         $this->assertSame('https://example.org/contao', $tokens['link_my_events_dashboard']);
 
                         return true;
-                    }
+                    },
                 ),
                 'de',
             )
@@ -168,7 +168,7 @@ final class SendInstructorPostEventTaskReminderHandlerTest extends ContaoTestCas
                     $this->calls[] = 'send';
 
                     return new ReceiptCollection([]);
-                }
+                },
             )
         ;
 

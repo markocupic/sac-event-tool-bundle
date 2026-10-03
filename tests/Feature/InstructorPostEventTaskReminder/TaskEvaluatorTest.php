@@ -43,8 +43,15 @@ final class TaskEvaluatorTest extends ContaoTestCase
     public function testDoesNotCallIsOpenForUnsupportedTasks(): void
     {
         $task = $this->createMock(PostEventTaskInterface::class);
-        $task->method('supports')->willReturn(false);
-        $task->expects($this->never())->method('isOpen');
+        $task
+            ->method('supports')
+            ->willReturn(false)
+        ;
+
+        $task
+            ->expects($this->never())
+            ->method('isOpen')
+        ;
 
         $event = $this->mockClassWithProperties(CalendarEventsModel::class, ['id' => 42]);
 
@@ -66,11 +73,28 @@ final class TaskEvaluatorTest extends ContaoTestCase
     private function createTask(string $name, bool $supports, bool $open): PostEventTaskInterface
     {
         $task = $this->createMock(PostEventTaskInterface::class);
-        $task->method('getName')->willReturn($name);
-        $task->method('supports')->willReturn($supports);
-        $task->method('isOpen')->willReturn($open);
-        $task->method('getLabel')->willReturn('Label '.$name);
-        $task->method('getUrl')->willReturnCallback(static fn (CalendarEventsModel $event): string => 'https://example.org/'.$name.'/'.$event->id);
+        $task
+            ->method('getName')
+            ->willReturn($name)
+        ;
+
+        $task
+            ->method('supports')
+            ->willReturn($supports)
+        ;
+
+        $task
+            ->method('isOpen')
+            ->willReturn($open)
+        ;
+
+        $task
+            ->method('getLabel')
+            ->willReturn('Label '.$name)
+        ;
+        $task
+            ->method('getUrl')
+            ->willReturnCallback(static fn (CalendarEventsModel $event): string => 'https://example.org/'.$name.'/'.$event->id);
 
         return $task;
     }

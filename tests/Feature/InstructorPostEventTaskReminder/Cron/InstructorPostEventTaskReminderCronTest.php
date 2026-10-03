@@ -18,9 +18,9 @@ use Contao\CalendarModel;
 use Contao\TestCase\ContaoTestCase;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\Cron\InstructorPostEventTaskReminderCron;
+use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\Messenger\Message\SendInstructorPostEventTaskReminderMessage;
 use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\OpenTaskProvider;
 use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\ReminderLog;
-use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\Messenger\Message\SendInstructorPostEventTaskReminderMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -71,7 +71,7 @@ final class InstructorPostEventTaskReminderCronTest extends ContaoTestCase
                     $dispatched[] = [$message->getUserId(), $message->getCalendarId()];
 
                     return new Envelope($message);
-                }
+                },
             )
         ;
 
