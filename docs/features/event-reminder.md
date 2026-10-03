@@ -1,7 +1,6 @@
 # Feature: Event Reminder
 
 Bundle: `markocupic/sac-event-tool-bundle` (bleibt im Bundle, kein eigenes Bundle)
-Status: in Betrieb. Am 2026-10-03 nach `src/Feature/EventReminder/` umgezogen, ohne Änderung der Logik. Neu seit dem Umzug: Die Benachrichtigung im Kalender ist ein Pflichtfeld und bietet nur Benachrichtigungen vom Typ `event_reminder` an.
 Ort: `src/Feature/EventReminder/` (Namespace `Markocupic\SacEventToolBundle\Feature\EventReminder`), Tests unter `tests/Feature/EventReminder/`
 
 ## Ziel
@@ -56,6 +55,12 @@ php vendor/bin/contao-console sacevt:event-reminder --event=123      # nur Event
 - Mit `--sync` und `--event` ruft der Command den `SendEventReminderHandler` direkt auf und zeigt, für welche Events die Erinnerung versendet wurde und für welche nicht (z. B. «bereits versendet am …»).
 - `--event` umgeht nur die Datumsprüfung. Alle anderen Bedingungen prüft der Handler weiterhin: bereits versendet (`eventReminderSentAt`), Erinnerung im Kalender eingeschaltet, Benachrichtigung gewählt, akzeptierte Teilnehmer, Kontaktperson mit E-Mail-Adresse. Eine Erinnerung ein zweites Mal versenden geht also nur, wenn `eventReminderSentAt` vorher auf `0` gesetzt wird.
 
+## Konfiguration
+
+1. **Benachrichtigung anlegen:** Notification Center → neue Benachrichtigung vom Typ «Event-Erinnerung vor Event-Start» (`event_reminder`). Als Empfänger `##recipient_to##`, als CC `##recipient_cc##`, als BCC `##recipient_bcc##` und als Antwort-an `##recipient_to##` eintragen. Die verfügbaren Tokens stehen unten.
+2. **Kalender einstellen:** Kalender bearbeiten → Legende «Event-Erinnerung-Einstellungen» → «Erinnerung vor Event-Start versenden» aktivieren, Anzahl Tage vor Event-Start wählen und die Benachrichtigung auswählen (Pflichtfeld, es erscheinen nur Benachrichtigungen vom Typ `event_reminder`).
+3. **Cron und Messenger:** Der Cron von Contao muss laufen (`contao:cron` oder Web-Cron). Die Messages werden vom Messenger-Worker verarbeitet (`contao_prio_low`). Ohne Worker lässt sich der Versand mit `sacevt:event-reminder --sync` anstossen.
+
 ## Datenmodell
 
 ### tl_calendar (Legende `event_reminder_legend`)
@@ -108,17 +113,3 @@ src/Feature/EventReminder/
 - `DataContainer/CalendarTest`: nur Benachrichtigungen vom Typ `event_reminder`
 - `Cron/EventReminderCronTest`: eine Message pro fälligem Event
 - `Command/EventReminderCommandTest`: wie der Cron, `--sync` mit Ergebnis, `--event` unabhängig vom Datum, `--dry-run`, keine fälligen Events
-
-## Umzug am 2026-10-03
-
-| Vorher | Nachher |
-|---|---|
-| `src/Cron/EventReminderCron.php` | `src/Feature/EventReminder/Cron/EventReminderCron.php` |
-| `src/Messenger/Message/SendEventReminderMessage.php` | `src/Feature/EventReminder/Messenger/Message/SendEventReminderMessage.php` |
-| `src/Messenger/MessageHandler/SendEventReminderHandler.php` | `src/Feature/EventReminder/Messenger/MessageHandler/SendEventReminderHandler.php` |
-| `src/NotificationType/EventReminderNotificationType.php` | `src/Feature/EventReminder/NotificationType/EventReminderNotificationType.php` |
-| `src/EventReminder/*.php` | `src/Feature/EventReminder/*.php` |
-| `tests/EventReminder/RecipientResolverTest.php` | `tests/Feature/EventReminder/RecipientResolverTest.php` |
-| `tests/Messenger/MessageHandler/SendEventReminderHandlerTest.php` | `tests/Feature/EventReminder/Messenger/MessageHandler/SendEventReminderHandlerTest.php` |
-
-Beim Ausrollen beachten: Wartende Messenger-Messages sind mit dem alten Klassennamen `Markocupic\SacEventToolBundle\Messenger\Message\SendEventReminderMessage` gespeichert und können nach dem Umzug nicht mehr gelesen werden. Der Cron dispatcht nur um 03:30 und 04:30 Uhr, tagsüber ist die Warteschlange leer. Nach dem Ausrollen `cache:clear` und laufende Messenger-Worker neu starten.

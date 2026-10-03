@@ -29,7 +29,7 @@ use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\TicketInfo;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\StepHandler\RegisterStep;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\Exception\EventRegistrationException;
-use Markocupic\SacEventToolBundle\Database\SyncEventRegistrationDatabase;
+use Markocupic\SacEventToolBundle\Feature\EventRegistrationDatabaseSync\SyncEventRegistrationDatabase;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use PHPUnit\Framework\MockObject\MockObject;

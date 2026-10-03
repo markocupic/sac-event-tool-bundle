@@ -27,7 +27,7 @@ use Psr\Log\LoggerInterface;
  *
  * See docs/features/auto-publish-events.md
  */
-#[AsCronJob('*/2 * * * *')]
+#[AsCronJob('*/15 * * * *')]
 readonly class AutoPublishEventsCron
 {
     public function __construct(

@@ -27,7 +27,7 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Markocupic\ContaoFrontendUserNotification\Notification\DefaultFrontendUserNotification;
 use Markocupic\SacEventToolBundle\Config\Log;
-use Markocupic\SacEventToolBundle\Database\SyncEventRegistrationDatabase;
+use Markocupic\SacEventToolBundle\Feature\EventRegistrationDatabaseSync\SyncEventRegistrationDatabase;
 use Markocupic\SacEventToolBundle\Model\SacSectionModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;

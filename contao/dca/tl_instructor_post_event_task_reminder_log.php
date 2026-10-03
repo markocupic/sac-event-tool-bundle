@@ -32,7 +32,7 @@ $GLOBALS['TL_DCA']['tl_instructor_post_event_task_reminder_log'] = [
 	'config'   => [
 		'dataContainer'    => DC_Table::class,
 		'closed'           => true,
-		'notDeletable'     => false,
+		'notDeletable'     => true,
 		'notCreatable'     => true,
 		'notEditable'      => true,
 		'notCopyable'      => true,
@@ -60,7 +60,7 @@ $GLOBALS['TL_DCA']['tl_instructor_post_event_task_reminder_log'] = [
 		'global_operations' => [],
 		// Read only: only the "show" operation
 		'operations'        => [
-			'all',
+			'show',
 		],
 	],
 	// Prepared in case editing is enabled one day (currently notEditable)

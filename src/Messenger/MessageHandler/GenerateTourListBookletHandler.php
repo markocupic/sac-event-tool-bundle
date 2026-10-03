@@ -73,7 +73,7 @@ readonly class GenerateTourListBookletHandler
     {
         $text = \sprintf('Hallo %s!', $memberModel->firstname);
 
-        return $this->revertInputEncoding($text);
+        return $this->decode($text);
     }
 
     private function generateMessageText(FrontendUserNotificationModel $notificationModel, FilesModel $filesModel, string $filename): string
@@ -92,7 +92,7 @@ readonly class GenerateTourListBookletHandler
 
         $text = \sprintf('<div class="lh-lg mb-3 small">Du kannst dein persönliches Tourenprogramm jetzt herunterladen:<br><a href="%s" title="Download starten">%s</a></div>', $urlSigned, $filename);
 
-        return $this->revertInputEncoding($text);
+        return $this->decode($text);
     }
 
     private function generateBooklet(array $arrIds, OutputType $outputType): FilesModel|bool
@@ -107,7 +107,7 @@ readonly class GenerateTourListBookletHandler
         }
     }
 
-    private function revertInputEncoding(string $text): string
+    private function decode(string $text): string
     {
         return StringUtil::revertInputEncoding($text);
     }

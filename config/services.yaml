@@ -47,8 +47,8 @@ services:
         exclude: ../src/{ContaoManager,Session,Event,DependencyInjection,Model}
 
     # Member sync: resolve the remote CSV finder interface to the FTP implementation
-    Markocupic\SacEventToolBundle\Database\SyncMember\RemoteCsvFileFinderInterface:
-        alias: Markocupic\SacEventToolBundle\Database\SyncMember\FtpCsvFileFinder
+    Markocupic\SacEventToolBundle\Feature\MemberDatabaseSync\RemoteCsvFileFinderInterface:
+        alias: Markocupic\SacEventToolBundle\Feature\MemberDatabaseSync\FtpCsvFileFinder
 
     # Override the Contao Backend User Provider
     # to enable login with the SAC member id
