@@ -143,9 +143,9 @@ Index: `(userId, calendarId, sentAt)`
 
 Backend-Modul «Log Leiter-Erinnerungen» (`sac_instructor_post_event_task_reminder_log` in `sac_be_modules`), **nur lesen**:
 
-- DCA: `closed`, `notCreatable`, `notEditable`, `notDeletable`, `notCopyable`, `notSortable`; keine globalen Operationen; einzige Operation `show`
-- Liste nach Versanddatum gruppiert (neueste zuerst), Filter nach Empfänger, Kalender und Zustellung
-- Spalten: Versendet am, Empfänger (Name und E-Mail), Kalender, Nr. (`reminderCount`; «–» bei älteren Einträgen ohne Wert), offene Aufgaben, Events (Titel mit ID), zugestellt; formatiert durch `DataContainer\ReminderLogTable` (Label-Callback). Gelöschte User, Kalender oder Events erscheinen mit ID und «(gelöscht)»
+- DCA: Palette und `inputType` sind für alle Felder vorbereitet (falls Bearbeiten einmal freigeschaltet wird), aktuell aber gesperrt: `closed`, `notCreatable`, `notEditable`, `notDeletable`, `notCopyable`, `notSortable`; keine globalen Operationen, einzige Operation `show`
+- Liste nach Versanddatum gruppiert (neueste zuerst), Filter nach Empfänger, Kalender und Zustellung; sortierbar nach Versanddatum, Kalender, Zähler, offenen Aufgaben und Zustellung
+- Spalten: Versendet am, Empfänger (Name und E-Mail), Kalender, Zähler (`reminderCount`; «–» bei älteren Einträgen ohne Wert), offene Aufgaben, Events (Titel mit ID), zugestellt; formatiert durch `DataContainer\ReminderLogTable` (Label-Callback). Gelöschte User, Kalender oder Events erscheinen mit ID und «(gelöscht)»
 - Sichtbar für Admins; andere Backend-User brauchen das Modul in ihren Rechten
 
 ## Klassen
@@ -163,7 +163,7 @@ Backend-Modul «Log Leiter-Erinnerungen» (`sac_instructor_post_event_task_remin
 | `Feature\InstructorPostEventTaskReminder\DataContainer\ReminderLogTable` | Label-Callback für das Backend-Modul des Logs (nur lesen) |
 | `Feature\InstructorPostEventTaskReminder\DataContainer\Calendar` | tl_calendar-Callback: Notification-Optionen (nur passender Typ) |
 | `Feature\InstructorPostEventTaskReminder\ReminderLog` | `getLastSentAt(userId, calendarId)`, `countSent(userId, calendarId)`, `add(userId, calendarId, notificationId, sentAt, reminderCount, openTaskCount, eventIds)` (gibt die Log-ID zurück), `markAsDelivered(logId)` |
-| `Feature\InstructorPostEventTaskReminder\Cron\InstructorPostEventTaskReminderCron` | `45 3,4 * * *` (zweiter Lauf fängt Verpasstes auf, das Intervall verhindert Duplikate), dispatcht Messages. Misst die Laufzeit mit der Symfony Stopwatch und schreibt sie ins Contao-Systemlog (siehe «Laufzeit») |
+| `Feature\InstructorPostEventTaskReminder\Cron\InstructorPostEventTaskReminderCron` | `45 1,4 * * *` (zweiter Lauf fängt Verpasstes auf, das Intervall verhindert Duplikate), dispatcht Messages. Misst die Laufzeit mit der Symfony Stopwatch und schreibt sie ins Contao-Systemlog (siehe «Laufzeit») |
 | `Feature\InstructorPostEventTaskReminder\Messenger\Message\SendInstructorPostEventTaskReminderMessage` | userId, calendarId; `LowPriorityMessageInterface` |
 | `Feature\InstructorPostEventTaskReminder\Messenger\MessageHandler\SendInstructorPostEventTaskReminderHandler` | prüft, loggt, versendet |
 | `Feature\InstructorPostEventTaskReminder\NotificationType\InstructorPostEventTaskReminderNotificationType` | `NAME = 'instructor_post_event_task_reminder'` |
