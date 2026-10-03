@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\Task;
 
 use Contao\CalendarEventsModel;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
@@ -24,12 +26,13 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Tours, courses and general events: the participation of the accepted participants has to be confirmed.
+ * Tours, courses and general events: the participation of the participants has to be confirmed.
  *
- * The task only exists if there is at least one accepted registration.
- * It is done as soon as at least one ACCEPTED registration has hasParticipated = 1.
- * hasParticipated = 1 on a registration that is not accepted (e.g. waiting list) does not count:
- * the reminder makes the instructor update the subscription state as well.
+ * Only registrations that are accepted OR on the waiting list count
+ * (EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED):
+ * - the task only exists if there is at least one such registration
+ * - it is done as soon as at least one of them has hasParticipated = 1
+ * Registrations in any other state are ignored.
  */
 #[AsTaggedItem(priority: 10)]
 class ParticipationConfirmationTask implements PostEventTaskInterface
@@ -56,19 +59,23 @@ class ParticipationConfirmationTask implements PostEventTaskInterface
     public function isOpen(CalendarEventsModel $event): bool
     {
         $row = $this->connection->fetchAssociative(
-            'SELECT COUNT(id) AS accepted, COALESCE(SUM(hasParticipated = 1), 0) AS confirmed FROM tl_calendar_events_member WHERE eventId = ? AND stateOfSubscription = ?',
-            [(int) $event->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED],
+            'SELECT COUNT(id) AS registrations, COALESCE(SUM(hasParticipated = 1), 0) AS confirmed
+            FROM tl_calendar_events_member
+            WHERE eventId = ? AND stateOfSubscription IN (?)',
+            [(int) $event->id, EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED],
+            [ParameterType::INTEGER, ArrayParameterType::STRING],
         );
 
         if (false === $row) {
             return false;
         }
 
-        // No accepted participants: nothing to confirm
-        if ((int) $row['accepted'] < 1) {
+        // No accepted or waiting-list registrations: nothing to confirm
+        if ((int) $row['registrations'] < 1) {
             return false;
         }
 
+        // Done as soon as one of them has been confirmed
         return (int) $row['confirmed'] < 1;
     }
 

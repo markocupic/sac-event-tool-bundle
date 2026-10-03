@@ -42,9 +42,11 @@ Gerechnet wird in ganzen Kalendertagen, die Zeitumstellung hat keinen Einfluss. 
 
 Bei `generalEvent` wird nur die Teilnahmebestätigung verlangt (entschieden am 2026-10-02): Das Backend bietet den Tourrapport-Button (Teilnehmerliste, Event-Dashboard, «Meine Events») nur bei Touren an.
 
-Die Teilnahme-Aufgabe existiert nur, wenn mindestens eine Anmeldung in `tl_calendar_events_member` mit `eventId = event.id` und `stateOfSubscription = 'subscription-accepted'` (`EventSubscriptionState::SUBSCRIPTION_ACCEPTED`) vorhanden ist.
-Sie ist erledigt, sobald mindestens eine akzeptierte Anmeldung `hasParticipated = 1` hat.
-`hasParticipated = 1` bei nicht akzeptierten Anmeldungen (z. B. Warteliste) zählt nicht. Das ist gewollt, damit der Leiter den Anmeldestatus nachführt.
+Für die Teilnahme-Aufgabe zählen nur Anmeldungen in `tl_calendar_events_member` mit `eventId = event.id` und dem Status `subscription-accepted` **oder** `subscription-on-waiting-list` (`EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED`, geändert am 2026-10-03):
+- Die Aufgabe existiert nur, wenn es mindestens eine solche Anmeldung gibt.
+- Die Aufgabe ist erledigt, sobald mindestens eine dieser Anmeldungen `hasParticipated = 1` hat.
+- Auch ein Event, das nur Wartelisten-Anmeldungen hat, löst eine Erinnerung aus, solange keine dieser Anmeldungen `hasParticipated = 1` hat.
+- Anmeldungen mit einem anderen Status werden ignoriert. Im Backend lässt sich die Teilnahme bei anderen Status ohnehin nicht setzen.
 
 Jede Spalte dieser Tabelle ist eine eigene Task-Klasse (siehe «Aufgaben-Bausteine»).
 
@@ -60,10 +62,10 @@ Jede Spalte dieser Tabelle ist eine eigene Task-Klasse (siehe «Aufgaben-Baustei
 ### Versandzeitpunkt
 
 - Erste Benachrichtigung: mindestens eine offene Aufgabe in einem fälligen Event und noch kein Log-Eintrag für (userId, calendarId)
-- Folgebenachrichtigung: weiterhin offene Aufgaben und `MAX(sentAt) + interval Tage <= jetzt`
+- Folgebenachrichtigung: weiterhin offene Aufgaben und `sentAt` (letzter Versand) `+ interval Tage <= jetzt`
 - Neu fällig gewordene Events durchbrechen das Intervall nicht
 - Events in der Bearbeitungsfrist erscheinen nie in einer Benachrichtigung
-- Jeder Versand wird geloggt, das Log wird nicht gelöscht
+- Jeder Versand wird geloggt: pro Empfänger und Kalender genau ein Log-Eintrag mit den Angaben zur letzten Erinnerung und der Gesamtzahl der Erinnerungen. Das Log wird nicht gelöscht
 
 ## Benennung
 
@@ -101,7 +103,7 @@ interface PostEventTaskInterface
 | Klasse | `getName()` | `supports()` | `isOpen()` | Priorität |
 |---|---|---|---|---|
 | `Task\TourReportTask` | `tour_report` | `tour`, `lastMinuteTour` | `filledInEventReportForm = 0` | 20 |
-| `Task\ParticipationConfirmationTask` | `participation_confirmation` | `tour`, `lastMinuteTour`, `course`, `generalEvent` | akzeptierte Anmeldungen vorhanden, aber keine mit `hasParticipated = 1` | 10 |
+| `Task\ParticipationConfirmationTask` | `participation_confirmation` | `tour`, `lastMinuteTour`, `course`, `generalEvent` | akzeptierte oder Wartelisten-Anmeldungen vorhanden, aber keine davon mit `hasParticipated = 1` | 10 |
 
 Regeln:
 
@@ -133,19 +135,19 @@ Ein Feld für den Lookback gibt es bewusst nicht (entfernt am 2026-10-02).
 | `userId` | `tl_user.id` |
 | `calendarId` | `tl_calendar.id` |
 | `notificationId` | verwendete Benachrichtigung |
-| `sentAt` | Versandzeitpunkt |
-| `reminderCount` | die wievielte Erinnerung für (userId, calendarId), inkl. dieser (1 = erste); gleicher Wert wie das Token `##reminder_count##`. Gezählt werden alle Log-Einträge, also auch nicht zugestellte |
-| `openTaskCount` | Anzahl offener Aufgaben beim Versand |
-| `eventIds` | betroffene Events |
-| `delivered` | Ergebnis laut Notification Center |
+| `sentAt` | Zeitpunkt der letzten Erinnerung |
+| `reminderCount` | Anzahl Erinnerungen für (userId, calendarId) insgesamt; wird bei jeder Erinnerung um 1 erhöht (auch wenn nicht zugestellt). Nach dem Versand gleicher Wert wie das Token `##reminder_count##` |
+| `openTaskCount` | Anzahl offener Aufgaben bei der letzten Erinnerung |
+| `eventIds` | betroffene Events der letzten Erinnerung |
+| `delivered` | Ergebnis der letzten Erinnerung laut Notification Center |
 
-Index: `(userId, calendarId, sentAt)`
+Unique Index: `(userId, calendarId)`, also genau ein Eintrag pro Empfänger und Kalender (entschieden am 2026-10-03, damit die Tabelle nicht wächst). Geschrieben wird mit `INSERT … ON DUPLICATE KEY UPDATE` (`ReminderLog::logNotification()`): beim ersten Versand neu mit `reminderCount = 1`, danach werden die Angaben überschrieben und `reminderCount` um 1 erhöht. Eine Historie der einzelnen Versände gibt es damit nicht mehr
 
 Backend-Modul «Log Leiter-Erinnerungen» (`sac_instructor_post_event_task_reminder_log` in `sac_be_modules`), **nur lesen**:
 
 - DCA: Palette und `inputType` sind für alle Felder vorbereitet (falls Bearbeiten einmal freigeschaltet wird), aktuell aber gesperrt: `closed`, `notCreatable`, `notEditable`, `notDeletable`, `notCopyable`, `notSortable`; keine globalen Operationen, einzige Operation `show`
 - Liste nach Versanddatum gruppiert (neueste zuerst), Filter nach Empfänger, Kalender und Zustellung; sortierbar nach Versanddatum, Kalender, Zähler, offenen Aufgaben und Zustellung
-- Spalten: Versendet am, Empfänger (Name und E-Mail), Kalender, Zähler (`reminderCount`; «–» bei älteren Einträgen ohne Wert), offene Aufgaben, Events (Titel mit ID), zugestellt; formatiert durch `DataContainer\ReminderLogTable` (Label-Callback). Gelöschte User, Kalender oder Events erscheinen mit ID und «(gelöscht)»
+- Spalten: Zuletzt versendet am, Empfänger (Name und E-Mail), Kalender, Zähler (`reminderCount`, Anzahl Erinnerungen insgesamt), offene Aufgaben, Events (Titel mit ID), zugestellt; formatiert durch `DataContainer\ReminderLogTable` (Label-Callback). Gelöschte User, Kalender oder Events erscheinen mit ID und «(gelöscht)»
 - Sichtbar für Admins; andere Backend-User brauchen das Modul in ihren Rechten
 
 ## Klassen
@@ -162,7 +164,7 @@ Backend-Modul «Log Leiter-Erinnerungen» (`sac_instructor_post_event_task_remin
 | `Feature\InstructorPostEventTaskReminder\TaskItem` | DTO einer offenen Aufgabe: name, label, url |
 | `Feature\InstructorPostEventTaskReminder\DataContainer\ReminderLogTable` | Label-Callback für das Backend-Modul des Logs (nur lesen) |
 | `Feature\InstructorPostEventTaskReminder\DataContainer\Calendar` | tl_calendar-Callback: Notification-Optionen (nur passender Typ) |
-| `Feature\InstructorPostEventTaskReminder\ReminderLog` | `getLastSentAt(userId, calendarId)`, `countSent(userId, calendarId)`, `add(userId, calendarId, notificationId, sentAt, reminderCount, openTaskCount, eventIds)` (gibt die Log-ID zurück), `markAsDelivered(logId)` |
+| `Feature\InstructorPostEventTaskReminder\ReminderLog` | `getLastSentAt(userId, calendarId)` (`sentAt`), `countSent(userId, calendarId)` (`reminderCount`), `logNotification(userId, calendarId, notificationId, sentAt, openTaskCount, eventIds)` (Insert bzw. Update mit `reminderCount + 1`, gibt die Log-ID zurück), `markAsDelivered(logId)` |
 | `Feature\InstructorPostEventTaskReminder\Cron\InstructorPostEventTaskReminderCron` | `45 1,4 * * *` (zweiter Lauf fängt Verpasstes auf, das Intervall verhindert Duplikate), dispatcht Messages. Misst die Laufzeit mit der Symfony Stopwatch und schreibt sie ins Contao-Systemlog (siehe «Laufzeit») |
 | `Feature\InstructorPostEventTaskReminder\Messenger\Message\SendInstructorPostEventTaskReminderMessage` | userId, calendarId; `LowPriorityMessageInterface` |
 | `Feature\InstructorPostEventTaskReminder\Messenger\MessageHandler\SendInstructorPostEventTaskReminderHandler` | prüft, loggt, versendet |
@@ -212,7 +214,7 @@ Der Mailversand selbst läuft getrennt im Messenger-Worker und ist nicht enthalt
 2. Symfony-Lock auf `userId-calendarId` holen. Ist er belegt, arbeitet ein anderer Worker daran → return.
 3. Intervall erneut gegen das Log prüfen (Schutz vor doppeltem Cron-Lauf). Nicht abgelaufen → return.
 4. Aufgaben neu berechnen über `OpenTaskProvider`. Keine Aufgaben → return.
-5. Log-Eintrag vor dem Senden schreiben (lieber eine Mail zu wenig als doppelt).
+5. Log-Eintrag vor dem Senden schreiben bzw. aktualisieren und `reminderCount` erhöhen (lieber eine Mail zu wenig als doppelt).
 6. `NotificationCenter::sendNotification($id, $tokens, $sacevtLocale)`; bei Erfolg `delivered` setzen, sonst Fehler an `contaoErrorLogger`. Lock freigeben.
 
 ## Notification-Tokens
@@ -245,21 +247,21 @@ URL-Erzeugung wie im `MyEventsDashboardController`. Der Cron läuft per CLI, dah
 ## Tests (PHPUnit 9.6, `composer unit-tests`)
 
 - `TourReportTaskTest`: `supports()` je Eventtyp, `isOpen()` mit und ohne Bericht
-- `ParticipationConfirmationTaskTest`: `supports()` je Eventtyp; keine Teilnehmer, keine Bestätigung, mindestens eine Bestätigung, hasParticipated nur bei nicht akzeptierter Anmeldung
+- `ParticipationConfirmationTaskTest`: `supports()` je Eventtyp; keine akzeptierten oder Wartelisten-Anmeldungen, keine Bestätigung, mindestens eine Bestätigung; Abfrage berücksichtigt nur akzeptierte und Wartelisten-Anmeldungen
 - `TaskEvaluatorTest`: nur unterstützte und offene Tasks, Reihenfolge nach Priorität (mit Dummy-Tasks)
 - `OpenTaskProviderTest`: Zuordnung zu den Empfängern: Leiter, Koordinator ohne Leiterrolle, Koordinator gleichzeitig Leiter (keine Duplikate), deaktivierte User und User ohne E-Mail, Events ohne offene Aufgaben, mehrere Events pro Empfänger, verschobene Events (fällig, noch nicht fällig, ohne Verschiebedatum), Sortierung nach massgebendem Enddatum, Eventtypen des Kalenders (keine gewählt, Übergabe an die Abfrage)
 - `ReminderScheduleTest`: Bearbeitungsfrist an den Tagesgrenzen (inkl. Zeitumstellung), verschobenes Enddatum (eintägig, mehrtägig, zwei Wochenenden, Zeitumstellung, ohne Verschiebedatum), erste Mail, Intervall nicht erreicht oder erreicht
-- `SendInstructorPostEventTaskReminderHandlerTest` (Mocks): Feature deaktiviert, keine Notification, ungültiger Empfänger, Intervall nicht abgelaufen, alles erledigt, Lock belegt, Log vor Versand (inkl. `reminderCount`) und Tokens
+- `SendInstructorPostEventTaskReminderHandlerTest` (Mocks): Feature deaktiviert, keine Notification, ungültiger Empfänger, Intervall nicht abgelaufen, alles erledigt, Lock belegt, Log vor Versand (`logNotification()`) und Tokens (inkl. `reminder_count`)
 - `InstructorPostEventTaskReminderCronTest`: eine Message pro fälligem Empfänger und Kalender, Intervall wird beachtet
 
-Nicht durch Unit-Tests abgedeckt: die SQL-Abfrage in `OpenTaskProvider::fetchCandidateEvents()` (Eventtyp, veröffentlicht, nicht abgesagt, `endDate`, Verschiebedatum) und die Abfrage in `ParticipationConfirmationTask::isOpen()` gegen eine echte Datenbank. Die Datumsgrenzen dazu prüft `ReminderScheduleTest`. Optional: DB-Tests für `OpenTaskProvider` und `ReminderLog` nach dem Muster von `CalendarEventsUtilDatabaseTest`.
+Nicht durch Unit-Tests abgedeckt: das SQL in `ReminderLog` (u. a. `ON DUPLICATE KEY UPDATE`), die SQL-Abfrage in `OpenTaskProvider::fetchCandidateEvents()` (Eventtyp, veröffentlicht, nicht abgesagt, `endDate`, Verschiebedatum) und die Abfrage in `ParticipationConfirmationTask::isOpen()` gegen eine echte Datenbank. Die Datumsgrenzen dazu prüft `ReminderScheduleTest`. Optional: DB-Tests für `OpenTaskProvider` und `ReminderLog` nach dem Muster von `CalendarEventsUtilDatabaseTest`.
 
 ## Inbetriebnahme
 
-1. `contao:migrate` (neue Kalenderfelder, Log-Tabelle). Wer eine frühe Version mit dem Feld `instructorPostEventTaskReminderLookback` migriert hat: Die Spalte wird nur mit `--with-deletes` bzw. Bestätigung im Install Tool entfernt
+1. `contao:migrate` (neue Kalenderfelder, Log-Tabelle). Auf Testinstallationen, deren Log noch aus der Zeit vor dem Unique Index `(userId, calendarId)` stammt (mehrere Einträge pro Empfänger und Kalender), die Tabelle vorher leeren (`TRUNCATE tl_instructor_post_event_task_reminder_log`), sonst bricht das Anlegen des Index ab. Wer eine frühe Version mit dem Feld `instructorPostEventTaskReminderLookback` migriert hat: Die Spalte wird nur mit `--with-deletes` bzw. Bestätigung im Install Tool entfernt
 2. Im Notification Center eine Benachrichtigung vom Typ «Leiter-Erinnerung an offene Aufgaben nach dem Event» anlegen: Empfänger `##recipient_email##`, Text mit `##task_list_text##` bzw. `##task_list_html##`
 3. Im Kalender das Feature aktivieren, Benachrichtigung wählen, Event-Typen, Bearbeitungsfrist und Intervall prüfen. Bei Kalendern, in denen das Feature schon vor dem Feld «Berücksichtigte Event-Typen» aktiviert war, ist das Feld leer: Typen wählen und speichern, sonst wird nichts geprüft
 4. Cache leeren (`cache:clear`), damit das Backend-Modul «Log Leiter-Erinnerungen» erscheint; Nicht-Admins das Modul in den Rechten zuweisen
 5. `framework.router.default_uri` setzen, damit die Links in den vom Cron versandten Mails auf die richtige Domain zeigen
 6. Cron per CLI laufen lassen und Messenger-Worker betreiben (bzw. `messenger:consume`)
-7. Kontrolle: Systemlog (Laufzeit, Anzahl Messages) und Backend-Modul «Log Leiter-Erinnerungen» (pro Empfänger und Kalender höchstens ein Eintrag pro Intervall)
+7. Kontrolle: Systemlog (Laufzeit, Anzahl Messages) und Backend-Modul «Log Leiter-Erinnerungen» (pro Empfänger und Kalender ein Eintrag; «Zuletzt versendet am» und «Zähler» ändern sich höchstens einmal pro Intervall)

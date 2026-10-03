@@ -21,6 +21,7 @@ use Contao\MemberModel;
 use Contao\Model\Collection;
 use Contao\UserModel;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
@@ -215,14 +216,27 @@ readonly class EventMember
         $objPhpWord->replace('eventId', $objEvent->id);
     }
 
+    /**
+     * Participants of the event: hasParticipated = 1 and a subscription state that allows
+     * confirming the participation (accepted or waiting list, see EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED).
+     */
     public function getParticipatedEventMembers(CalendarEventsModel $objEvent): Collection|null
     {
         /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
 
+        $allowedStates = EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED;
+
         return $calendarEventsMemberModelAdapter->findBy(
-            ['tl_calendar_events_member.eventId=?', 'tl_calendar_events_member.hasParticipated=?'],
-            [$objEvent->id, 1],
+            [
+                // Only participants of the event and a subscription state
+                // that allows confirming the participation (accepted or waiting list, see EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED)
+                // and hasParticipated = 1 are allowed.
+                'tl_calendar_events_member.eventId=?',
+                'tl_calendar_events_member.hasParticipated=?',
+                'tl_calendar_events_member.stateOfSubscription IN ('.implode(',', array_fill(0, \count($allowedStates), '?')).')',
+            ],
+            [$objEvent->id, 1, ...$allowedStates],
         );
     }
 

@@ -117,7 +117,7 @@ readonly class SendInstructorPostEventTaskReminderHandler
             $tokens = $this->getTokens($user, $calendar, $openTasks, $openTaskCount, $reminderCount);
 
             // Log first: better one missing reminder than a duplicate one
-            $logId = $this->reminderLog->add($userId, $calendarId, $notificationId, $now->getTimestamp(), $reminderCount, $openTaskCount, $eventIds);
+            $logId = $this->reminderLog->logNotification($userId, $calendarId, $notificationId, $now->getTimestamp(), $openTaskCount, $eventIds);
 
             $receipts = $this->notificationCenter->sendNotification($notificationId, $tokens, $this->sacevtLocale);
 

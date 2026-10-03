@@ -17,8 +17,10 @@ use Contao\DataContainer;
 
 /*
  * Log of the instructor post-event task reminder notifications.
- * One row per sent notification. Used to determine when the last notification
- * for a (user, calendar) pair was sent. The log is kept as history.
+ * One row per (user, calendar) pair (unique index): the LAST notification
+ * (sentAt, notificationId, openTaskCount, eventIds, delivered) and the total number
+ * of notifications (reminderCount). Each further notification updates the row (see ReminderLog::logNotification()).
+ * Used to determine when the last notification for a (user, calendar) pair was sent.
  *
  * Back end module "sac_instructor_post_event_task_reminder_log": READ ONLY.
  * Records can only be listed and shown, never created, edited, copied, moved or deleted.
@@ -39,7 +41,7 @@ $GLOBALS['TL_DCA']['tl_instructor_post_event_task_reminder_log'] = [
 		'sql'              => [
 			'keys' => [
 				'id'                       => 'primary',
-				'userId,calendarId,sentAt' => 'index',
+				'userId,calendarId'        => 'unique',
 			],
 		],
 	],
@@ -104,7 +106,7 @@ $GLOBALS['TL_DCA']['tl_instructor_post_event_task_reminder_log'] = [
 			'eval'      => ['rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
 			'sql'       => 'int(10) unsigned NOT NULL default 0',
 		],
-		// The how-manieth notification for this (user, calendar) pair, including this one (1 = first)
+		// Total number of notifications sent to this user for this calendar (incremented on every notification)
 		'reminderCount'  => [
 			'sorting'   => true,
 			'flag'      => DataContainer::SORT_BOTH,

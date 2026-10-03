@@ -126,8 +126,8 @@ final class SendInstructorPostEventTaskReminderHandlerTest extends ContaoTestCas
 
         $this->reminderLog
             ->expects($this->once())
-            ->method('add')
-            ->with(self::USER_ID, self::CALENDAR_ID, self::NOTIFICATION_ID, $this->greaterThan(0), 2, 3, [10, 11])
+            ->method('logNotification')
+            ->with(self::USER_ID, self::CALENDAR_ID, self::NOTIFICATION_ID, $this->greaterThan(0), 3, [10, 11])
             ->willReturnCallback(
                 function (): int {
                     $this->calls[] = 'log';
@@ -187,7 +187,7 @@ final class SendInstructorPostEventTaskReminderHandlerTest extends ContaoTestCas
     {
         $this->reminderLog
             ->expects($this->never())
-            ->method('add')
+            ->method('logNotification')
         ;
 
         $this->notificationCenter

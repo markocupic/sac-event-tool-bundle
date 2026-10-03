@@ -92,9 +92,11 @@ final class TaskEvaluatorTest extends ContaoTestCase
             ->method('getLabel')
             ->willReturn('Label '.$name)
         ;
+
         $task
             ->method('getUrl')
-            ->willReturnCallback(static fn (CalendarEventsModel $event): string => 'https://example.org/'.$name.'/'.$event->id);
+            ->willReturnCallback(static fn (CalendarEventsModel $event): string => 'https://example.org/'.$name.'/'.$event->id)
+        ;
 
         return $task;
     }

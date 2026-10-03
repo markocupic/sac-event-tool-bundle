@@ -18,7 +18,10 @@ use Doctrine\DBAL\Connection;
 
 /**
  * Reads and writes tl_instructor_post_event_task_reminder_log.
- * One row per sent notification; the rows are kept as history.
+ *
+ * One row per (user, calendar) pair (unique index). It holds the LAST notification
+ * (sentAt, notificationId, openTaskCount, eventIds, delivered) and the total number
+ * of notifications sent so far (reminderCount). Every further notification updates the row.
  *
  * Deliberately not "readonly" so it can be mocked in unit tests.
  */
@@ -36,7 +39,7 @@ class ReminderLog
     public function getLastSentAt(int $userId, int $calendarId): int|null
     {
         $lastSentAt = $this->connection->fetchOne(
-            'SELECT MAX(sentAt) FROM '.self::TABLE.' WHERE userId = ? AND calendarId = ?',
+            'SELECT sentAt FROM '.self::TABLE.' WHERE userId = ? AND calendarId = ?',
             [$userId, $calendarId],
         );
 
@@ -49,32 +52,42 @@ class ReminderLog
     public function countSent(int $userId, int $calendarId): int
     {
         return (int) $this->connection->fetchOne(
-            'SELECT COUNT(id) FROM '.self::TABLE.' WHERE userId = ? AND calendarId = ?',
+            'SELECT reminderCount FROM '.self::TABLE.' WHERE userId = ? AND calendarId = ?',
             [$userId, $calendarId],
         );
     }
 
     /**
-     * @param int       $reminderCount the how-manieth notification for this (user, calendar) pair, including this one (1 = first)
+     * Logs a notification for this (user, calendar) pair:
+     * - first notification: inserts the row with reminderCount = 1
+     * - further notifications: overwrites the data of the last notification and increments reminderCount
+     *
+     * Atomic thanks to the unique index (userId, calendarId).
+     *
      * @param list<int> $eventIds
      *
-     * @return int the ID of the new log entry
+     * @return int the ID of the log entry
      */
-    public function add(int $userId, int $calendarId, int $notificationId, int $sentAt, int $reminderCount, int $openTaskCount, array $eventIds): int
+    public function logNotification(int $userId, int $calendarId, int $notificationId, int $sentAt, int $openTaskCount, array $eventIds): int
     {
-        $this->connection->insert(self::TABLE, [
-            'tstamp' => time(),
-            'userId' => $userId,
-            'calendarId' => $calendarId,
-            'notificationId' => $notificationId,
-            'sentAt' => $sentAt,
-            'reminderCount' => $reminderCount,
-            'openTaskCount' => $openTaskCount,
-            'eventIds' => implode(',', $eventIds),
-            'delivered' => 0,
-        ]);
+        $this->connection->executeStatement(
+            'INSERT INTO '.self::TABLE.' (tstamp, userId, calendarId, notificationId, sentAt, reminderCount, openTaskCount, eventIds, delivered)
+            VALUES (?, ?, ?, ?, ?, 1, ?, ?, 0)
+            ON DUPLICATE KEY UPDATE
+                tstamp = VALUES(tstamp),
+                notificationId = VALUES(notificationId),
+                sentAt = VALUES(sentAt),
+                reminderCount = reminderCount + 1,
+                openTaskCount = VALUES(openTaskCount),
+                eventIds = VALUES(eventIds),
+                delivered = 0',
+            [time(), $userId, $calendarId, $notificationId, $sentAt, $openTaskCount, implode(',', $eventIds)],
+        );
 
-        return (int) $this->connection->lastInsertId();
+        return (int) $this->connection->fetchOne(
+            'SELECT id FROM '.self::TABLE.' WHERE userId = ? AND calendarId = ?',
+            [$userId, $calendarId],
+        );
     }
 
     public function markAsDelivered(int $logId): void

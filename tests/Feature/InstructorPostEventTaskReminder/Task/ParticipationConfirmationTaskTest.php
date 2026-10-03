@@ -16,7 +16,9 @@ namespace Markocupic\SacEventToolBundle\Tests\Feature\InstructorPostEventTaskRem
 
 use Contao\CalendarEventsModel;
 use Contao\TestCase\ContaoTestCase;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\Task\ParticipationConfirmationTask;
 use Symfony\Component\Routing\RouterInterface;
@@ -43,27 +45,27 @@ final class ParticipationConfirmationTaskTest extends ContaoTestCase
     }
 
     /**
-     * The query only counts ACCEPTED registrations, so a hasParticipated = 1
-     * on a waiting-list registration results in "confirmed = 0" here.
+     * "registrations": number of accepted or waiting-list registrations,
+     * "confirmed": how many of them have hasParticipated = 1.
      *
      * @dataProvider isOpenProvider
      */
-    public function testIsOpen(int $accepted, int $confirmed, bool $expectedOpen): void
+    public function testIsOpen(int $registrations, int $confirmed, bool $expectedOpen): void
     {
         $event = $this->mockClassWithProperties(CalendarEventsModel::class, ['id' => 42, 'eventType' => 'course']);
 
-        $this->assertSame($expectedOpen, $this->createTask($accepted, $confirmed)->isOpen($event));
+        $this->assertSame($expectedOpen, $this->createTask($registrations, $confirmed)->isOpen($event));
     }
 
     public static function isOpenProvider(): iterable
     {
-        yield 'no accepted participants' => [0, 0, false];
-        yield 'accepted participants, none confirmed' => [5, 0, true];
+        yield 'no accepted or waiting-list registrations' => [0, 0, false];
+        yield 'registrations, none confirmed' => [5, 0, true];
         yield 'one of several confirmed' => [5, 1, false];
         yield 'all confirmed' => [5, 5, false];
     }
 
-    public function testQueriesOnlyAcceptedRegistrationsOfTheEvent(): void
+    public function testCountsConfirmationsOfAcceptedAndWaitingListRegistrations(): void
     {
         $event = $this->mockClassWithProperties(CalendarEventsModel::class, ['id' => 42, 'eventType' => 'tour']);
 
@@ -72,10 +74,11 @@ final class ParticipationConfirmationTaskTest extends ContaoTestCase
             ->expects($this->once())
             ->method('fetchAssociative')
             ->with(
-                $this->stringContains('stateOfSubscription = ?'),
-                [42, EventSubscriptionState::SUBSCRIPTION_ACCEPTED],
+                $this->stringContains('stateOfSubscription IN (?)'),
+                [42, [EventSubscriptionState::SUBSCRIPTION_ACCEPTED, EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST]],
+                [ParameterType::INTEGER, ArrayParameterType::STRING],
             )
-            ->willReturn(['accepted' => 2, 'confirmed' => 0])
+            ->willReturn(['registrations' => 2, 'confirmed' => 0])
         ;
 
         $task = new ParticipationConfirmationTask($connection, $this->createMock(RouterInterface::class), $this->createMock(TranslatorInterface::class));
@@ -83,12 +86,12 @@ final class ParticipationConfirmationTaskTest extends ContaoTestCase
         $this->assertTrue($task->isOpen($event));
     }
 
-    private function createTask(int $accepted, int $confirmed): ParticipationConfirmationTask
+    private function createTask(int $registrations, int $confirmed): ParticipationConfirmationTask
     {
         $connection = $this->createMock(Connection::class);
         $connection
             ->method('fetchAssociative')
-            ->willReturn(['accepted' => (string) $accepted, 'confirmed' => (string) $confirmed])
+            ->willReturn(['registrations' => (string) $registrations, 'confirmed' => (string) $confirmed])
         ;
 
         return new ParticipationConfirmationTask($connection, $this->createMock(RouterInterface::class), $this->createMock(TranslatorInterface::class));

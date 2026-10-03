@@ -301,3 +301,7 @@ $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task']['tour_report'] = 'Toure
 $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task']['participation_confirmation'] = 'Teilnahme der Teilnehmenden bestätigen';
 $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_role']['instructor'] = 'als Leiter/in';
 $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_role']['registration_coordinator'] = 'als Anmelde-Koordinator/in';
+
+// Participation confirmation (tl_calendar_events_member.hasParticipated)
+$GLOBALS['TL_LANG']['MSC']['participationConfirmationNotAllowed'] = 'Die Teilnahme kann nur bei Anmeldungen mit dem Status «Bestätigt» oder «Warteliste» bestätigt werden.';
+$GLOBALS['TL_LANG']['ERR']['participationConfirmationNotAllowed'] = 'Die Teilnahme kann nur bei Anmeldungen mit dem Status «Bestätigt» oder «Warteliste» bestätigt werden.';

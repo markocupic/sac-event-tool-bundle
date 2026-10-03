@@ -26,6 +26,7 @@ use Contao\Image;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Config\BookingType;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsInstructorInvoiceVoter;
@@ -129,7 +130,11 @@ class CalendarEventsMember
                     if ('hasParticipated' === $request->get('field')) {
                         $rowReg = $dc->getCurrentRecord();
 
-                        if ($this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $rowReg['eventId'])) {
+                        // Confirming the participation (0 → 1) is only allowed for accepted registrations
+                        // and registrations on the waiting list. Removing it (1 → 0) is always allowed.
+                        $blnConfirmAllowed = $rowReg['hasParticipated'] || \in_array($rowReg['stateOfSubscription'] ?? '', EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED, true);
+
+                        if ($blnConfirmAllowed && $this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, $rowReg['eventId'])) {
                             $blnAllow = true;
                             $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notEditable'] = false;
                         }
