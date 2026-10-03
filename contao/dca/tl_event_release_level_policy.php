@@ -24,7 +24,9 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 		'switchToEdit'     => true,
 		'sql'              => [
 			'keys' => [
-				'id' => 'primary',
+				'id'        => 'primary',
+				// Every level only once per release level system (see DataContainer\EventReleaseLevelPolicy::validateLevel())
+				'pid,level' => 'unique',
 			],
 		],
 	],
@@ -63,12 +65,14 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 		'tstamp'                                     => [
 			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
+		// NULL instead of 0 for new, not yet saved records: the unique index pid,level allows several NULL values.
+		// doNotCopy: a copy would otherwise violate the unique index.
 		'level'                                      => [
 			'exclude'   => true,
 			'inputType' => 'select',
 			'options'   => range(1, 10),
-			'eval'      => ['mandatory' => true, 'tl_class' => 'clr'],
-			'sql'       => "smallint(2) unsigned NOT NULL default 0",
+			'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'nullIfEmpty' => true, 'doNotCopy' => true, 'tl_class' => 'clr'],
+			'sql'       => 'smallint(2) unsigned NULL',
 		],
 		'title'                                      => [
 			'exclude'   => true,

@@ -36,4 +36,13 @@ class EventSubscriptionState
         self::USER_HAS_UNSUBSCRIBED,
         self::SUBSCRIPTION_STATE_UNDEFINED,
     ];
+
+    /**
+     * Participation (tl_calendar_events_member.hasParticipated) can only be confirmed
+     * for registrations in one of these states.
+     */
+    public const array PARTICIPATION_CONFIRMATION_ALLOWED = [
+        self::SUBSCRIPTION_ACCEPTED,
+        self::SUBSCRIPTION_ON_WAITING_LIST,
+    ];
 }

@@ -45,24 +45,32 @@ $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['disableGrouping'] = true;
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableMaxEventReleaseLevelProtection'] = 'maxEventReleaseLevelTimeLimit';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableEventStartDateValidation'] = 'validTimePeriodStart,validTimePeriodStop';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['sendEventReminder'] = 'eventReminderOffset,eventReminderNotification';
+$GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['sendInstructorPostEventTaskReminder'] = 'instructorPostEventTaskReminderNotification,instructorPostEventTaskReminderEventTypes,instructorPostEventTaskReminderFirstOffset,instructorPostEventTaskReminderInterval';
+$GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['autoPublishEvents'] = 'autoPublishEventsDate,autoPublishEventsStatus';
 
 // Define selectors
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'enableMaxEventReleaseLevelProtection';
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'enableEventStartDateValidation';
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'sendEventReminder';
+$GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'sendInstructorPostEventTaskReminder';
+$GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'autoPublishEvents';
 
 // Palettes
 PaletteManipulator::create()
 	->addLegend('valid_time_period_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_release_level_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
+	->addLegend('auto_publish_events_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_type_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_reader_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_reminder_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
+	->addLegend('instructor_post_event_task_reminder_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addField(['enableEventStartDateValidation'], 'valid_time_period_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['enableMaxEventReleaseLevelProtection'], 'event_release_level_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['autoPublishEvents'], 'auto_publish_events_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['allowedEventTypes,notifyOnEventReleaseLevelChange,notifyOnEventPublish'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['userPortraitJumpTo'], 'event_reader_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['sendEventReminder'], 'event_reminder_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['sendInstructorPostEventTaskReminder'], 'instructor_post_event_task_reminder_legend', PaletteManipulator::POSITION_APPEND)
 	->applyToPalette('default', 'tl_calendar');
 
 // Fields
@@ -144,6 +152,9 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['maxEventReleaseLevelTimeLimit'] = [
 	'sql'       => 'bigint(20) unsigned NULL',
 ];
 
+// Event reminder
+// Reminds instructors and participants x days before the event start.
+// See docs/features/event-reminder.md
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['sendEventReminder'] = [
 	'filter'    => true,
 	'inputType' => 'checkbox',
@@ -151,13 +162,12 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['sendEventReminder'] = [
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
+// Options: only notifications of type "event_reminder" (see Feature\EventReminder\DataContainer\Calendar)
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventReminderNotification'] = [
-	'exclude'    => true,
-	'inputType'  => 'select',
-	'foreignKey' => 'tl_nc_notification.title',
-	'eval'       => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
-	'sql'        => "int(10) unsigned NOT NULL default 0",
-	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
+	'exclude'   => true,
+	'inputType' => 'select',
+	'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
+	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventReminderOffset'] = [
@@ -166,4 +176,89 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventReminderOffset'] = [
 	'options'   => range(1, 365),
 	'eval'      => ['rgxp' => 'natural', 'tl_class' => 'w50'],
 	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 14, 'unsigned' => true],
+];
+
+// Instructor post-event task reminder
+// Reminds instructors and registration coordinators of open tasks (tour report, participation confirmation) after an event.
+// See docs/features/instructor-post-event-task-reminder.md
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['sendInstructorPostEventTaskReminder'] = [
+	'exclude'   => true,
+	'filter'    => true,
+	'inputType' => 'checkbox',
+	'eval'      => ['submitOnChange' => true, 'tl_class' => 'm12 clr'],
+	'sql'       => ['type' => 'boolean', 'default' => false],
+];
+
+// Options: only notifications of type "instructor_post_event_task_reminder" (see Feature\InstructorPostEventTaskReminder\DataContainer\Calendar)
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderNotification'] = [
+	'exclude'   => true,
+	'inputType' => 'select',
+	'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
+	'sql'       => "int(10) unsigned NOT NULL default 0",
+];
+
+// Only events of these types are checked for open tasks.
+// Which tasks apply to an event type is decided by the task classes (PostEventTaskInterface::supports()).
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderEventTypes'] = [
+	'exclude'   => true,
+	'inputType' => 'select',
+	'options'   => EventType::ALL,
+	'reference' => &$GLOBALS['TL_LANG']['MSC'],
+	'default'   => [EventType::TOUR, EventType::LAST_MINUTE_TOUR, EventType::COURSE],
+	'eval'      => ['mandatory' => true, 'multiple' => true, 'chosen' => true, 'tl_class' => 'w50'],
+	'sql'       => 'blob NULL',
+];
+
+// Completion period: days after tl_calendar_events.endDate before the first notification is sent
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderFirstOffset'] = [
+	'exclude'   => true,
+	'inputType' => 'select',
+	'options' => range(1, 30),
+	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'tl_class' => 'w50 clr'],
+	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 7, 'unsigned' => true],
+];
+
+// Days between two notifications to the same recipient for this calendar
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderInterval'] = [
+	'exclude'   => true,
+	'inputType' => 'select',
+	'options' => range(1, 30),
+	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'tl_class' => 'w50'],
+	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 7, 'unsigned' => true],
+];
+
+// Auto publish events
+// On the given date and time, events on the second-highest release level are promoted to the highest level and published.
+// See docs/features/auto-publish-events.md
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['autoPublishEvents'] = [
+	'exclude'   => true,
+	'filter'    => true,
+	'inputType' => 'checkbox',
+	'eval'      => ['submitOnChange' => true, 'doNotCopy' => true, 'tl_class' => 'm12 clr'],
+	'sql'       => ['type' => 'boolean', 'default' => false],
+];
+
+// Due date incl. time. The cron runs every 15 minutes.
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['autoPublishEventsDate'] = [
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => ['rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'nullIfEmpty' => true, 'doNotCopy' => true, 'tl_class' => 'w50 wizard'],
+	'sql'       => 'bigint(20) unsigned NULL',
+];
+
+// Read-only status (last run), rendered by Feature\AutoPublishEvents\DataContainer\Calendar. No database column.
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['autoPublishEventsStatus'] = [
+	'exclude' => true,
+];
+
+// Set by the cron after the run, never edited in the backend (not part of any palette).
+// The run is due again as soon as autoPublishEventsDate differs from autoPublishEventsExecutedForDate.
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['autoPublishEventsExecutedAt'] = [
+	'eval' => ['doNotCopy' => true],
+	'sql'  => 'bigint(20) unsigned NULL',
+];
+
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['autoPublishEventsExecutedForDate'] = [
+	'eval' => ['doNotCopy' => true],
+	'sql'  => 'bigint(20) unsigned NULL',
 ];

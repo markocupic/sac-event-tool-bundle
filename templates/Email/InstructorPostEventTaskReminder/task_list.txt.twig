@@ -1,0 +1,18 @@
+{#
+    To-do list for the instructor post-event task reminder (plain text version).
+    Rendered into the notification token ##task_list_text##.
+
+    Variables:
+    - open_tasks: list<OpenTask> (eventId, title, eventType, endDate, role, tasks: list<TaskItem>)
+#}
+{% trans_default_domain 'contao_default' %}
+{% autoescape false %}
+{% for open_task in open_tasks %}
+{{ open_task.endDate|date('d.m.Y') }} – {{ open_task.title }}{% if open_task.role == 'registration_coordinator' %} ({{ ('MSC.instructor_post_event_task_role.' ~ open_task.role)|trans }}){% endif %}
+
+{% for task in open_task.tasks %}
+- {{ task.label }}: {{ task.url }}
+{% endfor %}
+
+{% endfor %}
+{% endautoescape %}

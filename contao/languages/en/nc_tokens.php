@@ -12,9 +12,10 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Feature\EventReminder\NotificationType\EventReminderNotificationType;
+use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\NotificationType\InstructorPostEventTaskReminderNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\EventDeregistrationNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\EventRegistrationNotificationType;
-use Markocupic\SacEventToolBundle\NotificationType\EventReminderNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\SubscriptionStateChangeNotificationType;
 
 /*
@@ -145,3 +146,32 @@ $GLOBALS['TL_LANG']['nc_tokens'][$type]['recipient_bcc'] = 'Empfänger für das 
 
 // Reminder
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['reminder_offset_days'] = 'Anzahl Tage vor Event-Start, an denen diese Erinnerung versendet wird (Einstellung im Kalender).';
+
+/*
+ * Instructor post-event task reminder
+ */
+$type = InstructorPostEventTaskReminderNotificationType::NAME;
+
+// Recipient (instructor or registration coordinator)
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['recipient_email'] = 'E-Mail-Adresse des Empfängers (Leiter oder Anmelde-Koordinator). Für das Feld "Empfänger" verwenden.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_email'] = 'E-Mail-Adresse des Empfängers (identisch mit ##recipient_email##).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_firstname'] = 'Vorname des Empfängers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_lastname'] = 'Nachname des Empfängers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_name'] = 'Vor- und Nachname des Empfängers.';
+
+// Calendar
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['calendar_title'] = 'Titel des Kalenders.';
+
+// To-do list
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['task_list_html'] = 'Liste der offenen Aufgaben als HTML (für den HTML-Text der E-Mail).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['task_list_text'] = 'Liste der offenen Aufgaben als Text (für den Text der E-Mail).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['open_task_count'] = 'Anzahl offener Aufgaben.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['event_count'] = 'Anzahl Events mit offenen Aufgaben.';
+
+// Calendar settings
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['first_offset_days'] = 'Bearbeitungsfrist in Tagen nach Event-Ende (Einstellung im Kalender).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['interval_days'] = 'Intervall in Tagen zwischen zwei Erinnerungen (Einstellung im Kalender).';
+
+// Notification
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['reminder_count'] = 'Die wievielte Erinnerung für diesen Empfänger und Kalender (1 = erste Erinnerung).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['link_my_events_dashboard'] = 'Absoluter Link ins Backend (Startseite mit dem Dashboard "Meine Events").';

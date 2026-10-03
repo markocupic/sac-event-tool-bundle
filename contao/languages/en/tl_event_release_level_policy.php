@@ -17,7 +17,7 @@ $GLOBALS['TL_LANG']['tl_event_release_level_policy']['new'] = ['Neue Freigabestu
 
 // Buttons
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['edit'] = ['Bearbeiten', 'Freigabestufe mit ID %s bearbeiten.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['delete'] = ['Löschen', 'Freigabestufe mit ID %s löschen.'];
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['delete'] = ['Löschen', 'Freigabestufe mit ID %s löschen. Es kann nur die höchste Stufe gelöscht werden.'];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['copy'] = ['Kopieren', 'Freigabestufe mit ID %s kopieren.'];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['show'] = ['Ansehen', 'Freigabestufe mit ID %s ansehen.'];
 
@@ -28,8 +28,8 @@ $GLOBALS['TL_LANG']['tl_event_release_level_policy']['event_release_level_grants
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['event_registrations_grants_legend'] = 'Rechte-Vergabe für Event-Registrierungen';
 
 // Fields
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['level'] = ['Veröffentlichungsstufe', 'Geben Sie eine Veröffentlichungsstufe ein. Keine doppelten Einträge!!!'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['title'] = ['Titel', 'Geben Sie für die Freigabestufe einen Namen an.'];
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['level'] = ['Veröffentlichungsstufe', 'Wählen Sie die Veröffentlichungsstufe aus. Jede Stufe darf pro Freigabestufen-System nur einmal vorkommen, und die Stufen müssen lückenlos bei 1 beginnen (1, 2, 3, …).'];
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['title'] = ['Titel', 'Geben Sie für die Freigabestufe einen Namen an. Der Name darf pro Freigabestufen-System nur einmal vorkommen.'];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['description'] = ['Beschreibung', 'Geben Sie für die Freigabestufe einen Namen ein.'];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['groupReleaseLevelPerm'] = ['Weitere berechtigten Gruppen', 'Geben Sie die berechtigten Gruppen an. Der Event-Besitzer (Autor) und der/die Event-Leiter müssen nicht angegeben werden.'];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['groupEventPerm'] = ['Weitere berechtigten Gruppen', 'Geben Sie die berechtigten Gruppen an. Der Event-Besitzer (Autor) und der/die Event-Leiter müssen nicht angegeben werden.'];
@@ -54,3 +54,9 @@ $GLOBALS['TL_LANG']['tl_event_release_level_policy']['canCutEvent'] = 'Event ver
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['canRelLevelUp'] = 'Freigabestufe hochstufen';
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['canRelLevelDown'] = 'Freigabestufe herabstufen';
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['canAdministerEventRegistrations'] = 'Event-Anmeldungen administrieren';
+
+// Errors
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['errLevelMin'] = 'Die Stufe %s ist nicht zulässig: Die tiefste Stufe ist immer 1.';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['errLevelExists'] = 'Die Stufe %s ist in diesem Freigabestufen-System bereits vergeben.';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['errLevelGap'] = 'Die Stufe %s ist nicht zulässig: Die Stufen müssen lückenlos bei 1 beginnen. Mit dieser Stufe wären es: %s.';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['errTitleExists'] = 'Der Titel "%s" ist in diesem Freigabestufen-System bereits vergeben.';

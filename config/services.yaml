@@ -71,6 +71,11 @@ services:
         tags:
             - { name: security.voter, priority: 10 }
 
+    # Only the highest release level may be deleted. Must run before the other voters (priority strategy), only denies or abstains.
+    Markocupic\SacEventToolBundle\Security\Voter\EventReleaseLevelPolicyDeleteVoter:
+        tags:
+            - { name: security.voter, priority: 20 }
+
     # Add a session bag
     Markocupic\SacEventToolBundle\Session\Attribute\ArrayAttributeBag:
         arguments:

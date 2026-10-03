@@ -19,6 +19,7 @@ use Contao\BackendTemplate;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
+use Contao\CoreBundle\DataContainer\DataContainerOperation;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\ResponseException;
@@ -28,6 +29,7 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\DataContainer;
+use Contao\Image;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\StringUtil;
@@ -128,6 +130,54 @@ class CalendarEventsMember
         if ('calendar' === $request->query->get('do') && '' !== $request->query->get('ref')) {
             $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('js/backend_member_autocomplete.js', 'markocupic_sac_event_tool');
         }
+    }
+
+    /**
+     * Participation can only be confirmed for accepted registrations and registrations on the waiting list.
+     * For all other registrations, the toggle icon is greyed out and has no link.
+     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'list.operations.toggleParticipationState.button', priority: 100)]
+    public function disableParticipationToggle(DataContainerOperation $operation): void
+    {
+        $row = $operation->getRecord();
+
+        if (\in_array($row['stateOfSubscription'] ?? '', EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED, true)) {
+            return;
+        }
+
+        // Greyed out icon that still shows the current state
+        $icon = $row['hasParticipated'] ? 'icons/fontawesome/disabled/square-check-regular.svg' : 'icons/fontawesome/disabled/square-regular.svg';
+        $title = $this->translator->trans('MSC.participationConfirmationNotAllowed', [], 'contao_default');
+
+        $operation->setHtml(
+            $this->framework->getAdapter(Image::class)->getHtml(
+                $this->packages->getUrl($icon, 'markocupic_sac_event_tool'),
+                $title,
+                'title="'.$this->stringUtil->specialchars($title).'"',
+            ),
+        );
+    }
+
+    /**
+     * Server-side guard (e.g. edit form or manipulated toggle URL):
+     * hasParticipated cannot be set for registrations that are neither accepted nor on the waiting list.
+     * Unsetting is always allowed.
+     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.hasParticipated.save', priority: 100)]
+    public function preventInvalidParticipationConfirmation(mixed $value, DataContainer $dc): mixed
+    {
+        if (!$value) {
+            return $value;
+        }
+
+        // In the edit form the subscription state may be changed in the same request
+        $state = $this->requestStack->getCurrentRequest()?->request->get('stateOfSubscription') ?? $dc->activeRecord?->stateOfSubscription;
+
+        if (!\in_array($state, EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED, true)) {
+            throw new \RuntimeException($this->translator->trans('ERR.participationConfirmationNotAllowed', [], 'contao_default'));
+        }
+
+        return $value;
     }
 
     /**
