@@ -27,12 +27,12 @@ use Contao\DataContainer;
  * See docs/features/instructor-post-event-task-reminder.md
  */
 $GLOBALS['TL_DCA']['tl_instructor_post_event_task_reminder_log'] = [
-	'config' => [
+	'config'   => [
 		'dataContainer'    => DC_Table::class,
 		'closed'           => true,
+		'notDeletable'     => true,
 		'notCreatable'     => true,
 		'notEditable'      => true,
-		'notDeletable'     => true,
 		'notCopyable'      => true,
 		'notSortable'      => true,
 		'doNotCopyRecords' => true,
@@ -43,7 +43,7 @@ $GLOBALS['TL_DCA']['tl_instructor_post_event_task_reminder_log'] = [
 			],
 		],
 	],
-	'list'   => [
+	'list'     => [
 		'sorting'           => [
 			'mode'        => DataContainer::MODE_SORTABLE,
 			'fields'      => ['sentAt'],
@@ -61,7 +61,11 @@ $GLOBALS['TL_DCA']['tl_instructor_post_event_task_reminder_log'] = [
 			'show',
 		],
 	],
-	'fields' => [
+	// Prepared in case editing is enabled one day (currently notEditable)
+	'palettes' => [
+		'default' => '{log_legend},userId,calendarId,notificationId,sentAt,reminderCount,openTaskCount,eventIds,delivered',
+	],
+	'fields'   => [
 		'id'             => [
 			'sql' => 'int(10) unsigned NOT NULL auto_increment',
 		],
@@ -71,48 +75,62 @@ $GLOBALS['TL_DCA']['tl_instructor_post_event_task_reminder_log'] = [
 		// tl_user.id of the recipient (instructor or registration coordinator)
 		'userId'         => [
 			'filter'     => true,
+			'inputType'  => 'select',
 			'foreignKey' => 'tl_user.name',
+			'eval'       => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
 			'sql'        => 'int(10) unsigned NOT NULL default 0',
 			'relation'   => ['type' => 'belongsTo', 'load' => 'lazy'],
 		],
 		'calendarId'     => [
 			'filter'     => true,
 			'sorting'    => true,
+			'inputType'  => 'select',
 			'foreignKey' => 'tl_calendar.title',
+			'eval'       => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
 			'sql'        => 'int(10) unsigned NOT NULL default 0',
 			'relation'   => ['type' => 'belongsTo', 'load' => 'lazy'],
 		],
 		'notificationId' => [
+			'inputType'  => 'select',
 			'foreignKey' => 'tl_nc_notification.title',
+			'eval'       => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
 			'sql'        => 'int(10) unsigned NOT NULL default 0',
 			'relation'   => ['type' => 'belongsTo', 'load' => 'lazy'],
 		],
 		'sentAt'         => [
-			'sorting' => true,
-			'flag'    => DataContainer::SORT_DAY_BOTH,
-			'eval'    => ['rgxp' => 'datim'],
-			'sql'     => 'int(10) unsigned NOT NULL default 0',
+			'sorting'   => true,
+			'flag'      => DataContainer::SORT_DAY_BOTH,
+			'inputType' => 'text',
+			'eval'      => ['rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+			'sql'       => 'int(10) unsigned NOT NULL default 0',
 		],
 		// The how-manieth notification for this (user, calendar) pair, including this one (1 = first)
 		'reminderCount'  => [
-			'sorting' => true,
-			'flag'    => DataContainer::SORT_BOTH,
-			'sql'     => 'int(10) unsigned NOT NULL default 0',
+			'sorting'   => true,
+			'flag'      => DataContainer::SORT_BOTH,
+			'inputType' => 'text',
+			'eval'      => ['rgxp' => 'natural', 'maxlength' => 10, 'tl_class' => 'w50'],
+			'sql'       => 'int(10) unsigned NOT NULL default 0',
 		],
 		'openTaskCount'  => [
-			'sorting' => true,
-			'flag'    => DataContainer::SORT_BOTH,
-			'sql'     => 'int(10) unsigned NOT NULL default 0',
+			'sorting'   => true,
+			'flag'      => DataContainer::SORT_BOTH,
+			'inputType' => 'text',
+			'eval'      => ['rgxp' => 'natural', 'maxlength' => 10, 'tl_class' => 'w50'],
+			'sql'       => 'int(10) unsigned NOT NULL default 0',
 		],
 		// Comma separated list of tl_calendar_events.id
 		'eventIds'       => [
-			'sql' => 'text NULL',
+			'inputType' => 'text',
+			'eval'      => ['tl_class' => 'clr long'],
+			'sql'       => 'text NULL',
 		],
 		'delivered'      => [
 			'filter'    => true,
 			'sorting'   => true,
 			'flag'      => DataContainer::SORT_BOTH,
 			'inputType' => 'checkbox',
+			'eval'      => ['tl_class' => 'clr m12'],
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
 	],
