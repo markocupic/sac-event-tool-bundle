@@ -14,37 +14,31 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Tests\Controller\FrontendModule\EventRegistration\StepHandler;
 
+use Codefog\HasteBundle\Form\Form;
 use Contao\CalendarEventsModel;
-use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\InsertTag\InsertTagParser;
-use Contao\FrontendUser;
+use Contao\Controller;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\MemberModel;
+use Contao\Message;
 use Contao\ModuleModel;
 use Contao\TestCase\ContaoTestCase;
-use Contao\UserModel;
-use Doctrine\DBAL\Connection;
-use Markocupic\SacEventToolBundle\Config\CarSeatInfo;
-use Markocupic\SacEventToolBundle\Config\EventState;
-use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
-use Markocupic\SacEventToolBundle\Config\TicketInfo;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\EventRegistrationCreator;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\EventRegistrationEligibility;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\EventRegistrationFormFactory;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\LoggedInMemberProvider;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\StepHandler\RegisterStep;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\Exception\EventRegistrationException;
-use Markocupic\SacEventToolBundle\Feature\EventRegistrationDatabaseSync\SyncEventRegistrationDatabase;
-use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
+use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\SecurityBundle\Security;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Lock\LockFactory;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RegisterStepTest extends ContaoTestCase
 {
-    private const int NOW = 1_700_000_000;
-
-    private const int DAY = 86400;
-
     public function testStaticMetaData(): void
     {
         $this->assertSame('register', RegisterStep::getName());
@@ -52,384 +46,203 @@ class RegisterStepTest extends ContaoTestCase
         $this->assertStringContainsString('register.html.twig', $this->createStep()->getTemplateName());
     }
 
-    public function testValidateReturnsFalseWhenNobodyIsLoggedIn(): void
+    public function testValidateReturnsFalseWithoutMember(): void
     {
-        $security = $this->createMock(Security::class);
-        $security
-            ->method('getUser')
-            ->willReturn(null)
+        $step = $this->createStep(member: null);
+
+        $this->assertFalse($step->validate($this->makeEvent(), new Request(), $this->createMock(ModuleModel::class)));
+    }
+
+    public function testValidateReturnsWhetherTheMemberIsRegistered(): void
+    {
+        $this->assertTrue($this->createStep(isRegistered: true)->validate($this->makeEvent(), new Request(), $this->createMock(ModuleModel::class)));
+        $this->assertFalse($this->createStep(isRegistered: false)->validate($this->makeEvent(), new Request(), $this->createMock(ModuleModel::class)));
+    }
+
+    public function testPrepareStepThrowsWithoutMember(): void
+    {
+        $this->expectException(AccessDeniedException::class);
+
+        $this->createStep(member: null)->prepareStep($this->makeEvent(), new Request(), $this->createMock(ModuleModel::class));
+    }
+
+    public function testPrepareStepShowsTheFormWithoutSaving(): void
+    {
+        $form = $this->createMock(Form::class);
+        $form
+            ->method('validate')
+            ->willReturn(false)
         ;
 
-        $step = $this->createStep(security: $security);
-
-        $this->assertFalse($step->validate($this->makeEvent(), $this->request(), $this->createMock(ModuleModel::class)));
-    }
-
-    public function testValidateReturnsFalseWhenTheMemberCannotBeResolved(): void
-    {
-        $memberAdapter = $this->mockAdapter(['findById']);
-        $memberAdapter
-            ->method('findById')
-            ->willReturn(null)
+        $creator = $this->createMock(EventRegistrationCreator::class);
+        $creator
+            ->expects($this->never())
+            ->method('create')
         ;
 
-        $step = $this->createStep(
-            framework: $this->mockContaoFramework([MemberModel::class => $memberAdapter]),
-            security: $this->mockSecurityWithFrontendUser(),
-        );
+        $template = $this->createStep(form: $form, creator: $creator)->prepareStep($this->makeEvent(), new Request(), $this->createMock(ModuleModel::class));
 
-        // Guards the null-pointer bug: an authenticated user without a member record must not fatal.
-        $this->assertFalse($step->validate($this->makeEvent(), $this->request(), $this->createMock(ModuleModel::class)));
+        $this->assertSame($form, $template['form']);
+        $this->assertArrayNotHasKey('eventFullyBooked', $template);
     }
 
-    /**
-     * @dataProvider ineligibleEventProvider
-     *
-     * @param array<string, mixed> $eventOverrides
-     */
-    public function testValidateEventRegistrationEligibilityThrowsForIneligibleEvents(array $eventOverrides, string $expectedText, string $expectedLevel): void
+    public function testPrepareStepSavesTheRegistrationAndReloads(): void
     {
-        $step = $this->createStep();
-
-        $this->assertEligibilityThrows(
-            $step,
-            $this->makeEvent($eventOverrides),
-            $this->validMember(),
-            $this->validInstructor(),
-            $expectedText,
-            $expectedLevel,
-        );
-    }
-
-    public static function ineligibleEventProvider(): iterable
-    {
-        yield 'not published' => [
-            ['published' => ''],
-            'ERR.evt_reg_eventNotPublishedYet',
-            EventRegistrationException::LEVEL_ERROR,
-        ];
-
-        yield 'online registration disabled' => [
-            ['disableOnlineRegistration' => '1'],
-            'ERR.evt_reg_onlineRegDisabled',
-            EventRegistrationException::LEVEL_INFO,
-        ];
-
-        yield 'event fully booked (state)' => [
-            ['eventState' => EventState::STATE_FULLY_BOOKED],
-            'ERR.evt_reg_eventFullyBooked',
-            EventRegistrationException::LEVEL_INFO,
-        ];
-
-        yield 'event canceled' => [
-            ['eventState' => EventState::STATE_CANCELED],
-            'ERR.evt_reg_eventCanceled',
-            EventRegistrationException::LEVEL_INFO,
-        ];
-
-        yield 'event rescheduled' => [
-            ['eventState' => EventState::STATE_RESCHEDULED],
-            'ERR.evt_reg_eventDeferred',
-            EventRegistrationException::LEVEL_INFO,
-        ];
-
-        yield 'registration has not started yet' => [
-            ['setRegistrationPeriod' => '1', 'registrationStartDate' => self::NOW + 1000, 'registrationEndDate' => self::NOW + 100000],
-            'ERR.evt_reg_registrationPossibleOn',
-            EventRegistrationException::LEVEL_INFO,
-        ];
-
-        yield 'registration deadline expired' => [
-            ['setRegistrationPeriod' => '1', 'registrationStartDate' => self::NOW - 100000, 'registrationEndDate' => self::NOW - 1000],
-            'ERR.evt_reg_registrationDeadlineExpired',
-            EventRegistrationException::LEVEL_INFO,
-        ];
-
-        yield 'no registration period and less than 24h before start' => [
-            ['setRegistrationPeriod' => '', 'startDate' => self::NOW + 1000],
-            'ERR.evt_reg_registrationPossible24HoursBeforeEventStart',
-            EventRegistrationException::LEVEL_INFO,
-        ];
-    }
-
-    public function testValidateEventRegistrationEligibilityThrowsWhenReleaseLevelPolicyIsMissing(): void
-    {
-        $step = $this->createStep(policy: null);
-
-        $this->assertEligibilityThrows(
-            $step,
-            $this->makeEvent(),
-            $this->validMember(),
-            $this->validInstructor(),
-            'ERR.evt_reg_eventReleaseLevelPolicyDoesNotAllowRegistrations',
-            EventRegistrationException::LEVEL_ERROR,
-        );
-    }
-
-    public function testValidateEventRegistrationEligibilityThrowsWhenBookingDatesOverlap(): void
-    {
-        $util = $this->mockUtil(areBookingDatesOccupied: true);
-
-        $step = $this->createStep(util: $util);
-
-        $this->assertEligibilityThrows(
-            $step,
-            $this->makeEvent(),
-            $this->validMember(),
-            $this->validInstructor(),
-            'ERR.evt_reg_eventDateOverlapError',
-            EventRegistrationException::LEVEL_INFO,
-        );
-    }
-
-    public function testValidateEventRegistrationEligibilityThrowsWhenMainInstructorIsMissing(): void
-    {
-        $step = $this->createStep();
-
-        $this->assertEligibilityThrows(
-            $step,
-            $this->makeEvent(),
-            $this->validMember(),
-            null,
-            'ERR.evt_reg_mainInstructorNotFound',
-            EventRegistrationException::LEVEL_INFO,
-        );
-    }
-
-    public function testValidateEventRegistrationEligibilityThrowsWhenMainInstructorEmailIsInvalid(): void
-    {
-        $step = $this->createStep();
-
-        $this->assertEligibilityThrows(
-            $step,
-            $this->makeEvent(),
-            $this->validMember(),
-            $this->mockClassWithProperties(UserModel::class, ['id' => 5, 'email' => 'not-an-email']),
-            'ERR.evt_reg_mainInstructorsEmailAddrNotFound',
-            EventRegistrationException::LEVEL_ERROR,
-        );
-    }
-
-    public function testValidateEventRegistrationEligibilityThrowsWhenMemberEmailIsInvalid(): void
-    {
-        $step = $this->createStep();
-
-        $this->assertEligibilityThrows(
-            $step,
-            $this->makeEvent(),
-            $this->mockClassWithProperties(MemberModel::class, ['id' => 5, 'email' => 'invalid']),
-            $this->validInstructor(),
-            'ERR.evt_reg_membersEmailAddrNotFound',
-            EventRegistrationException::LEVEL_INFO,
-        );
-    }
-
-    public function testValidateEventRegistrationEligibilityPassesForAnEligibleEvent(): void
-    {
-        $step = $this->createStep();
-
-        $this->invokeEligibility($step, $this->makeEvent(), $this->validMember(), $this->validInstructor());
-
-        // No exception means the event is eligible for registration.
-        $this->addToAssertionCount(1);
-    }
-
-    /**
-     * @dataProvider subscriptionStateProvider
-     *
-     * @param array<string, mixed> $eventOverrides
-     */
-    public function testResolveSubscriptionsState(array $eventOverrides, bool $fullyBooked, string $expectedState): void
-    {
-        $step = $this->createStep(util: $this->mockUtil(eventIsFullyBooked: $fullyBooked));
-
-        $method = new \ReflectionMethod(RegisterStep::class, 'resolveSubscriptionsState');
-        $method->setAccessible(true);
-
-        $this->assertSame($expectedState, $method->invoke($step, $this->makeEvent($eventOverrides)));
-    }
-
-    public static function subscriptionStateProvider(): iterable
-    {
-        yield 'fully booked goes to the waiting list' => [
-            ['autoConfirm' => '1', 'addIban' => ''],
-            true,
-            EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST,
-        ];
-
-        yield 'no auto-confirm stays not confirmed' => [
-            ['autoConfirm' => '', 'addIban' => ''],
-            false,
-            EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED,
-        ];
-
-        yield 'auto-confirm with iban stays not confirmed' => [
-            ['autoConfirm' => '1', 'addIban' => '1'],
-            false,
-            EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED,
-        ];
-
-        yield 'auto-confirm without iban is accepted' => [
-            ['autoConfirm' => '1', 'addIban' => ''],
-            false,
-            EventSubscriptionState::SUBSCRIPTION_ACCEPTED,
-        ];
-    }
-
-    private function assertEligibilityThrows(RegisterStep $step, CalendarEventsModel $event, MemberModel $member, UserModel|null $instructor, string $expectedText, string $expectedLevel): void
-    {
-        try {
-            $this->invokeEligibility($step, $event, $member, $instructor);
-            $this->fail(\sprintf('Expected an EventRegistrationException with text "%s".', $expectedText));
-        } catch (EventRegistrationException $e) {
-            $this->assertSame($expectedText, $e->getTranslatableText());
-            $this->assertSame($expectedLevel, $e->getErrorLevel());
-        }
-    }
-
-    private function invokeEligibility(RegisterStep $step, CalendarEventsModel $event, MemberModel $member, UserModel|null $instructor): void
-    {
-        $method = new \ReflectionMethod(RegisterStep::class, 'validateEventRegistrationEligibility');
-        $method->setAccessible(true);
-        $method->invoke($step, $event, $member, $instructor, ['regStartTimeOffset' => 0]);
-    }
-
-    /**
-     * @param array<string, mixed> $overrides
-     */
-    private function makeEvent(array $overrides = []): CalendarEventsModel
-    {
-        return $this->mockClassWithProperties(CalendarEventsModel::class, array_merge([
-            'id' => 1,
-            'title' => 'Testevent',
-            'published' => '1',
-            'eventState' => '',
-            'disableOnlineRegistration' => '',
-            'setRegistrationPeriod' => '',
-            'registrationStartDate' => 0,
-            'registrationEndDate' => 0,
-            'startDate' => self::NOW + 30 * self::DAY,
-            'mainInstructor' => 5,
-            'journey' => 0,
-            'autoConfirm' => '',
-            'addIban' => '',
-        ], $overrides));
-    }
-
-    private function validMember(): MemberModel
-    {
-        return $this->mockClassWithProperties(MemberModel::class, ['id' => 5, 'email' => 'member@example.com']);
-    }
-
-    private function validInstructor(): UserModel
-    {
-        return $this->mockClassWithProperties(UserModel::class, ['id' => 5, 'email' => 'guide@example.com']);
-    }
-
-    private function mockSecurityWithFrontendUser(): Security&MockObject
-    {
-        $security = $this->createMock(Security::class);
-        $security
-            ->method('getUser')
-            ->willReturn($this->mockClassWithProperties(FrontendUser::class, ['id' => 5]))
+        $form = $this->createMock(Form::class);
+        $form
+            ->method('validate')
+            ->willReturn(true)
         ;
 
-        return $security;
+        $form
+            ->method('fetchAll')
+            ->willReturn(['notes' => 'Hallo'])
+        ;
+
+        $registration = $this->createMock(CalendarEventsMemberModel::class);
+        $registration
+            ->method('row')
+            ->willReturn(['id' => 77])
+        ;
+
+        $creator = $this->createMock(EventRegistrationCreator::class);
+        $creator
+            ->expects($this->once())
+            ->method('create')
+            ->with($this->anything(), $this->anything(), ['notes' => 'Hallo'])
+            ->willReturn($registration)
+        ;
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with($this->isInstanceOf(EventRegistrationEvent::class))
+        ;
+
+        $controllerAdapter = $this->mockAdapter(['reload']);
+        $controllerAdapter
+            ->expects($this->once())
+            ->method('reload')
+        ;
+
+        $this->createStep(form: $form, creator: $creator, dispatcher: $dispatcher, controllerAdapter: $controllerAdapter)
+            ->prepareStep($this->makeEvent(), new Request(), $this->createMock(ModuleModel::class))
+        ;
     }
 
-    private function mockUtil(bool $areBookingDatesOccupied = false, bool $eventIsFullyBooked = false): CalendarEventsUtil
+    public function testFullyBookedEventIsFlagged(): void
     {
-        // CalendarEventsUtil is readonly and cannot be mocked by PHPUnit, so we use
-        // a readonly test double returning canned values (see FakeCalendarEventsUtil).
-        return new FakeCalendarEventsUtil(
-            $this->mockContaoFramework(),
-            $areBookingDatesOccupied,
-            $eventIsFullyBooked,
-        );
+        $template = $this->createStep(fullyBooked: true)->prepareStep($this->makeEvent(), new Request(), $this->createMock(ModuleModel::class));
+
+        $this->assertTrue($template['eventFullyBooked']);
     }
 
-    private function request(): Request
+    public function testIneligibleMemberGetsNoForm(): void
     {
-        return new Request();
+        $eligibility = $this->createMock(EventRegistrationEligibility::class);
+        $eligibility
+            ->method('check')
+            ->willThrowException(new EventRegistrationException('Not published.', EventRegistrationException::LEVEL_INFO, 'ERR.evt_reg_eventNotPublishedYet'))
+        ;
+
+        $formFactory = $this->createMock(EventRegistrationFormFactory::class);
+        $formFactory
+            ->expects($this->never())
+            ->method('create')
+        ;
+
+        $template = $this->createStep(eligibility: $eligibility, formFactory: $formFactory)->prepareStep($this->makeEvent(), new Request(), $this->createMock(ModuleModel::class));
+
+        $this->assertArrayNotHasKey('form', $template);
     }
 
-    /**
-     * Builds a RegisterStep whose time source is pinned to self::NOW.
-     */
-    private function createStep(CalendarEventsUtil|null $util = null, ContaoFramework|null $framework = null, Security|null $security = null, EventReleaseLevelPolicyModel|false|null $policy = false): RegisterStep
+    public function testUnknownErrorIsLoggedWithTheException(): void
     {
-        $util ??= $this->mockUtil();
+        $exception = new \RuntimeException('Database is gone');
 
-        // $policy === false means "use a valid default policy".
-        if (false === $policy) {
-            $policy = $this->mockClassWithProperties(EventReleaseLevelPolicyModel::class, ['allowRegistration' => true]);
+        $formFactory = $this->createMock(EventRegistrationFormFactory::class);
+        $formFactory
+            ->method('create')
+            ->willThrowException($exception)
+        ;
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger
+            ->expects($this->once())
+            ->method('error')
+            ->with(
+                'Database is gone',
+                $this->callback(static fn (array $context): bool => $exception === $context['exception']),
+            )
+        ;
+
+        $this->createStep(formFactory: $formFactory, logger: $logger)->prepareStep($this->makeEvent(), new Request(), $this->createMock(ModuleModel::class));
+    }
+
+    private function makeEvent(): CalendarEventsModel
+    {
+        return $this->mockClassWithProperties(CalendarEventsModel::class, ['id' => 1, 'title' => 'Testevent']);
+    }
+
+    private function createStep(MemberModel|false|null $member = false, bool $isRegistered = false, bool $fullyBooked = false, Form|null $form = null, EventRegistrationEligibility|null $eligibility = null, EventRegistrationFormFactory|null $formFactory = null, EventRegistrationCreator|null $creator = null, EventDispatcherInterface|null $dispatcher = null, MockObject|null $controllerAdapter = null, LoggerInterface|null $logger = null): RegisterStep
+    {
+        // false means "a valid member"
+        if (false === $member) {
+            $member = $this->mockClassWithProperties(MemberModel::class, ['id' => 5]);
         }
 
-        if (null === $framework) {
-            $policyAdapter = $this->mockAdapter(['findOneByEventId']);
-            $policyAdapter
-                ->method('findOneByEventId')
-                ->willReturn($policy)
+        $memberProvider = $this->createMock(LoggedInMemberProvider::class);
+        $memberProvider
+            ->method('getMember')
+            ->willReturn($member)
+        ;
+
+        $registrationAdapter = $this->mockAdapter(['isRegistered']);
+        $registrationAdapter
+            ->method('isRegistered')
+            ->willReturn($isRegistered)
+        ;
+
+        $messageAdapter = $this->mockAdapter(['add', 'addError', 'hasError', 'hasInfo']);
+        $messageAdapter
+            ->method('hasError')
+            ->willReturn(false)
+        ;
+
+        $messageAdapter
+            ->method('hasInfo')
+            ->willReturn(false)
+        ;
+
+        if (null === $formFactory) {
+            $formFactory = $this->createMock(EventRegistrationFormFactory::class);
+            $formFactory
+                ->method('create')
+                ->willReturn($form ?? $this->createMock(Form::class))
             ;
-            $framework = $this->mockContaoFramework([EventReleaseLevelPolicyModel::class => $policyAdapter]);
         }
 
-        $constructorArgs = [
-            $util,
-            $this->createMock(CarSeatInfo::class),
-            $this->createMock(Connection::class),
-            $framework,
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(InsertTagParser::class),
-            $this->createMock(LockFactory::class),
-            $security ?? $this->createMock(Security::class),
-            $this->createMock(SyncEventRegistrationDatabase::class),
-            $this->createMock(TicketInfo::class),
+        $calendarEventsUtil = $this->createMock(CalendarEventsUtil::class);
+        $calendarEventsUtil
+            ->method('eventIsFullyBooked')
+            ->willReturn($fullyBooked)
+        ;
+
+        return new RegisterStep(
+            $calendarEventsUtil,
+            $this->mockContaoFramework([
+                CalendarEventsMemberModel::class => $registrationAdapter,
+                Message::class => $messageAdapter,
+                Controller::class => $controllerAdapter ?? $this->mockAdapter(['reload']),
+            ]),
+            $dispatcher ?? $this->createMock(EventDispatcherInterface::class),
+            $creator ?? $this->createMock(EventRegistrationCreator::class),
+            $eligibility ?? $this->createMock(EventRegistrationEligibility::class),
+            $formFactory,
+            $memberProvider,
             $this->createMock(TranslatorInterface::class),
-            0,
-            null,
-            null,
-        ];
-
-        $step = $this->getMockBuilder(RegisterStep::class)
-            ->setConstructorArgs($constructorArgs)
-            ->onlyMethods(['getCurrentTimestamp'])
-            ->getMock()
-        ;
-
-        $step
-            ->method('getCurrentTimestamp')
-            ->willReturn(self::NOW)
-        ;
-
-        return $step;
-    }
-}
-
-/**
- * Test double for the readonly CalendarEventsUtil.
- *
- * PHPUnit cannot mock a readonly class (the generated subclass would not be
- * readonly), so this readonly subclass returns canned values for the two
- * methods RegisterStep relies on.
- */
-readonly class FakeCalendarEventsUtil extends CalendarEventsUtil
-{
-    public function __construct(
-        ContaoFramework $framework,
-        private bool $bookingDatesOccupied = false,
-        private bool $fullyBooked = false,
-    ) {
-        parent::__construct($framework);
-    }
-
-    public function areBookingDatesOccupied(CalendarEventsModel $objEvent, MemberModel $objMember): bool
-    {
-        return $this->bookingDatesOccupied;
-    }
-
-    public function eventIsFullyBooked(CalendarEventsModel $objEvent): bool
-    {
-        return $this->fullyBooked;
+            $logger,
+        );
     }
 }

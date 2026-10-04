@@ -18,11 +18,9 @@ use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ContentUrlGenerator;
-use Contao\FrontendUser;
-use Contao\MemberModel;
 use Contao\ModuleModel;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\LoggedInMemberProvider;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -39,7 +37,7 @@ class ConfirmStep implements StepHandlerInterface
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly ContentUrlGenerator $contentUrlGenerator,
-        private readonly Security $security,
+        private readonly LoggedInMemberProvider $loggedInMemberProvider,
         private readonly TranslatorInterface $translator,
     ) {
     }
@@ -66,13 +64,7 @@ class ConfirmStep implements StepHandlerInterface
 
     public function prepareStep(CalendarEventsModel $eventModel, Request $request, ModuleModel $moduleModel): array
     {
-        $user = $this->security->getUser();
-
-        if (!$user instanceof FrontendUser) {
-            throw new AccessDeniedException('No logged in user found.');
-        }
-
-        $memberModel = $this->framework->getAdapter(MemberModel::class)->findById($user->id);
+        $memberModel = $this->loggedInMemberProvider->getMember();
 
         if (null === $memberModel) {
             throw new AccessDeniedException('The logged in Contao Frontend User could not be matched to a member record.');

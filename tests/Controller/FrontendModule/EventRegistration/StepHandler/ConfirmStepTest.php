@@ -22,6 +22,7 @@ use Contao\FrontendUser;
 use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\TestCase\ContaoTestCase;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\LoggedInMemberProvider;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\StepHandler\ConfirmStep;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -58,7 +59,7 @@ class ConfirmStepTest extends ContaoTestCase
         $step = $this->createConfirmStep(security: $security);
 
         $this->expectException(AccessDeniedException::class);
-        $this->expectExceptionMessage('No logged in user found.');
+        $this->expectExceptionMessageMatches('/could not be matched to a member record/');
 
         $step->prepareStep($this->createMock(CalendarEventsModel::class), new Request(), $this->createMock(ModuleModel::class));
     }
@@ -179,10 +180,12 @@ class ConfirmStepTest extends ContaoTestCase
 
     private function createConfirmStep(ContaoFramework|null $framework = null, ContentUrlGenerator|null $urlGenerator = null, Security|null $security = null, TranslatorInterface|null $translator = null): ConfirmStep
     {
+        $framework ??= $this->mockContaoFramework();
+
         return new ConfirmStep(
-            $framework ?? $this->mockContaoFramework(),
+            $framework,
             $urlGenerator ?? $this->createMock(ContentUrlGenerator::class),
-            $security ?? $this->createMock(Security::class),
+            new LoggedInMemberProvider($framework, $security ?? $this->createMock(Security::class)),
             $translator ?? $this->createMock(TranslatorInterface::class),
         );
     }

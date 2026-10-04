@@ -61,9 +61,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[Autoconfigure(public: true)]
-readonly class CalendarEventsUtil
+class CalendarEventsUtil
 {
-    public function __construct(private ContaoFramework $framework)
+    public function __construct(private readonly ContaoFramework $framework)
     {
     }
 

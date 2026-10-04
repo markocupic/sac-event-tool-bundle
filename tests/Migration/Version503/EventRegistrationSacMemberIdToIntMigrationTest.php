@@ -77,7 +77,7 @@ final class EventRegistrationSacMemberIdToIntMigrationTest extends TestCase
                     $updates[] = [$table, $data, $criteria];
 
                     return 1;
-                }
+                },
             )
         ;
 
@@ -90,7 +90,7 @@ final class EventRegistrationSacMemberIdToIntMigrationTest extends TestCase
                     $statements[] = $sql;
 
                     return 0;
-                }
+                },
             )
         ;
 
