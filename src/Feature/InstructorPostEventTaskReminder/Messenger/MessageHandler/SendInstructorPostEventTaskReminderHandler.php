@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\
 use Contao\CalendarModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\UserModel;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\Messenger\Message\SendInstructorPostEventTaskReminderMessage;
 use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\OpenTask;
 use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\OpenTaskProvider;
@@ -46,6 +47,12 @@ readonly class SendInstructorPostEventTaskReminderHandler
     public const TEMPLATE_HTML = '@MarkocupicSacEventTool/Email/InstructorPostEventTaskReminder/task_list.html.twig';
 
     public const TEMPLATE_TEXT = '@MarkocupicSacEventTool/Email/InstructorPostEventTaskReminder/task_list.txt.twig';
+
+    /**
+     * Event types without a tour report: the event status (e.g. "canceled") can only be set
+     * in the event itself. The to-do list shows a hint with a link to the event for these types.
+     */
+    public const EVENT_TYPES_WITH_CANCEL_HINT = [EventType::COURSE, EventType::GENERAL_EVENT];
 
     public function __construct(
         private ContaoFramework $framework,
@@ -154,6 +161,11 @@ readonly class SendInstructorPostEventTaskReminderHandler
         $lastname = $this->decode((string) $user->lastname);
         $name = trim($firstname.' '.$lastname);
 
+        $templateData = [
+            'open_tasks' => $openTasks,
+            'cancel_hint_urls' => $this->getCancelHintUrls($openTasks),
+        ];
+
         return [
             'recipient_email' => $email,
             'instructor_email' => $email,
@@ -161,8 +173,8 @@ readonly class SendInstructorPostEventTaskReminderHandler
             'instructor_lastname' => $lastname,
             'instructor_name' => '' !== $name ? $name : $this->decode((string) $user->name),
             'calendar_title' => $this->decode((string) $calendar->title),
-            'task_list_html' => $this->twig->render(self::TEMPLATE_HTML, ['open_tasks' => $openTasks]),
-            'task_list_text' => trim($this->twig->render(self::TEMPLATE_TEXT, ['open_tasks' => $openTasks])),
+            'task_list_html' => $this->twig->render(self::TEMPLATE_HTML, $templateData),
+            'task_list_text' => trim($this->twig->render(self::TEMPLATE_TEXT, $templateData)),
             'open_task_count' => $openTaskCount,
             'event_count' => \count($openTasks),
             'first_offset_days' => (int) $calendar->instructorPostEventTaskReminderFirstOffset,
@@ -170,6 +182,39 @@ readonly class SendInstructorPostEventTaskReminderHandler
             'reminder_count' => $reminderCount,
             'link_my_events_dashboard' => $this->router->generate('contao_backend', [], UrlGeneratorInterface::ABSOLUTE_URL),
         ];
+    }
+
+    /**
+     * Link to the event edit form for events without a tour report (courses, general events),
+     * so the instructor can set the event status to "canceled" there. Canceled events are skipped
+     * by the reminder.
+     *
+     * @param list<OpenTask> $openTasks
+     *
+     * @return array<int, string> event id => absolute backend URL
+     */
+    private function getCancelHintUrls(array $openTasks): array
+    {
+        $urls = [];
+
+        foreach ($openTasks as $openTask) {
+            if (!\in_array($openTask->eventType, self::EVENT_TYPES_WITH_CANCEL_HINT, true)) {
+                continue;
+            }
+
+            $urls[$openTask->eventId] = $this->router->generate(
+                'contao_backend',
+                [
+                    'do' => 'calendar',
+                    'table' => 'tl_calendar_events',
+                    'act' => 'edit',
+                    'id' => $openTask->eventId,
+                ],
+                UrlGeneratorInterface::ABSOLUTE_URL,
+            );
+        }
+
+        return $urls;
     }
 
     /**

@@ -35,14 +35,20 @@ class ParseTemplateListener
     public function addDashboardToTheWelcomePage(Template $template): void
     {
         // List upcoming and past events on the backend home screen.
-        $request = $this->requestStack->getCurrentRequest();
-
-        // Do not show the dashboard when using custom routes/controllers
-        if ($request->attributes->get('_controller') !== BackendController::class.'::mainAction') {
+        if (!str_starts_with($template->getName(), 'be_main')) {
             return;
         }
 
-        if (!str_starts_with($template->getName(), 'be_main')) {
+        // No request when templates are parsed on the CLI (cron, messenger worker),
+        // e.g. when the Notification Center renders an e-mail template.
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (null === $request) {
+            return;
+        }
+
+        // Do not show the dashboard when using custom routes/controllers
+        if ($request->attributes->get('_controller') !== BackendController::class.'::mainAction') {
             return;
         }
 

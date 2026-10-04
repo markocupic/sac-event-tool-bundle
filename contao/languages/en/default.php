@@ -299,6 +299,13 @@ $GLOBALS['TL_LANG']['ERR']['mustBePositiveCashAmount'] = 'Ungültige Eingabe! Ge
 // Instructor post-event task reminder
 $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task']['tour_report'] = 'Tourenbericht ausfüllen';
 $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task']['participation_confirmation'] = 'Teilnahme der Teilnehmenden bestätigen';
+// Optional HTML labels for the HTML e-mail (may contain HTML). If missing, the text label above is used.
+$GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_html']['participation_confirmation'] = '<strong>Teilnahme</strong> der Teilnehmenden bestätigen';
+$GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_cancel_hint'] = 'Wurde der Anlass abgesagt? Dann im Event den Event-Status auf «Event abgesagt» setzen. Danach entfällt diese Erinnerung.';
+$GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_cancel_hint_link'] = 'Zum Event';
+// Link texts in the HTML e-mail. If missing, the whole label is rendered as link.
+$GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_link']['tour_report'] = 'Zum Tourenbericht';
+$GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_link']['participation_confirmation'] = 'Zur Teilnehmerliste';
 $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_role']['instructor'] = 'als Leiter/in';
 $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_role']['registration_coordinator'] = 'als Anmelde-Koordinator/in';
 

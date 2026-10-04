@@ -108,7 +108,7 @@ interface PostEventTaskInterface
 Regeln:
 
 - Reihenfolge in der Mail über `#[AsTaggedItem(priority: …)]`, höhere Priorität zuerst.
-- Die Klasse liefert Label und Link, das Layout der Liste bleibt in den Twig-Templates (HTML und Text).
+- Die Klasse liefert Label und Link, das Layout der Liste bleibt in den Twig-Templates (HTML und Text). Ein optionales HTML-Label kommt aus den Sprachdateien (siehe Templates).
 - Die gemeinsamen Filter (Eventtypen des Kalenders, `published`, `eventState`, Enddatum inkl. Verschiebung, Bearbeitungsfrist) gelten für alle Aufgaben und bleiben zentral im `OpenTaskProvider`. Eine Task-Klasse entscheidet nur über Eventtyp (`supports()`) und Status (`isOpen()`).
 - Die Prüfungen laufen pro Event. Einfache, lesbare Abfragen gehen vor Optimierung. Falls nötig, kann später eine Vorlade-Methode für mehrere Events ins Interface kommen.
 - Die Aufgaben gelten für alle Empfänger gleich (Leiter und Koordinator). Das Interface kennt deshalb keine Rolle.
@@ -235,7 +235,23 @@ Jede Zeile: massgebendes Enddatum (bei verschobenen Events das verschobene), Tit
 - `TourReportTask::getUrl()`: `contao?do=calendar&table=tl_calendar_events&act=edit&id={id}&call=writeTourReport`
 - `ParticipationConfirmationTask::getUrl()`: `contao?do=calendar&table=tl_calendar_events_member&id={id}`
 
-URL-Erzeugung wie im `MyEventsDashboardController`. Der Cron läuft per CLI, daher muss `framework.router.default_uri` gesetzt sein.
+Labels:
+- Text-Mail: immer das Label der Task-Klasse (`MSC.instructor_post_event_task.<name>`).
+- HTML-Mail: optional ein eigenes Label `MSC.instructor_post_event_task_html.<name>`, das HTML enthalten darf. Fehlt es, wird das Text-Label verwendet.
+- HTML-Mail, Linktext: `MSC.instructor_post_event_task_link.<name>` («Zum Tourenbericht», «Zur Teilnehmerliste»). Darstellung: `Label: <a href="…">Linktext</a>`. Fehlt der Linktext, wird das ganze Label verlinkt.
+- Die Text-Mail zeigt weiterhin `- Label: URL`.
+
+Absage-Hinweis bei Kursen und allgemeinen Events:
+- Diese Eventtypen haben keinen Tourenbericht. Der Event-Status lässt sich nur im Event selbst setzen.
+- Deshalb zeigt die Liste bei diesen Events zusätzlich einen Hinweis mit Link zur Event-Bearbeitung (`contao?do=calendar&table=tl_calendar_events&act=edit&id={id}`): «Wurde der Anlass abgesagt? Dann im Event den Event-Status auf «Event abgesagt» setzen. …»
+- Abgesagte Events werden übersprungen, die Erinnerung entfällt damit. Der Hinweis ist keine Aufgabe und zählt nicht in `open_task_count`.
+- Die Eventtypen stehen in `SendInstructorPostEventTaskReminderHandler::EVENT_TYPES_WITH_CANCEL_HINT`, die URLs werden dort erzeugt und als `cancel_hint_urls` (eventId → URL) ans Template übergeben.
+- Texte: `MSC.instructor_post_event_task_cancel_hint`, `MSC.instructor_post_event_task_cancel_hint_link` («Zum Event»).
+- Damit der Leiter den Status setzen kann, braucht er Schreibrecht auf das Event in der aktuellen Freigabestufe (`allowWriteAccessToInstructors`).
+
+URL-Erzeugung wie im `MyEventsDashboardController`. Der Cron läuft per CLI, daher muss der Router-Kontext konfiguriert sein: entweder `framework.router.default_uri` (z. B. `https://www.sac-pilatus.ch`) oder `router.request_context.host`/`scheme` in `parameters.yaml`.
+
+HTML-Mail im Worker: Das Notification Center wandelt im HTML relative URLs mit `Environment::get('base')` um. Ohne Request (Cron, Messenger-Worker) ergibt das `http://:/` und der Versand scheitert («Unable to parse URI»). Im HTML-Text der Notification deshalb keine relativen Links verwenden. TinyMCE kürzt Links auf die eigene Domain ab, interne Seiten darum als Insert-Tag verlinken: `{{link_url::<id>::absolute|urlattr}}`.
 
 ## Übrige Dateien
 
@@ -262,6 +278,6 @@ Nicht durch Unit-Tests abgedeckt: das SQL in `ReminderLog` (u. a. `ON DUPLICATE 
 2. Im Notification Center eine Benachrichtigung vom Typ «Leiter-Erinnerung an offene Aufgaben nach dem Event» anlegen: Empfänger `##recipient_email##`, Text mit `##task_list_text##` bzw. `##task_list_html##`
 3. Im Kalender das Feature aktivieren, Benachrichtigung wählen, Event-Typen, Bearbeitungsfrist und Intervall prüfen. Bei Kalendern, in denen das Feature schon vor dem Feld «Berücksichtigte Event-Typen» aktiviert war, ist das Feld leer: Typen wählen und speichern, sonst wird nichts geprüft
 4. Cache leeren (`cache:clear`), damit das Backend-Modul «Log Leiter-Erinnerungen» erscheint; Nicht-Admins das Modul in den Rechten zuweisen
-5. `framework.router.default_uri` setzen, damit die Links in den vom Cron versandten Mails auf die richtige Domain zeigen
+5. Router-Kontext setzen (`framework.router.default_uri` oder `router.request_context.host`/`scheme`), damit die Links in den vom Cron versandten Mails auf die richtige Domain zeigen
 6. Cron per CLI laufen lassen und Messenger-Worker betreiben (bzw. `messenger:consume`)
 7. Kontrolle: Systemlog (Laufzeit, Anzahl Messages) und Backend-Modul «Log Leiter-Erinnerungen» (pro Empfänger und Kalender ein Eintrag; «Zuletzt versendet am» und «Zähler» ändern sich höchstens einmal pro Intervall)
