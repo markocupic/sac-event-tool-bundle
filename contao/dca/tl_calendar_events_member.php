@@ -32,7 +32,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'keys' => [
 				'id'            => 'primary',
 				'email,eventId' => 'index',
-				'sacMemberId'   => 'index',
 			],
 		],
 	],
@@ -260,8 +259,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		'sacMemberId'                   => [
 			'exclude'   => true,
 			'inputType' => 'text',
-			'eval'      => ['doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberIdOrZero', 'maxlength' => 10, 'tl_class' => 'clr'],
-			'sql'       => "int(10) unsigned NOT NULL default 0",
+			'eval'      => ['doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberIdOrEmptyString', 'maxlength' => 6, 'tl_class' => 'clr'],
+			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'notes'                         => [
 			'exclude'   => true,

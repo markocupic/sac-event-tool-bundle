@@ -290,7 +290,7 @@ $GLOBALS['TL_LANG']['MSC']['evt_epe_youWillReceiveACopyOfThisMessage'] = 'Sie er
 
 // Custom RegEx
 $GLOBALS['TL_LANG']['ERR']['memberWithSACMemberIdNotFound'] = 'Es wurde kein Sektionsmitglied mit der Mitgliedernummer %s gefunden.';
-$GLOBALS['TL_LANG']['ERR']['SACMemberIdShouldBeNumberOrZero'] = 'Das ist keine gültige SAC Mitgliedernummer. Geben Sie eine mind. 6-stellige Zahl ein oder eine 0, falls der Teilnehmer kein Sektionsmitglied ist.';
+$GLOBALS['TL_LANG']['ERR']['SACMemberIdShouldBeNumberOrEmptyString'] = 'Das ist keine gültige SAC Mitgliedernummer. Geben Sie eine mind. 6-stellige Zahl ein oder lassen Sie das Feld leer, falls der Teilnehmer kein Sektionsmitglied ist.';
 $GLOBALS['TL_LANG']['ERR']['SACMemberIdShouldBeNumberOrZero'] = 'Das ist keine gültige SAC Mitgliedernummer. Geben Sie eine mind. 6-stellige Zahl ein oder 0.';
 $GLOBALS['TL_LANG']['ERR']['userWithThisSACMemberIdAlreadyExists'] = 'Es existiert bereits ein Benutzer mit der SAC Mitgliedernummer %s.';
 $GLOBALS['TL_LANG']['ERR']['invalidMinOrMaxMemberValue'] = 'Ungültige Eingabe! Geben Sie eine Zahl zwischen 2 und 999 ein.';

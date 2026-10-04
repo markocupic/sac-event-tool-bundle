@@ -262,11 +262,6 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                 }
 
                 break;
-            case 'sacMemberId':
-                // 0: no SAC member
-                $value = (int) $arrEventMember['sacMemberId'] > 0 ? $arrEventMember['sacMemberId'] : '';
-
-                break;
             case 'phone':
                 $objMember = $this->getContaoAdapter(MemberModel::class)->findOneBySacMemberId($arrEventMember['sacMemberId']);
 

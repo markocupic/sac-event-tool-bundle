@@ -179,7 +179,7 @@ readonly class EventMember
                 $objPhpWord->addToClone('i', 'firstname', $this->prepareString((string) $objEventMember->firstname), ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'lastname', $this->prepareString((string) $objEventMember->lastname), ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'ageInfo', $this->prepareString((string) $this->getAgeInfo($objEventMember->current())), ['multiline' => false]);
-                $objPhpWord->addToClone('i', 'sacMemberId', (int) $objEventMember->sacMemberId > 0 ? 'Mitgl. No. '.$objEventMember->sacMemberId : '', ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. '.$objEventMember->sacMemberId, ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'memberInSection', $strMemberInSection, ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'isNotSacMember', $strIsActiveMember, ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'street', $this->prepareString((string) $objEventMember->street), ['multiline' => false]);

@@ -109,14 +109,13 @@ readonly class AddCustomRegexpListener
     }
 
     #[AsHook('addCustomRegexp', priority: 100)]
-    public function isSacMemberIdOrZero(string $regexp, $input, Widget $widget): bool
+    public function isSacMemberIdEmptyOrString(string $regexp, $input, Widget $widget): bool
     {
-        if ('sacMemberIdOrZero' !== $regexp) {
+        if ('sacMemberIdOrEmptyString' !== $regexp) {
             return false;
         }
 
-        // 0 or empty (saved as 0): no SAC member
-        if ('' === $input || '0' === $input) {
+        if ('' === $input) {
             return true;
         }
 
@@ -133,7 +132,7 @@ readonly class AddCustomRegexpListener
             return true;
         }
 
-        $widget->addError($this->translator->trans('ERR.SACMemberIdShouldBeNumberOrZero', [], 'contao_default'));
+        $widget->addError($this->translator->trans('ERR.SACMemberIdShouldBeNumberOrEmptyString', [], 'contao_default'));
 
         return true;
     }

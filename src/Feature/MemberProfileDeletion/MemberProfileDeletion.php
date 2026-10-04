@@ -216,7 +216,7 @@ class MemberProfileDeletion
     {
         $ids = $this->connection->fetchFirstColumn(
             'SELECT r.id FROM tl_calendar_events_member AS r WHERE (r.contaoMemberId = ? OR (? > 0 AND r.sacMemberId = ?)) AND '.$condition.' ORDER BY r.id',
-            [$memberId, $sacMemberId, $sacMemberId],
+            [$memberId, $sacMemberId, (string) $sacMemberId],
         );
 
         return array_map(intval(...), $ids);

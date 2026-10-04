@@ -39,8 +39,7 @@ Nur Anmeldungen, die noch nicht anonymisiert sind (`anonymized = 0`).
 |---|---|
 | `firstname`, `lastname`, `street`, `city` | «Vorname/Nachname/Adresse/Ort [anonymisiert]» |
 | `postal` | `0` |
-| `email`, `phone`, `mobile`, `gender`, `dateOfBirth`, `ahvNumber`, `foodHabits`, `instructorNotes` | leer |
-| `sacMemberId` | `0` (kein SAC-Mitglied) |
+| `email`, `phone`, `mobile`, `gender`, `dateOfBirth`, `sacMemberId`, `ahvNumber`, `foodHabits`, `instructorNotes` | leer |
 | `sectionId` | `NULL` |
 | `contaoMemberId` | `0` |
 | `emergencyPhone` / `emergencyPhoneName` | `999 99 99` / «[anonymisiert]» |

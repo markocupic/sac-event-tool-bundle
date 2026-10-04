@@ -73,15 +73,15 @@ class EventRegistrationCleanup
     public function findRegistrationsOfDeletedMembers(): array
     {
         return $this->connection->fetchAllAssociative(
-            'SELECT '.self::COLUMNS.'
+            'SELECT '.self::COLUMNS."
             FROM tl_calendar_events_member AS r
             WHERE r.anonymized = 0
                 AND r.tstamp > 0
-                AND (r.contaoMemberId > 0 OR r.sacMemberId > 0)
+                AND (r.contaoMemberId > 0 OR (r.sacMemberId <> '' AND r.sacMemberId <> '0'))
                 AND NOT EXISTS (SELECT 1 FROM tl_member AS m WHERE m.id = r.contaoMemberId)
-                AND NOT (r.sacMemberId > 0 AND EXISTS (SELECT 1 FROM tl_member AS m WHERE m.sacMemberId = r.sacMemberId))
+                AND NOT (r.sacMemberId <> '' AND r.sacMemberId <> '0' AND EXISTS (SELECT 1 FROM tl_member AS m WHERE m.sacMemberId = r.sacMemberId))
                 AND EXISTS (SELECT 1 FROM tl_calendar_events AS e WHERE e.id = r.eventId)
-            ORDER BY r.id',
+            ORDER BY r.id",
         );
     }
 

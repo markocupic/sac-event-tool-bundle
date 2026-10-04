@@ -59,7 +59,7 @@ final class EventRegistrationAnonymizerTest extends TestCase
                 $this->callback(
                     static fn (array $data): bool => 1 === $data['anonymized']
                         && 0 === $data['contaoMemberId']
-                        && 0 === $data['sacMemberId']
+                        && '' === $data['sacMemberId']
                         && '' === $data['phone']
                         && '' === $data['gender']
                         && '' === $data['ahvNumber']

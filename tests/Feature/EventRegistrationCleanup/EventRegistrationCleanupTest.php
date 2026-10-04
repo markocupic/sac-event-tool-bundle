@@ -82,9 +82,9 @@ final class EventRegistrationCleanupTest extends TestCase
             ->with($this->logicalAnd(
                 $this->stringContains('r.anonymized = 0'),
                 // Guests (no Contao member ID and no SAC member ID) are not included
-                $this->stringContains('(r.contaoMemberId > 0 OR r.sacMemberId > 0)'),
+                $this->stringContains("(r.contaoMemberId > 0 OR (r.sacMemberId <> '' AND r.sacMemberId <> '0'))"),
                 $this->stringContains('NOT EXISTS (SELECT 1 FROM tl_member AS m WHERE m.id = r.contaoMemberId)'),
-                $this->stringContains('NOT (r.sacMemberId > 0 AND EXISTS (SELECT 1 FROM tl_member AS m WHERE m.sacMemberId = r.sacMemberId))'),
+                $this->stringContains("NOT (r.sacMemberId <> '' AND r.sacMemberId <> '0' AND EXISTS (SELECT 1 FROM tl_member AS m WHERE m.sacMemberId = r.sacMemberId))"),
                 $this->stringContains('AND EXISTS (SELECT 1 FROM tl_calendar_events AS e WHERE e.id = r.eventId)'),
             ))
             ->willReturn([])
@@ -100,7 +100,7 @@ final class EventRegistrationCleanupTest extends TestCase
             ->expects($this->once())
             ->method('fetchAllAssociative')
             ->with($this->logicalAnd(
-                $this->logicalNot($this->stringContains('r.sacMemberId >')),
+                $this->logicalNot($this->stringContains("r.sacMemberId = ''")),
                 $this->stringContains('NOT EXISTS (SELECT 1 FROM tl_calendar_events AS e WHERE e.id = r.eventId)'),
             ))
             ->willReturn([])
