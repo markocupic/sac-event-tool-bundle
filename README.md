@@ -24,6 +24,8 @@ Ausführliche Beschreibungen (Regeln, Datenmodell, Klassen, Tests) liegen unter 
 - [Mitgliederdaten in die Backend-User übernehmen](docs/features/member-to-user-sync.md): überträgt täglich die Personendaten aus `tl_member` in die Backend-User (`tl_user`) mit SAC-Mitgliedernummer.
 - [Mitgliederdaten in die Event-Anmeldungen übernehmen](docs/features/event-registration-database-sync.md): überträgt täglich die aktuellen Personendaten aus `tl_member` in die Anmeldungen (`tl_calendar_events_member`).
 - [Kursprogramm als PDF](docs/features/workshop-booklet.md): erzeugt das Kursprogramm eines Jahres oder einen einzelnen Kurs als PDF zum Herunterladen (nur für eingeloggte Mitglieder).
+- [Home-Verzeichnis für Backend-User](docs/features/backend-user-home-directory.md): legt für jeden Backend-User ein persönliches Verzeichnis mit Filemount an und archiviert die Verzeichnisse gelöschter User.
+- [Rechte-Reset für Backend-User](docs/features/backend-user-permission-reset.md): setzt die persönlichen Rechte von Backend-Usern mit Gruppenrechten zurück, damit sie ihre Rechte nur über Gruppen erhalten.
 
 ## Einrichtung und Konfiguration
 

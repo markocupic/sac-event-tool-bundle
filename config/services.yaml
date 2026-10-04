@@ -94,7 +94,8 @@ services:
     Markocupic\SacEventToolBundle\Avatar\Avatar:
         public: true
 
-    Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainBackendUser:
+    # Contao maintenance module (TL_PURGE): reset the permissions of all backend users
+    Markocupic\SacEventToolBundle\Feature\BackendUserPermissionReset\BackendUserPermissionReset:
         public: true
 
     Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventRegistrationStateController:

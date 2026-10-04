@@ -25,7 +25,7 @@ use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
-use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory;
+use Markocupic\SacEventToolBundle\Feature\BackendUserHomeDirectory\BackendUserHomeDirectory;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -39,7 +39,7 @@ class User
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
         private readonly Countries $countries,
-        private readonly MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory,
+        private readonly BackendUserHomeDirectory $backendUserHomeDirectory,
         private readonly Packages $packages,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
@@ -179,7 +179,7 @@ class User
 
         if (null !== ($objUser = $userModelAdapter->findById($id))) {
             // Create backend users home directory
-            $this->maintainBackendUsersHomeDirectory->createBackendUsersHomeDirectory($objUser);
+            $this->backendUserHomeDirectory->create($objUser);
 
             if ('extend' !== ($arrSet['inherit'] ?? null)) {
                 $randomPassword = sha1((string) random_int(0, getrandmax()));

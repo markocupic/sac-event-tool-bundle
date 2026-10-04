@@ -15,9 +15,9 @@ declare(strict_types=1);
 use Contao\CoreBundle\Controller\BackendCsvImportController;
 use Contao\ListWizard;
 use Contao\TableWizard;
-use Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainBackendUser;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventRegistrationStateController;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\SacBackendUserRolesExportController;
+use Markocupic\SacEventToolBundle\Feature\BackendUserPermissionReset\BackendUserPermissionReset;
 use Markocupic\SacEventToolBundle\Feature\EventRegistrationDatabaseSync\ContaoBackendMaintenance\EventRegistrationSync;
 use Markocupic\SacEventToolBundle\Feature\MemberDatabaseSync\ContaoBackendMaintenance\MemberDatabaseSync;
 use Markocupic\SacEventToolBundle\Model\CalendarContainerModel;
@@ -126,7 +126,7 @@ $GLOBALS['TL_MODELS'][UserRoleModel::getTable()] = UserRoleModel::class;
  * and tl_user.inherit = 'extend'
  */
 $GLOBALS['TL_PURGE']['custom']['reset_backend_user_rights'] = [
-	'callback' => [MaintainBackendUser::class, 'resetBackendUserPermissions'],
+	'callback' => [BackendUserPermissionReset::class, 'resetAll'],
 ];
 
 $GLOBALS['TL_MAINTENANCE'][] = MemberDatabaseSync::class;
