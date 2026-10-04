@@ -19,7 +19,7 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\DataContainer;
 use Contao\Message;
-use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
+use Markocupic\SacEventToolBundle\Feature\MemberProfileDeletion\MemberProfileDeletion;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -30,7 +30,7 @@ class Member
 
     public function __construct(
         private readonly Security $security,
-        private readonly ClearFrontendUserData $clearFrontendUserData,
+        private readonly MemberProfileDeletion $memberProfileDeletion,
         private readonly RouterInterface $router,
         private readonly TranslatorInterface $translator,
         private readonly Util $util,
@@ -51,7 +51,7 @@ class Member
             return;
         }
 
-        if (false === $this->clearFrontendUserData->clearMemberProfile((int) $dc->id)) {
+        if (false === $this->memberProfileDeletion->clearMemberProfile((int) $dc->id)) {
             $arrErrorMsg = $this->translator->trans('ERR.clearMemberProfile', [$dc->id], 'contao_default');
             Message::addError($arrErrorMsg);
 

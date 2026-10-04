@@ -12,6 +12,7 @@ Die Anmeldungen (`tl_calendar_events_member`) enthalten eine Kopie der Personend
 - Berücksichtigt werden alle Anmeldungen mit `contaoMemberId` eines bestehenden Mitglieds und `anonymized = 0`.
 - **Immer übernommen:** `gender`, `firstname`, `lastname`, `street`, `postal`, `city`, `dateOfBirth`, `phone`
 - **Nur wenn im Mitglied nicht leer:** `email`, `mobile`
+- **Nur wenn das Mitglied eine SAC-Mitgliedernummer hat** (`> 0`): `sacMemberId`. Korrigiert von Hand eingetragene Werte wie `00167400` oder `370883 SAC Pilatus`.
 - **Nur bei kommenden Events** (`startDate` in der Zukunft) und nur wenn im Mitglied nicht leer: `emergencyPhone` und `emergencyPhoneName` (nur zusammen), `foodHabits`
 - Die Anmeldungen werden zusammen mit den Mitgliederdaten in **einer** Abfrage gelesen (nur die benötigten Spalten) und Zeile für Zeile verarbeitet. Eine Anmeldung wird nur geschrieben, wenn sich mindestens ein Feld unterscheidet, und dann nur die geänderten Felder.
 - Alle Mitglieder laufen in **einer** Transaktion. Bei einem Fehler wird zurückgerollt, der Fehler steht im Protokoll (`with_error`, `exceptions`) und im Error-Log.
