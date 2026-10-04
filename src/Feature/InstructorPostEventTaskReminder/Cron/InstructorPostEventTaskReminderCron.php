@@ -37,7 +37,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  *
  * See docs/features/instructor-post-event-task-reminder.md
  */
-#[AsCronJob('45 1,4 * * *')]
+#[AsCronJob('*/2 * * * *')]
 readonly class InstructorPostEventTaskReminderCron
 {
     private const string STOP_WATCH_EVENT = 'instructor_post_event_task_reminder_cron';
