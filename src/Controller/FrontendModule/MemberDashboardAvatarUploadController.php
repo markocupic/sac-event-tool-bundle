@@ -86,7 +86,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             }
 
             if ('rotate-image' === $request->query->get('do')) {
-                $this->rotateImage->rotate($files, 90);
+                $this->rotateImage->rotate(Path::join($this->projectDir, $files->path), 90);
                 $this->framework->getAdapter(Controller::class)->redirect($page->getFrontendUrl());
             }
 
