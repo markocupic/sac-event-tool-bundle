@@ -99,7 +99,7 @@ final class MemberProfileDeletionTest extends ContaoTestCase
                     $this->stringContains('r.anonymized = 0'),
                     $this->stringContains('AND EXISTS (SELECT 1 FROM tl_calendar_events AS e WHERE e.id = r.eventId)'),
                 ),
-                [5, 123456, '123456'],
+                [5, 123456, 123456],
             )
             ->willReturn(['11', '12'])
         ;
@@ -118,7 +118,7 @@ final class MemberProfileDeletionTest extends ContaoTestCase
                     $this->stringContains('(r.contaoMemberId = ? OR (? > 0 AND r.sacMemberId = ?))'),
                     $this->stringContains('NOT EXISTS (SELECT 1 FROM tl_calendar_events AS e WHERE e.id = r.eventId)'),
                 ),
-                [5, 123456, '123456'],
+                [5, 123456, 123456],
             )
             ->willReturn(['31'])
         ;

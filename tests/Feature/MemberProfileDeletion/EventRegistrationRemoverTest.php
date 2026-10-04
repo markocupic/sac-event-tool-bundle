@@ -38,7 +38,7 @@ final class EventRegistrationRemoverTest extends TestCase
                     $statements[] = [$sql, $params, $types];
 
                     return 2;
-                }
+                },
             )
         ;
 

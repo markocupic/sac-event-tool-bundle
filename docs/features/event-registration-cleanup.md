@@ -24,7 +24,7 @@ Im Backend kann ein Event nur gelöscht werden, wenn es keine Anmeldungen mehr h
 Ausgewählt werden Anmeldungen (`findRegistrationsOfDeletedMembers()`), die alle Bedingungen erfüllen:
 
 - noch nicht anonymisiert (`anonymized = 0`) und gespeichert (`tstamp > 0`)
-- gehört zu einem Mitglied: `contaoMemberId > 0` **oder** SAC-Nummer gesetzt (Gäste ohne beides sind nicht betroffen)
+- gehört zu einem Mitglied: `contaoMemberId > 0` **oder** `sacMemberId > 0` (Gäste ohne beides sind nicht betroffen)
 - **kein** Mitglied in `tl_member` mit dieser `contaoMemberId`
 - **und**, falls eine SAC-Nummer gesetzt ist, **kein** Mitglied mit dieser SAC-Nummer
 - das Event existiert noch (Anmeldungen zu gelöschten Events werden in Schritt 1 gelöscht)
