@@ -177,6 +177,13 @@ class CalendarEvents
                     $this->controller->redirect($this->system->getReferer());
                 }
 
+                // Events can only be deleted if there are no registrations (same as "deleteAll")
+                if ($this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$dc->id])) {
+                    $this->message->addError($this->translator->trans('ERR.deleteEventMembersBeforeDeleteEvent', [$dc->id], 'contao_default'));
+
+                    $this->controller->redirect($this->system->getReferer());
+                }
+
                 break;
 
             case 'toggle':

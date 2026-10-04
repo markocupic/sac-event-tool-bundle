@@ -47,6 +47,10 @@ class SyncEventRegistrationDatabase
     // Copied from tl_member only for upcoming events and only if not empty there
     private const array FIELDS_UPCOMING_EVENTS_ONLY = ['emergencyPhone', 'emergencyPhoneName', 'foodHabits'];
 
+    // Copied from tl_member only if the member has a SAC member ID (> 0).
+    // Corrects manually entered values like "00167400" or "370883 SAC Pilatus".
+    private const string FIELD_SAC_MEMBER_ID = 'sacMemberId';
+
     private const array EMPTY_SYNC_LOG = [
         'processed_registrations' => 0,
         'processed_members' => 0,
@@ -142,6 +146,10 @@ class SyncEventRegistrationDatabase
             $target[$field] = (string) $row['member_'.$field];
         }
 
+        if ((int) $row['member_'.self::FIELD_SAC_MEMBER_ID] > 0) {
+            $target[self::FIELD_SAC_MEMBER_ID] = (string) (int) $row['member_'.self::FIELD_SAC_MEMBER_ID];
+        }
+
         // Do not override these contact data fields with empty values
         foreach (self::FIELDS_IF_NOT_EMPTY as $field) {
             if ('' !== (string) $row['member_'.$field]) {
@@ -227,7 +235,7 @@ class SyncEventRegistrationDatabase
      */
     private function iterateRegistrations(int|null $memberId): iterable
     {
-        $fields = [...self::FIELDS_ALWAYS, ...self::FIELDS_IF_NOT_EMPTY, ...self::FIELDS_UPCOMING_EVENTS_ONLY];
+        $fields = [...self::FIELDS_ALWAYS, self::FIELD_SAC_MEMBER_ID, ...self::FIELDS_IF_NOT_EMPTY, ...self::FIELDS_UPCOMING_EVENTS_ONLY];
 
         $columns = ['r.id', 'r.eventId', 'm.id AS member_id'];
 

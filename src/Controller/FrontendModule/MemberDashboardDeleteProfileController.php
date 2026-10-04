@@ -24,7 +24,7 @@ use Contao\FrontendUser;
 use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
+use Markocupic\SacEventToolBundle\Feature\MemberProfileDeletion\MemberProfileDeletion;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -39,7 +39,7 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
 
     public function __construct(
         private readonly TokenStorageInterface $tokenStorage,
-        private readonly ClearFrontendUserData $clearFrontendUserData,
+        private readonly MemberProfileDeletion $memberProfileDeletion,
     ) {
     }
 
@@ -130,10 +130,7 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
 
                 if (!$blnHasError) {
                     // Clear the account and redirect to the start page
-                    if (true === $this->clearFrontendUserData->clearMemberProfile((int) $this->user->id)) {
-                        $this->clearFrontendUserData->disableLogin((int) $this->user->id);
-                        $this->clearFrontendUserData->deleteFrontendAccount((int) $this->user->id);
-
+                    if ($this->memberProfileDeletion->deleteMember((int) $this->user->id)) {
                         throw new RedirectResponseException($request->getSchemeAndHttpHost());
                     }
                 }
