@@ -26,8 +26,6 @@ Ausführliche Beschreibungen (Regeln, Datenmodell, Klassen, Tests) liegen unter 
 - [Kursprogramm als PDF](docs/features/workshop-booklet.md): erzeugt das Kursprogramm eines Jahres oder einen einzelnen Kurs als PDF zum Herunterladen (nur für eingeloggte Mitglieder).
 - [Home-Verzeichnis für Backend-User](docs/features/backend-user-home-directory.md): legt für jeden Backend-User ein persönliches Verzeichnis mit Filemount an und archiviert die Verzeichnisse gelöschter User.
 - [Rechte-Reset für Backend-User](docs/features/backend-user-permission-reset.md): setzt die persönlichen Rechte von Backend-Usern mit Gruppenrechten zurück, damit sie ihre Rechte nur über Gruppen erhalten.
-- [Mitgliederprofil löschen](docs/features/member-profile-deletion.md): löscht ein Mitglied samt Avatar-Ordner und anonymisiert seine Anmeldungen zu vergangenen Events; verweigert die Löschung, solange das Mitglied auf einer Buchungsliste steht.
-- [Bereinigung der Event-Anmeldungen](docs/features/event-registration-cleanup.md): löscht täglich die Anmeldungen zu gelöschten Events und anonymisiert die Anmeldungen gelöschter Mitglieder.
 
 ## Einrichtung und Konfiguration
 

@@ -48,10 +48,7 @@ final class BackendUserPermissionResetTest extends ContaoTestCase
     public function testUnknownUserIsNotReset(): void
     {
         $connection = $this->createConnection(false, []);
-        $connection
-            ->expects($this->never())
-            ->method('update')
-        ;
+        $connection->expects($this->never())->method('update');
 
         $this->assertFalse($this->createReset($connection)->resetUser('nobody'));
     }
@@ -83,10 +80,7 @@ final class BackendUserPermissionResetTest extends ContaoTestCase
     public function testUserWithoutGroupsAndHomeDirectoryGetsEmptyPermissions(): void
     {
         $connection = $this->createConnection(['id' => '5', 'groups' => ''], []);
-        $connection
-            ->expects($this->never())
-            ->method('fetchAllAssociative')
-        ;
+        $connection->expects($this->never())->method('fetchAllAssociative');
 
         $this->createReset($connection)->resetUser('amuster');
 
@@ -146,7 +140,7 @@ final class BackendUserPermissionResetTest extends ContaoTestCase
     }
 
     /**
-     * @param array<string, mixed>|false $user
+     * @param array<string, mixed>|false     $user
      * @param list<array<string, mixed>> $groups
      */
     private function createConnection(array|false $user, array $groups): Connection&MockObject
@@ -162,20 +156,9 @@ final class BackendUserPermissionResetTest extends ContaoTestCase
         ;
 
         $connection = $this->createMock(Connection::class);
-        $connection
-            ->method('createSchemaManager')
-            ->willReturn($schemaManager)
-        ;
-
-        $connection
-            ->method('fetchAssociative')
-            ->willReturn($user)
-        ;
-
-        $connection
-            ->method('fetchAllAssociative')
-            ->willReturn($groups)
-        ;
+        $connection->method('createSchemaManager')->willReturn($schemaManager);
+        $connection->method('fetchAssociative')->willReturn($user);
+        $connection->method('fetchAllAssociative')->willReturn($groups);
         $connection
             ->method('update')
             ->willReturnCallback(

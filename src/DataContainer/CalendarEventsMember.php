@@ -270,6 +270,48 @@ class CalendarEventsMember
     }
 
     /**
+     * Delete orphaned records.
+     *
+     * @throws Exception
+     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
+    public function reviseTable(): void
+    {
+        $reload = false;
+
+        // Delete orphaned records
+        $ids = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar_events_member AS em WHERE em.sacMemberId > ? AND em.tstamp > ? AND NOT EXISTS (SELECT * FROM tl_member AS m WHERE em.sacMemberId = m.sacMemberId)', [0, 0]);
+
+        if (!empty($ids)) {
+            $rowsAffected = $this->connection->executeStatement('DELETE FROM tl_calendar_events_member WHERE id IN('.implode(',', $ids).')');
+
+            if ($rowsAffected) {
+                $reload = true;
+            }
+        }
+
+        // Delete event members without sacMemberId that are not related to an event
+        $ids = $this->connection
+            ->fetchFirstColumn(
+                'SELECT id FROM tl_calendar_events_member AS m WHERE (m.sacMemberId < ? OR m.sacMemberId = ?) AND tstamp > ? AND NOT EXISTS (SELECT * FROM tl_calendar_events AS e WHERE m.eventId = e.id)',
+                [1, '', 0],
+            )
+        ;
+
+        if (!empty($ids)) {
+            $rowsAffected = $this->connection->executeStatement('DELETE FROM tl_calendar_events_member WHERE id IN('.implode(',', $ids).')', []);
+
+            if ($rowsAffected) {
+                $reload = true;
+            }
+        }
+
+        if ($reload) {
+            $this->controller->reload();
+        }
+    }
+
+    /**
      * List SAC sections.
      *
      * @throws Exception

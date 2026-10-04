@@ -71,19 +71,6 @@ final class SyncEventRegistrationDatabaseTest extends ContaoTestCase
         );
     }
 
-    public function testSacMemberIdIsCorrected(): void
-    {
-        $sync = $this->createSync([]);
-
-        $this->assertSame(['sacMemberId' => '167400'], $sync->getChangedFields($this->row(['sacMemberId' => '00167400', 'member_sacMemberId' => '167400']), false));
-        $this->assertSame(['sacMemberId' => '370883'], $sync->getChangedFields($this->row(['sacMemberId' => '370883 SAC Pilatus', 'member_sacMemberId' => '370883']), false));
-    }
-
-    public function testSacMemberIdIsNotOverwrittenIfTheMemberHasNone(): void
-    {
-        $this->assertSame([], $this->createSync([])->getChangedFields($this->row(['member_sacMemberId' => '0']), false));
-    }
-
     public function testEmergencyContactNeedsPhoneAndName(): void
     {
         $row = $this->row(['member_emergencyPhone' => '079 111 11 11', 'member_emergencyPhoneName' => '']);
@@ -220,7 +207,6 @@ final class SyncEventRegistrationDatabaseTest extends ContaoTestCase
             'city' => 'Luzern',
             'dateOfBirth' => '315529200',
             'phone' => '041 123 45 67',
-            'sacMemberId' => '123456',
             'email' => 'anna@example.org',
             'mobile' => '079 123 45 67',
             'emergencyPhone' => '',

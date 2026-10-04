@@ -31,17 +31,8 @@ final class ResetPermissionsOnLoginListenerTest extends TestCase
     public function testResetsTheResettableBackendUser(): void
     {
         $reset = $this->createMock(BackendUserPermissionReset::class);
-        $reset
-            ->method('isResettable')
-            ->with('amuster')
-            ->willReturn(true)
-        ;
-
-        $reset
-            ->expects($this->once())
-            ->method('resetUser')
-            ->with('amuster')
-        ;
+        $reset->method('isResettable')->with('amuster')->willReturn(true);
+        $reset->expects($this->once())->method('resetUser')->with('amuster');
 
         (new ResetPermissionsOnLoginListener($reset, true))($this->createEvent($this->createBackendUser()));
     }
@@ -49,10 +40,7 @@ final class ResetPermissionsOnLoginListenerTest extends TestCase
     public function testDoesNothingIfDisabled(): void
     {
         $reset = $this->createMock(BackendUserPermissionReset::class);
-        $reset
-            ->expects($this->never())
-            ->method('resetUser')
-        ;
+        $reset->expects($this->never())->method('resetUser');
 
         (new ResetPermissionsOnLoginListener($reset, false))($this->createEvent($this->createBackendUser()));
     }
@@ -60,15 +48,8 @@ final class ResetPermissionsOnLoginListenerTest extends TestCase
     public function testDoesNotResetAdminsOrUsersWithoutGroupInheritance(): void
     {
         $reset = $this->createMock(BackendUserPermissionReset::class);
-        $reset
-            ->method('isResettable')
-            ->willReturn(false)
-        ;
-
-        $reset
-            ->expects($this->never())
-            ->method('resetUser')
-        ;
+        $reset->method('isResettable')->willReturn(false);
+        $reset->expects($this->never())->method('resetUser');
 
         (new ResetPermissionsOnLoginListener($reset, true))($this->createEvent($this->createBackendUser()));
     }
@@ -76,10 +57,7 @@ final class ResetPermissionsOnLoginListenerTest extends TestCase
     public function testIgnoresFrontendUsers(): void
     {
         $reset = $this->createMock(BackendUserPermissionReset::class);
-        $reset
-            ->expects($this->never())
-            ->method('isResettable')
-        ;
+        $reset->expects($this->never())->method('isResettable');
 
         (new ResetPermissionsOnLoginListener($reset, true))($this->createEvent($this->createMock(FrontendUser::class)));
     }
@@ -87,10 +65,7 @@ final class ResetPermissionsOnLoginListenerTest extends TestCase
     private function createBackendUser(): BackendUser
     {
         $user = $this->createMock(BackendUser::class);
-        $user
-            ->method('getUserIdentifier')
-            ->willReturn('amuster')
-        ;
+        $user->method('getUserIdentifier')->willReturn('amuster');
 
         return $user;
     }
@@ -98,10 +73,7 @@ final class ResetPermissionsOnLoginListenerTest extends TestCase
     private function createEvent(UserInterface $user): LoginSuccessEvent
     {
         $token = $this->createMock(TokenInterface::class);
-        $token
-            ->method('getUser')
-            ->willReturn($user)
-        ;
+        $token->method('getUser')->willReturn($user);
 
         return new LoginSuccessEvent(
             $this->createMock(AuthenticatorInterface::class),

@@ -34,40 +34,16 @@ final class CreateHomeDirectoryOnLoginListenerTest extends ContaoTestCase
         $userModel = $this->createMock(UserModel::class);
 
         $userModelAdapter = $this->mockAdapter(['findByUsername', 'findAll']);
-        $userModelAdapter
-            ->expects($this->once())
-            ->method('findByUsername')
-            ->with('amuster')
-            ->willReturn($userModel)
-        ;
-
-        $userModelAdapter
-            ->expects($this->never())
-            ->method('findAll')
-        ;
+        $userModelAdapter->expects($this->once())->method('findByUsername')->with('amuster')->willReturn($userModel);
+        $userModelAdapter->expects($this->never())->method('findAll');
 
         $homeDirectory = $this->createMock(BackendUserHomeDirectory::class);
-        $homeDirectory
-            ->expects($this->once())
-            ->method('create')
-            ->with($userModel)
-        ;
-
-        $homeDirectory
-            ->expects($this->never())
-            ->method('createForAllUsers')
-        ;
-
-        $homeDirectory
-            ->expects($this->never())
-            ->method('archiveOrphanedDirectories')
-        ;
+        $homeDirectory->expects($this->once())->method('create')->with($userModel);
+        $homeDirectory->expects($this->never())->method('createForAllUsers');
+        $homeDirectory->expects($this->never())->method('archiveOrphanedDirectories');
 
         $user = $this->createMock(BackendUser::class);
-        $user
-            ->method('getUserIdentifier')
-            ->willReturn('amuster')
-        ;
+        $user->method('getUserIdentifier')->willReturn('amuster');
 
         $listener = new CreateHomeDirectoryOnLoginListener($this->mockContaoFramework([UserModel::class => $userModelAdapter]), $homeDirectory);
         $listener($this->createEvent($user));
@@ -76,10 +52,7 @@ final class CreateHomeDirectoryOnLoginListenerTest extends ContaoTestCase
     public function testIgnoresFrontendUsers(): void
     {
         $homeDirectory = $this->createMock(BackendUserHomeDirectory::class);
-        $homeDirectory
-            ->expects($this->never())
-            ->method('create')
-        ;
+        $homeDirectory->expects($this->never())->method('create');
 
         $listener = new CreateHomeDirectoryOnLoginListener($this->mockContaoFramework(), $homeDirectory);
         $listener($this->createEvent($this->createMock(FrontendUser::class)));
@@ -88,10 +61,7 @@ final class CreateHomeDirectoryOnLoginListenerTest extends ContaoTestCase
     private function createEvent(UserInterface $user): LoginSuccessEvent
     {
         $token = $this->createMock(TokenInterface::class);
-        $token
-            ->method('getUser')
-            ->willReturn($user)
-        ;
+        $token->method('getUser')->willReturn($user);
 
         return new LoginSuccessEvent(
             $this->createMock(AuthenticatorInterface::class),
