@@ -230,6 +230,8 @@ class EventRegistrationListGeneratorCsv
         }
 
         return match ($field) {
+            // 0: no SAC member
+            'sacMemberId' => '0' === $value ? '' : $value,
             'phone', 'mobile', 'emergencyPhone' => 'T: '.PhoneNumberFormatter::format($value),
             'stateOfSubscription', 'gender' => $GLOBALS['TL_LANG']['MSC'][$value] ?? $value,
             'dateOfBirth' => $this->dateAdapter->parse($this->configAdapter->get('dateFormat'), (int) $value),

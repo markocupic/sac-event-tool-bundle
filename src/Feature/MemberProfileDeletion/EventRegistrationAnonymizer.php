@@ -78,7 +78,7 @@ class EventRegistrationAnonymizer
             'tstamp' => time(),
             'anonymized' => 1,
             'contaoMemberId' => 0,
-            'sacMemberId' => '',
+            'sacMemberId' => 0,
             'gender' => '',
             'firstname' => 'Vorname '.self::ANONYMIZED,
             'lastname' => 'Nachname '.self::ANONYMIZED,
