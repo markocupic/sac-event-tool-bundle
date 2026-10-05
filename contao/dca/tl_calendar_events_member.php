@@ -60,7 +60,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 100],
 				'href'                   => System::getContainer()->get('router')->generate('contao_backend', ['do' => 'calendar', 'table' => 'tl_calendar_events', 'id' => '%s', 'act' => 'edit', 'rt' => '%s', 'ref' => '%s']),
-				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/left-regular.svg', 'markocupic_sac_event_tool'),
+				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/left-regular.svg', 'markocupic_sac_event_tool'),
 				'label'                  => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
 			],
 			'sendEmail'                         => [
@@ -69,7 +69,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 				'class'                  => 'send_email',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 90],
-				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/at-regular.svg', 'markocupic_sac_event_tool'),
+				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/at-regular.svg', 'markocupic_sac_event_tool'),
 			],
 			'downloadEventRegistrationListCsv'  => [
 				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
@@ -77,7 +77,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 80],
 				'href'                   => 'action=downloadEventRegistrationListCsv&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
-				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/file-excel-regular.svg', 'markocupic_sac_event_tool'),
+				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/file-excel-regular.svg', 'markocupic_sac_event_tool'),
 			],
 			'downloadEventRegistrationListDocx' => [
 				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
@@ -85,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 70],
 				'href'                   => 'action=downloadEventRegistrationListDocx&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
-				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/file-word-regular.svg', 'markocupic_sac_event_tool'),
+				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/file-word-regular.svg', 'markocupic_sac_event_tool'),
 			],
 			'writeTourReport'                   => [
 				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'tour_report', 'sorting' => 100],
 				'href'                   => 'table=tl_calendar_events&act=edit&call=writeTourReport&id=%d',
-				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/pencil-regular.svg', 'markocupic_sac_event_tool'),
+				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/pencil-regular.svg', 'markocupic_sac_event_tool'),
 			],
 			'printInstructorInvoice'            => [
 				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'tour_report', 'sorting' => 90],
 				'href'                   => 'table=tl_calendar_events_instructor_invoice&id=%d',
-				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/print-regular.svg', 'markocupic_sac_event_tool'),
+				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/print-regular.svg', 'markocupic_sac_event_tool'),
 			],
 		],
 		'operations'        => [
@@ -110,7 +110,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'show',
 			'toggleParticipationState' => [
 				'href' => 'act=toggle&amp;field=hasParticipated',
-				'icon' => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/default/square-check-regular.svg', 'markocupic_sac_event_tool'),
+				'icon' => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/square-check.svg', 'markocupic_sac_event_tool'),
 			],
 		],
 	],

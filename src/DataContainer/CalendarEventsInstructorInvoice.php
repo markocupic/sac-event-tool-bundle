@@ -15,15 +15,14 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Code4Nix\UriSigner\UriSigner;
-use Contao\Backend;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
+use Contao\CoreBundle\DataContainer\DataContainerOperation;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\ResponseException;
 use Contao\DataContainer;
-use Contao\Image;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
@@ -290,56 +289,32 @@ readonly class CalendarEventsInstructorInvoice
     }
 
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.edit.button', priority: 90)]
-    public function editButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    public function editButton(DataContainerOperation $operation): void
     {
-        $invoice = CalendarEventsInstructorInvoiceModel::findById($row['id']);
-
-        $allow = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_UPDATE, $invoice);
-
-        if (!$allow) {
-            return Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
-        }
-
-        $href = Backend::addToUrl($href.'&amp;id='.$row['id']);
-
-        return '<a href="'.StringUtil::specialcharsUrl($href).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        $this->disableIfNotGranted(CalendarEventsInstructorInvoiceVoter::CAN_UPDATE, $operation);
     }
 
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.delete.button', priority: 90)]
-    public function deleteButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    public function deleteButton(DataContainerOperation $operation): void
     {
-        $invoice = CalendarEventsInstructorInvoiceModel::findById($row['id']);
-
-        $allow = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_DELETE, $invoice);
-
-        if (!$allow) {
-            return Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
-        }
-
-        $href = Backend::addToUrl($href.'&amp;id='.$row['id']);
-
-        return '<a href="'.StringUtil::specialcharsUrl($href).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        $this->disableIfNotGranted(CalendarEventsInstructorInvoiceVoter::CAN_DELETE, $operation);
     }
 
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.sendRapport.button', priority: 90)]
-    public function sendRapport(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    public function sendRapport(DataContainerOperation $operation): void
     {
-        $invoice = CalendarEventsInstructorInvoiceModel::findById($row['id']);
-
-        $allow = $this->security->isGranted(CalendarEventsInstructorInvoiceVoter::CAN_SEND, $invoice);
-
-        if (false === $allow) {
-            return Image::getHtml(str_replace('default', 'disabled', $icon), $label).' ';
+        if ($this->disableIfNotGranted(CalendarEventsInstructorInvoiceVoter::CAN_SEND, $operation)) {
+            return;
         }
 
-        // Generate a signed url
-        $href = $this->uriSigner->sign($this->router->generate(SendTourRapportNotificationController::class, [
-            'rapport_id' => $row['id'],
+        // Signed url to the SendTourRapportNotificationController
+        $url = $this->uriSigner->sign($this->router->generate(SendTourRapportNotificationController::class, [
+            'rapport_id' => $operation->getRecord()['id'],
             'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
             'sid' => uniqid(),
         ]));
 
-        return '<a href="'.StringUtil::specialcharsUrl($href).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        $operation->setUrl(StringUtil::specialcharsUrl($url));
     }
 
     /**
@@ -429,5 +404,22 @@ readonly class CalendarEventsInstructorInvoice
 
         // Return the processed value
         return $value;
+    }
+
+    /**
+     * Disable the operation if the user is not granted the given permission on the
+     * invoice. Returns true if the operation has been disabled.
+     */
+    private function disableIfNotGranted(string $attribute, DataContainerOperation $operation): bool
+    {
+        $invoice = CalendarEventsInstructorInvoiceModel::findById($operation->getRecord()['id']);
+
+        if ($this->security->isGranted($attribute, $invoice)) {
+            return false;
+        }
+
+        $operation->disable();
+
+        return true;
     }
 }

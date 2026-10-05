@@ -153,7 +153,7 @@ class CalendarEventsMember
         }
 
         // Greyed out icon that still shows the current state
-        $icon = $registration['hasParticipated'] ? 'icons/fontawesome/disabled/square-check-regular.svg' : 'icons/fontawesome/disabled/square-regular.svg';
+        $icon = $registration['hasParticipated'] ? 'icons/fontawesome/square-check--disabled.svg' : 'icons/fontawesome/square-check_--disabled.svg';
         $title = $this->translator->trans('MSC.participationConfirmationNotAllowed', [], 'contao_default');
 
         $operation->setHtml(

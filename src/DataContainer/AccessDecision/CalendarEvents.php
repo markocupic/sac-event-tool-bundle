@@ -14,14 +14,13 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer\AccessDecision;
 
-use Contao\Backend;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
+use Contao\CoreBundle\DataContainer\DataContainerOperation;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
-use Contao\Image;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
@@ -61,8 +60,6 @@ class CalendarEvents
     private const array SHOW_FIELD_VALUE = [CalendarEventsDataContainer::class, 'showFieldValue'];
 
     // Adapters
-    private Adapter $backend;
-
     private Adapter $calendarEventsModel;
 
     private Adapter $controller;
@@ -70,8 +67,6 @@ class CalendarEvents
     private Adapter $eventReleaseLevelPolicyModel;
 
     private Adapter $eventReleaseLevelPolicyPackageModel;
-
-    private Adapter $image;
 
     private Adapter $message;
 
@@ -91,12 +86,10 @@ class CalendarEvents
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
         // Adapters
-        $this->backend = $this->framework->getAdapter(Backend::class);
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->eventReleaseLevelPolicyModel = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
         $this->eventReleaseLevelPolicyPackageModel = $this->framework->getAdapter(EventReleaseLevelPolicyPackageModel::class);
-        $this->image = $this->framework->getAdapter(Image::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->system = $this->framework->getAdapter(System::class);
@@ -240,9 +233,10 @@ class CalendarEvents
 
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.upgradeEventReleaseLevel.button', priority: 100)]
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.downgradeEventReleaseLevel.button', priority: 100)]
-    public function downOrUpgradeEventReleaseLevelIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    public function downOrUpgradeEventReleaseLevelIcon(DataContainerOperation $operation): void
     {
-        $isUpgrade = str_contains((string) $href, self::ACTION_UPGRADE);
+        $row = $operation->getRecord();
+        $isUpgrade = str_contains((string) $operation['href'], self::ACTION_UPGRADE);
 
         $currentLevel = $this->eventReleaseLevelPolicyModel->findById($row['eventReleaseLevel']);
         $targetLevelNumber = null;
@@ -257,38 +251,34 @@ class CalendarEvents
         $levelExists = $this->eventReleaseLevelPolicyModel->levelExists($row['id'], $targetLevelNumber);
 
         if (!$isGranted || !$levelExists) {
-            return $this->image->getHtml(str_replace('default', 'disabled', $icon), $label).' ';
+            $operation->disable();
         }
-
-        return $this->renderOperationLink($this->backend->addToUrl($href.'&amp;id='.$row['id']), $label, $title, $icon, $attributes);
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.delete.button', priority: 80)]
-    public function deleteIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    public function deleteIcon(DataContainerOperation $operation): void
     {
-        return $this->renderOperation(CalendarEventsVoter::CAN_DELETE_EVENT, $row, $href, $label, $title, $icon, $attributes);
+        $this->disableIfNotGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $operation);
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.cut.button', priority: 70)]
-    public function cutIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    public function cutIcon(DataContainerOperation $operation): void
     {
-        return $this->renderOperation(CalendarEventsVoter::CAN_CUT_EVENT, $row, $href, $label, $title, $icon, $attributes);
+        $this->disableIfNotGranted(CalendarEventsVoter::CAN_CUT_EVENT, $operation);
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.copy.button', priority: 70)]
-    public function copyIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    public function copyIcon(DataContainerOperation $operation): void
     {
-        return $this->renderOperation(CalendarEventsVoter::CAN_WRITE_EVENT, $row, $href, $label, $title, $icon, $attributes);
+        $this->disableIfNotGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $operation);
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.preview.button', priority: 70)]
-    public function previewIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    public function previewIcon(DataContainerOperation $operation): void
     {
-        $event = $this->calendarEventsModel->findById($row['id']);
+        $event = $this->calendarEventsModel->findById($operation->getRecord()['id']);
 
-        $href = $this->calendarEventsUtil->generateEventPreviewUrl($event);
-
-        return $this->renderOperationLink($href, $label, $title, $icon, $attributes);
+        $operation->setUrl($this->stringUtil->specialcharsUrl($this->calendarEventsUtil->generateEventPreviewUrl($event)));
     }
 
     /**
@@ -540,18 +530,11 @@ class CalendarEvents
         return \is_array($arrIDS) ? $arrIDS : [];
     }
 
-    private function renderOperation(string $voterAttribute, array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    private function disableIfNotGranted(string $voterAttribute, DataContainerOperation $operation): void
     {
-        if (!$this->security->isGranted($voterAttribute, $row['id'])) {
-            return $this->image->getHtml(str_replace('.svg', '--disabled.svg', $icon), $label).' ';
+        if (!$this->security->isGranted($voterAttribute, $operation->getRecord()['id'])) {
+            $operation->disable();
         }
-
-        return $this->renderOperationLink($this->backend->addToUrl($href.'&amp;id='.$row['id']), $label, $title, $icon, $attributes);
-    }
-
-    private function renderOperationLink(string $href, string $label, string $title, string|null $icon, string $attributes): string
-    {
-        return '<a href="'.$this->stringUtil->specialcharsUrl($href).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 
     private function addErrorAndRedirectBack(string $translationKey, array $params): void

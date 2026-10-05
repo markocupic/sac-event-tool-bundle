@@ -14,16 +14,14 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer\AccessDecision;
 
-use Contao\Backend;
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Contao\CoreBundle\DataContainer\DataContainerOperation;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
-use Contao\Image;
-use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
@@ -79,15 +77,9 @@ class CalendarEventsMember
     private const array TOUR_EVENT_TYPES = [EventType::TOUR, EventType::LAST_MINUTE_TOUR];
 
     // Adapters
-    private Adapter $backend;
-
     private Adapter $calendarEvents;
 
     private Adapter $calendarEventsMemberModel;
-
-    private Adapter $image;
-
-    private Adapter $stringUtil;
 
     public function __construct(
         private readonly ContaoFramework $framework,
@@ -95,11 +87,8 @@ class CalendarEventsMember
         private readonly Security $security,
     ) {
         // Adapters
-        $this->image = $this->framework->getAdapter(Image::class);
-        $this->backend = $this->framework->getAdapter(Backend::class);
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsMemberModel = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }
 
     /**
@@ -255,25 +244,31 @@ class CalendarEventsMember
     }
 
     /**
-     * Return the edit button.
+     * Disable the edit button, if the user does not administer the registrations of the event.
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.operations.edit.button', priority: 100)]
-    public function editButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    public function editButton(DataContainerOperation $operation): void
     {
-        $isAllowed = $this->security->isGranted('ROLE_ADMIN') || $this->canAdministerRegistrations($row['eventId']);
+        $row = $operation->getRecord();
 
-        return $this->renderButton($isAllowed, $row, $href, $label, $title, $icon, $attributes);
+        if (!$this->security->isGranted('ROLE_ADMIN') && !$this->canAdministerRegistrations($row['eventId'])) {
+            $operation->disable();
+        }
     }
 
     /**
-     * Return the delete button. Only manual registrations can be deleted.
+     * Disable the delete button. Only manual registrations can be deleted.
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.operations.delete.button', priority: 100)]
-    public function deleteButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    public function deleteButton(DataContainerOperation $operation): void
     {
+        $row = $operation->getRecord();
+
         $isAllowed = $this->security->isGranted('ROLE_ADMIN') || ($this->canAdministerRegistrations($row['eventId']) && BookingType::MANUALLY === ($row['bookingType'] ?? null));
 
-        return $this->renderButton($isAllowed, $row, $href, $label, $title, $icon, $attributes);
+        if (!$isAllowed) {
+            $operation->disable();
+        }
     }
 
     /**
@@ -365,16 +360,5 @@ class CalendarEventsMember
         $GLOBALS['TL_DCA'][self::TABLE]['config']['notCreatable'] = $notCreatable;
         $GLOBALS['TL_DCA'][self::TABLE]['config']['notEditable'] = $notEditable;
         $GLOBALS['TL_DCA'][self::TABLE]['config']['notDeletable'] = $notDeletable;
-    }
-
-    private function renderButton(bool $isAllowed, array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
-    {
-        if (!$isAllowed) {
-            return $this->image->getHtml(str_replace('.svg', '--disabled.svg', $icon)).' ';
-        }
-
-        $href = $this->backend->addToUrl($href.'&amp;id='.$row['id']);
-
-        return '<a href="'.$this->stringUtil->specialcharsUrl($href).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 }
