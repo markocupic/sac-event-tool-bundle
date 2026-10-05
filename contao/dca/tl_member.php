@@ -48,7 +48,7 @@ $GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index
 $GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = [
     'exclude'   => true,
     'inputType' => 'fileTree',
-    'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
+    'eval'      => ['fieldType' => 'radio', 'filesOnly' => true, 'mandatory' => false, 'tl_class' => 'clr'],
     'sql'       => 'binary(16) NULL',
 ];
 
@@ -72,7 +72,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = [
     'sorting'   => true,
     'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
     'inputType' => 'text',
-    'eval'      => ['doNotCopy' => true, 'readonly' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'rgxp' => 'natural'],
+    'eval'      => ['doNotCopy' => true, 'mandatory' => true, 'maxlength' => 255, 'readonly' => true, 'rgxp' => 'natural', 'tl_class' => 'w50'],
     'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
@@ -87,7 +87,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['hasLeadClimbingEducation'] = [
 $GLOBALS['TL_DCA']['tl_member']['fields']['dateOfLeadClimbingEducation'] = [
     'exclude'   => true,
     'inputType' => 'text',
-    'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+    'eval'      => ['datepicker' => true, 'mandatory' => true, 'rgxp' => 'date', 'tl_class' => 'w50 wizard'],
     'sql'       => "varchar(11) NOT NULL default ''",
 ];
 
@@ -95,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['ahvNumber'] = [
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => ['mandatory' => false, 'maxlength' => 16, 'rgxp' => 'ahv', 'placeholder' => '756.7086.3589.03', 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+    'eval'      => ['decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'mandatory' => false, 'maxlength' => 16, 'placeholder' => '756.7086.3589.03', 'rgxp' => 'ahv', 'tl_class' => 'w50'],
     'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
@@ -103,7 +103,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = [
     'exclude'   => true,
     'inputType' => 'select',
     'filter'    => true,
-    'eval'      => ['multiple' => true, 'chosen' => true, 'doNotCopy' => true, 'tl_class' => 'clr'],
+    'eval'      => ['chosen' => true, 'doNotCopy' => true, 'multiple' => true, 'tl_class' => 'clr'],
     'sql'       => 'blob NULL',
 ];
 
@@ -113,7 +113,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['profession'] = [
     'sorting'   => true,
     'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
     'inputType' => 'text',
-    'eval'      => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
+    'eval'      => ['feEditable' => true, 'feGroup' => 'address', 'feViewable' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
     'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
@@ -121,7 +121,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['addressExtra'] = [
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
+    'eval'      => ['feEditable' => true, 'feGroup' => 'address', 'feViewable' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
     'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
@@ -129,7 +129,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['poBox'] = [
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
+    'eval'      => ['feEditable' => true, 'feGroup' => 'address', 'feViewable' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
     'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
@@ -193,7 +193,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhone'] = [
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+    'eval'      => ['decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'feViewable' => true, 'maxlength' => 64, 'rgxp' => 'phone', 'tl_class' => 'w50'],
     'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
@@ -201,7 +201,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhoneName'] = [
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => ['maxlength' => 255, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+    'eval'      => ['decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'feViewable' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
     'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
@@ -209,7 +209,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = [
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => ['tl_class' => 'clr', 'maxlength' => 5000],
+    'eval'      => ['maxlength' => 5000, 'tl_class' => 'clr'],
     'sql'       => 'text NULL',
 ];
 

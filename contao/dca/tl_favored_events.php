@@ -46,13 +46,13 @@ $GLOBALS['TL_DCA']['tl_favored_events'] = [
         ],
         'eventId'  => [
             'foreignKey' => 'tl_calendar_events.title',
-            'eval'       => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
+            'eval'       => ['fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
             'sql'        => "int(10) unsigned NOT NULL default 0",
             'relation'   => ['type' => 'belongsTo', 'field' => 'id', 'load' => 'lazy'],
         ],
         'memberId' => [
             'foreignKey' => 'tl_member.id',
-            'eval'       => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
+            'eval'       => ['fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
             'sql'        => "int(10) unsigned NOT NULL default 0",
             'relation'   => ['type' => 'belongsTo', 'field' => 'id', 'load' => 'lazy'],
         ],

@@ -68,7 +68,7 @@ $GLOBALS['TL_DCA']['tl_event_feedback_reminder'] = [
 			'inputType' => 'text',
 			'sorting'   => true,
 			'flag'      => DataContainer::SORT_DAY_DESC,
-			'eval'      => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+			'eval'      => ['datepicker' => true, 'rgxp' => 'datim', 'tl_class' => 'w50 wizard'],
 			'sql'       => 'int(10) unsigned NOT NULL default 0',
 		],
 		'uuid'          => [
@@ -86,21 +86,21 @@ $GLOBALS['TL_DCA']['tl_event_feedback_reminder'] = [
 		],
 		'dispatchTime'  => [
 			'inputType' => 'text',
-			'eval'      => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+			'eval'      => ['datepicker' => true, 'rgxp' => 'datim', 'tl_class' => 'w50 wizard'],
 			'sql'       => "varchar(11) NOT NULL default ''",
 		],
 		'executionDate' => [
 			'inputType' => 'text',
 			'sorting'   => true,
 			'flag'      => DataContainer::SORT_DAY_ASC,
-			'eval'      => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+			'eval'      => ['datepicker' => true, 'rgxp' => 'datim', 'tl_class' => 'w50 wizard'],
 			'sql'       => "varchar(11) NOT NULL default ''",
 		],
 		'expiration'    => [
 			'inputType' => 'text',
 			'sorting'   => true,
 			'flag'      => DataContainer::SORT_DAY_DESC,
-			'eval'      => ['rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+			'eval'      => ['datepicker' => true, 'rgxp' => 'datim', 'tl_class' => 'w50 wizard'],
 			'sql'       => "varchar(11) NOT NULL default ''",
 		],
 	],

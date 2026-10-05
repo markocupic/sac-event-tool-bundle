@@ -56,7 +56,7 @@ $GLOBALS['TL_DCA']['tl_event_type'] = [
 			'exclude'   => true,
 			'search'    => true,
 			'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
-			'eval'      => ['mandatory' => true, 'rgxp' => 'alnum', 'maxlength' => 128, 'tl_class' => 'w50'],
+			'eval'      => ['mandatory' => true, 'maxlength' => 128, 'rgxp' => 'alnum', 'tl_class' => 'w50'],
 			'sql'       => 'varchar(128) NULL',
 		],
 		'title'                        => [
@@ -79,7 +79,7 @@ $GLOBALS['TL_DCA']['tl_event_type'] = [
 			'exclude'    => true,
 			'inputType'  => 'pageTree',
 			'foreignKey' => 'tl_page.title',
-			'eval'       => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
+			'eval'       => ['fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
 			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 		],

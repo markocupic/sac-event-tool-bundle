@@ -81,7 +81,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventType'] = [
 	'search'    => true,
 	'inputType' => 'select',
 	'options'   => EventType::ALL,
-	'eval'      => ['mandatory' => true, 'multiple' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'],
+	'eval'      => ['chosen' => true, 'includeBlankOption' => true, 'mandatory' => true, 'multiple' => true, 'tl_class' => 'clr'],
 	'sql'       => 'blob NULL',
 ];
 
@@ -90,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventDeregistrationNotification'] = [
 	'search'     => true,
 	'inputType'  => 'select',
 	'foreignKey' => 'tl_nc_notification.title',
-	'eval'       => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'],
+	'eval'       => ['chosen' => true, 'includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'clr'],
 	'sql'        => "int(10) unsigned NOT NULL default 0",
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];
@@ -100,7 +100,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['receiptEventRegistrationNotificationI
 	'search'     => true,
 	'inputType'  => 'select',
 	'foreignKey' => 'tl_nc_notification.title',
-	'eval'       => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'],
+	'eval'       => ['chosen' => true, 'includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'clr'],
 	'sql'        => "int(10) unsigned NOT NULL default 0",
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];
@@ -120,7 +120,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventBlogOrganizers'] = [
 	'inputType'  => 'checkbox',
 	'foreignKey' => 'tl_event_organizer.title',
 	'relation'   => ['type' => 'hasMany', 'load' => 'lazy'],
-	'eval'       => ['multiple' => true, 'mandatory' => false, 'tl_class' => 'clr m12'],
+	'eval'       => ['mandatory' => false, 'multiple' => true, 'tl_class' => 'clr m12'],
 	'sql'        => 'blob NULL',
 ];
 
@@ -128,7 +128,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['print_export_allowedEventTypes'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
 	'options'   => EventType::ALL,
-	'eval'      => ['mandatory' => false, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],
+	'eval'      => ['chosen' => true, 'mandatory' => false, 'multiple' => true, 'tl_class' => 'clr'],
 	'sql'       => 'blob NULL',
 ];
 
@@ -173,7 +173,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventRegCheckoutLinkPage'] = [
 	'exclude'    => true,
 	'inputType'  => 'pageTree',
 	'foreignKey' => 'tl_page.title',
-	'eval'       => ['mandatory' => true, 'fieldType' => 'radio'],
+	'eval'       => ['fieldType' => 'radio', 'mandatory' => true],
 	'sql'        => 'int(10) unsigned NOT NULL default 0',
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];
@@ -182,7 +182,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['watchEventListModule'] = [
 	'exclude'    => true,
 	'inputType'  => 'radio',
 	'foreignKey' => 'tl_module.name',
-	'eval'       => ['mandatory' => true, 'fieldType' => 'radio'],
+	'eval'       => ['fieldType' => 'radio', 'mandatory' => true],
 	'sql'        => 'int(10) unsigned NOT NULL default 0',
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];

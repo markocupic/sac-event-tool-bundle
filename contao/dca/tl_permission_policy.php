@@ -66,7 +66,7 @@ $GLOBALS['TL_DCA']['tl_permission_policy'] = [
 			'sorting'   => true,
 			'inputType' => 'select',
 			'options'   => ['calendar_events_instructor_invoice'],
-			'eval'      => ['submitOnChange' => true, 'includeBlankOption' => true, 'mandatory' => true, 'maxlength' => 255],
+			'eval'      => ['includeBlankOption' => true, 'mandatory' => true, 'maxlength' => 255, 'submitOnChange' => true],
 			'sql'       => 'blob NULL',
 		],
 		'title'                                    => [
@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_permission_policy'] = [
 					'label'     => &$GLOBALS['TL_LANG']['tl_permission_policy']['calendar_events_instructor_invoice_rules__flags'],
 					'inputType' => 'select',
 					'options'   => ['has_access', 'can_create', 'can_update', 'can_delete', 'can_download', 'can_send'],
-					'eval'      => ['multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],
+					'eval'      => ['chosen' => true, 'multiple' => true, 'tl_class' => 'clr'],
 				]
 			],
 			// disable ordering (on by default)

@@ -91,7 +91,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['allowedEventTypes'] = [
 	'inputType' => 'checkbox',
 	'reference' => &$GLOBALS['TL_LANG']['MSC'],
 	'options'   => EventType::ALL,
-	'eval'      => ['multiple' => true, 'includeBlankOption' => false, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => true],
+	'eval'      => ['doNotShow' => false, 'includeBlankOption' => false, 'mandatory' => true, 'multiple' => true, 'tl_class' => 'clr m12'],
 	'sql'       => 'blob NULL',
 ];
 
@@ -100,7 +100,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['notifyOnEventReleaseLevelChange'] =
 	'exclude'   => true,
 	'filter'    => false,
 	'inputType' => 'text',
-	'eval'      => ['tl_class' => 'clr m12', 'mandatory' => false],
+	'eval'      => ['mandatory' => false, 'tl_class' => 'clr m12'],
 	'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
@@ -109,7 +109,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['notifyOnEventPublish'] = [
 	'exclude'   => true,
 	'filter'    => false,
 	'inputType' => 'text',
-	'eval'      => ['tl_class' => 'clr m12', 'mandatory' => false],
+	'eval'      => ['mandatory' => false, 'tl_class' => 'clr m12'],
 	'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
@@ -131,13 +131,13 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['enableEventStartDateValidation'] = 
 
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['validTimePeriodStart'] = [
 	'inputType' => 'text',
-	'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+	'eval'      => ['datepicker' => true, 'mandatory' => true, 'rgxp' => 'date', 'tl_class' => 'w50 wizard'],
 	'sql'       => "varchar(10) COLLATE ascii_bin NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['validTimePeriodStop'] = [
 	'inputType' => 'text',
-	'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+	'eval'      => ['datepicker' => true, 'mandatory' => true, 'rgxp' => 'date', 'tl_class' => 'w50 wizard'],
 	'sql'       => "varchar(10) COLLATE ascii_bin NOT NULL default ''",
 ];
 
@@ -152,7 +152,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['maxEventReleaseLevelTimeLimit'] = [
 	'default'   => time(),
 	'exclude'   => true,
 	'inputType' => 'text',
-	'eval'      => ['rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+	'eval'      => ['datepicker' => true, 'mandatory' => true, 'rgxp' => 'datim', 'tl_class' => 'w50 wizard'],
 	'sql'       => 'bigint(20) unsigned NULL',
 ];
 
@@ -170,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['sendEventReminder'] = [
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventReminderNotification'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
-	'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
+	'eval'      => ['chosen' => true, 'includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'w50'],
 	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
@@ -197,7 +197,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['sendEventCompletionReminder'] = [
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventCompletionReminderNotification'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
-	'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
+	'eval'      => ['chosen' => true, 'includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'w50'],
 	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
@@ -209,7 +209,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventCompletionReminderEventTypes']
 	'options'   => EventType::ALL,
 	'reference' => &$GLOBALS['TL_LANG']['MSC'],
 	'default'   => [EventType::TOUR, EventType::LAST_MINUTE_TOUR, EventType::COURSE],
-	'eval'      => ['mandatory' => true, 'multiple' => true, 'chosen' => true, 'tl_class' => 'w50'],
+	'eval'      => ['chosen' => true, 'mandatory' => true, 'multiple' => true, 'tl_class' => 'w50'],
 	'sql'       => 'blob NULL',
 ];
 
@@ -217,7 +217,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventCompletionReminderEventTypes']
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventCompletionReminderFirstOffset'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
-	'options' => range(1, 30),
+	'options'   => range(1, 30),
 	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'tl_class' => 'w50 clr'],
 	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 7, 'unsigned' => true],
 ];
@@ -226,7 +226,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventCompletionReminderFirstOffset'
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventCompletionReminderInterval'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
-	'options' => range(1, 30),
+	'options'   => range(1, 30),
 	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'tl_class' => 'w50'],
 	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 7, 'unsigned' => true],
 ];
@@ -264,7 +264,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['sendReminderEach'] = [
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['sendReminderNotification'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
-	'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50 clr'],
+	'eval'      => ['chosen' => true, 'includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'w50 clr'],
 	'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
@@ -275,7 +275,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['autoPublishEvents'] = [
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'checkbox',
-	'eval'      => ['submitOnChange' => true, 'doNotCopy' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['doNotCopy' => true, 'submitOnChange' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
@@ -283,7 +283,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['autoPublishEvents'] = [
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['autoPublishEventsDate'] = [
 	'exclude'   => true,
 	'inputType' => 'text',
-	'eval'      => ['rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'nullIfEmpty' => true, 'doNotCopy' => true, 'tl_class' => 'w50 wizard'],
+	'eval'      => ['datepicker' => true, 'doNotCopy' => true, 'mandatory' => true, 'nullIfEmpty' => true, 'rgxp' => 'datim', 'tl_class' => 'w50 wizard'],
 	'sql'       => 'bigint(20) unsigned NULL',
 ];
 
@@ -310,8 +310,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['autoPublishEventsExecutedForDate'] 
 PaletteManipulator::create()
 	->addLegend('sac_event_feedback_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addField('enableOnlineEventFeedback', 'sac_event_feedback_legend', PaletteManipulator::POSITION_APPEND)
-	->applyToPalette('default', 'tl_calendar')
-;
+	->applyToPalette('default', 'tl_calendar');
 
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'enableOnlineEventFeedback';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableOnlineEventFeedback'] = 'onlineFeedbackConfiguration,onlineFeedbackNotification,onlineFeedbackPage,onlineFeedbackForm';
@@ -328,7 +327,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['enableOnlineEventFeedback'] = [
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['onlineFeedbackConfiguration'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
-	'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
+	'eval'      => ['includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'w50'],
 	'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
@@ -336,7 +335,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['onlineFeedbackConfiguration'] = [
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['onlineFeedbackNotification'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
-	'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
+	'eval'      => ['includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'w50'],
 	'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
@@ -345,7 +344,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['onlineFeedbackPage'] = [
 	'exclude'    => true,
 	'inputType'  => 'pageTree',
 	'foreignKey' => 'tl_page.title',
-	'eval'       => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
+	'eval'       => ['fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
 	'sql'        => 'int(10) unsigned NOT NULL default 0',
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];
@@ -354,6 +353,6 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['onlineFeedbackPage'] = [
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['onlineFeedbackForm'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
-	'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
+	'eval'      => ['includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'w50'],
 	'sql'       => "varchar(64) NOT NULL default ''",
 ];

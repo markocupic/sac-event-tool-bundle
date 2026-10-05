@@ -38,7 +38,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
 	'search'     => true,
 	'inputType'  => 'pageTree',
 	'foreignKey' => 'tl_page.title',
-	'eval'       => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'w50 wizard'],
+	'eval'       => ['fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'w50 wizard'],
 	'sql'        => "int(10) unsigned NOT NULL default 0",
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];
@@ -58,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_replacePrivateAdressWithRol
 	'filter'    => true,
 	'inputType' => 'checkbox',
 	'options'   => ['email', 'phone', 'mobile', 'street', 'postal', 'city'],
-	'eval'      => ['submitOnChange' => false, 'multiple' => true, 'tl_class' => 'clr'],
+	'eval'      => ['multiple' => true, 'submitOnChange' => false, 'tl_class' => 'clr'],
 	'sql'       => 'blob NULL',
 ];
 
@@ -69,7 +69,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_users'] = [
 	'inputType'  => 'select',
 	'foreignKey' => 'tl_user.name',
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
-	'eval'       => ['chosen' => true, 'tl_class' => 'clr m12', 'includeBlankOption' => true, 'multiple' => true, 'mandatory' => true],
+	'eval'       => ['chosen' => true, 'includeBlankOption' => true, 'mandatory' => true, 'multiple' => true, 'tl_class' => 'clr m12'],
 	'sql'        => 'blob NULL',
 ];
 
@@ -77,7 +77,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_userRoles'] = [
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'select',
-	'eval'      => ['multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],
+	'eval'      => ['chosen' => true, 'multiple' => true, 'tl_class' => 'clr'],
 	'sql'       => 'blob NULL',
 ];
 
@@ -103,7 +103,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['imgSize'] = [
 	'exclude'          => true,
 	'inputType'        => 'imageSize',
 	'reference'        => &$GLOBALS['TL_LANG']['MSC'],
-	'eval'             => ['rgxp' => 'natural', 'includeBlankOption' => true, 'nospace' => true, 'helpwizard' => true, 'tl_class' => 'w50'],
+	'eval'             => ['helpwizard' => true, 'includeBlankOption' => true, 'nospace' => true, 'rgxp' => 'natural', 'tl_class' => 'w50'],
 	'options_callback' => static fn() => System::getContainer()->get('contao.image.sizes')->getAllOptions(),
 	'sql'              => "varchar(64) NOT NULL default ''",
 ];
@@ -113,7 +113,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['swisstopoCenter'] = [
 	'search'    => true,
 	'sorting'   => true,
 	'inputType' => 'text',
-	'eval'      => ['mandatory' => true, 'maxlength' => 16, 'decodeEntities' => true, 'preserveTags' => true, 'rgxp' => 'swisstopoCoords', 'tl_class' => 'w50'],
+	'eval'      => ['decodeEntities' => true, 'mandatory' => true, 'maxlength' => 16, 'preserveTags' => true, 'rgxp' => 'swisstopoCoords', 'tl_class' => 'w50'],
 	'sql'       => "varchar(255) NOT NULL default '2600000,1200000'",
 ];
 
@@ -130,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['eventUnsubscribePage'] = [
 	'exclude'    => true,
 	'inputType'  => 'pageTree',
 	'foreignKey' => 'tl_page.title',
-	'eval'       => ['mandatory' => true, 'fieldType' => 'radio'],
+	'eval'       => ['fieldType' => 'radio', 'mandatory' => true],
 	'sql'        => 'int(10) unsigned NOT NULL default 0',
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];

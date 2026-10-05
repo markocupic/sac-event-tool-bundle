@@ -58,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_sac_section'] = [
 			'search'    => true,
 			'sorting'   => true,
 			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'unique' => true, 'rgxp' => 'natural', 'maxlength' => 4, 'minlength' => 4, 'tl_class' => 'w50'],
+			'eval'      => ['mandatory' => true, 'maxlength' => 4, 'minlength' => 4, 'rgxp' => 'natural', 'tl_class' => 'w50', 'unique' => true],
 			'sql'       => "varchar(4) NOT NULL default ''",
 		],
 		'name'      => [

@@ -294,7 +294,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = [
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'select',
-	'eval'      => ['submitOnChange' => true, 'includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['includeBlankOption' => true, 'mandatory' => true, 'submitOnChange' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(32) NOT NULL default ''",
 ];
 
@@ -320,7 +320,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mainInstructor'] = [
 	'inputType'  => 'radio',
 	'flag'       => DataContainer::SORT_ASC,
 	'foreignKey' => 'tl_user.name',
-	'eval'       => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'clr'],
+	'eval'       => ['includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'clr'],
 	'sql'        => "int(10) unsigned NOT NULL default 0",
 	'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
 ];
@@ -332,9 +332,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
 	'inputType' => 'multiColumnWizard',
 	// Save instructors in a child table tl_calendar_events_instructors
 	'eval'      => [
-		'tl_class'     => 'mcwColumnCount_1 m12 clr',
-		'helpWizard'   => false,
-		'mandatory'    => true,
 		'columnFields' => [
 			'instructorId' => [
 				'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructorId'],
@@ -344,9 +341,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
 				'filter'           => true,
 				'relation'         => ['type' => 'hasOne', 'load' => 'eager'],
 				'options_callback' => [System::getContainer()->get(CalendarEvents::class), 'listInstructors'],
-				'eval'             => ['style' => 'width:350px', 'mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'multiple' => false, 'tl_class' => 'hidelabel'],
+				'eval'             => ['chosen' => true, 'includeBlankOption' => true, 'mandatory' => true, 'multiple' => false, 'style' => 'width:350px', 'tl_class' => 'hidelabel'],
 			],
 		],
+		'helpWizard'   => false,
+		'mandatory'    => true,
+		'tl_class'     => 'mcwColumnCount_1 m12 clr',
 	],
 	'sql'       => 'blob NULL',
 ];
@@ -400,7 +400,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0'] = [
 	'search'    => true,
 	'filter'    => true,
 	'inputType' => 'select',
-	'eval'      => ['submitOnChange' => true, 'includeBlankOption' => true, 'multiple' => false, 'mandatory' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['includeBlankOption' => true, 'mandatory' => true, 'multiple' => false, 'submitOnChange' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
@@ -412,7 +412,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1'] = [
 	'inputType'  => 'select',
 	'foreignKey' => 'tl_course_sub_type.name',
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
-	'eval'       => ['multiple' => false, 'mandatory' => true, 'tl_class' => 'm12 clr'],
+	'eval'       => ['mandatory' => true, 'multiple' => false, 'tl_class' => 'm12 clr'],
 	'sql'        => "int(10) unsigned NOT NULL default 0",
 ];
 
@@ -424,7 +424,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['organizers'] = [
 	'sorting'    => true,
 	'inputType'  => 'select',
 	'foreignKey' => 'tl_event_organizer.title',
-	'eval'       => ['multiple' => true, 'chosen' => true, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'm12 clr'],
+	'eval'       => ['chosen' => true, 'includeBlankOption' => false, 'mandatory' => true, 'multiple' => true, 'tl_class' => 'm12 clr'],
 	'sql'        => 'blob NULL',
 ];
 
@@ -442,7 +442,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['durationInfo'] = [
 	'filter'    => true,
 	'exclude'   => true,
 	'inputType' => 'select',
-	'eval'      => ['includeBlankOption' => true, 'rgxp' => 'durationInfo', 'mandatory' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['includeBlankOption' => true, 'mandatory' => true, 'rgxp' => 'durationInfo', 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(32) NOT NULL default ''",
 ];
 
@@ -469,7 +469,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['minMembers'] = [
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',
-	'eval'      => ['rgxp' => 'custom', 'customRgxp' => '/^(?:[2-9]|[1-9][0-9]|[1-9][0-9]{2})$/', 'errorMsg' => $GLOBALS['TL_LANG']['ERR']['invalidMinOrMaxMemberValue'], 'mandatory' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['customRgxp' => '/^(?:[2-9]|[1-9][0-9]|[1-9][0-9]{2})$/', 'errorMsg' => $GLOBALS['TL_LANG']['ERR']['invalidMinOrMaxMemberValue'], 'mandatory' => true, 'rgxp' => 'custom', 'tl_class' => 'm12 clr'],
 	'sql'       => 'int(3) unsigned NULL',
 ];
 
@@ -478,7 +478,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['maxMembers'] = [
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',
-	'eval'      => ['rgxp' => 'custom', 'customRgxp' => '/^(?:[2-9]|[1-9][0-9]|[1-9][0-9]{2})$/', 'errorMsg' => $GLOBALS['TL_LANG']['ERR']['invalidMinOrMaxMemberValue'], 'mandatory' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['customRgxp' => '/^(?:[2-9]|[1-9][0-9]|[1-9][0-9]{2})$/', 'errorMsg' => $GLOBALS['TL_LANG']['ERR']['invalidMinOrMaxMemberValue'], 'mandatory' => true, 'rgxp' => 'custom', 'tl_class' => 'm12 clr'],
 	'sql'       => 'int(3) unsigned NULL',
 ];
 
@@ -503,7 +503,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addIban'] = [
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'checkbox',
-	'eval'      => ['submitOnChange' => true, 'mandatory' => false, 'tl_class' => 'm12 clr'],
+	'eval'      => ['mandatory' => false, 'submitOnChange' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
@@ -529,10 +529,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDates'] = [
 	'exclude'   => true,
 	'inputType' => 'multiColumnWizard',
 	'eval'      => [
-		'tl_class'        => 'mcwColumnCount_1 m12 clr',
-		'columnsCallback' => [CalendarEvents::class, 'listFixedDates'],
 		'buttons'         => ['up' => false, 'down' => false],
+		'columnsCallback' => [CalendarEvents::class, 'listFixedDates'],
 		'mandatory'       => true,
+		'tl_class'        => 'mcwColumnCount_1 m12 clr',
 	],
 	'sql'       => 'blob NULL',
 ];
@@ -544,7 +544,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
 	'inputType' => 'select',
 	'options'   => EventState::ALL,
 	'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-	'eval'      => ['doNotCopy' => true, 'mandatory' => false, 'submitOnChange' => true, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_calendar_events']['noSpecificEventState'], 'tl_class' => 'm12 clr'],
+	'eval'      => ['blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_calendar_events']['noSpecificEventState'], 'doNotCopy' => true, 'includeBlankOption' => true, 'mandatory' => false, 'submitOnChange' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
@@ -552,7 +552,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['rescheduledEventDate'] = [
 	'exclude'   => true,
 	'inputType' => 'text',
-	'eval'      => ['rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => true, 'datepicker' => true, 'tl_class' => 'm12 clr wizard'],
+	'eval'      => ['datepicker' => true, 'doNotCopy' => true, 'mandatory' => true, 'rgxp' => 'date', 'tl_class' => 'm12 clr wizard'],
 	'sql'       => "bigint(20) unsigned NULL",
 ];
 
@@ -560,7 +560,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['rescheduledEventDate'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['meetingPoint'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
-	'eval'      => ['tl_class' => 'm12 clr', 'mandatory' => false],
+	'eval'      => ['mandatory' => false, 'tl_class' => 'm12 clr'],
 	'sql'       => 'text NULL',
 ];
 
@@ -568,7 +568,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['meetingPoint'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['singleSRCBroschuere'] = [
 	'exclude'   => true,
 	'inputType' => 'fileTree',
-	'eval'      => ['filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'm12 clr'],
+	'eval'      => ['extensions' => Config::get('validImageTypes'), 'fieldType' => 'radio', 'filesOnly' => true, 'mandatory' => false, 'tl_class' => 'm12 clr'],
 	'sql'       => 'binary(16) NULL',
 ];
 
@@ -608,7 +608,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationGoesTo'] = [
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'select',
-	'eval'      => ['multiple' => false, 'chosen' => false, 'includeBlankOption' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['chosen' => false, 'includeBlankOption' => true, 'multiple' => false, 'tl_class' => 'm12 clr'],
 	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
@@ -634,7 +634,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = [
 	'default'   => strtotime(Date::parse('Y-m-d')),
 	'exclude'   => true,
 	'inputType' => 'text',
-	'eval'      => ['doNotCopy' => true, 'rgxp' => 'date', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+	'eval'      => ['datepicker' => true, 'doNotCopy' => true, 'mandatory' => true, 'rgxp' => 'date', 'tl_class' => 'w50 wizard'],
 	'sql'       => 'bigint(20) unsigned NULL',
 ];
 
@@ -643,7 +643,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate'] = [
 	'default'   => strtotime(Date::parse('Y-m-d')) + (2 * 24 * 3600) - 60,
 	'exclude'   => true,
 	'inputType' => 'text',
-	'eval'      => ['doNotCopy' => true, 'rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+	'eval'      => ['datepicker' => true, 'doNotCopy' => true, 'mandatory' => true, 'rgxp' => 'datim', 'tl_class' => 'w50 wizard'],
 	'sql'       => 'bigint(20) unsigned NULL',
 ];
 
@@ -662,7 +662,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['deregistrationLimit'] = [
 	'filter'    => true,
 	'inputType' => 'select',
 	'options'   => range(1, 720),
-	'eval'      => ['rgxp' => 'natural', 'nospace' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['nospace' => true, 'rgxp' => 'natural', 'tl_class' => 'm12 clr'],
 	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
@@ -679,7 +679,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addGallery'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['multiSRC'] = [
 	'exclude'   => true,
 	'inputType' => 'fileTree',
-	'eval'      => ['multiple' => true, 'extensions' => 'jpg,jpeg,png', 'fieldType' => 'checkbox', 'orderField' => 'orderSRC', 'files' => true, 'filesOnly' => true, 'mandatory' => true, 'tl_class' => 'm12 clr'],
+	'eval'      => ['extensions' => 'jpg,jpeg,png', 'fieldType' => 'checkbox', 'files' => true, 'filesOnly' => true, 'isGallery' => true, 'isSortable' => true, 'mandatory' => true, 'multiple' => true, 'orderField' => 'orderSRC', 'tll_class' => 'm12 clr'],
 	'sql'       => 'blob NULL',
 ];
 
@@ -695,7 +695,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType'] = [
 	'inputType'  => 'select',
 	'foreignKey' => 'tl_tour_type.title',
 	'relation'   => ['type' => 'hasMany', 'load' => 'eager'],
-	'eval'       => ['multiple' => true, 'chosen' => true, 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'm12 clr'],
+	'eval'       => ['chosen' => true, 'includeBlankOption' => true, 'mandatory' => true, 'multiple' => true, 'tl_class' => 'm12 clr'],
 	'sql'        => 'blob NULL',
 ];
 
@@ -704,8 +704,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
 	'exclude'   => true,
 	'inputType' => 'multiColumnWizard',
 	'eval'      => [
-		'mandatory'    => true,
-		'tl_class'     => 'mcwColumnCount_2 m12 clr',
 		'columnFields' => [
 			'tourTechDifficultyMin' => [
 				'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'],
@@ -718,7 +716,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
 					'load' => 'eager',
 				],
 				'foreignKey'       => 'tl_tour_difficulty.shortcut',
-				'eval'             => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'hidelabel'],
+				'eval'             => ['includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'hidelabel'],
 			],
 			'tourTechDifficultyMax' => [
 				'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'],
@@ -728,9 +726,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
 				'options_callback' => [CalendarEvents::class, 'getTourDifficulties'],
 				'relation'         => ['type' => 'hasMany', 'load' => 'eager'],
 				'foreignKey'       => 'tl_tour_difficulty.shortcut',
-				'eval'             => ['mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'hidelabel'],
+				'eval'             => ['includeBlankOption' => true, 'mandatory' => false, 'tl_class' => 'hidelabel'],
 			],
 		],
+		'mandatory'    => true,
+		'tl_class'     => 'mcwColumnCount_2 m12 clr',
 	],
 	'sql'       => 'blob NULL',
 ];
@@ -740,32 +740,32 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = [
 	'exclude'   => true,
 	'inputType' => 'multiColumnWizard',
 	'eval'      => [
-		'mandatory'    => false,
-		'tl_class'     => 'mcwColumnCount_4 m12 clr',
 		'columnFields' => [
 			'tourProfileAscentMeters'  => [
 				'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'],
 				'inputType' => 'text',
 				'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-				'eval'      => ['datepicker' => false, 'rgxp' => 'natural', 'mandatory' => false, 'tl_class' => 'hidelabel'],
+				'eval'      => ['datepicker' => false, 'mandatory' => false, 'rgxp' => 'natural', 'tl_class' => 'hidelabel'],
 			],
 			'tourProfileAscentTime'    => [
 				'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'],
 				'inputType' => 'text',
-				'eval'      => ['datepicker' => false, 'rgxp' => 'digit', 'mandatory' => false, 'tl_class' => 'hidelabel'],
+				'eval'      => ['datepicker' => false, 'mandatory' => false, 'rgxp' => 'digit', 'tl_class' => 'hidelabel'],
 			],
 			'tourProfileDescentMeters' => [
 				'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'],
 				'inputType' => 'text',
 				'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-				'eval'      => ['datepicker' => false, 'rgxp' => 'natural', 'mandatory' => false, 'tl_class' => 'hidelabel'],
+				'eval'      => ['datepicker' => false, 'mandatory' => false, 'rgxp' => 'natural', 'tl_class' => 'hidelabel'],
 			],
 			'tourProfileDescentTime'   => [
 				'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'],
 				'inputType' => 'text',
-				'eval'      => ['datepicker' => false, 'rgxp' => 'digit', 'mandatory' => false, 'tl_class' => 'hidelabel'],
+				'eval'      => ['datepicker' => false, 'mandatory' => false, 'rgxp' => 'digit', 'tl_class' => 'hidelabel'],
 			],
 		],
+		'mandatory'    => false,
+		'tl_class'     => 'mcwColumnCount_4 m12 clr',
 	],
 	'sql'       => 'blob NULL',
 ];
@@ -812,7 +812,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customizeEventRegistrationCo
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfirmationEmailText'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
-	'eval'      => ['mandatory' => false, 'preserveTags' => true, 'allowHtml' => true, 'decodeEntities' => false, 'tl_class' => 'm12 clr'],
+	'eval'      => ['allowHtml' => true, 'decodeEntities' => false, 'mandatory' => false, 'preserveTags' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => 'text NULL',
 ];
 
@@ -820,7 +820,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfi
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReminderSentAt'] = [
 	'exclude'   => true,
 	'inputType' => 'text',
-	'eval'      => ['rgxp' => 'datim', 'readonly' => true, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => 'w50'],
+	'eval'      => ['doNotCopy' => true, 'doNotShow' => true, 'readonly' => true, 'rgxp' => 'datim', 'tl_class' => 'w50'],
 	'sql'       => 'int(10) unsigned NOT NULL default 0',
 ];
 
@@ -841,7 +841,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
 	'inputType' => 'select',
 	'options'   => EventExecutionState::ALL,
 	'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-	'eval'      => ['doNotCopy' => true, 'submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => true, 'tl_class' => 'm12 clr', 'mandatory' => true],
+	'eval'      => ['doNotCopy' => true, 'doNotShow' => true, 'includeBlankOption' => true, 'mandatory' => true, 'submitOnChange' => true, 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
@@ -851,7 +851,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['coordsCH1903'] = [
 	'search'    => true,
 	'sorting'   => true,
 	'inputType' => 'text',
-	'eval'      => ['mandatory' => false, 'maxlength' => 255, 'decodeEntities' => true, 'preserveTags' => true, 'rgxp' => 'swisstopoCoords', 'tl_class' => 'm12 clr'],
+	'eval'      => ['decodeEntities' => true, 'mandatory' => false, 'maxlength' => 255, 'preserveTags' => true, 'rgxp' => 'swisstopoCoords', 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
@@ -862,7 +862,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = [
 	'inputType'  => 'select',
 	'foreignKey' => 'tl_calendar_events_journey.title',
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
-	'eval'       => ['multiple' => false, 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'm12 clr'],
+	'eval'       => ['includeBlankOption' => true, 'mandatory' => true, 'multiple' => false, 'tl_class' => 'm12 clr'],
 	'sql'        => "varchar(255) NOT NULL default ''",
 ];
 
@@ -898,7 +898,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = 
 	'inputType' => 'select',
 	'options'   => System::getContainer()->get(AvalancheLevel::class)->getAll(),
 	'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-	'eval'      => ['doNotCopy' => true, 'multiple' => false, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'm12 clr'],
+	'eval'      => ['doNotCopy' => true, 'includeBlankOption' => false, 'mandatory' => true, 'multiple' => false, 'tl_class' => 'm12 clr'],
 	'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
@@ -906,7 +906,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
-	'eval'      => ['doNotCopy' => true, 'tl_class' => 'm12 clr', 'mandatory' => false],
+	'eval'      => ['doNotCopy' => true, 'mandatory' => false, 'tl_class' => 'm12 clr'],
 	'sql'       => 'text NULL',
 ];
 
@@ -914,7 +914,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReportAdditionalNotices'] = [
 	'exclude'   => true,
 	'inputType' => 'textarea',
-	'eval'      => ['doNotCopy' => true, 'tl_class' => 'm12 clr', 'mandatory' => false],
+	'eval'      => ['doNotCopy' => true, 'mandatory' => false, 'tl_class' => 'm12 clr'],
 	'sql'       => 'text NULL',
 ];
 
@@ -983,8 +983,7 @@ PaletteManipulator::create()
 	->applyToPalette(EventType::TOUR, 'tl_calendar_events')
 	->applyToPalette(EventType::LAST_MINUTE_TOUR, 'tl_calendar_events')
 	->applyToPalette(EventType::COURSE, 'tl_calendar_events')
-	->applyToPalette(EventType::GENERAL_EVENT, 'tl_calendar_events')
-;
+	->applyToPalette(EventType::GENERAL_EVENT, 'tl_calendar_events');
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['enableOnlineEventFeedback'] = [
 	'exclude'   => true,

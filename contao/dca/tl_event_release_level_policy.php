@@ -54,75 +54,75 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 		{event_registrations_grants_legend},allowRegistration',
 	],
 	'fields'   => [
-		'id'                                         => [
+		'id'                                             => [
 			'sql' => 'int(10) unsigned NOT NULL auto_increment',
 		],
-		'pid'                                        => [
+		'pid'                                            => [
 			'foreignKey' => 'tl_event_release_level_policy_package.title',
 			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 		],
-		'tstamp'                                     => [
+		'tstamp'                                         => [
 			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		// NULL instead of 0 for new, not yet saved records: the unique index pid,level allows several NULL values.
 		// doNotCopy: a copy would otherwise violate the unique index.
-		'level'                                      => [
+		'level'                                          => [
 			'exclude'   => true,
 			'inputType' => 'select',
 			'options'   => range(1, 10),
-			'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'nullIfEmpty' => true, 'doNotCopy' => true, 'tl_class' => 'clr'],
+			'eval'      => ['doNotCopy' => true, 'includeBlankOption' => true, 'mandatory' => true, 'nullIfEmpty' => true, 'tl_class' => 'clr'],
 			'sql'       => 'smallint(2) unsigned NULL',
 		],
-		'title'                                      => [
+		'title'                                          => [
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
-		'description'                                => [
+		'description'                                    => [
 			'exclude'   => true,
 			'inputType' => 'textarea',
 			'eval'      => ['mandatory' => true, 'tl_class' => 'clr'],
 			'sql'       => 'text NULL',
 		],
-		'allowSwitchingToPrevLevel'                  => [
+		'allowSwitchingToPrevLevel'                      => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowSwitchingToNextLevel'                  => [
+		'allowSwitchingToNextLevel'                      => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowWriteAccessToAuthor'                   => [
+		'allowWriteAccessToAuthor'                       => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowWriteAccessToInstructors'              => [
+		'allowWriteAccessToInstructors'                  => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowDeleteAccessToAuthor'                  => [
+		'allowDeleteAccessToAuthor'                      => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowDeleteAccessToInstructors'             => [
+		'allowDeleteAccessToInstructors'                 => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowCutAccessToAuthor'                     => [
+		'allowCutAccessToAuthor'                         => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
@@ -140,23 +140,22 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowCutAccessToInstructors'                => [
+		'allowCutAccessToInstructors'                    => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'allowCutAccessToInstructors'                => [
+		'allowCutAccessToInstructors'                    => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'groupEventPerm'                             => [
+		'groupEventPerm'                                 => [
 			'exclude'   => true,
 			'inputType' => 'multiColumnWizard',
 			'eval'      => [
-				'mandatory'    => false,
 				'columnFields' => [
 					'group'       => [
 						'label'      => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['group'],
@@ -165,7 +164,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 						'reference'  => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
 						'relation'   => ['type' => 'hasMany', 'load' => 'eager'],
 						'foreignKey' => 'tl_user_group.name',
-						'eval'       => ['style' => 'width: 80%', 'mandatory' => false, 'includeBlankOption' => true],
+						'eval'       => ['includeBlankOption' => true, 'mandatory' => false, 'style' => 'width: 80%'],
 					],
 					'permissions' => [
 						'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissions'],
@@ -173,24 +172,23 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 						'inputType' => 'select',
 						'options'   => ['canWriteEvent', 'canDeleteEvent', 'canCutEvent', 'canAdministerEventRegistrations'],
 						'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
-						'eval'      => ['style' => 'width: 80%', 'multiple' => true, 'chosen' => true, 'mandatory' => false],
+						'eval'      => ['chosen' => true, 'mandatory' => false, 'multiple' => true, 'style' => 'width: 80%'],
 					],
 				],
+				'mandatory'    => false,
 			],
 			'sql'       => 'blob NULL',
 		],
-		'allowRegistration'                          => [
+		'allowRegistration'                              => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'groupReleaseLevelPerm'                      => [
+		'groupReleaseLevelPerm'                          => [
 			'exclude'   => true,
 			'inputType' => 'multiColumnWizard',
 			'eval'      => [
-				'tl_class'     => 'mcwColumnCount_4',
-				'mandatory'    => false,
 				'columnFields' => [
 					'group'       => [
 						'label'      => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['group'],
@@ -199,7 +197,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 						'reference'  => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
 						'relation'   => ['type' => 'hasMany', 'load' => 'eager'],
 						'foreignKey' => 'tl_user_group.name',
-						'eval'       => ['tl_class' => 'w50', 'mandatory' => false, 'includeBlankOption' => true],
+						'eval'       => ['includeBlankOption' => true, 'mandatory' => false, 'tl_class' => 'w50'],
 					],
 					'permissions' => [
 						'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissions'],
@@ -207,9 +205,11 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 						'inputType' => 'select',
 						'options'   => ['canRelLevelUp', 'canRelLevelDown'],
 						'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
-						'eval'      => ['tl_class' => 'w50', 'multiple' => true, 'chosen' => true, 'mandatory' => false],
+						'eval'      => ['chosen' => true, 'mandatory' => false, 'multiple' => true, 'tl_class' => 'w50'],
 					],
 				],
+				'mandatory'    => false,
+				'tl_class'     => 'mcwColumnCount_4',
 			],
 			'sql'       => 'blob NULL',
 		],

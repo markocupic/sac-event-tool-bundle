@@ -57,7 +57,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
 			'exclude'   => true,
 			'search'    => true,
 			'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
-			'eval'      => ['mandatory' => true, 'rgxp' => 'alnum', 'maxlength' => 64, 'tl_class' => 'w50'],
+			'eval'      => ['mandatory' => true, 'maxlength' => 64, 'rgxp' => 'alnum', 'tl_class' => 'w50'],
 			'sql'       => 'varchar(64) NULL',
 		],
 	],

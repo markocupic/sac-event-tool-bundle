@@ -44,5 +44,5 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['allowedEventTypes'] = [
 	'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 	'foreignKey' => 'tl_event_type.title',
 	'sql'        => 'blob NULL',
-	'eval'       => ['multiple' => true, 'mandatory' => false, 'tl_class' => 'clr'],
+	'eval'       => ['mandatory' => false, 'multiple' => true, 'tl_class' => 'clr'],
 ];

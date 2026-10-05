@@ -14,6 +14,6 @@ declare(strict_types=1);
 
 $GLOBALS['TL_DCA']['tl_frontend_user_notification']['fields']['tourlistSRC'] = [
     'inputType' => 'fileTree',
-    'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
+    'eval'      => ['fieldType' => 'radio', 'filesOnly' => true, 'mandatory' => true, 'tl_class' => 'clr'],
     'sql'       => "binary(16) NULL",
 ];

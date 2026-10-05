@@ -90,14 +90,14 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
 			'search'    => true,
 			'sorting'   => true,
 			'inputType' => 'text',
-			'eval'      => ['rgxp' => 'digit', 'mandatory' => true, 'maxlength' => 255],
+			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'rgxp' => 'digit'],
 			'sql'       => "int(10) unsigned NOT NULL default 0",
 		],
 		'belongsToOrganization'              => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'select',
-			'eval'      => ['multiple' => true, 'chosen' => true, 'tl_class' => 'clr m12'],
+			'eval'      => ['chosen' => true, 'multiple' => true, 'tl_class' => 'clr m12'],
 			'sql'       => 'blob NULL',
 		],
 		'ignoreFilterInEventList'            => [
@@ -128,51 +128,51 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
 		'tourRegulationExtract'              => [
 			'exclude'   => true,
 			'inputType' => 'textarea',
-			'eval'      => ['tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true],
+			'eval'      => ['helpwizard' => true, 'mandatory' => true, 'rte' => 'tinyMCE', 'tl_class' => 'clr m12'],
 			'sql'       => 'text NULL',
 		],
 		'courseRegulationExtract'            => [
 			'exclude'   => true,
 			'inputType' => 'textarea',
-			'eval'      => ['tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true],
+			'eval'      => ['helpwizard' => true, 'mandatory' => true, 'rte' => 'tinyMCE', 'tl_class' => 'clr m12'],
 			'sql'       => 'text NULL',
 		],
 		'tourRegulationSRC'                  => [
 			'exclude'   => true,
 			'inputType' => 'fileTree',
-			'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
+			'eval'      => ['fieldType' => 'radio', 'filesOnly' => true, 'mandatory' => false, 'tl_class' => 'clr'],
 			'sql'       => 'binary(16) NULL',
 		],
 		'courseRegulationSRC'                => [
 			'exclude'   => true,
 			'inputType' => 'fileTree',
-			'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
+			'eval'      => ['fieldType' => 'radio', 'filesOnly' => true, 'mandatory' => false, 'tl_class' => 'clr'],
 			'sql'       => 'binary(16) NULL',
 		],
 		'codeOfConductSRC'                   => [
 			'exclude'   => true,
 			'inputType' => 'fileTree',
-			'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
+			'eval'      => ['fieldType' => 'radio', 'filesOnly' => true, 'mandatory' => false, 'tl_class' => 'clr'],
 			'sql'       => 'binary(16) NULL',
 		],
 		'avbSvbUrl'                          => [
 			'exclude'   => true,
 			'search'    => true,
 			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'rgxp' => 'url', 'decodeEntities' => true, 'maxlength' => 1022, 'tl_class' => 'w50'],
+			'eval'      => ['decodeEntities' => true, 'mandatory' => true, 'maxlength' => 1022, 'rgxp' => 'url', 'tl_class' => 'w50'],
 			'sql'       => "varchar(1022) NOT NULL default ''"
 		],
 		'notifyWebmasterOnNewEventBlog'      => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'select',
-			'eval'      => ['multiple' => true, 'chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'clr'],
+			'eval'      => ['chosen' => true, 'includeBlankOption' => true, 'multiple' => true, 'tl_class' => 'clr'],
 			'sql'       => 'blob NULL',
 		],
 		'emergencyConcept'                   => [
 			'exclude'   => true,
 			'inputType' => 'textarea',
-			'eval'      => ['tl_class' => 'clr m12', 'mandatory' => true],
+			'eval'      => ['mandatory' => true, 'tl_class' => 'clr m12'],
 			'sql'       => 'text NULL',
 		],
 		'addLogo'                            => [
@@ -184,7 +184,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
 		'singleSRC'                          => [
 			'exclude'   => true,
 			'inputType' => 'fileTree',
-			'eval'      => ['filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
+			'eval'      => ['extensions' => Config::get('validImageTypes'), 'fieldType' => 'radio', 'filesOnly' => true, 'mandatory' => true, 'tl_class' => 'clr'],
 			'sql'       => 'binary(16) NULL',
 		],
 		'annualProgramShowHeadline'          => [
