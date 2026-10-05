@@ -18,6 +18,8 @@ use Contao\TableWizard;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventRegistrationStateController;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\SacBackendUserRolesExportController;
 use Markocupic\SacEventToolBundle\Feature\BackendUserPermissionReset\BackendUserPermissionReset;
+use Markocupic\SacEventToolBundle\Feature\EventFeedback\Controller\EventFeedbackBackendController;
+use Markocupic\SacEventToolBundle\Feature\EventStats\Controller\EventStatsController;
 use Markocupic\SacEventToolBundle\Feature\EventRegistrationDatabaseSync\ContaoBackendMaintenance\EventRegistrationSync;
 use Markocupic\SacEventToolBundle\Feature\MemberDatabaseSync\ContaoBackendMaintenance\MemberDatabaseSync;
 use Markocupic\SacEventToolBundle\Model\CalendarContainerModel;
@@ -27,6 +29,8 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
 use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
+use Markocupic\SacEventToolBundle\Model\EventFeedbackModel;
+use Markocupic\SacEventToolBundle\Model\EventFeedbackReminderModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyPackageModel;
@@ -100,6 +104,26 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = [
 	],
 ];
 
+// Event statistics (see docs/features/event-stats.md). The backend menu listener adds the menu entry.
+$GLOBALS['BE_MOD']['sac_be_modules'][EventStatsController::BACKEND_MODULE_TYPE] = [
+	'hideInNavigation' => true,
+];
+
+/*
+ * Event feedback (see docs/features/event-feedback.md)
+ */
+$GLOBALS['BE_MOD']['event_feedback'] = [
+	'event_feedback'          => [
+		'tables' => ['tl_event_feedback'],
+	],
+	'event_feedback_reminder' => [
+		'tables' => ['tl_event_feedback_reminder'],
+	],
+];
+
+$GLOBALS['BE_MOD']['sac_be_modules']['calendar']['showEventFeedbacks'] = [EventFeedbackBackendController::class, 'getEventFeedbackAction'];
+$GLOBALS['BE_MOD']['sac_be_modules']['calendar']['showEventFeedbacksAsPdf'] = [EventFeedbackBackendController::class, 'getEventFeedbackAsPdfAction'];
+
 /*
  * Register the models
  */
@@ -110,6 +134,8 @@ $GLOBALS['TL_MODELS'][CalendarEventsJourneyModel::getTable()] = CalendarEventsJo
 $GLOBALS['TL_MODELS'][CalendarEventsMemberModel::getTable()] = CalendarEventsMemberModel::class;
 $GLOBALS['TL_MODELS'][CourseMainTypeModel::getTable()] = CourseMainTypeModel::class;
 $GLOBALS['TL_MODELS'][CourseSubTypeModel::getTable()] = CourseSubTypeModel::class;
+$GLOBALS['TL_MODELS'][EventFeedbackModel::getTable()] = EventFeedbackModel::class;
+$GLOBALS['TL_MODELS'][EventFeedbackReminderModel::getTable()] = EventFeedbackReminderModel::class;
 $GLOBALS['TL_MODELS'][EventOrganizerModel::getTable()] = EventOrganizerModel::class;
 $GLOBALS['TL_MODELS'][EventReleaseLevelPolicyModel::getTable()] = EventReleaseLevelPolicyModel::class;
 $GLOBALS['TL_MODELS'][EventReleaseLevelPolicyPackageModel::getTable()] = EventReleaseLevelPolicyPackageModel::class;

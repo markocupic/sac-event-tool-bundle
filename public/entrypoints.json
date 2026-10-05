@@ -2,12 +2,12 @@
   "entrypoints": {
     "stimulus_backend": {
       "js": [
-        "/bundles/markocupicsaceventtool/stimulus_backend.9995f93c.js"
+        "/bundles/markocupicsaceventtool/stimulus_backend.a5668611.js"
       ]
     },
     "stimulus_frontend": {
       "js": [
-        "/bundles/markocupicsaceventtool/stimulus_frontend.12e5bf51.js"
+        "/bundles/markocupicsaceventtool/stimulus_frontend.cc4df52f.js"
       ]
     },
     "swisstopo_event_map": {

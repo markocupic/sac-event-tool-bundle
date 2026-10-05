@@ -979,3 +979,23 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReportAdditionalNotices
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration']['eval']['doNotCopy'] = false;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['rescheduledEventDate']['eval']['doNotCopy'] = true;
+
+// Event feedback: the field is removed in Feature\EventFeedback\DataContainer\CalendarEvents
+// if the feedback is not set up completely on the calendar. See docs/features/event-feedback.md
+PaletteManipulator::create()
+	->addLegend('sac_event_feedback_legend', 'gallery_legend', PaletteManipulator::POSITION_BEFORE)
+	->addField('enableOnlineEventFeedback', 'sac_event_feedback_legend', PaletteManipulator::POSITION_APPEND)
+	->applyToPalette('default', 'tl_calendar_events')
+	->applyToPalette(EventType::TOUR, 'tl_calendar_events')
+	->applyToPalette(EventType::LAST_MINUTE_TOUR, 'tl_calendar_events')
+	->applyToPalette(EventType::COURSE, 'tl_calendar_events')
+	->applyToPalette(EventType::GENERAL_EVENT, 'tl_calendar_events')
+;
+
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['enableOnlineEventFeedback'] = [
+	'exclude'   => true,
+	'filter'    => true,
+	'inputType' => 'checkbox',
+	'eval'      => ['tl_class' => 'w50'],
+	'sql'       => "char(1) NOT NULL default ''",
+];

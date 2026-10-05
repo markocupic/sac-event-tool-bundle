@@ -1,0 +1,58 @@
+{% extends "@Contao/be_main" %}
+
+{% block main_content %}
+    <div class="tl_listing_container sac-event-stats">
+        {% for section in sections %}
+            <h3 class="sac-event-stats__headline">{{ section.headline }}:</h3>
+            <table class="sac-event-stats__table">
+                <tr>
+                    <th>&nbsp;</th>
+                    {% for year in years %}
+                        <th class="sac-event-stats__number">{{ year }}</th>
+                    {% endfor %}
+                </tr>
+                {% for row in section.rows %}
+                    <tr>
+                        <td>{{ row.label }}</td>
+                        {% for year in years %}
+                            <td class="sac-event-stats__number">{{ row.values[year]|default(0) }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+            {% if section.notes %}
+                <p class="sac-event-stats__notes">
+                    {% for note in section.notes %}{{ note }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+                </p>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <style{{ attrs().setIfExists('nonce', csp_nonce('style-src')) }}>
+        .sac-event-stats__headline {
+            margin-top: 48px;
+        }
+
+        .sac-event-stats__headline:first-child {
+            margin-top: 16px;
+        }
+
+        .sac-event-stats__table {
+            margin: 10px 0 8px 0;
+        }
+
+        .sac-event-stats__table td,
+        .sac-event-stats__table th {
+            padding: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .sac-event-stats__number {
+            text-align: end;
+        }
+
+        .sac-event-stats__notes {
+            font-size: smaller;
+            line-height: 1.4;
+        }
+    </style>
+{% endblock %}

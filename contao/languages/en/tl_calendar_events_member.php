@@ -95,3 +95,10 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['twint'] = 'TWINT';
 // Messages
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['notificationDueToMissingEmailDisabled'] = 'Achtung! Eine Benachrichtigung des Teilnehmers bei Änderung des Buchungsstatus ist wegen fehlender E-Mail-Adresse nicht möglich.';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['bookingStateHasBeenChangedButParticipantWasNotNotifiedDueToMissingEmail'] = 'Der Buchungsstatus wurde auf "%s" geändert, jedoch konnte der Teilnehmer wegen fehlender E-Mail-Adresse nicht darüber benachrichtigt werden.';
+
+// Event feedback
+// Legends
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['onlineFeedback_legend'] = 'Einstellungen für die Event Auswertung';
+
+// Fields
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['countOnlineEventFeedbackNotifications'] = ['Bereits versendete Reminder', 'Hier sehen Sie die Anzahl bereits versendeter Benachrichtigungen, in denen der Teilnehmer angehalten wurde, das Formular für die Event-Auswertung auszufüllen.'];

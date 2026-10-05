@@ -29,6 +29,7 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardPastE
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\PrintTourListButtonController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListController;
+use Markocupic\SacEventToolBundle\Feature\EventFeedback\Controller\FrontendModule\EventFeedbackFormController;
 
 // Add palettes (Contao 4 style)
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventPreviewReader'] = '{title_legend},name,headline,type;{template_legend:hide},cal_template,customTpl;{image_legend},imgSize;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
@@ -185,3 +186,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['watchEventListModule'] = [
 	'sql'        => 'int(10) unsigned NOT NULL default 0',
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];
+
+// Event feedback form, see docs/features/event-feedback.md
+$GLOBALS['TL_DCA']['tl_module']['palettes'][EventFeedbackFormController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
