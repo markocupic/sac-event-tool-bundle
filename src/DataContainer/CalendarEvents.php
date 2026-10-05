@@ -23,6 +23,7 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -35,7 +36,6 @@ use Contao\Image;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
-use Contao\User;
 use Contao\UserGroupModel;
 use Contao\UserModel;
 use Contao\Versions;
@@ -62,13 +62,54 @@ use Markocupic\SacEventToolBundle\String\Validator\SwisstopoLV95Validator;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * DCA callbacks for tl_calendar_events: palettes and filters, CSV export, date shift,
+ * defaults on create/copy, consistency on submit, field callbacks and the list view.
+ *
+ * Access checks are in AccessDecision\CalendarEvents.
+ */
 class CalendarEvents
 {
+    private const string TABLE = 'tl_calendar_events';
+
+    /**
+     * Filters that non-admins can use in the list view.
+     */
+    private const array FILTERS_FOR_NON_ADMINS = [
+        'mountainguide',
+        'author',
+        'organizers',
+        'tourType',
+        'journey',
+        'eventReleaseLevel',
+        'mainInstructor',
+        'courseTypeLevel0',
+        'startTime',
+    ];
+
+    /**
+     * Palettes that contain the field "rescheduledEventDate".
+     */
+    private const array PALETTES = ['default', 'tour', 'lastMinuteTour', 'course', 'generalEvent', 'tour_report'];
+
+    /**
+     * Columns of the CSV export (in this order).
+     */
+    private const array CSV_EXPORT_FIELDS = ['id', 'title', 'location', 'eventDates', 'eventDurationInDays', 'published', 'organizers', 'mountainguide', 'mainInstructor', 'instructor', 'instructorNotes', 'minMembers', 'maxMembers', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey', 'teaser', 'tourDetailText', 'requirements', 'leistungen'];
+
+    /**
+     * Text fields whose line breaks are replaced by spaces in the CSV export.
+     */
+    private const array CSV_EXPORT_TEXT_FIELDS = ['teaser', 'instructorNotes', 'tourDetailText', 'requirements', 'leistungen'];
+
+    private const array DATE_SORTING_FLAGS = [DataContainer::SORT_DAY_ASC, DataContainer::SORT_DAY_DESC, DataContainer::SORT_MONTH_ASC, DataContainer::SORT_MONTH_DESC, DataContainer::SORT_YEAR_ASC, DataContainer::SORT_YEAR_DESC];
+
     // Adapters
     private Adapter $arrayUtil;
+
+    private Adapter $calendar;
 
     private Adapter $calendarEventsJourneyModel;
 
@@ -82,6 +123,12 @@ class CalendarEvents
 
     private Adapter $date;
 
+    private Adapter $eventReleaseLevelPolicyModel;
+
+    private Adapter $eventReleaseLevelPolicyPackageModel;
+
+    private Adapter $eventTypeModel;
+
     private Adapter $filesModel;
 
     private Adapter $idna;
@@ -94,6 +141,10 @@ class CalendarEvents
 
     private Adapter $system;
 
+    private Adapter $tourDifficultyCategoryModel;
+
+    private Adapter $userGroupModel;
+
     private Adapter $userModel;
 
     public function __construct(
@@ -103,7 +154,6 @@ class CalendarEvents
         private readonly CourseLevels $courseLevels,
         private readonly EventDurationInfo $eventDurationInfo,
         private readonly EventReleaseLevelUtil $eventReleaseLevelUtil,
-        private readonly PasswordHasherFactoryInterface $passwordHasherFactory,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
@@ -111,98 +161,79 @@ class CalendarEvents
     ) {
         // Adapters
         $this->arrayUtil = $this->framework->getAdapter(ArrayUtil::class);
+        $this->calendar = $this->framework->getAdapter(Calendar::class);
         $this->calendarEventsJourneyModel = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarModel = $this->framework->getAdapter(CalendarModel::class);
         $this->config = $this->framework->getAdapter(Config::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->date = $this->framework->getAdapter(Date::class);
+        $this->eventReleaseLevelPolicyModel = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
+        $this->eventReleaseLevelPolicyPackageModel = $this->framework->getAdapter(EventReleaseLevelPolicyPackageModel::class);
+        $this->eventTypeModel = $this->framework->getAdapter(EventTypeModel::class);
         $this->filesModel = $this->framework->getAdapter(FilesModel::class);
         $this->idna = $this->framework->getAdapter(Idna::class);
         $this->image = $this->framework->getAdapter(Image::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->system = $this->framework->getAdapter(System::class);
+        $this->tourDifficultyCategoryModel = $this->framework->getAdapter(TourDifficultyCategoryModel::class);
+        $this->userGroupModel = $this->framework->getAdapter(UserGroupModel::class);
         $this->userModel = $this->framework->getAdapter(UserModel::class);
     }
 
     /**
-     * Set the "on create new" palette.
+     * A new event only shows the field "eventType" until the event type is set.
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 90)]
     public function setPaletteWhenCreatingNew(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ('edit' === $request->query->get('act')) {
-            $objCalendarEventsModel = $this->calendarEventsModel->findById($dc->id);
+        if ('edit' !== $request->query->get('act')) {
+            return;
+        }
 
-            if (null !== $objCalendarEventsModel) {
-                if (0 === (int) $objCalendarEventsModel->tstamp && empty($objCalendarEventsModel->eventType)) {
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = 'eventType';
-                }
-            }
+        $event = $this->calendarEventsModel->findById($dc->id);
+
+        if (null !== $event && 0 === (int) $event->tstamp && empty($event->eventType)) {
+            $GLOBALS['TL_DCA'][self::TABLE]['palettes']['default'] = 'eventType';
         }
     }
 
     /**
-     * Reduce filter fields for tour guides and course instructors and Adjust filters
-     * depending on the event type.
+     * Reduce the filter fields for non-admins and hide the filters that do not match
+     * the event types of the calendar.
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 80)]
     public function adjustFilterSearchAndSortingBoard(DataContainer $dc): void
     {
-        // Reduce filter fields to tour guides and course instructors
         if (!$this->security->isGranted('ROLE_ADMIN')) {
-            $allowedFilters = [
-                'mountainguide',
-                'author',
-                'organizers',
-                'tourType',
-                'journey',
-                'eventReleaseLevel',
-                'mainInstructor',
-                'courseTypeLevel0',
-                'startTime',
-            ];
-
-            // Reduce filter fields for tour guides and course instructors
-            foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $field) {
-                if (\in_array($field, $allowedFilters, true)) {
-                    continue;
+            foreach (array_keys($GLOBALS['TL_DCA'][self::TABLE]['fields']) as $field) {
+                if (!\in_array($field, self::FILTERS_FOR_NON_ADMINS, true)) {
+                    $GLOBALS['TL_DCA'][self::TABLE]['fields'][$field]['filter'] = null;
                 }
-
-                $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['filter'] = null;
             }
         }
 
-        // Adjust filters depending on the event type
-        if ($dc->currentPid) {
-            $objCalendar = $this->calendarModel->findById($dc->currentPid);
+        if (!$dc->currentPid) {
+            return;
+        }
 
-            if (null !== $objCalendar) {
-                $arrAllowedEventTypes = $this->stringUtil->deserialize($objCalendar->allowedEventTypes, true);
+        $calendar = $this->calendarModel->findById($dc->currentPid);
 
-                if (!\in_array(EventType::TOUR, $arrAllowedEventTypes, true) && !\in_array(EventType::LAST_MINUTE_TOUR, $arrAllowedEventTypes, true)) {
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType']['filter'] = false;
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType']['search'] = false;
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType']['sorting'] = false;
-                }
+        if (null === $calendar) {
+            return;
+        }
 
-                if (!\in_array(EventType::COURSE, $arrAllowedEventTypes, true)) {
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0']['filter'] = false;
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0']['search'] = false;
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0']['sorting'] = false;
+        $allowedEventTypes = $this->stringUtil->deserialize($calendar->allowedEventTypes, true);
 
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1']['filter'] = false;
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1']['search'] = false;
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1']['sorting'] = false;
+        if (!\in_array(EventType::TOUR, $allowedEventTypes, true) && !\in_array(EventType::LAST_MINUTE_TOUR, $allowedEventTypes, true)) {
+            $this->disableFilterSearchAndSorting('tourType');
+        }
 
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel']['filter'] = false;
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel']['search'] = false;
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel']['sorting'] = false;
-                }
-            }
+        if (!\in_array(EventType::COURSE, $allowedEventTypes, true)) {
+            $this->disableFilterSearchAndSorting('courseTypeLevel0', 'courseTypeLevel1', 'courseLevel');
         }
     }
 
@@ -212,6 +243,7 @@ class CalendarEvents
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 70)]
     public function onloadCallbackDeleteInvalidEvents(DataContainer $dc): void
     {
+        // Events that have been created more than a day ago, but never saved with a title
         $this->connection->executeStatement(
             'DELETE FROM tl_calendar_events WHERE tstamp < ? AND tstamp > ? AND title = ?',
             [time() - 86400, 0, ''],
@@ -219,7 +251,7 @@ class CalendarEvents
     }
 
     /**
-     * Set palette for course, tour, tour_report, etc.
+     * Set the palette for the event type (tour, course, etc.) and for the tour report.
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 50)]
     public function setPalettes(DataContainer $dc): void
@@ -234,173 +266,87 @@ class CalendarEvents
             return;
         }
 
-        $objCalendarEventsModel = $this->calendarEventsModel->findById($dc->id);
+        $event = $this->calendarEventsModel->findById($dc->id);
 
-        if (null === $objCalendarEventsModel) {
+        if (null === $event) {
             return;
         }
 
-        // Set palette for tour and course
-        if (isset($GLOBALS['TL_DCA']['tl_calendar_events']['palettes'][$objCalendarEventsModel->eventType])) {
-            $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events']['palettes'][$objCalendarEventsModel->eventType];
+        // Palette of the event type
+        if (isset($GLOBALS['TL_DCA'][self::TABLE]['palettes'][$event->eventType])) {
+            $GLOBALS['TL_DCA'][self::TABLE]['palettes']['default'] = $GLOBALS['TL_DCA'][self::TABLE]['palettes'][$event->eventType];
         }
 
-        // Remove the field "rescheduledEventDate" if the event has not been rescheduled
-        if (EventState::STATE_RESCHEDULED !== $objCalendarEventsModel->eventState) {
-            $palettes = ['default', 'tour', 'lastMinuteTour', 'course', 'generalEvent', 'tour_report'];
-
-            foreach ($palettes as $palette) {
+        // The field "rescheduledEventDate" is only shown for rescheduled events
+        if (EventState::STATE_RESCHEDULED !== $event->eventState) {
+            foreach (self::PALETTES as $palette) {
                 PaletteManipulator::create()
                     ->removeField('rescheduledEventDate')
-                    ->applyToPalette($palette, 'tl_calendar_events')
+                    ->applyToPalette($palette, self::TABLE)
                 ;
             }
         }
 
-        // Apply a custom palette for the tour report
+        // Palette of the tour report
         if ('writeTourReport' === $request->query->get('call')) {
-            $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour_report'];
+            $GLOBALS['TL_DCA'][self::TABLE]['palettes']['default'] = $GLOBALS['TL_DCA'][self::TABLE]['palettes']['tour_report'];
         }
     }
 
     /**
-     * Make a CSV-export of the events of the current calendar.
+     * CSV export of the events of a calendar: contao?do=calendar&table=tl_calendar_events&id=<calendar id>&action=onloadCallbackExportCalendar.
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 40)]
     public function exportCalendar(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ('onloadCallbackExportCalendar' === $request->query->get('action') && $request->query->get('id') > 0) {
-            $csv = new CsvDownload();
-            $csv->convertOutputEncoding(CsvDownload::ENCODING_ISO_8859_1);
-
-            // Selected fields
-            $arrFields = array_unique(['id', 'title', 'location', 'eventDates', 'eventDurationInDays', 'published', 'organizers', 'mountainguide', 'mainInstructor', 'instructor', 'instructorNotes', 'minMembers', 'maxMembers', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey', 'teaser', 'tourDetailText', 'requirements', 'leistungen']);
-
-            // Insert headline first
-            $this->controller->loadLanguageFile('tl_calendar_events');
-
-            $arrHeadline = array_map(
-                static fn ($field) => $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?? $field,
-                $arrFields,
-            );
-
-            $csv->setHeadline($arrHeadline);
-
-            $objEvent = $this->calendarEventsModel->findBy(
-                ['tl_calendar_events.pid = ?'],
-                [$request->query->get('id')],
-                ['order' => 'tl_calendar_events.startDate ASC'],
-            );
-
-            if (null !== $objEvent) {
-                while ($objEvent->next()) {
-                    $arrRow = [];
-
-                    foreach ($arrFields as $field) {
-                        switch ($field) {
-                            case 'eventType':
-                                $arrRow[] = $GLOBALS['TL_LANG']['MSC'][$objEvent->{$field}] ?? $objEvent->{$field};
-                                break;
-                            case 'mainInstructor':
-                                $objUser = $this->userModel->findById($objEvent->{$field});
-                                $arrRow[] = null !== $objUser ? html_entity_decode($objUser->lastname.' '.$objUser->firstname) : '';
-                                break;
-                            case 'tourTechDifficulty':
-                                $arrDiff = $this->calendarEventsUtil->getTourTechDifficultiesAsArray($objEvent->current(), false, false);
-                                $arrRow[] = implode(' und ', $arrDiff);
-                                break;
-                            case 'eventDates':
-                                $arrTimestamps = $this->calendarEventsUtil->getEventTimestamps($objEvent->current());
-                                $arrDates = array_map(
-                                    static fn ($tstamp) => Date::parse(Config::get('dateFormat'), $tstamp),
-                                    $arrTimestamps,
-                                );
-                                $arrRow[] = implode(',', $arrDates);
-                                break;
-                            case 'eventDurationInDays':
-                                $arrRow[] = \count($this->calendarEventsUtil->getEventTimestamps($objEvent->current()));
-                                break;
-                            case 'organizers':
-                                $arrOrganizers = $this->calendarEventsUtil->getEventOrganizersAsArray($objEvent->current(), 'title');
-                                $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
-                                break;
-                            case 'instructor':
-                                $arrInstructors = $this->calendarEventsUtil->getInstructorNamesAsArray($objEvent->current());
-                                $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
-                                break;
-                            case 'tourType':
-                                if (EventType::COURSE === $objEvent->eventType) {
-                                    $arrRow[] = '';
-                                } else {
-                                    $arrTourTypes = $this->calendarEventsUtil->getTourTypesAsArray($objEvent->current(), 'title');
-                                    $arrRow[] = html_entity_decode(implode(',', $arrTourTypes));
-                                }
-                                break;
-                            case 'eventReleaseLevel':
-                                $objFS = EventReleaseLevelPolicyModel::findById($objEvent->{$field});
-                                $arrRow[] = null !== $objFS ? $objFS->level : '';
-                                break;
-                            case 'journey':
-                                $objJourney = $this->calendarEventsJourneyModel->findById($objEvent->{$field});
-                                $arrRow[] = null !== $objJourney ? $objJourney->title : $objEvent->{$field};
-                                break;
-                            case 'courseLevel':
-                                if (EventType::COURSE !== $objEvent->eventType || !\is_int($objEvent->{$field}) || !$this->courseLevels->has($objEvent->{$field})) {
-                                    $arrRow[] = '';
-                                } else {
-                                    $arrRow[] = $this->courseLevels->get($objEvent->{$field});
-                                }
-                                break;
-                            case 'courseTypeLevel0':
-                                if (EventType::COURSE !== $objEvent->eventType) {
-                                    $arrRow[] = '';
-                                } else {
-                                    $arrRow[] = empty($objEvent->{$field}) ? '' : (string) $this->connection->fetchOne('SELECT name FROM tl_course_main_type WHERE id = ?', [$objEvent->{$field}]);
-                                }
-                                break;
-                            case 'courseTypeLevel1':
-                                if (EventType::COURSE !== $objEvent->eventType) {
-                                    $arrRow[] = '';
-                                } else {
-                                    $arrRow[] = empty($objEvent->{$field}) ? '' : (string) $this->connection->fetchOne('SELECT name FROM tl_course_sub_type WHERE id = ?', [$objEvent->{$field}]);
-                                }
-                                break;
-                            case 'executionState':
-                                $arrRow[] = empty($objEvent->{$field}) ? '' : $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->{$field}] ?? $objEvent->{$field};
-                                break;
-                            case 'eventState':
-                                $arrRow[] = empty($objEvent->{$field}) ? '' : $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->{$field}][0] ?? $objEvent->{$field};
-                                break;
-
-                            default:
-                                if (\in_array($field, ['teaser', 'instructorNotes', 'tourDetailText', 'requirements', 'leistungen'], true)) {
-                                    $arrRow[] = str_replace(['<br>', '<br/>', '<br />', '{{br}}'], [' ', ' ', ' ', ' '], nl2br((string) $objEvent->{$field}));
-                                } else {
-                                    $arrRow[] = $objEvent->{$field};
-                                }
-                        }
-                    }
-
-                    $arrRow = array_map(fn ($strValue) => $this->stringUtil->revertInputEncoding((string) $strValue), $arrRow);
-
-                    $csv->addRecord($arrRow);
-                }
-            }
-
-            $objCalendar = $this->calendarModel->findById($request->query->get('id'));
-
-            $fileName = $this->stringUtil->revertInputEncoding($objCalendar->title).'.csv';
-            $fileName = $this->stringUtil->sanitizeFileName($fileName);
-
-            throw new ResponseException($csv->createStreamedResponse($fileName)->send());
+        if ('onloadCallbackExportCalendar' !== $request->query->get('action') || !($request->query->get('id') > 0)) {
+            return;
         }
+
+        $csv = new CsvDownload();
+        $csv->convertOutputEncoding(CsvDownload::ENCODING_ISO_8859_1);
+
+        // Headline
+        $this->controller->loadLanguageFile(self::TABLE);
+
+        $csv->setHeadline(array_map(
+            static fn ($field) => $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?? $field,
+            self::CSV_EXPORT_FIELDS,
+        ));
+
+        $events = $this->calendarEventsModel->findBy(
+            ['tl_calendar_events.pid = ?'],
+            [$request->query->get('id')],
+            ['order' => 'tl_calendar_events.startDate ASC'],
+        );
+
+        if (null !== $events) {
+            while ($events->next()) {
+                $row = [];
+
+                foreach (self::CSV_EXPORT_FIELDS as $field) {
+                    $row[] = $this->getCsvValue($events->current(), $field);
+                }
+
+                $row = array_map(fn ($value) => $this->stringUtil->revertInputEncoding((string) $value), $row);
+
+                $csv->addRecord($row);
+            }
+        }
+
+        $calendar = $this->calendarModel->findById($request->query->get('id'));
+
+        $fileName = $this->stringUtil->revertInputEncoding($calendar->title).'.csv';
+        $fileName = $this->stringUtil->sanitizeFileName($fileName);
+
+        throw new ResponseException($csv->createStreamedResponse($fileName)->send());
     }
 
     /**
-     * Shift all event dates of a certain calendar by +/- 1 year
-     * contao?do=calendar&table=tl_calendar_events&id=21&transformDate=+52weeks.
+     * Shift all event dates of a calendar by +/- 52 weeks:
+     * contao?do=calendar&table=tl_calendar_events&id=<calendar id>&transformDates=plus52weeks|minus52weeks.
      *
      * @throws Exception
      */
@@ -409,74 +355,42 @@ class CalendarEvents
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ($request->query->get('transformDates')) {
-            $transform = $request->query->get('transformDates');
+        $transform = $request->query->get('transformDates');
 
-            if (!\in_array($transform, ['plus52weeks', 'minus52weeks'], true)) {
-                throw new \InvalidArgumentException('Invalid transform mode. Use "plus52weeks" or "minus52weeks"!');
-            }
-
-            // $_GET['transformDates'] can be "plus52weeks" or "minus52weeks"
-            $mode = match ($transform) {
-                'plus52weeks' => '+52 weeks',
-                'minus52weeks' => '-52 weeks',
-                default => null,
-            };
-
-            $calendarId = $request->query->get('id');
-
-            $rows = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events WHERE pid = ?', [$calendarId]);
-
-            foreach ($rows as $row) {
-                $set = [];
-
-                $set['startTime'] = strtotime($mode, (int) $row['startTime']);
-                $set['endTime'] = strtotime($mode, (int) $row['endTime']);
-                $set['startDate'] = strtotime($mode, (int) $row['startDate']);
-                $set['endDate'] = strtotime($mode, (int) $row['endDate']);
-
-                if ($row['registrationStartDate'] > 0) {
-                    $set['registrationStartDate'] = strtotime($mode, (int) $row['registrationStartDate']);
-                }
-
-                if ($row['registrationEndDate'] > 0) {
-                    $set['registrationEndDate'] = strtotime($mode, (int) $row['registrationEndDate']);
-                }
-
-                $repeats = $this->stringUtil->deserialize($row['eventDates'], true);
-                $newRepeats = [];
-
-                foreach ($repeats as $repeat) {
-                    $repeat['new_repeat'] = strtotime($mode, (int) $repeat['new_repeat']);
-
-                    if (!DateValidator::isValidTimestamp($repeat['new_repeat'])) {
-                        // Show error message
-                        $this->message->addError(
-                            $this->translator->trans('ERR.eventDatesInvalid', [$row['id']], 'contao_default'),
-                        );
-
-                        // Skip this event
-                        continue 2;
-                    }
-
-                    $newRepeats[] = $repeat;
-                }
-
-                if ([] !== $newRepeats) {
-                    $set['eventDates'] = serialize($newRepeats);
-                }
-
-                $affected = $this->connection->update('tl_calendar_events', $set, ['id' => $row['id']]);
-
-                if ($affected > 0) {
-                    $versions = new Versions('tl_calendar_events', $row['id']);
-                    $versions->create();
-                }
-            }
-
-            // Redirect
-            $this->controller->redirect($this->system->getReferer());
+        if (!$transform) {
+            return;
         }
+
+        if (!\in_array($transform, ['plus52weeks', 'minus52weeks'], true)) {
+            throw new \InvalidArgumentException('Invalid transform mode. Use "plus52weeks" or "minus52weeks"!');
+        }
+
+        // Only admins see the global operations "plus1year" and "minus1year" (see AccessDecision\CalendarEvents)
+        if (!$this->security->isGranted('ROLE_ADMIN')) {
+            throw new AccessDeniedException('Only admins are allowed to shift the event dates of a calendar.');
+        }
+
+        $modifier = 'plus52weeks' === $transform ? '+52 weeks' : '-52 weeks';
+
+        $rows = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events WHERE pid = ?', [$request->query->get('id')]);
+
+        foreach ($rows as $row) {
+            $set = $this->getShiftedDates($row, $modifier);
+
+            // Skip events with invalid event dates
+            if (null === $set) {
+                continue;
+            }
+
+            $affected = $this->connection->update(self::TABLE, $set, ['id' => $row['id']]);
+
+            if ($affected > 0) {
+                $versions = new Versions(self::TABLE, $row['id']);
+                $versions->create();
+            }
+        }
+
+        $this->controller->redirect($this->system->getReferer());
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit')]
@@ -492,52 +406,48 @@ class CalendarEvents
             return;
         }
 
+        // Registrations cannot be confirmed automatically if an IBAN is required
         if ($record['autoConfirm'] && $record['addIban']) {
-            $this->connection->update('tl_calendar_events', ['autoConfirm' => 0], ['id' => $dc->id]);
+            $this->connection->update(self::TABLE, ['autoConfirm' => 0], ['id' => $dc->id]);
             $this->message->addError($this->translator->trans('ERR.autoConfirm_and_addIban_not_allowed', [], 'contao_default'));
         }
     }
 
     /**
-     * Set defaults.
+     * Defaults of a new event: source, author, main instructor and the text of the
+     * custom registration confirmation email.
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.oncreate', priority: 100)]
     public function onCreate(string $strTable, int $insertId, array $set, DataContainer $dc): void
     {
         $user = $this->security->getUser();
 
-        // Set source, add author, set to the first release level and & set
-        // customEventRegistrationConfirmationEmailText on creating new events
-        $objEventsModel = $this->calendarEventsModel->findById($insertId);
+        $event = $this->calendarEventsModel->findById($insertId);
 
-        if (null !== $objEventsModel) {
-            // Set source always to "default"
-            $objEventsModel->source = 'default';
-
-            // Set logged-in User as author
-            $objEventsModel->author = $user->id;
-            $objEventsModel->mainInstructor = $user->id;
-            $objEventsModel->instructor = serialize([['instructorId' => $user->id]]);
-
-            // Set the customEventRegistrationConfirmationEmailText
-            $objEventsModel->customEventRegistrationConfirmationEmailText = file_get_contents($this->sacevtEventRegistrationConfigEmailAcceptCustomTemplPath);
-
-            $objEventsModel->save();
-
-            // Add a new entry in tl_calendar_events_instructor!
-            // This makes the entry appear in the "My Events Dashboard" in the backend.
-            $set = [
-                'pid' => $insertId,
-                'userId' => $user->id,
-                'isMainInstructor' => 1,
-                'tstamp' => time(),
-            ];
-
-            $this->connection->insert('tl_calendar_events_instructor', $set);
+        if (null === $event) {
+            return;
         }
+
+        $event->source = 'default';
+        $event->author = $user->id;
+        $event->mainInstructor = $user->id;
+        $event->instructor = serialize([['instructorId' => $user->id]]);
+        $event->customEventRegistrationConfirmationEmailText = file_get_contents($this->sacevtEventRegistrationConfigEmailAcceptCustomTemplPath);
+        $event->save();
+
+        // The entry in tl_calendar_events_instructor makes the event appear in the "My
+        // Events Dashboard" in the backend.
+        $this->connection->insert('tl_calendar_events_instructor', [
+            'pid' => $insertId,
+            'userId' => $user->id,
+            'isMainInstructor' => 1,
+            'tstamp' => time(),
+        ]);
     }
 
     /**
+     * A copied event gets the current user as author and the first release level.
+     *
      * @throws \Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.oncopy', priority: 100)]
@@ -545,45 +455,47 @@ class CalendarEvents
     {
         $user = $this->security->getUser();
 
-        // Add author and set to the first release level on creating new events
-        $objEventsModel = $this->calendarEventsModel->findById($insertId);
+        $event = $this->calendarEventsModel->findById($insertId);
 
-        if (null !== $objEventsModel) {
-            // Set the currently logged-in user as the author of the event
-            $objEventsModel->author = $user->id;
-            $objEventsModel->alias = 'event-'.$objEventsModel->id;
-            $objEventsModel->save();
+        if (null === $event) {
+            return;
+        }
 
-            // Set eventReleaseLevel
-            if ('' !== $objEventsModel->eventType) {
-                $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($objEventsModel->id);
+        $event->author = $user->id;
+        $event->alias = 'event-'.$event->id;
+        $event->save();
 
-                if (null !== $objEventReleaseLevelPolicyModel) {
-                    $objEventsModel->eventReleaseLevel = $objEventReleaseLevelPolicyModel->id;
-                    $objEventsModel->save();
-                }
-            }
+        if ('' === $event->eventType) {
+            return;
+        }
+
+        $firstLevel = $this->eventReleaseLevelPolicyModel->findMinLevelByEventId($event->id);
+
+        if (null !== $firstLevel) {
+            $event->eventReleaseLevel = $firstLevel->id;
+            $event->save();
         }
     }
 
     /**
-     * Add a priority of -100 This way this callback will be executed after! the
-     * legacy callback tl_calendar_events.adjustTime() but before
-     * self::adjustRegistrationPeriod (priority: -110).
+     * Set startDate/startTime and endDate/endTime from the event dates.
+     *
+     * Priority -100: runs after the legacy callback tl_calendar_events.adjustTime()
+     * and before self::adjustRegistrationPeriod() (priority -110).
      *
      * @throws Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: -100)]
     public function adjustStartAndEndDate(DataContainer $dc): void
     {
-        // Return if there is no active record (override all)
+        // No active record in the overrideAll mode
         if (!$dc->activeRecord) {
             return;
         }
 
-        $row = $this->connection->fetchOne('SELECT eventDates FROM tl_calendar_events WHERE id = ?', [$dc->id]);
+        $eventDates = $this->connection->fetchOne('SELECT eventDates FROM tl_calendar_events WHERE id = ?', [$dc->id]);
 
-        $repeats = $this->stringUtil->deserialize($row, true);
+        $repeats = $this->stringUtil->deserialize($eventDates, true);
 
         if (empty($repeats)) {
             return;
@@ -591,8 +503,8 @@ class CalendarEvents
 
         $timestamps = [];
 
-        foreach ($repeats as $v) {
-            $timestamp = $v['new_repeat'] ?? null;
+        foreach ($repeats as $repeat) {
+            $timestamp = $repeat['new_repeat'] ?? null;
 
             if (!DateValidator::isValidTimestamp($timestamp)) {
                 $this->message->addError($this->translator->trans('ERR.eventDatesInvalid', [$dc->id], 'contao_default'));
@@ -612,71 +524,76 @@ class CalendarEvents
         $startTime = $firstTimestamp > 0 ? $firstTimestamp : 0;
         $endTime = $lastTimestamp > 0 ? $lastTimestamp : 0;
 
-        $set = [];
-        $set['startDate'] = $startTime;
-        $set['startTime'] = $startTime;
-        $set['endDate'] = $endTime;
-        $set['endTime'] = $endTime;
+        $set = [
+            'startDate' => $startTime,
+            'startTime' => $startTime,
+            'endDate' => $endTime,
+            'endTime' => $endTime,
+        ];
 
-        $affected = $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
+        $affected = $this->connection->update(self::TABLE, $set, ['id' => $dc->activeRecord->id]);
 
         if ($affected > 0) {
-            DataContainer::clearCurrentRecordCache($dc->id, 'tl_calendar_events');
+            DataContainer::clearCurrentRecordCache($dc->id, self::TABLE);
         }
     }
 
     /**
-     * Add a priority of -110 This way this callback will be executed after! the
-     * legacy callback tl_calendar_events.adjustTime() and after
-     * self::adjustStartAndEndDate (priority: -100).
+     * The registration period must end before the event starts.
+     *
+     * Priority -110: runs after the legacy callback tl_calendar_events.adjustTime()
+     * and after self::adjustStartAndEndDate() (priority -100).
      *
      * @throws Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: -110)]
     public function adjustRegistrationPeriod(DataContainer $dc): void
     {
-        // Return if there is no active record (override all)
+        // No active record in the overrideAll mode
         if (!$dc->activeRecord) {
             return;
         }
 
         $row = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events WHERE id = ?', [$dc->activeRecord->id]);
 
-        if ($row) {
-            if ($row['setRegistrationPeriod'] && $row['startDate']) {
-                $regEndDate = $row['registrationEndDate'];
-                $regStartDate = $row['registrationStartDate'];
-
-                if ($regEndDate > $row['startDate']) {
-                    $regEndDate = strtotime(date('Y-m-d', (int) $row['startDate']).' +1 day') - 1;
-                    $this->message->addInfo($GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck']);
-                }
-
-                if ($regStartDate > $regEndDate) {
-                    $regStartDate = $regEndDate - 86400;
-                    $this->message->addInfo($GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck']);
-                }
-
-                $set = [
-                    'registrationStartDate' => $regStartDate,
-                    'registrationEndDate' => $regEndDate,
-                ];
-
-                $dc->activeRecord->registrationStartDate = $regStartDate;
-                $dc->activeRecord->registrationEndDate = $regEndDate;
-
-                $this->connection->update('tl_calendar_events', $set, ['id' => $row['id']]);
-            }
+        if (!$row || !$row['setRegistrationPeriod'] || !$row['startDate']) {
+            return;
         }
+
+        $regEndDate = $row['registrationEndDate'];
+        $regStartDate = $row['registrationStartDate'];
+
+        if ($regEndDate > $row['startDate']) {
+            // End of the day before the event starts
+            $regEndDate = strtotime(date('Y-m-d', (int) $row['startDate']).' +1 day') - 1;
+            $this->message->addInfo($GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck']);
+        }
+
+        if ($regStartDate > $regEndDate) {
+            $regStartDate = $regEndDate - 86400;
+            $this->message->addInfo($GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck']);
+        }
+
+        $set = [
+            'registrationStartDate' => $regStartDate,
+            'registrationEndDate' => $regEndDate,
+        ];
+
+        $dc->activeRecord->registrationStartDate = $regStartDate;
+        $dc->activeRecord->registrationEndDate = $regEndDate;
+
+        $this->connection->update(self::TABLE, $set, ['id' => $row['id']]);
     }
 
     /**
+     * Events without release level get the first release level.
+     *
      * @throws Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: 80)]
     public function adjustEventReleaseLevel(DataContainer $dc): void
     {
-        // Return if there is no active record (override all)
+        // No active record in the overrideAll mode
         if (!$dc->activeRecord) {
             return;
         }
@@ -685,17 +602,18 @@ class CalendarEvents
             return;
         }
 
-        // Set releaseLevel to level 1
-        $eventReleaseLevelModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($dc->activeRecord->id);
+        $firstLevel = $this->eventReleaseLevelPolicyModel->findMinLevelByEventId($dc->activeRecord->id);
 
-        if (null !== $eventReleaseLevelModel) {
-            $set = ['eventReleaseLevel' => $eventReleaseLevelModel->id];
-            $dc->activeRecord->eventReleaseLevel = $eventReleaseLevelModel->id;
-            $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
+        if (null !== $firstLevel) {
+            $dc->activeRecord->eventReleaseLevel = $firstLevel->id;
+            $this->connection->update(self::TABLE, ['eventReleaseLevel' => $firstLevel->id], ['id' => $dc->activeRecord->id]);
         }
     }
 
     /**
+     * After the tour report has been saved, the invoice form can be printed in
+     * tl_calendar_events_instructor_invoice.
+     *
      * @throws Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: 40)]
@@ -703,14 +621,8 @@ class CalendarEvents
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        // Set filledInEventReportForm, now the invoice form can be printed in
-        // tl_calendar_events_instructor_invoice
         if ('writeTourReport' === $request->query->get('call')) {
-            $set = [
-                'filledInEventReportForm' => 1,
-            ];
-
-            $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
+            $this->connection->update(self::TABLE, ['filledInEventReportForm' => 1], ['id' => $dc->activeRecord->id]);
         }
     }
 
@@ -720,58 +632,60 @@ class CalendarEvents
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: 30)]
     public function setAlias(DataContainer $dc): void
     {
-        $set = [
-            'alias' => 'event-'.$dc->id,
-        ];
-
-        $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
+        $this->connection->update(self::TABLE, ['alias' => 'event-'.$dc->id], ['id' => $dc->activeRecord->id]);
     }
 
     /**
+     * The release level must belong to the release level package of the event type.
+     *
      * @throws Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: 20)]
     public function setValidEventReleaseLevel(DataContainer $dc): void
     {
-        // Set the correct event release level
-        $objEvent = $this->calendarEventsModel->findById($dc->activeRecord->id);
+        $event = $this->calendarEventsModel->findById($dc->activeRecord->id);
 
-        if (null !== $objEvent) {
-            if ('' !== $objEvent->eventType) {
-                if ($objEvent->eventReleaseLevel > 0) {
-                    $objEventReleaseLevel = EventReleaseLevelPolicyModel::findById($objEvent->eventReleaseLevel);
+        if (null === $event || '' === $event->eventType) {
+            return;
+        }
 
-                    if (null !== $objEventReleaseLevel) {
-                        $objEventReleaseLevelPackage = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($objEvent->id);
-                        // Change eventReleaseLevel when changing eventType...
-                        if ($objEventReleaseLevel->pid !== $objEventReleaseLevelPackage->id) {
-                            $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($objEvent->id);
+        if ($event->eventReleaseLevel > 0) {
+            $currentLevel = $this->eventReleaseLevelPolicyModel->findById($event->eventReleaseLevel);
 
-                            if (null !== $oEventReleaseLevelModel) {
-                                $set = [
-                                    'eventReleaseLevel' => $oEventReleaseLevelModel->id,
-                                ];
+            if (null === $currentLevel) {
+                return;
+            }
 
-                                $this->connection->update('tl_calendar_events', $set, ['id' => $objEvent->id]);
-                            }
-                        }
-                    }
-                } else {
-                    // Add eventReleaseLevel when creating a new event...
-                    $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($objEvent->id);
+            $package = $this->eventReleaseLevelPolicyPackageModel->findReleaseLevelPolicyPackageModelByEventId($event->id);
 
-                    $set = ['eventReleaseLevel' => $oEventReleaseLevelModel->id];
-                    $dc->activeRecord->eventReleaseLevel = $oEventReleaseLevelModel->id;
+            // The event type has been changed: use the first release level of the new package
+            if ($currentLevel->pid !== $package->id) {
+                $firstLevel = $this->eventReleaseLevelPolicyModel->findMinLevelByEventId($event->id);
 
-                    $this->connection->update('tl_calendar_events', $set, [$objEvent->id]);
+                if (null !== $firstLevel) {
+                    $this->connection->update(self::TABLE, ['eventReleaseLevel' => $firstLevel->id], ['id' => $event->id]);
                 }
             }
+
+            return;
         }
+
+        // New event: set the first release level
+        $firstLevel = $this->eventReleaseLevelPolicyModel->findMinLevelByEventId($event->id);
+
+        if (null === $firstLevel) {
+            return;
+        }
+
+        $dc->activeRecord->eventReleaseLevel = $firstLevel->id;
+
+        $this->connection->update(self::TABLE, ['eventReleaseLevel' => $firstLevel->id], ['id' => $event->id]);
     }
 
     /**
-     * Only shows the content/value of the field, and not the form widget. Is used if
-     * the field cannot be edited because the release level (FS) is too high.
+     * Only shows the value of the field instead of the form widget. Is used if the
+     * field cannot be edited because the release level (FS) is too high (see
+     * AccessDecision\CalendarEvents).
      *
      * @throws Exception
      */
@@ -780,225 +694,46 @@ class CalendarEvents
     {
         $fieldName = $dc->field;
 
-        $strTable = 'tl_calendar_events';
-
         // Do not show the field in the overrideAll mode
         if (!$dc->activeRecord->id) {
             return '';
         }
 
-        $intId = $dc->activeRecord->id;
+        $value = $this->connection->fetchOne('SELECT '.$fieldName.' FROM tl_calendar_events WHERE id = ?', [$dc->activeRecord->id]);
 
-        $varFieldValue = $this->connection->fetchOne('SELECT '.$fieldName.' FROM tl_calendar_events WHERE id = ?', [$intId]);
-
-        if (false === $varFieldValue) {
+        if (false === $value) {
             return '';
         }
 
-        $arrDcaFields = \is_array($GLOBALS['TL_DCA'][$strTable]['fields'] ?? []) ? $GLOBALS['TL_DCA'][$strTable]['fields'] : [];
-        $allowedFields = array_unique(array_merge(['id', 'pid', 'sorting', 'tstamp'], array_keys($arrDcaFields)));
+        $dcaFields = \is_array($GLOBALS['TL_DCA'][self::TABLE]['fields'] ?? []) ? $GLOBALS['TL_DCA'][self::TABLE]['fields'] : [];
+        $allowedFields = array_unique(array_merge(['id', 'pid', 'sorting', 'tstamp'], array_keys($dcaFields)));
 
         if (!\in_array($fieldName, $allowedFields, true)) {
             return '';
         }
 
-        // Label and help
-        if (isset($arrDcaFields[$fieldName]['label'])) {
-            $label = $arrDcaFields[$fieldName]['label'][0] ?? $fieldName;
-            $help = $arrDcaFields[$fieldName]['label'][1] ?? $fieldName;
-        } else {
-            $label = isset($GLOBALS['TL_LANG']['MSC'][$fieldName]) && \is_array($GLOBALS['TL_LANG']['MSC'][$fieldName]) ? $GLOBALS['TL_LANG']['MSC'][$fieldName][0] : $GLOBALS['TL_LANG']['MSC'][$fieldName];
-            $help = isset($GLOBALS['TL_LANG']['MSC'][$fieldName]) && \is_array($GLOBALS['TL_LANG']['MSC'][$fieldName]) ? $GLOBALS['TL_LANG']['MSC'][$fieldName][1] : $GLOBALS['TL_LANG']['MSC'][$fieldName];
-        }
+        $dcaField = $dcaFields[$fieldName] ?? [];
 
-        if (empty($label)) {
-            $label = $fieldName;
-        }
+        [$label, $help] = $this->getFieldLabel($fieldName, $dcaField);
 
-        if (!empty($help)) {
+        if ('' !== $help) {
             $help = '<p class="tl_help tl_tip tl_full_height">'.$help.'</p>';
         }
 
-        // Do only show allowed fields
-        if ($arrDcaFields[$fieldName]['eval']['hideInput'] ?? false) {
-            $varFieldValue = '********';
-        }
-
-        $varFieldValue = $this->stringUtil->deserialize($varFieldValue);
-
-        // Decrypt the value
-        if ($arrDcaFields[$fieldName]['eval']['encrypt'] ?? null) {
-            $passwordHasherFactory = $this->passwordHasherFactory
-                ->getPasswordHasher(User::class)
-            ;
-            $varFieldValue = $passwordHasherFactory->hash($varFieldValue);
-        }
-
-        // Get the field value
-        if ('eventState' === $fieldName) {
-            $varFieldValue = '' === $varFieldValue ? '---' : $varFieldValue;
-        } elseif ('mountainguide' === $fieldName) {
-            $varFieldValue = $GLOBALS['TL_LANG'][$strTable]['mountainguide_reference'][(int) $varFieldValue];
-        } elseif ('eventDates' === $fieldName) {
-            if (!empty($varFieldValue) && \is_array($varFieldValue)) {
-                $arrDate = [];
-
-                foreach ($varFieldValue as $arrTstamp) {
-                    $arrDate[] = $this->date->parse('D, d.m.Y', $arrTstamp['new_repeat']);
-                }
-                $varFieldValue = implode('<br>', $arrDate);
-            }
-        } elseif ('tourProfile' === $fieldName) {
-            // Special treatment for tourProfile
-            $arrProfile = [];
-            $m = 0;
-
-            if (!empty($varFieldValue) && \is_array($varFieldValue)) {
-                foreach ($varFieldValue as $profile) {
-                    ++$m;
-
-                    if (\count($varFieldValue) > 1) {
-                        $pattern = $m.'. Tag &nbsp;&nbsp;&nbsp; Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
-                    } else {
-                        $pattern = 'Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
-                    }
-
-                    $arrProfile[] = \sprintf($pattern, $profile['tourProfileAscentMeters'], $profile['tourProfileAscentTime'], $profile['tourProfileDescentMeters'], $profile['tourProfileDescentTime']);
-                }
-            }
-
-            if (!empty($arrProfile)) {
-                $varFieldValue = implode('<br>', $arrProfile);
-            }
-        } elseif ('instructor' === $fieldName) {
-            // Special treatment for instructor
-            $arrInstructors = [];
-
-            foreach ($varFieldValue as $arrInstructor) {
-                if ($arrInstructor['instructorId'] > 0) {
-                    $objUser = $this->userModel->findById($arrInstructor['instructorId']);
-
-                    if (null !== $objUser) {
-                        $arrInstructors[] = $objUser->name;
-                    }
-                }
-            }
-
-            if (!empty($arrInstructors)) {
-                $varFieldValue = implode('<br>', $arrInstructors);
-            }
-        } elseif ('tourTechDifficulty' === $fieldName) {
-            // Special treatment for tourTechDifficulty
-            $arrDiff = [];
-
-            foreach ($varFieldValue as $difficulty) {
-                $strDiff = '';
-
-                if (\strlen((string) $difficulty['tourTechDifficultyMin']) && \strlen($difficulty['tourTechDifficultyMax'])) {
-                    $strMin = $this->connection->fetchOne('SELECT shortcut FROM tl_tour_difficulty WHERE id = ?', [$difficulty['tourTechDifficultyMin']]);
-
-                    if ($strMin) {
-                        $strDiff = $strMin;
-                    }
-
-                    $strMax = $this->connection->fetchOne('SELECT shortcut FROM tl_tour_difficulty WHERE id = ?', [$difficulty['tourTechDifficultyMax']]);
-
-                    if ($strMax) {
-                        $strDiff .= ' - '.$strMax;
-                    }
-
-                    $arrDiff[] = $strDiff;
-                } elseif (\strlen((string) $difficulty['tourTechDifficultyMin'])) {
-                    $strMin = $this->connection->fetchOne('SELECT shortcut FROM tl_tour_difficulty WHERE id = ?', [$difficulty['tourTechDifficultyMin']]);
-
-                    if ($strMin) {
-                        $strDiff = $strMin;
-                    }
-
-                    $arrDiff[] = $strDiff;
-                }
-            }
-
-            if (!empty($arrDiff)) {
-                $varFieldValue = implode(', ', $arrDiff);
-            }
-        } elseif (isset($arrDcaFields[$fieldName]['foreignKey'])) {
-            $temp = [];
-            $chunks = explode('.', $arrDcaFields[$fieldName]['foreignKey'], 2);
-
-            foreach ((array) $varFieldValue as $v) {
-                // Use \Contao\Database::quoteIdentifier instead of
-                // Doctrine\DBAL\Connection::quoteIdentifier because only Contao can handle
-                // chained foreign keys like this: 'foreignKey' => "tl_user.CONCAT(lastname, ' ',
-                // firstname, ', ', city)",
-                $keyValue = $this->connection->fetchOne('SELECT '.Database::quoteIdentifier($chunks[1]).' AS value FROM '.$chunks[0].' WHERE id = ?', [$v]);
-
-                if ($keyValue) {
-                    $temp[] = $keyValue;
-                }
-            }
-
-            $varFieldValue = implode(', ', $temp);
-        } elseif (($arrDcaFields[$fieldName]['inputType'] ?? null) === 'fileTree') {
-            if (\is_array($varFieldValue)) {
-                foreach ($varFieldValue as $kk => $vv) {
-                    if (($objFile = $this->filesModel->findByUuid($vv)) instanceof FilesModel) {
-                        $varFieldValue[$kk] = $objFile->path.' ('.$this->stringUtil->binToUuid($vv).')';
-                    } else {
-                        $varFieldValue[$kk] = '';
-                    }
-                }
-
-                $varFieldValue = implode(', ', $varFieldValue);
-            } elseif (($objFile = $this->filesModel->findByUuid($varFieldValue)) instanceof FilesModel) {
-                $varFieldValue = $objFile->path.' ('.$this->stringUtil->binToUuid($varFieldValue).')';
-            } else {
-                $varFieldValue = '';
-            }
-        } elseif (\is_array($varFieldValue)) {
-            if (isset($varFieldValue['value'], $varFieldValue['unit']) && 2 === \count($varFieldValue)) {
-                $varFieldValue = trim($varFieldValue['value'].', '.$varFieldValue['unit']);
-            } else {
-                foreach ($varFieldValue as $kk => $vv) {
-                    if (\is_array($vv)) {
-                        $values = array_values($vv);
-                        $varFieldValue[$kk] = array_shift($values).' ('.implode(', ', array_filter($values)).')';
-                    }
-                }
-
-                if ($this->arrayUtil->isAssoc($varFieldValue)) {
-                    foreach ($varFieldValue as $kk => $vv) {
-                        $varFieldValue[$kk] = $kk.': '.$vv;
-                    }
-                }
-
-                $varFieldValue = implode(', ', $varFieldValue);
-            }
-        } elseif (($arrDcaFields[$fieldName]['eval']['rgxp'] ?? null) === 'date') {
-            $varFieldValue = $varFieldValue ? $this->date->parse($this->config->get('dateFormat'), $varFieldValue) : '-';
-        } elseif (($arrDcaFields[$fieldName]['eval']['rgxp'] ?? null) === 'time') {
-            $varFieldValue = $varFieldValue ? $this->date->parse($this->config->get('timeFormat'), $varFieldValue) : '-';
-        } elseif ('tstamp' === $fieldName || ($arrDcaFields[$fieldName]['eval']['rgxp'] ?? null) === 'datim' || \in_array($arrDcaFields[$fieldName]['flag'] ?? null, [DataContainer::SORT_DAY_ASC, DataContainer::SORT_DAY_DESC, DataContainer::SORT_MONTH_ASC, DataContainer::SORT_MONTH_DESC, DataContainer::SORT_YEAR_ASC, DataContainer::SORT_YEAR_DESC], true)) {
-            $varFieldValue = $varFieldValue ? $this->date->parse($this->config->get('datimFormat'), $varFieldValue) : '-';
-        } elseif (($arrDcaFields[$fieldName]['eval']['isBoolean'] ?? null) || (($arrDcaFields[$fieldName]['inputType'] ?? null) === 'checkbox' && !($arrDcaFields[$fieldName]['eval']['multiple'] ?? null))) {
-            $varFieldValue = $varFieldValue ? $GLOBALS['TL_LANG']['MSC']['yes'] : $GLOBALS['TL_LANG']['MSC']['no'];
-        } elseif (($arrDcaFields[$fieldName]['eval']['rgxp'] ?? null) === 'email') {
-            $varFieldValue = $this->idna->decodeEmail($varFieldValue);
-        } elseif (($arrDcaFields[$fieldName]['inputType'] ?? null) === 'textarea' && (($arrDcaFields[$fieldName]['eval']['allowHtml'] ?? null) || ($arrDcaFields[$fieldName]['eval']['preserveTags'] ?? null))) {
-            $varFieldValue = $this->stringUtil->specialchars($varFieldValue);
-        } elseif (\is_array($arrDcaFields[$fieldName]['reference'] ?? null)) {
-            $varFieldValue = isset($arrDcaFields[$fieldName]['reference'][$varFieldValue]) ? (\is_array($arrDcaFields[$fieldName]['reference'][$varFieldValue]) ? $arrDcaFields[$fieldName]['reference'][$varFieldValue][0] : $arrDcaFields[$fieldName]['reference'][$varFieldValue]) : $varFieldValue;
-        } elseif (($arrDcaFields[$fieldName]['eval']['isAssociative'] ?? null) || $this->arrayUtil->isAssoc($arrDcaFields[$fieldName]['options'] ?? null)) {
-            $varFieldValue = $arrDcaFields[$fieldName]['options'][$varFieldValue] ?? null;
+        // Hidden and encrypted values are never shown
+        if (($dcaField['eval']['hideInput'] ?? false) || ($dcaField['eval']['encrypt'] ?? false)) {
+            $value = '********';
+        } else {
+            $value = $this->formatFieldValue($fieldName, $this->stringUtil->deserialize($value), $dcaField);
         }
 
         $markup = '<div class="clr readonly">
-			<h3><label for="ctrl_title">%s</label></h3>
+			<h3><label>%s</label></h3>
     		<div class="field-content-box" data-field="%s">%s</div>
 			%s
 		</div>';
 
-        return \sprintf($markup, $label, $this->stringUtil->specialchars($fieldName), $varFieldValue, $help);
+        return \sprintf($markup, $label, $this->stringUtil->specialchars($fieldName), $value, $help);
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventDates.load', priority: 100)]
@@ -1015,8 +750,11 @@ class CalendarEvents
         return serialize($repeats);
     }
 
+    /**
+     * The tour report form can only be saved (and closed).
+     */
     #[AsCallback(table: 'tl_calendar_events', target: 'edit.buttons', priority: 100)]
-    public function editButtons($arrButtons, $dc)
+    public function editButtons(array $arrButtons, DataContainer $dc): array
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -1056,61 +794,51 @@ class CalendarEvents
     {
         return $this->connection->fetchAllKeyValue(
             'SELECT id, CONCAT(name, ", ", city) FROM tl_user WHERE disable = 0 AND (stop = "" OR stop > ?) ORDER BY name',
-            [
-                time(),
-            ],
-            [
-                Types::INTEGER,
-            ],
+            [time()],
+            [Types::INTEGER],
         );
     }
 
     /**
-     * Options callback for Multi Column Wizard field tl_calendar_events.tourTechDifficulty.
+     * Options callback for the Multi Column Wizard field tl_calendar_events.tourTechDifficulty,
+     * grouped by difficulty category.
      *
      * @throws Exception
      */
     public function getTourDifficulties(): array
     {
         $options = [];
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_tour_difficulty ORDER BY pid, code');
+        $result = $this->connection->executeQuery('SELECT * FROM tl_tour_difficulty ORDER BY pid, code');
 
-        while (false !== ($row = $stmt->fetchAssociative())) {
-            $objDiffCat = TourDifficultyCategoryModel::findById($row['pid']);
+        while (false !== ($row = $result->fetchAssociative())) {
+            $category = $this->tourDifficultyCategoryModel->findById($row['pid']);
 
-            if (null !== $objDiffCat) {
-                if ('' !== $objDiffCat->title) {
-                    if (!isset($options[$objDiffCat->title])) {
-                        $options[$objDiffCat->title] = [];
-                    }
-
-                    $options[$objDiffCat->title][$row['id']] = $row['shortcut'];
-                }
+            if (null === $category || '' === $category->title) {
+                continue;
             }
+
+            $options[$category->title] ??= [];
+            $options[$category->title][$row['id']] = $row['shortcut'];
         }
 
         return $options;
     }
 
     /**
-     * Options callback for Multi Column Wizard field tl_calendar_events.instructor.
+     * Options callback for the Multi Column Wizard field tl_calendar_events.instructor.
      *
      * @throws Exception
      */
     public function listInstructors(): array
     {
         $options = [];
-        $stmt = $this->connection->executeQuery(
+        $result = $this->connection->executeQuery(
             'SELECT id,firstname,lastname,city FROM tl_user WHERE disable = 0 AND (stop = "" OR stop > ?) && lastname != "" && firstname != "" ORDER BY lastname',
-            [
-                time(),
-            ],
-            [
-                Types::INTEGER,
-            ],
+            [time()],
+            [Types::INTEGER],
         );
 
-        while (false !== ($row = $stmt->fetchAssociative())) {
+        while (false !== ($row = $result->fetchAssociative())) {
             $options[$row['id']] = $row['lastname'].' '.$row['firstname'].', '.$row['city'];
         }
 
@@ -1118,49 +846,30 @@ class CalendarEvents
     }
 
     /**
+     * The event types allowed in the calendar.
+     *
      * @throws \Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventType.options', priority: 70)]
     public function getEventTypes(DataContainer|null $dc): array
     {
-        $options = [];
-        $user = $this->security->getUser();
-
         if (!$dc) {
-            return $options;
+            return [];
         }
+
+        $calendar = null;
 
         if (!$dc->id && $dc->currentPid > 0) {
-            $objCalendar = $this->calendarModel->findById($dc->currentPid);
+            $calendar = $this->calendarModel->findById($dc->currentPid);
         } elseif ($dc->id > 0) {
-            $objCalendar = $this->calendarEventsModel->findById($dc->id)->getRelated('pid');
+            $calendar = $this->calendarEventsModel->findById($dc->id)?->getRelated('pid');
         }
 
-        $arrAllowedEventTypes = [];
-
-        if (isset($objCalendar) && null !== $user) {
-            $arrGroups = $this->stringUtil->deserialize($user->groups, true);
-
-            foreach ($arrGroups as $group) {
-                $objGroup = UserGroupModel::findById($group);
-
-                if (null !== $objGroup && !empty($objGroup->allowedEventTypes) && \is_array($objGroup->allowedEventTypes)) {
-                    $arrAllowedEvtTypes = $this->stringUtil->deserialize($objGroup->allowedEventTypes, true);
-
-                    foreach ($arrAllowedEvtTypes as $eventType) {
-                        if (!\in_array($eventType, $arrAllowedEventTypes, false)) {
-                            $arrAllowedEventTypes[] = $eventType;
-                        }
-                    }
-                }
-            }
+        if (null === $calendar) {
+            return [];
         }
 
-        if (isset($objCalendar)) {
-            $options = $this->stringUtil->deserialize($objCalendar->allowedEventTypes, true);
-        }
-
-        return $options;
+        return $this->stringUtil->deserialize($calendar->allowedEventTypes, true);
     }
 
     /**
@@ -1171,85 +880,55 @@ class CalendarEvents
     {
         $options = [];
 
-        $eventId = $this->connection->fetchOne(
-            'SELECT courseTypeLevel0 FROM tl_calendar_events WHERE id = ?',
-            [$dc->id],
-        );
+        $courseTypeLevel0 = $this->connection->fetchOne('SELECT courseTypeLevel0 FROM tl_calendar_events WHERE id = ?', [$dc->id]);
 
-        if ($eventId) {
-            $stmt = $this->connection->executeQuery(
-                'SELECT * FROM tl_course_sub_type WHERE pid = ? ORDER BY pid, code',
-                [$eventId],
-            );
+        if (!$courseTypeLevel0) {
+            return $options;
+        }
 
-            while (false !== ($row = $stmt->fetchAssociative())) {
-                $options[$row['id']] = $row['code'].' '.$row['name'];
-            }
+        $result = $this->connection->executeQuery('SELECT * FROM tl_course_sub_type WHERE pid = ? ORDER BY pid, code', [$courseTypeLevel0]);
+
+        while (false !== ($row = $result->fetchAssociative())) {
+            $options[$row['id']] = $row['code'].' '.$row['name'];
         }
 
         return $options;
     }
 
     /**
+     * Release levels grouped by release level package. Non-admins only get the
+     * packages of the event types allowed in their user groups.
+     *
      * @throws Exception
-     * @throws \Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventReleaseLevel.options', priority: 50)]
     public function getEventReleaseLevels(DataContainer $dc): array
     {
-        // Use
-        // $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel']['foreignKey']
-        // for the filter panel instead of the options-callback
-        $referringMethod = debug_backtrace()[2]['function'];
+        $act = $this->requestStack->getCurrentRequest()->query->get('act');
 
-        if ('panel' === $referringMethod) {
+        // The filter panel of the list view uses the foreignKey of the field, as it
+        // cannot handle grouped options.
+        if (!$act || 'select' === $act) {
             return [];
+        }
+
+        $user = $this->security->getUser();
+
+        if (!$user instanceof BackendUser) {
+            return [];
+        }
+
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return $this->getReleaseLevelOptions();
         }
 
         $options = [];
 
-        $user = $this->security->getUser();
-        $arrAllowedEventTypes = [];
+        foreach ($this->getEventTypesOfUserGroups($user) as $eventType) {
+            $eventTypeModel = $this->eventTypeModel->findById($eventType);
 
-        if ($user instanceof BackendUser) {
-            if (!$this->security->isGranted('ROLE_ADMIN')) {
-                $arrGroups = $this->stringUtil->deserialize($user->groups, true);
-
-                foreach ($arrGroups as $group) {
-                    $objGroup = UserGroupModel::findById($group);
-
-                    if (null !== $objGroup) {
-                        $arrEventTypes = $this->stringUtil->deserialize($objGroup->allowedEventTypes, true);
-
-                        foreach ($arrEventTypes as $eventType) {
-                            if (!\in_array($eventType, $arrAllowedEventTypes, false)) {
-                                $arrAllowedEventTypes[] = $eventType;
-                            }
-                        }
-                    }
-                }
-
-                foreach ($arrAllowedEventTypes as $eventType) {
-                    $objEventType = EventTypeModel::findById($eventType);
-
-                    if (null !== $objEventType) {
-                        $objEventReleasePackage = EventReleaseLevelPolicyPackageModel::findById($objEventType->levelAccessPermissionPackage);
-
-                        if (null !== $objEventReleasePackage) {
-                            $stmt = $this->connection->executeQuery('SELECT * FROM tl_event_release_level_policy WHERE pid = ? ORDER BY level', [$objEventReleasePackage->id]);
-
-                            while (false !== ($rowEventReleaseLevels = $stmt->fetchAssociative())) {
-                                $options[EventReleaseLevelPolicyModel::findById($rowEventReleaseLevels['id'])->getRelated('pid')->title][$rowEventReleaseLevels['id']] = $rowEventReleaseLevels['title'];
-                            }
-                        }
-                    }
-                }
-            } else {
-                $stmt = $this->connection->executeQuery('SELECT * FROM tl_event_release_level_policy ORDER BY pid,level');
-
-                while (false !== ($rowEventReleaseLevels = $stmt->fetchAssociative())) {
-                    $options[EventReleaseLevelPolicyModel::findById($rowEventReleaseLevels['id'])->getRelated('pid')->title][$rowEventReleaseLevels['id']] = $rowEventReleaseLevels['title'];
-                }
+            if (null !== $eventTypeModel) {
+                $options = array_replace_recursive($options, $this->getReleaseLevelOptions((int) $eventTypeModel->levelAccessPermissionPackage));
             }
         }
 
@@ -1257,7 +936,7 @@ class CalendarEvents
     }
 
     /**
-     * Multi Column Wizard columnsCallback listFixedDates().
+     * Multi Column Wizard columnsCallback for tl_calendar_events.eventDates.
      */
     public function listFixedDates(): array
     {
@@ -1275,48 +954,43 @@ class CalendarEvents
     #[AsCallback(table: 'tl_calendar_events', target: 'list.sorting.child_record', priority: 100)]
     public function childRecordCallback(array $arrRow): string
     {
-        $span = Calendar::calculateSpan($arrRow['startTime'], $arrRow['endTime']);
-        $objEvent = $this->calendarEventsModel->findById($arrRow['id']);
+        $span = $this->calendar->calculateSpan($arrRow['startTime'], $arrRow['endTime']);
+        $event = $this->calendarEventsModel->findById($arrRow['id']);
 
-        if ($span > 0) {
-            $date = $this->date->parse($this->config->get($arrRow['addTime'] ? 'datimFormat' : 'dateFormat'), $arrRow['startTime']).' – '.$this->date->parse($this->config->get($arrRow['addTime'] ? 'datimFormat' : 'dateFormat'), $arrRow['endTime']);
-        } elseif ((int) $arrRow['startTime'] === (int) $arrRow['endTime']) {
-            $date = $this->date->parse($this->config->get('dateFormat'), $arrRow['startTime']).($arrRow['addTime'] ? ' '.$this->date->parse($this->config->get('timeFormat'), $arrRow['startTime']) : '');
-        } else {
-            $date = $this->date->parse($this->config->get('dateFormat'), $arrRow['startTime']).($arrRow['addTime'] ? ' '.$this->date->parse($this->config->get('timeFormat'), $arrRow['startTime']).' – '.$this->date->parse($this->config->get('timeFormat'), $arrRow['endTime']) : '');
-        }
+        $date = $this->formatEventDate($arrRow, $span);
 
-        // Add icon
+        // Published icon
         if ($arrRow['published']) {
             $icon = $this->image->getHtml('visible.svg', $GLOBALS['TL_LANG']['MSC']['published'], 'title="'.$GLOBALS['TL_LANG']['MSC']['published'].'"');
         } else {
             $icon = $this->image->getHtml('invisible.svg', $GLOBALS['TL_LANG']['MSC']['unpublished'], 'title="'.$GLOBALS['TL_LANG']['MSC']['unpublished'].'"');
         }
 
-        // Add the main instructor
+        // Main instructor
         $strAuthor = '';
-        $objUser = $this->userModel->findById($arrRow['mainInstructor']);
+        $mainInstructor = $this->userModel->findById($arrRow['mainInstructor']);
 
-        if (null !== $objUser) {
-            $strAuthor = ' <span style="color:#b3b3b3;padding-left:3px">[Hauptleiter: '.$objUser->name.']</span><br>';
+        if (null !== $mainInstructor) {
+            $strAuthor = ' <span style="color:#b3b3b3;padding-left:3px">[Hauptleiter: '.$this->stringUtil->specialchars($mainInstructor->name).']</span><br>';
         }
 
-        $strRegistrations = $this->calendarEventsUtil->getSubscriptionStateBadges($objEvent);
+        // Registration badges
+        $strRegistrations = $this->calendarEventsUtil->getSubscriptionStateBadges($event);
 
         if ('' !== $strRegistrations) {
             $strRegistrations = '<br>'.$strRegistrations;
         }
 
-        // Add event release level
+        // Release level
         $strLevel = '';
-        $eventReleaseLevelModel = EventReleaseLevelPolicyModel::findById($arrRow['eventReleaseLevel']);
+        $currentLevel = $this->eventReleaseLevelPolicyModel->findById($arrRow['eventReleaseLevel']);
 
-        if (null !== $eventReleaseLevelModel) {
+        if (null !== $currentLevel) {
             $strLevel = \sprintf(
                 '<span class="release-level-%d text-decoration-underline" title="Freigabestufe: %s">FS: %s</span> ',
-                StringUtil::specialchars($eventReleaseLevelModel->level),
-                StringUtil::specialchars($eventReleaseLevelModel->title),
-                $eventReleaseLevelModel->level,
+                $this->stringUtil->specialchars($currentLevel->level),
+                $this->stringUtil->specialchars($currentLevel->title),
+                $currentLevel->level,
             );
         }
 
@@ -1324,7 +998,7 @@ class CalendarEvents
             '<div class="tl_content_left">%s %s%s <span style="color:#999;padding-left:3px">[%s]</span>%s%s</div>',
             $icon,
             $strLevel,
-            $arrRow['title'],
+            $this->stringUtil->specialchars($arrRow['title']),
             $date,
             $strAuthor,
             $strRegistrations,
@@ -1374,7 +1048,7 @@ class CalendarEvents
     /**
      * - Event date fields cannot be empty
      * - Must contain one or more valid dates
-     * - Bust be correctly sorted
+     * - Must be correctly sorted
      * - Formatted dates are converted to unix timestamps.
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventDates.save', priority: 100)]
@@ -1389,26 +1063,22 @@ class CalendarEvents
         foreach ($repeats as $k => $item) {
             $value = $item['new_repeat'] ?? null;
 
-            // Convert date string to timestamp
             if (DateValidator::isValidDate($value, $this->config->get('dateFormat'))) {
+                // Convert the date string to a timestamp
                 $repeats[$k]['new_repeat'] = new Date($value, $this->config->get('dateFormat'))->tstamp;
-            }
-            // Timestamp
-            elseif (DateValidator::isValidTimestamp($value)) {
+            } elseif (DateValidator::isValidTimestamp($value)) {
                 $repeats[$k]['new_repeat'] = (int) $value;
-            }
-            // Invalid
-            else {
+            } else {
                 throw new \Exception($this->translator->trans('ERR.eventDatesInvalid', [], 'contao_default'));
             }
 
-            // 4. Timestamp must be > 0
+            // The timestamp must be > 0
             if ($repeats[$k]['new_repeat'] <= 0) {
                 throw new \Exception($this->translator->trans('ERR.eventDatesInvalid', [], 'contao_default'));
             }
         }
 
-        // Check sorted order
+        // The dates must be sorted in ascending order
         $previousTstamp = 0;
 
         foreach ($repeats as $item) {
@@ -1423,7 +1093,8 @@ class CalendarEvents
     }
 
     /**
-     * Update the main instructor (the first instructor in the list is the main instructor).
+     * Sync tl_calendar_events_instructor and tl_calendar_events.mainInstructor with the
+     * instructors of the event. The first instructor in the list is the main instructor.
      *
      * @throws Exception
      */
@@ -1433,30 +1104,23 @@ class CalendarEvents
         if (!$dc->id) {
             return $varValue;
         }
-        $arrInstructors = $this->stringUtil->deserialize($varValue, true);
-        $instructorIds = array_column($arrInstructors, 'instructorId');
-        $instructorIds = !empty($instructorIds) ? array_map('intval', $instructorIds) : $instructorIds;
-        file_put_contents(System::getContainer()->getParameter('kernel.project_dir').'/test.log', "\n".print_r($instructorIds, true), FILE_APPEND);
 
-        // Remove instructors that are no longer present
+        $instructors = $this->stringUtil->deserialize($varValue, true);
+        $instructorIds = array_column($instructors, 'instructorId');
+        $instructorIds = !empty($instructorIds) ? array_map('intval', $instructorIds) : $instructorIds;
+
+        // Remove the instructors that are no longer in the list
         if (!empty($instructorIds)) {
             $this->connection->executeStatement(
                 'DELETE FROM tl_calendar_events_instructor WHERE pid = ? AND userId NOT IN (?)',
-                [
-                    $dc->id,
-                    $instructorIds,
-                ],
-                [
-                    ParameterType::INTEGER,
-                    ArrayParameterType::INTEGER,
-                ],
+                [$dc->id, $instructorIds],
+                [ParameterType::INTEGER, ArrayParameterType::INTEGER],
             );
         } else {
-            // No instructors → remove all
             $this->connection->delete('tl_calendar_events_instructor', ['pid' => (int) $dc->id]);
         }
 
-        // Upsert instructors → userid_pid unique key must be configured on tl_calendar_events_instructor!
+        // Insert or update the instructors (unique key userid_pid on tl_calendar_events_instructor)
         foreach ($instructorIds as $i => $userId) {
             $sql = '
             INSERT INTO tl_calendar_events_instructor (pid, userId, tstamp, isMainInstructor)
@@ -1474,14 +1138,7 @@ class CalendarEvents
             ]);
         }
 
-        // Update mainInstructor field in parent table
-        $mainInstructor = $instructorIds[0] ?? 0;
-
-        $this->connection->update(
-            'tl_calendar_events',
-            ['mainInstructor' => $mainInstructor],
-            ['id' => $dc->id],
-        );
+        $this->connection->update(self::TABLE, ['mainInstructor' => $instructorIds[0] ?? 0], ['id' => $dc->id]);
 
         return $varValue;
     }
@@ -1489,25 +1146,23 @@ class CalendarEvents
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventReleaseLevel.save', priority: 90)]
     public function saveCallbackEventReleaseLevel(int $targetEventReleaseLevelId, DataContainer $dc): int
     {
-        $objEvent = CalendarEventsModel::findById($dc->id);
+        $event = $this->calendarEventsModel->findById($dc->id);
 
-        if (null === $objEvent) {
+        if (null === $event) {
             return $targetEventReleaseLevelId;
         }
 
         try {
-            $this->eventReleaseLevelUtil->validateEventReleaseLevelTransition($objEvent, $targetEventReleaseLevelId);
-            $this->eventReleaseLevelUtil->shiftEventReleaseLevel($objEvent, EventReleaseLevelPolicyModel::findById($targetEventReleaseLevelId));
+            $this->eventReleaseLevelUtil->validateEventReleaseLevelTransition($event, $targetEventReleaseLevelId);
+            $this->eventReleaseLevelUtil->shiftEventReleaseLevel($event, $this->eventReleaseLevelPolicyModel->findById($targetEventReleaseLevelId));
 
-            // Everything ok, return the new event release level id
             return $targetEventReleaseLevelId;
         } catch (EventReleaseLevelTransitionException $e) {
             $this->message->add($this->translator->trans($e->getTranslatableText(), $e->getParams(), 'contao_default'), $e->getErrorLevel());
-        } catch (\Exception $e) {
-            throw $e;
         }
 
-        return $objEvent->eventReleaseLevel;
+        // Keep the current release level
+        return $event->eventReleaseLevel;
     }
 
     /**
@@ -1516,54 +1171,48 @@ class CalendarEvents
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.tourTechDifficulty.save', priority: 90)]
     public function setCorrectTourTechDifficulty(string $value, DataContainer $dc): string
     {
-        $arrValue = $this->stringUtil->deserialize($value, true);
+        $difficulties = $this->stringUtil->deserialize($value, true);
         $hasUpdate = false;
 
-        if (!empty($arrValue)) {
-            foreach ($arrValue as $i => $tourTechDiff) {
-                if (isset($tourTechDiff['tourTechDifficultyMin'], $tourTechDiff['tourTechDifficultyMax']) && $tourTechDiff['tourTechDifficultyMin'] === $tourTechDiff['tourTechDifficultyMax']) {
-                    $arrValue[$i]['tourTechDifficultyMax'] = '';
-                    $hasUpdate = true;
-                }
-            }
-
-            if ($hasUpdate) {
-                return serialize($arrValue);
+        foreach ($difficulties as $i => $difficulty) {
+            if (isset($difficulty['tourTechDifficultyMin'], $difficulty['tourTechDifficultyMax']) && $difficulty['tourTechDifficultyMin'] === $difficulty['tourTechDifficultyMax']) {
+                $difficulties[$i]['tourTechDifficultyMax'] = '';
+                $hasUpdate = true;
             }
         }
 
-        return $value;
+        return $hasUpdate ? serialize($difficulties) : $value;
     }
 
     /**
+     * Save the event type immediately and set the first release level if the event
+     * has no valid release level yet.
+     *
      * @throws \Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventType.save', priority: 80)]
     public function saveCallbackEventType(string $strEventType, DataContainer $dc, int|null $intId = null): string
     {
-        if ('' !== $strEventType) {
-            if ($dc->activeRecord->id > 0) {
-                $objEvent = $this->calendarEventsModel->findById($dc->activeRecord->id);
-            } else {
-                $objEvent = $this->calendarEventsModel->findById($intId);
-            }
+        if ('' === $strEventType) {
+            return $strEventType;
+        }
 
-            if (null === $objEvent) {
-                throw new \Exception('Event not found.');
-            }
+        $event = $this->calendarEventsModel->findById($dc->activeRecord->id > 0 ? $dc->activeRecord->id : $intId);
 
-            // !important, because if the eventType is not saved, no eventReleaseLevel
-            // can be assigned
-            $objEvent->eventType = $strEventType;
-            $objEvent->save();
+        if (null === $event) {
+            throw new \Exception('Event not found.');
+        }
 
-            if (null === EventReleaseLevelPolicyModel::findById($objEvent->eventReleaseLevel)) {
-                $objEventReleaseModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($objEvent->id);
+        // Important: Without the event type, no release level can be assigned
+        $event->eventType = $strEventType;
+        $event->save();
 
-                if (null !== $objEventReleaseModel) {
-                    $objEvent->eventReleaseLevel = $objEventReleaseModel->id;
-                    $objEvent->save();
-                }
+        if (null === $this->eventReleaseLevelPolicyModel->findById($event->eventReleaseLevel)) {
+            $firstLevel = $this->eventReleaseLevelPolicyModel->findMinLevelByEventId($event->id);
+
+            if (null !== $firstLevel) {
+                $event->eventReleaseLevel = $firstLevel->id;
+                $event->save();
             }
         }
 
@@ -1593,5 +1242,477 @@ class CalendarEvents
         }
 
         return $value;
+    }
+
+    private function disableFilterSearchAndSorting(string ...$fields): void
+    {
+        foreach ($fields as $field) {
+            $GLOBALS['TL_DCA'][self::TABLE]['fields'][$field]['filter'] = false;
+            $GLOBALS['TL_DCA'][self::TABLE]['fields'][$field]['search'] = false;
+            $GLOBALS['TL_DCA'][self::TABLE]['fields'][$field]['sorting'] = false;
+        }
+    }
+
+    /**
+     * Value of a column in the CSV export.
+     */
+    private function getCsvValue(CalendarEventsModel $event, string $field): mixed
+    {
+        $value = $event->{$field};
+
+        switch ($field) {
+            case 'eventType':
+                return $GLOBALS['TL_LANG']['MSC'][$value] ?? $value;
+
+            case 'mainInstructor':
+                $user = $this->userModel->findById($value);
+
+                return null !== $user ? html_entity_decode($user->lastname.' '.$user->firstname) : '';
+
+            case 'tourTechDifficulty':
+                return implode(' und ', $this->calendarEventsUtil->getTourTechDifficultiesAsArray($event, false, false));
+
+            case 'eventDates':
+                $dates = array_map(
+                    fn ($tstamp) => $this->date->parse($this->config->get('dateFormat'), $tstamp),
+                    $this->calendarEventsUtil->getEventTimestamps($event),
+                );
+
+                return implode(',', $dates);
+
+            case 'eventDurationInDays':
+                return \count($this->calendarEventsUtil->getEventTimestamps($event));
+
+            case 'organizers':
+                return html_entity_decode(implode(',', $this->calendarEventsUtil->getEventOrganizersAsArray($event, 'title')));
+
+            case 'instructor':
+                return html_entity_decode(implode(',', $this->calendarEventsUtil->getInstructorNamesAsArray($event)));
+
+            case 'tourType':
+                if (EventType::COURSE === $event->eventType) {
+                    return '';
+                }
+
+                return html_entity_decode(implode(',', $this->calendarEventsUtil->getTourTypesAsArray($event, 'title')));
+
+            case 'eventReleaseLevel':
+                $releaseLevel = $this->eventReleaseLevelPolicyModel->findById($value);
+
+                return null !== $releaseLevel ? $releaseLevel->level : '';
+
+            case 'journey':
+                $journey = $this->calendarEventsJourneyModel->findById($value);
+
+                return null !== $journey ? $journey->title : $value;
+
+            case 'courseLevel':
+                if (EventType::COURSE !== $event->eventType || !\is_int($value) || !$this->courseLevels->has($value)) {
+                    return '';
+                }
+
+                return $this->courseLevels->get($value);
+
+            case 'courseTypeLevel0':
+                if (EventType::COURSE !== $event->eventType || empty($value)) {
+                    return '';
+                }
+
+                return (string) $this->connection->fetchOne('SELECT name FROM tl_course_main_type WHERE id = ?', [$value]);
+
+            case 'courseTypeLevel1':
+                if (EventType::COURSE !== $event->eventType || empty($value)) {
+                    return '';
+                }
+
+                return (string) $this->connection->fetchOne('SELECT name FROM tl_course_sub_type WHERE id = ?', [$value]);
+
+            case 'executionState':
+                return empty($value) ? '' : $GLOBALS['TL_LANG']['tl_calendar_events'][$value] ?? $value;
+
+            case 'eventState':
+                return empty($value) ? '' : $GLOBALS['TL_LANG']['tl_calendar_events'][$value][0] ?? $value;
+
+            default:
+                if (\in_array($field, self::CSV_EXPORT_TEXT_FIELDS, true)) {
+                    return str_replace(['<br>', '<br/>', '<br />', '{{br}}'], [' ', ' ', ' ', ' '], nl2br((string) $value));
+                }
+
+                return $value;
+        }
+    }
+
+    /**
+     * Shifted dates of an event or null, if the event has invalid event dates.
+     */
+    private function getShiftedDates(array $row, string $modifier): array|null
+    {
+        $set = [];
+
+        $set['startTime'] = strtotime($modifier, (int) $row['startTime']);
+        $set['endTime'] = strtotime($modifier, (int) $row['endTime']);
+        $set['startDate'] = strtotime($modifier, (int) $row['startDate']);
+        $set['endDate'] = strtotime($modifier, (int) $row['endDate']);
+
+        if ($row['registrationStartDate'] > 0) {
+            $set['registrationStartDate'] = strtotime($modifier, (int) $row['registrationStartDate']);
+        }
+
+        if ($row['registrationEndDate'] > 0) {
+            $set['registrationEndDate'] = strtotime($modifier, (int) $row['registrationEndDate']);
+        }
+
+        $repeats = [];
+
+        foreach ($this->stringUtil->deserialize($row['eventDates'], true) as $repeat) {
+            $repeat['new_repeat'] = strtotime($modifier, (int) $repeat['new_repeat']);
+
+            if (!DateValidator::isValidTimestamp($repeat['new_repeat'])) {
+                $this->message->addError($this->translator->trans('ERR.eventDatesInvalid', [$row['id']], 'contao_default'));
+
+                return null;
+            }
+
+            $repeats[] = $repeat;
+        }
+
+        if ([] !== $repeats) {
+            $set['eventDates'] = serialize($repeats);
+        }
+
+        return $set;
+    }
+
+    /**
+     * Label and help text of a field: from the DCA, tl_calendar_events or MSC (in this
+     * order). Falls back to the field name.
+     *
+     * @return array{0: string, 1: string}
+     */
+    private function getFieldLabel(string $fieldName, array $dcaField): array
+    {
+        $labels = $dcaField['label'] ?? $GLOBALS['TL_LANG'][self::TABLE][$fieldName] ?? $GLOBALS['TL_LANG']['MSC'][$fieldName] ?? [];
+        $labels = \is_array($labels) ? $labels : [$labels];
+
+        $label = (string) ($labels[0] ?? '');
+        $help = (string) ($labels[1] ?? '');
+
+        return ['' !== $label ? $label : $fieldName, $help];
+    }
+
+    /**
+     * Human-readable value of a field for showFieldValue().
+     */
+    private function formatFieldValue(string $fieldName, mixed $value, array $dcaField): mixed
+    {
+        if ('eventState' === $fieldName) {
+            return '' === $value ? '---' : $value;
+        }
+
+        if ('mountainguide' === $fieldName) {
+            return $GLOBALS['TL_LANG'][self::TABLE]['mountainguide_reference'][(int) $value];
+        }
+
+        if ('eventDates' === $fieldName) {
+            return $this->formatEventDates($value);
+        }
+
+        if ('tourProfile' === $fieldName) {
+            return $this->formatTourProfile($value);
+        }
+
+        if ('instructor' === $fieldName) {
+            return $this->formatInstructors($value);
+        }
+
+        if ('tourTechDifficulty' === $fieldName) {
+            return $this->formatTourTechDifficulties($value);
+        }
+
+        if (isset($dcaField['foreignKey'])) {
+            return $this->formatForeignKeyValue($value, $dcaField['foreignKey']);
+        }
+
+        if (($dcaField['inputType'] ?? null) === 'fileTree') {
+            return $this->formatFileTreeValue($value);
+        }
+
+        if (\is_array($value)) {
+            return $this->formatArrayValue($value);
+        }
+
+        $rgxp = $dcaField['eval']['rgxp'] ?? null;
+
+        if ('date' === $rgxp) {
+            return $value ? $this->date->parse($this->config->get('dateFormat'), $value) : '-';
+        }
+
+        if ('time' === $rgxp) {
+            return $value ? $this->date->parse($this->config->get('timeFormat'), $value) : '-';
+        }
+
+        if ('tstamp' === $fieldName || 'datim' === $rgxp || \in_array($dcaField['flag'] ?? null, self::DATE_SORTING_FLAGS, true)) {
+            return $value ? $this->date->parse($this->config->get('datimFormat'), $value) : '-';
+        }
+
+        if (($dcaField['eval']['isBoolean'] ?? null) || (($dcaField['inputType'] ?? null) === 'checkbox' && !($dcaField['eval']['multiple'] ?? null))) {
+            return $value ? $GLOBALS['TL_LANG']['MSC']['yes'] : $GLOBALS['TL_LANG']['MSC']['no'];
+        }
+
+        if ('email' === $rgxp) {
+            return $this->idna->decodeEmail($value);
+        }
+
+        if (($dcaField['inputType'] ?? null) === 'textarea' && (($dcaField['eval']['allowHtml'] ?? null) || ($dcaField['eval']['preserveTags'] ?? null))) {
+            return $this->stringUtil->specialchars($value);
+        }
+
+        if (\is_array($dcaField['reference'] ?? null)) {
+            if (!isset($dcaField['reference'][$value])) {
+                return $value;
+            }
+
+            return \is_array($dcaField['reference'][$value]) ? $dcaField['reference'][$value][0] : $dcaField['reference'][$value];
+        }
+
+        if (($dcaField['eval']['isAssociative'] ?? null) || $this->arrayUtil->isAssoc($dcaField['options'] ?? null)) {
+            return $dcaField['options'][$value] ?? null;
+        }
+
+        return $value;
+    }
+
+    private function formatEventDates(mixed $value): mixed
+    {
+        if (empty($value) || !\is_array($value)) {
+            return $value;
+        }
+
+        $dates = [];
+
+        foreach ($value as $repeat) {
+            $dates[] = $this->date->parse('D, d.m.Y', $repeat['new_repeat']);
+        }
+
+        return implode('<br>', $dates);
+    }
+
+    private function formatTourProfile(mixed $value): mixed
+    {
+        $profiles = [];
+        $day = 0;
+
+        if (!empty($value) && \is_array($value)) {
+            foreach ($value as $profile) {
+                ++$day;
+
+                if (\count($value) > 1) {
+                    $pattern = $day.'. Tag &nbsp;&nbsp;&nbsp; Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
+                } else {
+                    $pattern = 'Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
+                }
+
+                $profiles[] = \sprintf($pattern, $profile['tourProfileAscentMeters'], $profile['tourProfileAscentTime'], $profile['tourProfileDescentMeters'], $profile['tourProfileDescentTime']);
+            }
+        }
+
+        return empty($profiles) ? $value : implode('<br>', $profiles);
+    }
+
+    private function formatInstructors(mixed $value): mixed
+    {
+        $names = [];
+
+        foreach ($value as $instructor) {
+            if ($instructor['instructorId'] > 0) {
+                $user = $this->userModel->findById($instructor['instructorId']);
+
+                if (null !== $user) {
+                    $names[] = $user->name;
+                }
+            }
+        }
+
+        return empty($names) ? $value : implode('<br>', $names);
+    }
+
+    private function formatTourTechDifficulties(mixed $value): mixed
+    {
+        $difficulties = [];
+
+        foreach ($value as $difficulty) {
+            $strDiff = '';
+
+            if (\strlen((string) $difficulty['tourTechDifficultyMin']) && \strlen($difficulty['tourTechDifficultyMax'])) {
+                $strMin = $this->getTourDifficultyShortcut($difficulty['tourTechDifficultyMin']);
+
+                if ($strMin) {
+                    $strDiff = $strMin;
+                }
+
+                $strMax = $this->getTourDifficultyShortcut($difficulty['tourTechDifficultyMax']);
+
+                if ($strMax) {
+                    $strDiff .= ' - '.$strMax;
+                }
+
+                $difficulties[] = $strDiff;
+            } elseif (\strlen((string) $difficulty['tourTechDifficultyMin'])) {
+                $strMin = $this->getTourDifficultyShortcut($difficulty['tourTechDifficultyMin']);
+
+                if ($strMin) {
+                    $strDiff = $strMin;
+                }
+
+                $difficulties[] = $strDiff;
+            }
+        }
+
+        return empty($difficulties) ? $value : implode(', ', $difficulties);
+    }
+
+    private function getTourDifficultyShortcut(mixed $id): mixed
+    {
+        return $this->connection->fetchOne('SELECT shortcut FROM tl_tour_difficulty WHERE id = ?', [$id]);
+    }
+
+    private function formatForeignKeyValue(mixed $value, string $foreignKey): string
+    {
+        $values = [];
+        [$table, $column] = explode('.', $foreignKey, 2);
+
+        foreach ((array) $value as $id) {
+            // Use \Contao\Database::quoteIdentifier instead of
+            // Doctrine\DBAL\Connection::quoteIdentifier because only Contao can handle
+            // chained foreign keys like this: 'foreignKey' => "tl_user.CONCAT(lastname, ' ',
+            // firstname, ', ', city)",
+            $keyValue = $this->connection->fetchOne('SELECT '.Database::quoteIdentifier($column).' AS value FROM '.$table.' WHERE id = ?', [$id]);
+
+            if ($keyValue) {
+                $values[] = $keyValue;
+            }
+        }
+
+        return implode(', ', $values);
+    }
+
+    private function formatFileTreeValue(mixed $value): string
+    {
+        if (\is_array($value)) {
+            foreach ($value as $key => $uuid) {
+                $value[$key] = $this->getFilePathWithUuid($uuid);
+            }
+
+            return implode(', ', $value);
+        }
+
+        return $this->getFilePathWithUuid($value);
+    }
+
+    private function getFilePathWithUuid(mixed $uuid): string
+    {
+        $file = $this->filesModel->findByUuid($uuid);
+
+        if (!$file instanceof FilesModel) {
+            return '';
+        }
+
+        return $file->path.' ('.$this->stringUtil->binToUuid($uuid).')';
+    }
+
+    private function formatArrayValue(array $value): string
+    {
+        // inputUnit
+        if (isset($value['value'], $value['unit']) && 2 === \count($value)) {
+            return trim($value['value'].', '.$value['unit']);
+        }
+
+        foreach ($value as $key => $item) {
+            if (\is_array($item)) {
+                $values = array_values($item);
+                $value[$key] = array_shift($values).' ('.implode(', ', array_filter($values)).')';
+            }
+        }
+
+        if ($this->arrayUtil->isAssoc($value)) {
+            foreach ($value as $key => $item) {
+                $value[$key] = $key.': '.$item;
+            }
+        }
+
+        return implode(', ', $value);
+    }
+
+    /**
+     * Date (and time) of the event in the list view.
+     */
+    private function formatEventDate(array $row, int $span): string
+    {
+        if ($span > 0) {
+            $format = $this->config->get($row['addTime'] ? 'datimFormat' : 'dateFormat');
+
+            return $this->date->parse($format, $row['startTime']).' – '.$this->date->parse($this->config->get($row['addTime'] ? 'datimFormat' : 'dateFormat'), $row['endTime']);
+        }
+
+        $date = $this->date->parse($this->config->get('dateFormat'), $row['startTime']);
+
+        if (!$row['addTime']) {
+            return $date;
+        }
+
+        if ((int) $row['startTime'] === (int) $row['endTime']) {
+            return $date.' '.$this->date->parse($this->config->get('timeFormat'), $row['startTime']);
+        }
+
+        return $date.' '.$this->date->parse($this->config->get('timeFormat'), $row['startTime']).' – '.$this->date->parse($this->config->get('timeFormat'), $row['endTime']);
+    }
+
+    /**
+     * Event types allowed in the user groups of the user.
+     */
+    private function getEventTypesOfUserGroups(BackendUser $user): array
+    {
+        $eventTypes = [];
+
+        foreach ($this->stringUtil->deserialize($user->groups, true) as $groupId) {
+            $group = $this->userGroupModel->findById($groupId);
+
+            if (null === $group) {
+                continue;
+            }
+
+            foreach ($this->stringUtil->deserialize($group->allowedEventTypes, true) as $eventType) {
+                if (!\in_array($eventType, $eventTypes, false)) {
+                    $eventTypes[] = $eventType;
+                }
+            }
+        }
+
+        return $eventTypes;
+    }
+
+    /**
+     * Release levels of all packages or of one package, grouped by the title of the
+     * package: [package title => [release level id => release level title]].
+     *
+     * @throws Exception
+     */
+    private function getReleaseLevelOptions(int|null $packageId = null): array
+    {
+        $sql = 'SELECT l.id, l.title, p.title AS packageTitle FROM tl_event_release_level_policy l INNER JOIN tl_event_release_level_policy_package p ON p.id = l.pid';
+
+        if (null === $packageId) {
+            $rows = $this->connection->fetchAllAssociative($sql.' ORDER BY l.pid, l.level');
+        } else {
+            $rows = $this->connection->fetchAllAssociative($sql.' WHERE l.pid = ? ORDER BY l.level', [$packageId], [Types::INTEGER]);
+        }
+
+        $options = [];
+
+        foreach ($rows as $row) {
+            $options[$row['packageTitle']][$row['id']] = $row['title'];
+        }
+
+        return $options;
     }
 }
