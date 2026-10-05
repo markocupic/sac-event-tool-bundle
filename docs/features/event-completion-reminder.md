@@ -157,9 +157,9 @@ Backend-Modul «Reminder für Event-Abschluss» (`sac_event_completion_reminder_
 | `Feature\EventCompletionReminder\Task\PostEventTaskInterface` | Interface der Aufgaben-Bausteine |
 | `Feature\EventCompletionReminder\Task\TourReportTask` | Aufgabe Tourenbericht |
 | `Feature\EventCompletionReminder\Task\ParticipationConfirmationTask` | Aufgabe Teilnahmebestätigung |
-| `Feature\EventCompletionReminder\OpenTask` | DTO: eventId, title, eventType, endDate (massgebendes Enddatum, bei verschobenen Events das verschobene), role (`instructor` oder `registration_coordinator`), tasks (Liste aus name, label, url) |
+| `Feature\EventCompletionReminder\OpenTask` | DTO: eventId, title, eventType, startDate (bei verschobenen Events `rescheduledEventDate`), endDate (massgebendes Enddatum, bei verschobenen Events das verschobene), role (`instructor` oder `registration_coordinator`), tasks (Liste aus name, label, url) |
 | `Feature\EventCompletionReminder\TaskEvaluator` | erhält alle Tasks per `#[AutowireIterator('sacevt.instructor_post_event_task')]`, liefert die offenen Aufgaben eines Events |
-| `Feature\EventCompletionReminder\ReminderSchedule` | reine Logik: Fälligkeit nach Bearbeitungsfrist, massgebendes bzw. verschobenes Enddatum (`getEffectiveEndDate()`, `getRescheduledEndDate()`), Versand fällig? (lastSentAt, interval, now) |
+| `Feature\EventCompletionReminder\ReminderSchedule` | reine Logik: Fälligkeit nach Bearbeitungsfrist, massgebendes bzw. verschobenes Start- und Enddatum (`getEffectiveStartDate()`, `getEffectiveEndDate()`, `getRescheduledEndDate()`), Versand fällig? (lastSentAt, interval, now) |
 | `Feature\EventCompletionReminder\OpenTaskProvider` | lädt die in Frage kommenden Events per SQL (`fetchCandidateEvents()`), bestimmt in PHP das massgebende Enddatum und die Fälligkeit (`findDueEvents()`), prüft sie über den `TaskEvaluator` und ordnet sie den Empfängern zu (Leiter ∪ Koordinator). Öffentlich: `getOpenTasksByRecipient(calendar, now)`, `getOpenTasks(userId, calendar, now)`, `getRecipientIdsWithOpenTasks(calendar, now)`, `getRecipient(userId)` (aktiv, mit E-Mail). Nicht readonly (mockbar) |
 | `Feature\EventCompletionReminder\TaskItem` | DTO einer offenen Aufgabe: name, label, url |
 | `Feature\EventCompletionReminder\DataContainer\ReminderLogTable` | Label-Callback für das Backend-Modul des Logs (nur lesen) |
@@ -231,7 +231,7 @@ Der Mailversand selbst läuft getrennt im Messenger-Worker und ist nicht enthalt
 ## Templates
 
 `templates/Email/EventCompletionReminder/task_list.html.twig` und `task_list.txt.twig`, gerendert über `@MarkocupicSacEventTool/...`.
-Jede Zeile: massgebendes Enddatum (bei verschobenen Events das verschobene), Titel, Rolle des Empfängers (z. B. «als Anmelde-Koordinator»), offene Aufgaben mit Label und Direktlink aus der jeweiligen Task-Klasse:
+Jede Zeile: Datum, bei mehrtägigen Events «von–bis» (z. B. `10.01.2026–11.01.2026`), bei eintägigen nur ein Datum; bei verschobenen Events die verschobenen Daten. Dann Titel, Rolle des Empfängers (z. B. «als Anmelde-Koordinator»), offene Aufgaben mit Label und Direktlink aus der jeweiligen Task-Klasse:
 - `TourReportTask::getUrl()`: `contao?do=calendar&table=tl_calendar_events&act=edit&id={id}&call=writeTourReport`
 - `ParticipationConfirmationTask::getUrl()`: `contao?do=calendar&table=tl_calendar_events_member&id={id}`
 

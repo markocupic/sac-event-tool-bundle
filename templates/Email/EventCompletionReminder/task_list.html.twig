@@ -3,7 +3,8 @@
     Rendered into the notification token ##task_list_html##.
 
     Variables:
-    - open_tasks: list<OpenTask> (eventId, title, eventType, endDate, role, tasks: list<TaskItem>)
+    - open_tasks: list<OpenTask> (eventId, title, eventType, startDate, endDate, role, tasks: list<TaskItem>)
+      Multi-day events show "start–end", one-day events only one date.
     - cancel_hint_urls: array<eventId, url> link to the event edit form (courses and general events only)
 
     Task labels: the HTML label MSC.instructor_post_event_task_html.<task name> is used if it exists
@@ -16,7 +17,9 @@
     {% for open_task in open_tasks %}
         <tr>
             <td style="padding:10px 0;border-bottom:1px solid #dddddd;vertical-align:top;">
-                <strong>{{ open_task.endDate|date('d.m.Y') }} – {{ open_task.title }}</strong>
+                {% set start_date = open_task.startDate|date('d.m.Y') %}
+                {% set end_date = open_task.endDate|date('d.m.Y') %}
+                <strong>{{ start_date != end_date ? start_date ~ '–' ~ end_date : end_date }} – {{ open_task.title }}</strong>
                 {% if open_task.role == 'registration_coordinator' %}
                     <span style="color:#666666;">({{ ('MSC.instructor_post_event_task_role.' ~ open_task.role)|trans }})</span>
                 {% endif %}

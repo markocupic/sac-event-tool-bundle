@@ -41,6 +41,20 @@ final readonly class ReminderSchedule
     }
 
     /**
+     * Start date shown in the notification:
+     * - normal events: tl_calendar_events.startDate
+     * - rescheduled events with a new date: tl_calendar_events.rescheduledEventDate (the new start day)
+     */
+    public static function getEffectiveStartDate(int $startDate, string $eventState, int|null $rescheduledEventDate): int
+    {
+        if (EventState::STATE_RESCHEDULED === $eventState && null !== $rescheduledEventDate && $rescheduledEventDate > 0) {
+            return $rescheduledEventDate;
+        }
+
+        return $startDate;
+    }
+
+    /**
      * End date that counts for the reminder:
      * - normal events: tl_calendar_events.endDate
      * - rescheduled events: the shifted end date (see getRescheduledEndDate()),

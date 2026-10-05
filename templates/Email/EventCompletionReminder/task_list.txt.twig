@@ -3,7 +3,8 @@
     Rendered into the notification token ##task_list_text##.
 
     Variables:
-    - open_tasks: list<OpenTask> (eventId, title, eventType, endDate, role, tasks: list<TaskItem>)
+    - open_tasks: list<OpenTask> (eventId, title, eventType, startDate, endDate, role, tasks: list<TaskItem>)
+      Multi-day events show "start–end", one-day events only one date.
     - cancel_hint_urls: array<eventId, url> link to the event edit form (courses and general events only)
 
     Task labels: always the text label (TaskItem.label).
@@ -11,7 +12,9 @@
 {% trans_default_domain 'contao_default' %}
 {% autoescape false %}
 {% for open_task in open_tasks %}
-{{ open_task.endDate|date('d.m.Y') }} – {{ open_task.title }}{% if open_task.role == 'registration_coordinator' %} ({{ ('MSC.instructor_post_event_task_role.' ~ open_task.role)|trans }}){% endif %}
+{% set start_date = open_task.startDate|date('d.m.Y') %}
+{% set end_date = open_task.endDate|date('d.m.Y') %}
+{{ start_date != end_date ? start_date ~ '–' ~ end_date : end_date }} – {{ open_task.title }}{% if open_task.role == 'registration_coordinator' %} ({{ ('MSC.instructor_post_event_task_role.' ~ open_task.role)|trans }}){% endif %}
 
 {% for task in open_task.tasks %}
 - {{ task.label }}: {{ task.url }}

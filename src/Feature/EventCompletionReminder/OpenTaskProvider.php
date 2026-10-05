@@ -84,8 +84,14 @@ class OpenTaskProvider
             // Contao stores the title input-encoded (e.g. "&amp;"); the templates escape it themselves
             $title = html_entity_decode((string) $event->title, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-            // Rescheduled events: the shifted end date is shown in the notification
-            $openTask = new OpenTask((int) $event->id, $title, (string) $event->eventType, $effectiveEndDate, OpenTask::ROLE_INSTRUCTOR, $tasks);
+            // Rescheduled events: the shifted dates are shown in the notification
+            $effectiveStartDate = ReminderSchedule::getEffectiveStartDate(
+                (int) $event->startDate,
+                (string) $event->eventState,
+                $event->rescheduledEventDate ? (int) $event->rescheduledEventDate : null,
+            );
+
+            $openTask = new OpenTask((int) $event->id, $title, (string) $event->eventType, $effectiveStartDate, $effectiveEndDate, OpenTask::ROLE_INSTRUCTOR, $tasks);
 
             foreach ($this->getRecipientRoles($event) as $userId => $role) {
                 $openTasksByRecipient[$userId][] = $openTask->withRole($role);

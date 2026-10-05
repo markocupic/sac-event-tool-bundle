@@ -237,11 +237,11 @@ final class SendEventCompletionReminderHandlerTest extends ContaoTestCase
         $this->openTaskProvider
             ->method('getOpenTasks')
             ->willReturn($openTasks ?? [
-                new OpenTask(10, 'Skitour', 'tour', 1759000000, OpenTask::ROLE_INSTRUCTOR, [
+                new OpenTask(10, 'Skitour', 'tour', 1758900000, 1759000000, OpenTask::ROLE_INSTRUCTOR, [
                     new TaskItem('tour_report', 'Tourenbericht ausfüllen', 'https://example.org/1'),
                     new TaskItem('participation_confirmation', 'Teilnahme bestätigen', 'https://example.org/2'),
                 ]),
-                new OpenTask(11, 'Kletterkurs', 'course', 1759100000, OpenTask::ROLE_REGISTRATION_COORDINATOR, [
+                new OpenTask(11, 'Kletterkurs', 'course', 1759100000, 1759100000, OpenTask::ROLE_REGISTRATION_COORDINATOR, [
                     new TaskItem('participation_confirmation', 'Teilnahme bestätigen', 'https://example.org/3'),
                 ]),
             ])

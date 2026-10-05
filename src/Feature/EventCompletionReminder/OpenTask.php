@@ -30,6 +30,7 @@ final readonly class OpenTask
         public int $eventId,
         public string $title,
         public string $eventType,
+        public int $startDate,
         public int $endDate,
         public string $role,
         public array $tasks,
@@ -38,7 +39,7 @@ final readonly class OpenTask
 
     public function withRole(string $role): self
     {
-        return new self($this->eventId, $this->title, $this->eventType, $this->endDate, $role, $this->tasks);
+        return new self($this->eventId, $this->title, $this->eventType, $this->startDate, $this->endDate, $role, $this->tasks);
     }
 
     public function countTasks(): int

@@ -108,4 +108,15 @@ final class ReminderScheduleTest extends TestCase
     {
         $this->assertTrue(ReminderSchedule::isNotificationDue(0, 7, new \DateTimeImmutable('2026-10-08 03:45')));
     }
+
+    public function testEffectiveStartDate(): void
+    {
+        $start = strtotime('2026-01-10');
+        $rescheduled = strtotime('2026-01-24');
+
+        $this->assertSame($start, ReminderSchedule::getEffectiveStartDate($start, '', null), 'Normal event: startDate');
+        $this->assertSame($start, ReminderSchedule::getEffectiveStartDate($start, 'event_fully_booked', $rescheduled), 'Not rescheduled: startDate');
+        $this->assertSame($rescheduled, ReminderSchedule::getEffectiveStartDate($start, 'event_rescheduled', $rescheduled), 'Rescheduled: new start date');
+        $this->assertSame($start, ReminderSchedule::getEffectiveStartDate($start, 'event_rescheduled', null), 'Rescheduled without new date: startDate');
+    }
 }

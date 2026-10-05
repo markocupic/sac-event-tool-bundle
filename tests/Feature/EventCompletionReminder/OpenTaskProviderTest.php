@@ -143,6 +143,7 @@ final class OpenTaskProviderTest extends ContaoTestCase
         $result = $provider->getOpenTasks(self::ANNA, $this->createCalendar(), $now);
 
         $this->assertSame([10], array_map(static fn (OpenTask $t): int => $t->eventId, $result));
+        $this->assertSame(strtotime('2026-01-24'), $result[0]->startDate, 'The notification shows the new start date');
         $this->assertSame(strtotime('2026-01-25'), $result[0]->endDate, 'The notification shows the shifted end date');
     }
 
