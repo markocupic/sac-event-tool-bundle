@@ -312,3 +312,11 @@ $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_role']['registration_coor
 // Participation confirmation (tl_calendar_events_member.hasParticipated)
 $GLOBALS['TL_LANG']['MSC']['participationConfirmationNotAllowed'] = 'Die Teilnahme kann nur bei Anmeldungen mit dem Status «Bestätigt» oder «Warteliste» bestätigt werden.';
 $GLOBALS['TL_LANG']['ERR']['participationConfirmationNotAllowed'] = 'Die Teilnahme kann nur bei Anmeldungen mit dem Status «Bestätigt» oder «Warteliste» bestätigt werden.';
+
+// Event registration reminder (labels in the list of unconfirmed registrations)
+$GLOBALS['TL_LANG']['MSC']['serr_participant_female'] = 'Teilnehmerin';
+$GLOBALS['TL_LANG']['MSC']['serr_participant_male'] = 'Teilnehmer';
+$GLOBALS['TL_LANG']['MSC']['serr_participant_other'] = 'Teilnehmer*';
+$GLOBALS['TL_LANG']['MSC']['serr_these_registrations_are_also_pending'] = 'Diese Registrierung/en zur selben Tour sind ebenfalls noch hängig:';
+$GLOBALS['TL_LANG']['MSC']['serr_days_registered'] = 'seit %d Tag/en';
+$GLOBALS['TL_LANG']['MSC']['serr_sac_member_id'] = 'Mitglieder-Nr.: %d';

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DependencyInjection;
 
+use Markocupic\SacEventToolBundle\Feature\EventRegistrationReminder\Cron\EventRegistrationReminderCron;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -85,5 +86,17 @@ class MarkocupicSacEventToolExtension extends Extension
         $container->setParameter($rootKey.'.event_registration.config.email_waitinglist_templ_path', $config['event_registration']['config']['email_waitinglist_templ_path']);
         $container->setParameter($rootKey.'.event_registration.config.email_accept_custom_templ_path', $config['event_registration']['config']['email_accept_custom_templ_path']);
         $container->setParameter($rootKey.'.event_registration.config.reg_start_time_offset', $config['event_registration']['config']['reg_start_time_offset']);
+
+        // Features
+        $container->setParameter($rootKey.'.feature.event_registration_reminder.disable', $config['feature']['event_registration_reminder']['disable']);
+        $container->setParameter($rootKey.'.feature.event_registration_reminder.cron_schedule', $config['feature']['event_registration_reminder']['cron_schedule']);
+
+        // The cron schedule of the event registration reminder is configurable (instead of #[AsCronJob])
+        if ($container->hasDefinition(EventRegistrationReminderCron::class)) {
+            $container
+                ->getDefinition(EventRegistrationReminderCron::class)
+                ->addTag('contao.cronjob', ['interval' => $config['feature']['event_registration_reminder']['cron_schedule']])
+            ;
+        }
     }
 }

@@ -1,0 +1,25 @@
+{#
+    List of unconfirmed registrations for the event registration reminder (plain text).
+    Rendered into the notification token ##registrations##.
+
+    Variables:
+    - events: list<PendingEvent> (eventId, title, eventType, overdueRegistrations, recentRegistrations: list<PendingRegistration>)
+#}
+{% trans_default_domain 'contao_default' %}
+{% autoescape false %}
+{% for event in events %}
+-----------------------------------------------------
+{{ ('MSC.' ~ event.eventType)|trans }}: {{ event.title }}
+{% for registration in event.overdueRegistrations %}
+- {{ ('MSC.serr_participant_' ~ registration.gender)|trans }} {{ registration.firstname }} {{ registration.lastname }}, {{ 'MSC.serr_sac_member_id'|trans([registration.sacMemberId]) }} ({{ 'MSC.serr_days_registered'|trans([registration.daysRegistered]) }})
+{% endfor %}
+{% if event.recentRegistrations is not empty %}
+
+{{ 'MSC.serr_these_registrations_are_also_pending'|trans }}
+{% for registration in event.recentRegistrations %}
+- {{ ('MSC.serr_participant_' ~ registration.gender)|trans }} {{ registration.firstname }} {{ registration.lastname }}, {{ 'MSC.serr_sac_member_id'|trans([registration.sacMemberId]) }} ({{ 'MSC.serr_days_registered'|trans([registration.daysRegistered]) }})
+{% endfor %}
+{% endif %}
+
+{% endfor %}
+{% endautoescape %}

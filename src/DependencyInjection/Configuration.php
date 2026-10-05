@@ -61,6 +61,27 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                // Feature settings: sacevt.feature.<feature_name>.<option>
+                ->arrayNode('feature')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        // See docs/features/event-registration-reminder.md
+                        ->arrayNode('event_registration_reminder')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('disable')
+                                    ->info('Disable the event registration reminder globally, regardless of the calendar settings.')
+                                    ->defaultFalse()
+                                ->end()
+                                ->scalarNode('cron_schedule')
+                                    ->info('Cron schedule of the event registration reminder, e.g. "30 4,5 * * *".')
+                                    ->cannotBeEmpty()
+                                    ->defaultValue('30 4,5 * * *')
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
                 // Temp dir e.g system/tmp
                 ->scalarNode('temp_dir')->defaultValue('system/tmp')->cannotBeEmpty()->end()
                 // Avatars

@@ -46,6 +46,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableMaxEventReleaseLevelProt
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableEventStartDateValidation'] = 'validTimePeriodStart,validTimePeriodStop';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['sendEventReminder'] = 'eventReminderOffset,eventReminderNotification';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['sendEventCompletionReminder'] = 'eventCompletionReminderNotification,eventCompletionReminderEventTypes,eventCompletionReminderFirstOffset,eventCompletionReminderInterval';
+$GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableInstructorReminderNotification'] = 'sendFirstReminderAfter,sendReminderEach,sendReminderNotification';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['autoPublishEvents'] = 'autoPublishEventsDate,autoPublishEventsStatus';
 
 // Define selectors
@@ -53,6 +54,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'enableMaxEven
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'enableEventStartDateValidation';
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'sendEventReminder';
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'sendEventCompletionReminder';
+$GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'enableInstructorReminderNotification';
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'autoPublishEvents';
 
 // Palettes
@@ -64,6 +66,7 @@ PaletteManipulator::create()
 	->addLegend('event_reader_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_reminder_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_completion_reminder_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
+	->addLegend('event_registration_reminder_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addField(['enableEventStartDateValidation'], 'valid_time_period_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['enableMaxEventReleaseLevelProtection'], 'event_release_level_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['autoPublishEvents'], 'auto_publish_events_legend', PaletteManipulator::POSITION_APPEND)
@@ -71,6 +74,7 @@ PaletteManipulator::create()
 	->addField(['userPortraitJumpTo'], 'event_reader_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['sendEventReminder'], 'event_reminder_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['sendEventCompletionReminder'], 'event_completion_reminder_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['enableInstructorReminderNotification'], 'event_registration_reminder_legend', PaletteManipulator::POSITION_APPEND)
 	->applyToPalette('default', 'tl_calendar');
 
 // Fields
@@ -225,6 +229,44 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventCompletionReminderInterval'] =
 	'options' => range(1, 30),
 	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'tl_class' => 'w50'],
 	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 7, 'unsigned' => true],
+];
+
+// Event registration reminder
+// Reminds the registration coordinator or main instructor of unconfirmed registrations of upcoming events.
+// The field names come from the former extension markocupic/sac-event-registration-reminder and were kept on purpose.
+// See docs/features/event-registration-reminder.md
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['enableInstructorReminderNotification'] = [
+	'exclude'   => true,
+	'filter'    => true,
+	'inputType' => 'checkbox',
+	'eval'      => ['submitOnChange' => true, 'tl_class' => 'm12 clr'],
+	'sql'       => ['type' => 'boolean', 'default' => false],
+];
+
+// Days after the registration before the first reminder is sent
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['sendFirstReminderAfter'] = [
+	'exclude'   => true,
+	'inputType' => 'select',
+	'options'   => range(1, 30),
+	'eval'      => ['mandatory' => true, 'tl_class' => 'w50'],
+	'sql'       => 'smallint(5) unsigned NOT NULL default 0',
+];
+
+// Days between two reminders to the same user for this calendar
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['sendReminderEach'] = [
+	'exclude'   => true,
+	'inputType' => 'select',
+	'options'   => range(1, 30),
+	'eval'      => ['mandatory' => true, 'tl_class' => 'w50'],
+	'sql'       => 'smallint(5) unsigned NOT NULL default 0',
+];
+
+// Options: only notifications of type "event_registration_reminder" (see Feature\EventRegistrationReminder\DataContainer\Calendar)
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['sendReminderNotification'] = [
+	'exclude'   => true,
+	'inputType' => 'select',
+	'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50 clr'],
+	'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
 // Auto publish events

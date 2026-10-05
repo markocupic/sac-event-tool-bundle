@@ -21,6 +21,7 @@ $GLOBALS['TL_LANG']['tl_calendar']['valid_time_period_legend'] = 'Einstellungen 
 $GLOBALS['TL_LANG']['tl_calendar']['event_release_level_legend'] = 'Freigabestufe-Einstellungen';
 $GLOBALS['TL_LANG']['tl_calendar']['event_reminder_legend'] = 'Event-Erinnerung-Einstellungen';
 $GLOBALS['TL_LANG']['tl_calendar']['event_completion_reminder_legend'] = 'Leiter-Erinnerung an offene Aufgaben nach dem Event';
+$GLOBALS['TL_LANG']['tl_calendar']['event_registration_reminder_legend'] = 'Reminder für unbearbeitete Event-Anmeldungen';
 $GLOBALS['TL_LANG']['tl_calendar']['auto_publish_events_legend'] = 'Events automatisch veröffentlichen';
 
 // Fields
@@ -56,3 +57,9 @@ $GLOBALS['TL_LANG']['tl_calendar'][EventType::TOUR] = 'SAC-Tourenkalender';
 $GLOBALS['TL_LANG']['tl_calendar']['copy'] = ['Kalender mit Events kopieren', 'Kalender ID %s mit Events kopieren'];
 $GLOBALS['TL_LANG']['tl_calendar']['copyWithoutChildRecords'] = ['Kalender ohne Events kopieren', 'Kalender ID %s ohne Events kopieren'];
 $GLOBALS['TL_LANG']['tl_calendar']['cut'] = ['Kalender verschieben', 'Event ID %s verschieben'];
+
+// Event registration reminder
+$GLOBALS['TL_LANG']['tl_calendar']['enableInstructorReminderNotification'] = ['Reminder für unbearbeitete Anmeldungen aktivieren', 'Anmelde-Koordinator bzw. Hauptleiter werden in regelmässigen Abständen per E-Mail daran erinnert, dass sie im Event-Tool noch unbearbeitete Anmeldungen haben.'];
+$GLOBALS['TL_LANG']['tl_calendar']['sendFirstReminderAfter'] = ['Ersten Reminder nach x Tagen senden', 'Nach wie vielen Tagen seit der Anmeldung eine unbearbeitete Anmeldung den Reminder auslöst.'];
+$GLOBALS['TL_LANG']['tl_calendar']['sendReminderEach'] = ['Intervall in Tagen', 'Sind weiterhin Anmeldungen unbearbeitet, wird der Reminder nach so vielen Tagen wiederholt.'];
+$GLOBALS['TL_LANG']['tl_calendar']['sendReminderNotification'] = ['Benachrichtigung', 'Wählen Sie eine Benachrichtigung vom Typ «Reminder für unbearbeitete Event-Anmeldungen».'];

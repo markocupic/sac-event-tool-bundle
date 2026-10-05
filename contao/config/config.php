@@ -44,53 +44,55 @@ unset($GLOBALS['BE_MOD']['content']['calendar']);
 
 // Back end modules
 $GLOBALS['BE_MOD']['sac_be_modules'] = [
-	'sac_section_tool'                                  => [
+	'sac_section_tool'                                       => [
 		'tables' => ['tl_sac_section'],
 	],
-	'calendar'                                          => [
+	'calendar'                                               => [
 		'tables'                                          => ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'],
 		'table'                                           => [BackendCsvImportController::class, 'importTableWizardAction'],
 		'list'                                            => [BackendCsvImportController::class, 'importListWizardAction'],
 		NotifyEventRegistrationStateController::PARAM_KEY => [NotifyEventRegistrationStateController::class, 'generate'],
 	],
-	'sac_course_main_types_tool'                        => [
+	'sac_course_main_types_tool'                             => [
 		'tables' => ['tl_course_main_type'],
 	],
-	'sac_course_sub_types_tool'                         => [
+	'sac_course_sub_types_tool'                              => [
 		'tables' => ['tl_course_sub_type'],
 	],
-	'sac_event_type_tool'                               => [
+	'sac_event_type_tool'                                    => [
 		'tables' => ['tl_event_type'],
 	],
-	'sac_tour_difficulty_tool'                          => [
+	'sac_tour_difficulty_tool'                               => [
 		'tables' => ['tl_tour_difficulty_category', 'tl_tour_difficulty'],
 		'table'  => [TableWizard::class, 'importTable'],
 		'list'   => [ListWizard::class, 'importList'],
 	],
-	'sac_tour_type_tool'                                => [
+	'sac_tour_type_tool'                                     => [
 		'tables' => ['tl_tour_type'],
 	],
-	'sac_event_release_tool'                            => [
+	'sac_event_release_tool'                                 => [
 		'tables' => ['tl_event_release_level_policy_package', 'tl_event_release_level_policy'],
 		'table'  => [TableWizard::class, 'importTable'],
 		'list'   => [ListWizard::class, 'importList'],
 	],
-	'sac_permission_tool'                               => [
+	'sac_permission_tool'                                    => [
 		'tables' => ['tl_permission_policy'],
 	],
-	'sac_event_organizer_tool'                          => [
+	'sac_event_organizer_tool'                               => [
 		'tables' => ['tl_event_organizer'],
 		'table'  => [TableWizard::class, 'importTable'],
 		'list'   => [ListWizard::class, 'importList'],
 	],
-	'sac_event_journey_tool'                            => [
+	'sac_event_journey_tool'                                 => [
 		'tables' => ['tl_calendar_events_journey'],
 	],
-	'sac_user_role_tool'                                => [
+	'sac_user_role_tool'                                     => [
 		'tables' => ['tl_user_role'],
 	],
-	// Read only: see contao/dca/tl_event_completion_reminder_log.php
-	'sac_event_completion_reminder_log'       => [
+	'event_registration_reminder_notification'               => [
+		'tables' => ['tl_event_registration_reminder_notification'],
+	],
+	'sac_event_completion_reminder_log'                      => [
 		'tables' => ['tl_event_completion_reminder_log'],
 	],
 	SacBackendUserRolesExportController::BACKEND_MODULE_TYPE => [

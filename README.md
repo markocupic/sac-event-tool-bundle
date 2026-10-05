@@ -19,6 +19,7 @@ Ausführliche Beschreibungen (Regeln, Datenmodell, Klassen, Tests) liegen unter 
 
 - [Event-Erinnerung vor Event-Start](docs/features/event-reminder.md): erinnert Leiter und Teilnehmer x Tage vor dem Event-Start mit einer E-Mail pro Event (An: Kontaktperson, CC: Leiter, BCC: Teilnehmer).
 - [Leiter-Erinnerung an offene Aufgaben nach dem Event](docs/features/event-completion-reminder.md): erinnert Leiter und Anmelde-Koordinatoren per Benachrichtigung an fehlende Tourenberichte und Teilnahmebestätigungen.
+- [Reminder für unbearbeitete Event-Anmeldungen](docs/features/event-registration-reminder.md): erinnert Anmelde-Koordinator bzw. Hauptleiter an Anmeldungen, die noch nicht angenommen, abgelehnt oder auf die Warteliste gesetzt wurden.
 - [Events automatisch veröffentlichen](docs/features/auto-publish-events.md): setzt an einem Stichtag pro Kalender die Events von der zweithöchsten auf die höchste Freigabestufe und veröffentlicht sie.
 - [Mitglieder-Sync mit dem Zentralverband](docs/features/member-database-sync.md): übernimmt täglich die Mitgliederdaten aus der Mitgliederdatenbank des SAC Zentralverbands in `tl_member`.
 - [Mitgliederdaten in die Backend-User übernehmen](docs/features/member-to-user-sync.md): überträgt täglich die Personendaten aus `tl_member` in die Backend-User (`tl_user`) mit SAC-Mitgliedernummer.

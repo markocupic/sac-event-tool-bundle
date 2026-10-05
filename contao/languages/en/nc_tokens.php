@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 use Markocupic\SacEventToolBundle\Feature\EventReminder\NotificationType\EventReminderNotificationType;
 use Markocupic\SacEventToolBundle\Feature\EventCompletionReminder\NotificationType\EventCompletionReminderNotificationType;
+use Markocupic\SacEventToolBundle\Feature\EventRegistrationReminder\NotificationType\EventRegistrationReminderNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\EventDeregistrationNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\EventRegistrationNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\SubscriptionStateChangeNotificationType;
@@ -175,3 +176,21 @@ $GLOBALS['TL_LANG']['nc_tokens'][$type]['interval_days'] = 'Intervall in Tagen z
 // Notification
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['reminder_count'] = 'Die wievielte Erinnerung für diesen Empfänger und Kalender (1 = erste Erinnerung).';
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['link_my_events_dashboard'] = 'Absoluter Link ins Backend (Startseite mit dem Dashboard "Meine Events").';
+
+/*
+ * Event registration reminder
+ */
+$type = EventRegistrationReminderNotificationType::NAME;
+
+// Recipient (registration coordinator or main instructor)
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_email'] = 'E-Mail-Adresse des Empfängers (Anmelde-Koordinator bzw. Hauptleiter). Für das Feld "Empfänger" verwenden.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_firstname'] = 'Vorname des Empfängers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_lastname'] = 'Nachname des Empfängers.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_name'] = 'Name des Empfängers.';
+
+// Registrations
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['registrations'] = 'Auflistung der Event-Anmeldungen, die der Empfänger noch nicht bearbeitet hat (generierter Text, gruppiert nach Event).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['send_reminder_each'] = 'Intervall in Tagen, in dem die Erinnerung wiederholt wird (Einstellung im Kalender).';
+
+// Admin
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['admin_email'] = 'E-Mail-Adresse des Systemadministrators (Contao-Einstellung "E-Mail-Adresse des Systemadministrators").';
