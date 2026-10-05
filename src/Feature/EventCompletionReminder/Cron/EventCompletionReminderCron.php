@@ -37,7 +37,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  *
  * See docs/features/event-completion-reminder.md
  */
-#[AsCronJob('*/1 * * * *')]
+#[AsCronJob('45 1,4 * * *')]
 readonly class EventCompletionReminderCron
 {
     private const string STOP_WATCH_EVENT = 'event_completion_reminder_cron';
