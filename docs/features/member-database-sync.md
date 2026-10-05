@@ -1,6 +1,6 @@
 # Feature: Member Database Sync
 
-Bundle: `markocupic/sac-event-tool-bundle` (bleibt im Bundle, kein eigenes Bundle)
+Bundle: `markocupic/sac-event-tool-bundle`
 Ort: `src/Feature/MemberDatabaseSync/` (Namespace `Markocupic\SacEventToolBundle\Feature\MemberDatabaseSync`), Tests unter `tests/Feature/MemberDatabaseSync/`
 
 ## Ziel

@@ -320,3 +320,4 @@ $GLOBALS['TL_LANG']['MSC']['serr_participant_other'] = 'Teilnehmer*';
 $GLOBALS['TL_LANG']['MSC']['serr_these_registrations_are_also_pending'] = 'Diese Registrierung/en zur selben Tour sind ebenfalls noch hängig:';
 $GLOBALS['TL_LANG']['MSC']['serr_days_registered'] = 'seit %d Tag/en';
 $GLOBALS['TL_LANG']['MSC']['serr_sac_member_id'] = 'Mitglieder-Nr.: %d';
+$GLOBALS['TL_LANG']['MSC']['serr_link_member_list'] = 'Zur Teilnehmerliste';

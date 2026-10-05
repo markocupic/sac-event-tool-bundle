@@ -1,6 +1,6 @@
 # Feature: Member To User Sync
 
-Bundle: `markocupic/sac-event-tool-bundle` (bleibt im Bundle, kein eigenes Bundle)
+Bundle: `markocupic/sac-event-tool-bundle`
 Ort: `src/Feature/MemberToUserSync/` (Namespace `Markocupic\SacEventToolBundle\Feature\MemberToUserSync`)
 
 ## Ziel

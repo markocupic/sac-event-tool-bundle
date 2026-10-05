@@ -1,8 +1,6 @@
 # Feature: Event Completion Reminder
 
-Bundle: `markocupic/sac-event-tool-bundle` (bleibt im Bundle, kein eigenes Bundle)
-Status: Spezifikation verabschiedet am 2026-10-01, umgesetzt am 2026-10-01, erweitert am 2026-10-02 (kein Lookback, verschobene Events, Eventtypen im Kalender, Backend-Modul für das Log)
-Vorbild: bestehender Event-Reminder unter `src/Feature/EventReminder/` (`EventReminderCron`, `SendEventReminderMessage`, `SendEventReminderHandler`, `EventReminderNotificationType`, `PersonProvider`), siehe [event-reminder.md](event-reminder.md)
+Bundle: `markocupic/sac-event-tool-bundle`
 
 ## Ziel
 
@@ -19,7 +17,7 @@ Leiter (Haupt- und Hilfsleiter) sowie der Anmelde-Koordinator (`registrationGoes
 - Verschobene Events (`eventState = 'event_rescheduled'`) nur, wenn `rescheduledEventDate` eingetragen ist. `rescheduledEventDate` ist der neue Starttag; das massgebende Enddatum wird verschoben (siehe «Verschobene Events»)
 - Nicht verschobene Events: `endDate > 0`. `endDate` ist der letzte Termin aus `eventDates`, er wird beim Speichern in `DataContainer\CalendarEvents` gesetzt.
 - Bearbeitungsfrist abgelaufen: `Enddatum + firstOffset Tage <= heute` (Enddatum = `endDate`, bei verschobenen Events das verschobene Enddatum), gerechnet in ganzen Kalendertagen (Tagesbeginn, Zeitzone wie bei `EventReminderCron`)
-- Kein Lookback: Es werden alle Events des Kalenders geprüft, unabhängig davon, wie lange ihr Ende zurückliegt. Offene Aufgaben werden erinnert, bis sie erledigt sind.
+- Es werden alle Events des Kalenders geprüft, unabhängig davon, wie lange ihr Ende zurückliegt. Offene Aufgaben werden erinnert, bis sie erledigt sind.
 
 ### Verschobene Events
 
@@ -31,7 +29,7 @@ Für verschobene Events gilt `rescheduledEventDate` als neuer Starttag. Die ursp
 - Sa 10.01.–So 11.01., verschoben auf den 24.01. → Ende 25.01.
 - Kurs über zwei Wochenenden 10.01.–18.01. (8 Tage), verschoben auf den 07.02. → Ende 15.02.
 
-Gerechnet wird in ganzen Kalendertagen, die Zeitumstellung hat keinen Einfluss. Ohne eingetragenes Verschiebedatum wird ein verschobenes Event nicht geprüft. In der Benachrichtigung wird das verschobene Enddatum angezeigt. Annahme: Das verschobene Event dauert gleich lange wie das ursprüngliche (entschieden am 2026-10-02, Variante A).
+Gerechnet wird in ganzen Kalendertagen, die Zeitumstellung hat keinen Einfluss. Ohne eingetragenes Verschiebedatum wird ein verschobenes Event nicht geprüft. In der Benachrichtigung wird das verschobene Enddatum angezeigt. Annahme: Das verschobene Event dauert gleich lange wie das ursprüngliche.
 
 ### Aufgaben pro Event
 
@@ -40,9 +38,9 @@ Gerechnet wird in ganzen Kalendertagen, die Zeitumstellung hat keinen Einfluss. 
 | `tour`, `lastMinuteTour` | offen, wenn `filledInEventReportForm = 0` | offen, siehe unten |
 | `course`, `generalEvent` | - | offen, siehe unten |
 
-Bei `generalEvent` wird nur die Teilnahmebestätigung verlangt (entschieden am 2026-10-02): Das Backend bietet den Tourrapport-Button (Teilnehmerliste, Event-Dashboard, «Meine Events») nur bei Touren an.
+Bei `generalEvent` wird nur die Teilnahmebestätigung verlangt: Das Backend bietet den Tourrapport-Button (Teilnehmerliste, Event-Dashboard, «Meine Events») nur bei Touren an.
 
-Für die Teilnahme-Aufgabe zählen nur Anmeldungen in `tl_calendar_events_member` mit `eventId = event.id` und dem Status `subscription-accepted` **oder** `subscription-on-waiting-list` (`EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED`, geändert am 2026-10-03):
+Für die Teilnahme-Aufgabe zählen nur Anmeldungen in `tl_calendar_events_member` mit `eventId = event.id` und dem Status `subscription-accepted` **oder** `subscription-on-waiting-list` (`EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED`):
 - Die Aufgabe existiert nur, wenn es mindestens eine solche Anmeldung gibt.
 - Die Aufgabe ist erledigt, sobald mindestens eine dieser Anmeldungen `hasParticipated = 1` hat.
 - Auch ein Event, das nur Wartelisten-Anmeldungen hat, löst eine Erinnerung aus, solange keine dieser Anmeldungen `hasParticipated = 1` hat.
@@ -110,7 +108,7 @@ Regeln:
 - Reihenfolge in der Mail über `#[AsTaggedItem(priority: …)]`, höhere Priorität zuerst.
 - Die Klasse liefert Label und Link, das Layout der Liste bleibt in den Twig-Templates (HTML und Text). Ein optionales HTML-Label kommt aus den Sprachdateien (siehe Templates).
 - Die gemeinsamen Filter (Eventtypen des Kalenders, `published`, `eventState`, Enddatum inkl. Verschiebung, Bearbeitungsfrist) gelten für alle Aufgaben und bleiben zentral im `OpenTaskProvider`. Eine Task-Klasse entscheidet nur über Eventtyp (`supports()`) und Status (`isOpen()`).
-- Die Prüfungen laufen pro Event. Einfache, lesbare Abfragen gehen vor Optimierung. Falls nötig, kann später eine Vorlade-Methode für mehrere Events ins Interface kommen.
+- Die Prüfungen laufen pro Event. Einfache, lesbare Abfragen gehen vor Optimierung.
 - Die Aufgaben gelten für alle Empfänger gleich (Leiter und Koordinator). Das Interface kennt deshalb keine Rolle.
 
 ## Datenmodell
@@ -124,8 +122,6 @@ Regeln:
 | `eventCompletionReminderEventTypes` | Select, Mehrfachauswahl mit Chosen, Optionen `EventType::ALL`, Pflichtfeld, `blob` (serialisiert) | `tour`, `lastMinuteTour`, `course` (nur bei neuen Kalendern) |
 | `eventCompletionReminderFirstOffset` | Select 1–30, Bearbeitungsfrist in Tagen nach dem massgebenden Enddatum | `7` |
 | `eventCompletionReminderInterval` | Select 1–30, Tage zwischen Benachrichtigungen | `7` |
-
-Ein Feld für den Lookback gibt es bewusst nicht (entfernt am 2026-10-02).
 
 ### tl_event_completion_reminder_log
 
@@ -141,11 +137,11 @@ Ein Feld für den Lookback gibt es bewusst nicht (entfernt am 2026-10-02).
 | `eventIds` | betroffene Events der letzten Erinnerung |
 | `delivered` | Ergebnis der letzten Erinnerung laut Notification Center |
 
-Unique Index: `(userId, calendarId)`, also genau ein Eintrag pro Empfänger und Kalender (entschieden am 2026-10-03, damit die Tabelle nicht wächst). Geschrieben wird mit `INSERT … ON DUPLICATE KEY UPDATE` (`ReminderLog::logNotification()`): beim ersten Versand neu mit `reminderCount = 1`, danach werden die Angaben überschrieben und `reminderCount` um 1 erhöht. Eine Historie der einzelnen Versände gibt es damit nicht mehr
+Unique Index: `(userId, calendarId)`, also genau ein Eintrag pro Empfänger und Kalender (damit die Tabelle nicht wächst). Geschrieben wird mit `INSERT … ON DUPLICATE KEY UPDATE` (`ReminderLog::logNotification()`): beim ersten Versand neu mit `reminderCount = 1`, danach werden die Angaben überschrieben und `reminderCount` um 1 erhöht. Eine Historie der einzelnen Versände gibt es nicht.
 
 Backend-Modul «Reminder für Event-Abschluss» (`sac_event_completion_reminder_log` in `sac_be_modules`), **nur lesen**:
 
-- DCA: Palette und `inputType` sind für alle Felder vorbereitet (falls Bearbeiten einmal freigeschaltet wird), aktuell aber gesperrt: `closed`, `notCreatable`, `notEditable`, `notDeletable`, `notCopyable`, `notSortable`; keine globalen Operationen, einzige Operation `show`
+- DCA gesperrt: `closed`, `notCreatable`, `notEditable`, `notDeletable`, `notCopyable`, `notSortable`; keine globalen Operationen, einzige Operation `show`
 - Liste nach Versanddatum gruppiert (neueste zuerst), Filter nach Empfänger, Kalender und Zustellung; sortierbar nach Versanddatum, Kalender, Zähler, offenen Aufgaben und Zustellung
 - Spalten: Zuletzt versendet am, Empfänger (Name und E-Mail), Kalender, Zähler (`reminderCount`, Anzahl Erinnerungen insgesamt), offene Aufgaben, Events (Titel mit ID), zugestellt; formatiert durch `DataContainer\ReminderLogTable` (Label-Callback). Gelöschte User, Kalender oder Events erscheinen mit ID und «(gelöscht)»
 - Sichtbar für Admins; andere Backend-User brauchen das Modul in ihren Rechten
@@ -206,7 +202,7 @@ Der Cron misst den ganzen Lauf (Suche über alle aktivierten Kalender und Dispat
 
 `Event completion reminder cron: checked 4 calendar(s) and dispatched 12 message(s) in 1.83 s.`
 
-Der Mailversand selbst läuft getrennt im Messenger-Worker und ist nicht enthalten. Die Laufzeit wächst mit der Anzahl fälliger Events (pro Event eine Abfrage für die Teilnahmebestätigung und eine für die Leiter). Da es keinen Lookback gibt, zählen dazu alle vergangenen Events der gewählten Typen im Kalender, auch solche ohne offene Aufgaben. Der Cron sollte per CLI (`contao:cron`) laufen, dort gilt standardmässig keine `max_execution_time`.
+Der Mailversand selbst läuft getrennt im Messenger-Worker und ist nicht enthalten. Die Laufzeit wächst mit der Anzahl fälliger Events (pro Event eine Abfrage für die Teilnahmebestätigung und eine für die Leiter). Dazu zählen alle vergangenen Events der gewählten Typen im Kalender, auch solche ohne offene Aufgaben. Der Cron sollte per CLI (`contao:cron`) laufen, dort gilt standardmässig keine `max_execution_time`.
 
 ## Ablauf Handler
 
@@ -239,7 +235,7 @@ Labels:
 - Text-Mail: immer das Label der Task-Klasse (`MSC.instructor_post_event_task.<name>`).
 - HTML-Mail: optional ein eigenes Label `MSC.instructor_post_event_task_html.<name>`, das HTML enthalten darf. Fehlt es, wird das Text-Label verwendet.
 - HTML-Mail, Linktext: `MSC.instructor_post_event_task_link.<name>` («Zum Tourenbericht», «Zur Teilnehmerliste»). Darstellung: `Label: <a href="…">Linktext</a>`. Fehlt der Linktext, wird das ganze Label verlinkt.
-- Die Text-Mail zeigt weiterhin `- Label: URL`.
+- Die Text-Mail zeigt `- Label: URL`.
 
 Absage-Hinweis bei Kursen und allgemeinen Events:
 - Diese Eventtypen haben keinen Tourenbericht. Der Event-Status lässt sich nur im Event selbst setzen.
@@ -258,7 +254,7 @@ HTML-Mail im Worker: Das Notification Center wandelt im HTML relative URLs mit `
 - `contao/dca/tl_calendar.php`, `contao/dca/tl_event_completion_reminder_log.php`
 - `contao/config/config.php` (Backend-Modul), `contao/languages/en/modules.php`, `contao/languages/en/tl_event_completion_reminder_log.php`
 - `contao/languages/en/...` (deutscher Inhalt; wird per composer-file-copier nach `de` kopiert)
-- `config/services.yaml`: keine Änderung nötig (Autowiring; `$sacevtLocale` ist bereits gebunden)
+- `config/services.yaml`: kein Eintrag nötig (Autowiring; `$sacevtLocale` ist gebunden)
 
 ## Tests (PHPUnit 9.6, `composer unit-tests`)
 
@@ -270,13 +266,13 @@ HTML-Mail im Worker: Das Notification Center wandelt im HTML relative URLs mit `
 - `SendEventCompletionReminderHandlerTest` (Mocks): Feature deaktiviert, keine Notification, ungültiger Empfänger, Intervall nicht abgelaufen, alles erledigt, Lock belegt, Log vor Versand (`logNotification()`) und Tokens (inkl. `reminder_count`)
 - `EventCompletionReminderCronTest`: eine Message pro fälligem Empfänger und Kalender, Intervall wird beachtet
 
-Nicht durch Unit-Tests abgedeckt: das SQL in `ReminderLog` (u. a. `ON DUPLICATE KEY UPDATE`), die SQL-Abfrage in `OpenTaskProvider::fetchCandidateEvents()` (Eventtyp, veröffentlicht, nicht abgesagt, `endDate`, Verschiebedatum) und die Abfrage in `ParticipationConfirmationTask::isOpen()` gegen eine echte Datenbank. Die Datumsgrenzen dazu prüft `ReminderScheduleTest`. Optional: DB-Tests für `OpenTaskProvider` und `ReminderLog` nach dem Muster von `CalendarEventsUtilDatabaseTest`.
+Nicht durch Unit-Tests abgedeckt: das SQL in `ReminderLog` (u. a. `ON DUPLICATE KEY UPDATE`), die SQL-Abfrage in `OpenTaskProvider::fetchCandidateEvents()` (Eventtyp, veröffentlicht, nicht abgesagt, `endDate`, Verschiebedatum) und die Abfrage in `ParticipationConfirmationTask::isOpen()` gegen eine echte Datenbank. Die Datumsgrenzen dazu prüft `ReminderScheduleTest`.
 
-## Inbetriebnahme
+## Konfiguration
 
-1. `contao:migrate` (neue Kalenderfelder, Log-Tabelle). Auf Testinstallationen, deren Log noch aus der Zeit vor dem Unique Index `(userId, calendarId)` stammt (mehrere Einträge pro Empfänger und Kalender), die Tabelle vorher leeren (`TRUNCATE tl_event_completion_reminder_log`), sonst bricht das Anlegen des Index ab. Wer eine frühe Version mit dem Feld `instructorPostEventTaskReminderLookback` migriert hat: Die Spalte wird nur mit `--with-deletes` bzw. Bestätigung im Install Tool entfernt
+1. `contao:migrate` (Kalenderfelder, Log-Tabelle)
 2. Im Notification Center eine Benachrichtigung vom Typ «Benachrichtigung für Event-Abschluss» anlegen: Empfänger `##recipient_email##`, Text mit `##task_list_text##` bzw. `##task_list_html##`
-3. Im Kalender das Feature aktivieren, Benachrichtigung wählen, Event-Typen, Bearbeitungsfrist und Intervall prüfen. Bei Kalendern, in denen das Feature schon vor dem Feld «Berücksichtigte Event-Typen» aktiviert war, ist das Feld leer: Typen wählen und speichern, sonst wird nichts geprüft
+3. Im Kalender das Feature aktivieren, Benachrichtigung wählen, Event-Typen, Bearbeitungsfrist und Intervall prüfen.
 4. Cache leeren (`cache:clear`), damit das Backend-Modul «Reminder für Event-Abschluss» erscheint; Nicht-Admins das Modul in den Rechten zuweisen
 5. Router-Kontext setzen (`framework.router.default_uri` oder `router.request_context.host`/`scheme`), damit die Links in den vom Cron versandten Mails auf die richtige Domain zeigen
 6. Cron per CLI laufen lassen und Messenger-Worker betreiben (bzw. `messenger:consume`)

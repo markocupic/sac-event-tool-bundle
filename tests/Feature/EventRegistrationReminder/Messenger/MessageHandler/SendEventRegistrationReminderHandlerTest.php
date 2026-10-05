@@ -28,6 +28,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\SharedLockInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Terminal42\NotificationCenterBundle\NotificationCenter;
 use Terminal42\NotificationCenterBundle\Receipt\ReceiptCollection;
 use Twig\Environment;
@@ -147,8 +148,11 @@ final class SendEventRegistrationReminderHandlerTest extends ContaoTestCase
                         $this->assertSame('Anna', $tokens['instructor_firstname']);
                         $this->assertSame('Muster', $tokens['instructor_lastname']);
                         $this->assertSame('admin@example.org', $tokens['admin_email']);
-                        $this->assertSame('registration-list', $tokens['registrations']);
+                        $this->assertSame('text-list', $tokens['registrations']);
+                        $this->assertSame('<html-list>', $tokens['registrations_html']);
+                        $this->assertSame(5, $tokens['send_first_reminder_after']);
                         $this->assertSame(7, $tokens['send_reminder_each']);
+                        $this->assertSame('https://example.org/contao', $tokens['link_event_tool']);
 
                         return true;
                     },
@@ -192,7 +196,7 @@ final class SendEventRegistrationReminderHandlerTest extends ContaoTestCase
             'id' => self::CALENDAR_ID,
             'enableInstructorReminderNotification' => true,
             'sendReminderNotification' => (string) self::NOTIFICATION_ID,
-            'sendFirstReminderAfter' => 7,
+            'sendFirstReminderAfter' => 5,
             'sendReminderEach' => 7,
         ], $calendarProperties));
 
@@ -250,10 +254,25 @@ final class SendEventRegistrationReminderHandlerTest extends ContaoTestCase
             ->willReturn($lock)
         ;
 
+        $router = $this->createMock(RouterInterface::class);
+        $router
+            ->method('generate')
+            ->willReturnCallback(static fn (string $route, array $parameters): string => [] === $parameters ? 'https://example.org/contao' : 'https://example.org/contao?do=calendar&table=tl_calendar_events_member&id=10')
+        ;
+
         $twig = $this->createMock(Environment::class);
         $twig
             ->method('render')
-            ->willReturn("registration-list\n")
+            ->willReturnCallback(
+                static function (string $template, array $context): string {
+                    // Every event gets a link to its registration list
+                    if ([10] !== array_keys($context['member_list_urls'])) {
+                        return 'missing member list url';
+                    }
+
+                    return SendEventRegistrationReminderHandler::TEMPLATE_HTML === $template ? '<html-list>' : "text-list\n";
+                },
+            )
         ;
 
         return new SendEventRegistrationReminderHandler(
@@ -262,6 +281,7 @@ final class SendEventRegistrationReminderHandlerTest extends ContaoTestCase
             $this->notificationCenter,
             $this->provider,
             $this->reminderLog,
+            $router,
             $twig,
             'de',
             $this->createMock(LoggerInterface::class),

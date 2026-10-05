@@ -1,6 +1,6 @@
 # Feature: Event Registration Database Sync
 
-Bundle: `markocupic/sac-event-tool-bundle` (bleibt im Bundle, kein eigenes Bundle)
+Bundle: `markocupic/sac-event-tool-bundle`
 Ort: `src/Feature/EventRegistrationDatabaseSync/` (Namespace `Markocupic\SacEventToolBundle\Feature\EventRegistrationDatabaseSync`), Tests unter `tests/Feature/EventRegistrationDatabaseSync/`
 
 ## Ziel

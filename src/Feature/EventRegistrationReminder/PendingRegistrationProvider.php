@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\Feature\EventRegistrationReminder;
 
 use Contao\CalendarModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\System;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
@@ -137,7 +138,7 @@ class PendingRegistrationProvider
      */
     protected function fetchUpcomingEvents(int $calendarId, int $now): array
     {
-        return $this->connection->fetchAllAssociative(
+        $events = $this->connection->fetchAllAssociative(
             'SELECT e.id, e.title, e.eventType, e.registrationGoesTo,
                 (SELECT i.userId FROM tl_calendar_events_instructor i WHERE i.pid = e.id AND i.isMainInstructor = 1 LIMIT 1) AS mainInstructorId
             FROM tl_calendar_events e
@@ -145,6 +146,13 @@ class PendingRegistrationProvider
             ORDER BY e.startDate, e.id',
             [$calendarId, $now],
         );
+
+        if (false !== $events && 218 === $calendarId) {
+            $projectDir = System::getContainer()->getParameter('kernel.project_dir');
+            file_put_contents($projectDir.'/test.txt', print_r($events, true));
+        }
+
+        return $events;
     }
 
     /**

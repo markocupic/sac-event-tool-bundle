@@ -17,7 +17,6 @@ use Contao\DC_Table;
 
 /*
  * Log of the event registration reminder: one row per (user, calendar) pair with the last reminder.
- * The table name comes from the former extension markocupic/sac-event-registration-reminder and was kept on purpose.
  *
  * Back end module "event_registration_reminder_notification": READ ONLY.
  *
@@ -29,7 +28,7 @@ $GLOBALS['TL_DCA']['tl_event_registration_reminder_notification'] = [
 		'closed'        => true,
 		'notCreatable'  => true,
 		'notEditable'   => true,
-		'notDeletable'  => true,
+		'notDeletable'  => false,
 		'notCopyable'   => true,
 		'notSortable'   => true,
 		'sql'           => [
@@ -51,7 +50,10 @@ $GLOBALS['TL_DCA']['tl_event_registration_reminder_notification'] = [
 			'showColumns' => true,
 		],
 		'global_operations' => [],
-		'operations'        => ['show'],
+		'operations'        => [
+			'show',
+			'delete',
+		],
 	],
 	'palettes' => [
 		'default' => '{first_legend},title,user,calendar,dateAdded,prevReminderTstamp,history',

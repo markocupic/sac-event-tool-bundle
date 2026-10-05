@@ -233,7 +233,6 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventCompletionReminderInterval'] =
 
 // Event registration reminder
 // Reminds the registration coordinator or main instructor of unconfirmed registrations of upcoming events.
-// The field names come from the former extension markocupic/sac-event-registration-reminder and were kept on purpose.
 // See docs/features/event-registration-reminder.md
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['enableInstructorReminderNotification'] = [
 	'exclude'   => true,

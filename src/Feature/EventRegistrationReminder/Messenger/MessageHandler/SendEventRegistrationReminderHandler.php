@@ -25,6 +25,8 @@ use Markocupic\SacEventToolBundle\Feature\EventRegistrationReminder\ReminderLog;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Terminal42\NotificationCenterBundle\NotificationCenter;
 use Twig\Environment as Twig;
 
@@ -40,7 +42,9 @@ use Twig\Environment as Twig;
 #[AsMessageHandler]
 readonly class SendEventRegistrationReminderHandler
 {
-    public const TEMPLATE = '@MarkocupicSacEventTool/Email/EventRegistrationReminder/registrations.txt.twig';
+    public const TEMPLATE_HTML = '@MarkocupicSacEventTool/Email/EventRegistrationReminder/registrations.html.twig';
+
+    public const TEMPLATE_TEXT = '@MarkocupicSacEventTool/Email/EventRegistrationReminder/registrations.txt.twig';
 
     public function __construct(
         private ContaoFramework $framework,
@@ -48,6 +52,7 @@ readonly class SendEventRegistrationReminderHandler
         private NotificationCenter $notificationCenter,
         private PendingRegistrationProvider $pendingRegistrationProvider,
         private ReminderLog $reminderLog,
+        private RouterInterface $router,
         private Twig $twig,
         private string $sacevtLocale,
         private LoggerInterface|null $contaoErrorLogger,
@@ -133,14 +138,49 @@ readonly class SendEventRegistrationReminderHandler
      */
     private function getTokens(UserModel $user, CalendarModel $calendar, array $pendingEvents): array
     {
+        $templateData = [
+            'events' => $pendingEvents,
+            'member_list_urls' => $this->getMemberListUrls($pendingEvents),
+        ];
+
         return [
             'admin_email' => (string) $this->framework->getAdapter(Config::class)->get('adminEmail'),
             'instructor_email' => trim((string) $user->email),
             'instructor_firstname' => (string) $user->firstname,
             'instructor_lastname' => (string) $user->lastname,
             'instructor_name' => (string) $user->name,
-            'registrations' => trim($this->twig->render(self::TEMPLATE, ['events' => $pendingEvents])),
+            'registrations' => trim($this->twig->render(self::TEMPLATE_TEXT, $templateData)),
+            'registrations_html' => $this->twig->render(self::TEMPLATE_HTML, $templateData),
+            'send_first_reminder_after' => (int) $calendar->sendFirstReminderAfter,
             'send_reminder_each' => (int) $calendar->sendReminderEach,
+            'link_event_tool' => $this->router->generate('contao_backend', [], UrlGeneratorInterface::ABSOLUTE_URL),
         ];
+    }
+
+    /**
+     * Link to the registration list (tl_calendar_events_member) of each event,
+     * where the registrations can be accepted, refused or put on the waiting list.
+     *
+     * @param list<PendingEvent> $pendingEvents
+     *
+     * @return array<int, string> event id => absolute backend URL
+     */
+    private function getMemberListUrls(array $pendingEvents): array
+    {
+        $urls = [];
+
+        foreach ($pendingEvents as $pendingEvent) {
+            $urls[$pendingEvent->eventId] = $this->router->generate(
+                'contao_backend',
+                [
+                    'do' => 'calendar',
+                    'table' => 'tl_calendar_events_member',
+                    'id' => $pendingEvent->eventId,
+                ],
+                UrlGeneratorInterface::ABSOLUTE_URL,
+            );
+        }
+
+        return $urls;
     }
 }

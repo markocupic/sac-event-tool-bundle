@@ -1,6 +1,6 @@
 # Feature: Workshop Booklet
 
-Bundle: `markocupic/sac-event-tool-bundle` (bleibt im Bundle, kein eigenes Bundle)
+Bundle: `markocupic/sac-event-tool-bundle`
 Ort: `src/Feature/WorkshopBooklet/` (Namespace `Markocupic\SacEventToolBundle\Feature\WorkshopBooklet`)
 
 ## Ziel

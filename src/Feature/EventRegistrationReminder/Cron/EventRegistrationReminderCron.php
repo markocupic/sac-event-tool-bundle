@@ -23,6 +23,7 @@ use Markocupic\SacEventToolBundle\Feature\EventRegistrationReminder\ReminderLog;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * For every calendar with the registration reminder enabled: finds all users with
@@ -40,6 +41,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
  */
 readonly class EventRegistrationReminderCron
 {
+    private const string STOP_WATCH_EVENT = 'event_registration_reminder_cron';
+
     public function __construct(
         private Connection $connection,
         private ContaoFramework $framework,
@@ -57,6 +60,9 @@ readonly class EventRegistrationReminderCron
         if ($this->disable) {
             return;
         }
+
+        // Measure the whole run to see whether it gets close to max_execution_time
+        $stopwatchEvent = (new Stopwatch())->start(self::STOP_WATCH_EVENT);
 
         $this->framework->initialize();
 
@@ -85,11 +91,14 @@ readonly class EventRegistrationReminderCron
             }
         }
 
+        $duration = round($stopwatchEvent->stop()->getDuration() / 1000, 2);
+
         // The messages are handled (and the notifications sent) asynchronously by SendEventRegistrationReminderHandler
         $this->contaoCronLogger?->info(\sprintf(
-            'Event registration reminder cron: checked %d calendar(s) and dispatched %d message(s).',
+            'Event registration reminder cron: checked %d calendar(s) and dispatched %d message(s) in %s s.',
             \count($calendarIds),
             $count,
+            $duration,
         ));
     }
 }

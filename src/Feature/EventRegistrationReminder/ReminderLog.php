@@ -94,7 +94,7 @@ class ReminderLog
                     'calendar' => $calendarId,
                     'history' => implode("\n", $history),
                 ]);
-            }
+            },
         );
     }
 }

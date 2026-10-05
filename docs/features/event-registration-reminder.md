@@ -2,7 +2,6 @@
 
 Bundle: `markocupic/sac-event-tool-bundle`
 Ort: `src/Feature/EventRegistrationReminder/` (Namespace `Markocupic\SacEventToolBundle\Feature\EventRegistrationReminder`), Tests unter `tests/Feature/EventRegistrationReminder/`
-Herkunft: übernommen aus der Extension `markocupic/sac-event-registration-reminder` und an die Feature-Konventionen angepasst (Cron + Messenger, wie `EventCompletionReminder`)
 
 ## Ziel
 
@@ -55,11 +54,16 @@ sacevt:
 
 Parameter: `sacevt.feature.event_registration_reminder.disable`, `sacevt.feature.event_registration_reminder.cron_schedule`. Beide sind optional. `disable` wird im Cron geprüft: Es werden keine neuen Messages mehr dispatcht.
 
-Gegenüber der früheren Extension weggefallen: `sid` und `allow_web_scope` (keine Web-Route mehr), `notification_limit_per_request` (Versand einzeln über den Messenger), `default_locale` (ersetzt durch `sacevt.locale`).
+### Einrichtung
+
+1. `contao:migrate` (Kalenderfelder, Log-Tabelle), `cache:clear`
+2. Im Notification Center eine Benachrichtigung vom Typ «Reminder für unbearbeitete Event-Anmeldungen» anlegen: Empfänger `##instructor_email##`, Rohtext mit `##registrations##`, HTML-Version mit `##registrations_html##`. Interne Links im HTML-Text als Insert-Tag mit `absolute` setzen (z. B. `{{link_url::123::absolute|urlattr}}`) bzw. `##link_event_tool##` verwenden; relative Links lassen den Versand im Worker scheitern («Unable to parse URI»).
+3. Im Kalender den Reminder aktivieren, Frist, Intervall und Benachrichtigung wählen
+4. Der Router-Kontext muss gesetzt sein (`framework.router.default_uri` oder `router.request_context.host`/`scheme`), damit die Links auf die richtige Domain zeigen
+5. Contao-Cron per CLI laufen lassen und Messenger-Worker betreiben
+6. Kontrolle: Systemlog (Anzahl Messages, Laufzeit) und Backend-Modul «Reminder für Event-Anmeldungen»
 
 ## Datenmodell
-
-Die Namen der Felder, der Log-Tabelle, des Backend-Moduls und des Notification-Typs stammen aus der früheren Extension und wurden bewusst beibehalten. So bleiben Einstellungen, Log und Benachrichtigungen bestehender Installationen erhalten, eine Migration ist nicht nötig.
 
 ### tl_calendar (Legende `event_registration_reminder_legend`)
 
@@ -82,14 +86,15 @@ Eine Zeile pro (Empfänger, Kalender) mit dem letzten Reminder:
 | `title` | z. B. «Sent a reminder to Anna Muster (last time 01.10.2026).»; der Zusatz erscheint, wenn der vorherige Reminder weniger als zwei Intervalle zurückliegt |
 | `history` | die letzten 10 Reminder |
 
-Backend-Modul «Reminder für unbearbeitete Anmeldungen» (`event_registration_reminder_notification` in `sac_be_modules`), **nur lesen**: Liste und Detailansicht, kein Erstellen, Bearbeiten oder Löschen.
+Backend-Modul «Reminder für Event-Anmeldungen» (`event_registration_reminder_notification` in `sac_be_modules`), **nur lesen**: Liste und Detailansicht, kein Erstellen, Bearbeiten oder Löschen.
 
 ## Tokens (Notification Center, Typ `event_registration_reminder`)
 
 - E-Mail: `instructor_email` (Empfänger), `admin_email`
 - Empfänger: `instructor_firstname`, `instructor_lastname`, `instructor_name`
-- Liste: `registrations` (Text, gruppiert nach Event, Template `templates/Email/EventRegistrationReminder/registrations.txt.twig`)
-- Einstellung: `send_reminder_each`
+- Liste: `registrations` (Rohtext, Template `registrations.txt.twig`) und `registrations_html` (HTML, Template `registrations.html.twig`), beide unter `templates/Email/EventRegistrationReminder/`, gruppiert nach Event. Pro Event ein Link zur Teilnehmerliste (`contao?do=calendar&table=tl_calendar_events_member&id={id}`), Linktext `MSC.serr_link_member_list` («Zur Teilnehmerliste»). Die URLs erzeugt der Handler (`getMemberListUrls()`).
+- Einstellungen: `send_first_reminder_after` (Frist bis zum ersten Reminder), `send_reminder_each` (Intervall)
+- Link: `link_event_tool` (absoluter Link zum Contao-Backend). Im HTML-Text als `href="##link_event_tool##"` verwenden, damit TinyMCE keinen relativen Link daraus macht.
 
 ## Klassen
 
@@ -113,10 +118,6 @@ src/Feature/EventRegistrationReminder/
 - `Cron/EventRegistrationReminderCronTest`: eine Message pro fälligem (Empfänger, Kalender), nichts bei `disable`
 - `Messenger/MessageHandler/SendEventRegistrationReminderHandlerTest`: Abbruchfälle, Log vor dem Versand, Tokens, Sprache des Benutzers
 
-## Inbetriebnahme
+## Laufzeit
 
-1. Die Extension `markocupic/sac-event-registration-reminder` deinstallieren (`composer remove`) und ihre Konfiguration `sac_evt_reg_reminder` aus `config/config.yaml` entfernen; `disable` und `cron_schedule` bei Bedarf unter `sacevt.feature.event_registration_reminder` übernehmen. Beide gleichzeitig installiert führt zu doppelten Definitionen.
-2. Falls ein externer Cronjob die alte Route `/_event_registration_reminder/{sid}` aufruft: entfernen. Der Reminder läuft jetzt über den Contao-Cron und den Messenger-Worker.
-3. `contao:migrate` (keine Änderungen erwartet), `cache:clear`
-4. Im Kalender prüfen, ob die gewählte Benachrichtigung vom Typ «Reminder für unbearbeitete Event-Anmeldungen» ist. Andere Typen werden nicht mehr angeboten.
-5. Kontrolle: Systemlog (Anzahl Messages) und Backend-Modul «Reminder für unbearbeitete Anmeldungen»
+Der Cron misst seine Laufzeit mit der Symfony Stopwatch und schreibt sie ins Contao-Systemlog, z. B. «Event registration reminder cron: checked 74 calendar(s) and dispatched 0 message(s) in 0.02 s.». Der Versand im Messenger-Worker ist nicht enthalten.

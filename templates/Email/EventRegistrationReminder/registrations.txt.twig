@@ -4,6 +4,7 @@
 
     Variables:
     - events: list<PendingEvent> (eventId, title, eventType, overdueRegistrations, recentRegistrations: list<PendingRegistration>)
+    - member_list_urls: array<eventId, url> link to the registration list of the event
 #}
 {% trans_default_domain 'contao_default' %}
 {% autoescape false %}
@@ -19,6 +20,10 @@
 {% for registration in event.recentRegistrations %}
 - {{ ('MSC.serr_participant_' ~ registration.gender)|trans }} {{ registration.firstname }} {{ registration.lastname }}, {{ 'MSC.serr_sac_member_id'|trans([registration.sacMemberId]) }} ({{ 'MSC.serr_days_registered'|trans([registration.daysRegistered]) }})
 {% endfor %}
+{% endif %}
+{% if member_list_urls[event.eventId] is defined %}
+
+{{ 'MSC.serr_link_member_list'|trans }}: {{ member_list_urls[event.eventId] }}
 {% endif %}
 
 {% endfor %}

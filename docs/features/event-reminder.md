@@ -1,6 +1,6 @@
 # Feature: Event Reminder
 
-Bundle: `markocupic/sac-event-tool-bundle` (bleibt im Bundle, kein eigenes Bundle)
+Bundle: `markocupic/sac-event-tool-bundle`
 Ort: `src/Feature/EventReminder/` (Namespace `Markocupic\SacEventToolBundle\Feature\EventReminder`), Tests unter `tests/Feature/EventReminder/`
 
 ## Ziel

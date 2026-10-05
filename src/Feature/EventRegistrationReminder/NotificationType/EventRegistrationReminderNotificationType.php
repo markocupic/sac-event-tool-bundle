@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\Feature\EventRegistrationReminder\Notifi
 use Terminal42\NotificationCenterBundle\NotificationType\NotificationTypeInterface;
 use Terminal42\NotificationCenterBundle\Token\Definition\EmailTokenDefinition;
 use Terminal42\NotificationCenterBundle\Token\Definition\Factory\TokenDefinitionFactoryInterface;
+use Terminal42\NotificationCenterBundle\Token\Definition\HtmlTokenDefinition;
 use Terminal42\NotificationCenterBundle\Token\Definition\TextTokenDefinition;
 
 /**
@@ -46,6 +47,10 @@ class EventRegistrationReminderNotificationType implements NotificationTypeInter
             $tokenDefinitions[] = $this->factory->create(EmailTokenDefinition::class, $token, self::NAME.'.'.$token);
         }
 
+        foreach ($this->getTokenConfig()['html_token'] as $token) {
+            $tokenDefinitions[] = $this->factory->create(HtmlTokenDefinition::class, $token, self::NAME.'.'.$token);
+        }
+
         foreach ($this->getTokenConfig()['text_token'] as $token) {
             $tokenDefinitions[] = $this->factory->create(TextTokenDefinition::class, $token, self::NAME.'.'.$token);
         }
@@ -60,12 +65,17 @@ class EventRegistrationReminderNotificationType implements NotificationTypeInter
                 'instructor_email',
                 'admin_email',
             ],
+            'html_token' => [
+                'registrations_html',
+            ],
             'text_token' => [
                 'instructor_firstname',
                 'instructor_lastname',
                 'instructor_name',
                 'registrations',
+                'send_first_reminder_after',
                 'send_reminder_each',
+                'link_event_tool',
             ],
         ];
     }

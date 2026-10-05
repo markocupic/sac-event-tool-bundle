@@ -189,8 +189,13 @@ $GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_lastname'] = 'Nachname des E
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['instructor_name'] = 'Name des Empfängers.';
 
 // Registrations
-$GLOBALS['TL_LANG']['nc_tokens'][$type]['registrations'] = 'Auflistung der Event-Anmeldungen, die der Empfänger noch nicht bearbeitet hat (generierter Text, gruppiert nach Event).';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['registrations'] = 'Auflistung der Event-Anmeldungen, die der Empfänger noch nicht bearbeitet hat (generierter Text, gruppiert nach Event, mit Link zur Teilnehmerliste). Für den Rohtext verwenden.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['registrations_html'] = 'Dieselbe Auflistung als HTML (mit Link «Zur Teilnehmerliste»). Für die HTML-Version verwenden.';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['send_first_reminder_after'] = 'Anzahl Tage seit der Anmeldung, nach denen eine unbearbeitete Anmeldung den Reminder auslöst (Einstellung «Ersten Reminder nach x Tagen» im Kalender).';
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['send_reminder_each'] = 'Intervall in Tagen, in dem die Erinnerung wiederholt wird (Einstellung im Kalender).';
+
+// Links
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['link_event_tool'] = 'Absoluter Link zum Event-Tool (Contao-Backend). Im HTML-Text als href verwenden: <a href="##link_event_tool##">Zum Event-Tool</a>.';
 
 // Admin
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['admin_email'] = 'E-Mail-Adresse des Systemadministrators (Contao-Einstellung "E-Mail-Adresse des Systemadministrators").';
