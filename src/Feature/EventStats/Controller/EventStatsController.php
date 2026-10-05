@@ -69,7 +69,7 @@ class EventStatsController extends AbstractBackendController
         $years = [$currentYear - 2, $currentYear - 1, $currentYear];
 
         return $this->render('@MarkocupicSacEventTool/EventStats/be_event_stats.html.twig', [
-            'headline' => $this->translator->trans('MOD.'.self::BACKEND_MODULE_TYPE.'.0', [], 'contao_default'),
+            'headline' => $this->translator->trans('MOD.'.self::BACKEND_MODULE_TYPE.'.0', [], 'contao_modules'),
             'years' => $years,
             'sections' => [
                 $this->getEventSection($years, 'Ausgeschriebene Touren (ab FS3)', EventType::TOUR, ['Anm: Es werden keine Last Minute Touren berücksichtigt.']),
