@@ -15,12 +15,20 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\StringUtil;
 
-class TourDifficulty
+readonly class TourDifficulty
 {
+    public function __construct(private ContaoFramework $framework)
+    {
+    }
+
     #[AsCallback(table: 'tl_tour_difficulty', target: 'list.sorting.child_record', priority: 100)]
     public function listDifficulties(array $row): string
     {
-        return '<div class="tl_content_left"><span class="level">'.$row['title'].'</span> '.$row['shortcut']."</div>\n";
+        $stringUtil = $this->framework->getAdapter(StringUtil::class);
+
+        return '<div class="tl_content_left"><span class="level">'.$stringUtil->specialchars($row['title']).'</span> '.$stringUtil->specialchars($row['shortcut'])."</div>\n";
     }
 }

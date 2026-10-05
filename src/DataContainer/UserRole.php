@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 use Contao\Backend;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
 use Contao\Image;
 use Contao\StringUtil;
@@ -25,15 +26,24 @@ use Doctrine\DBAL\Exception;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-readonly class UserRole
+class UserRole
 {
+    /**
+     * The ids of the user roles assigned to at least one user.
+     */
+    private array|null $assignedRoleIds = null;
+
     public function __construct(
-        private RequestStack $requestStack,
-        private Connection $connection,
-        private TranslatorInterface $translator,
+        private readonly Connection $connection,
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
+    /**
+     * User roles can only be sorted, the "paste into" mode is not allowed.
+     */
     #[AsCallback(table: 'tl_user_role', target: 'config.onload', priority: 100)]
     public function checkPermission(DataContainer|null $dc = null): void
     {
@@ -43,62 +53,66 @@ readonly class UserRole
 
         $request = $this->requestStack->getCurrentRequest();
 
-        $act = $request->query->get('act');
-
-        switch ($act) {
-            case 'cut': // Do not allow the paste into mode
-                if ('1' !== $request->query->get('mode')) {
-                    throw new AccessDeniedException('The paste into operation is not allowed on this record!');
-                }
-                break;
+        if ('cut' === $request->query->get('act') && '1' !== $request->query->get('mode')) {
+            throw new AccessDeniedException('The paste into operation is not allowed on this record!');
         }
     }
 
     /**
-     * Add the "role currently vacant" label to each record, if the user role could
-     * not be found in tl_user.
+     * Mark user roles that are not assigned to any user as "currently vacant".
      *
      * @throws Exception
      */
     #[AsCallback(table: 'tl_user_role', target: 'list.label.label', priority: 100)]
     public function checkForUsage(array $row, string $label, DataContainer $dc, string $args): string
     {
-        $arrRoles = [];
+        $stringUtil = $this->framework->getAdapter(StringUtil::class);
 
-        $arrUserRoles = $this->connection->fetchFirstColumn('SELECT userRole FROM tl_user');
+        $style = '';
 
-        if (!empty($arrUserRoles)) {
-            foreach ($arrUserRoles as $roles) {
-                $arrRecord = StringUtil::deserialize($roles, true);
-                $arrRoles = array_merge($arrRecord, $arrRoles);
-            }
+        if (!\in_array($row['id'], $this->getAssignedRoleIds(), false)) {
+            $msg = $this->translator->trans('MSC.roleCurrentlyVacant', [], 'contao_default');
+            $style = \sprintf(' title="%s" style="color:red"', $stringUtil->specialchars($msg));
         }
 
-        $arrRoles = array_values(array_unique($arrRoles));
-
-        $blnUsed = \in_array($row['id'], $arrRoles, false);
-
-        $msg = $this->translator->trans('MSC.roleCurrentlyVacant', [], 'contao_default');
-
-        $style = !$blnUsed ? \sprintf(' title="%s" style="color:red"', StringUtil::specialchars($msg)) : '';
-
-        return \sprintf('<span%s>%s</span> <span style="color:grey">%s</span>', $style, $row['title'], $row['email']);
+        return \sprintf('<span%s>%s</span> <span style="color:grey">%s</span>', $style, $stringUtil->specialchars($row['title']), $stringUtil->specialchars($row['email']));
     }
 
     /**
-     * Do not show the paste into button.
+     * Only show the "paste after" button. A record cannot be pasted after itself.
      */
     #[AsCallback(table: 'tl_user_role', target: 'list.sorting.paste_button', priority: 100)]
-    public function pasteButtonCallback(DataContainer $dc, array $row, string $strTable, bool $blnCircularRef, array $arrClipboard, array|null $children, string|null $previousLabel, string|null $nextLabel): string
+    public function pasteButtonCallback(DataContainer $dc, array $row, string $table, bool $circularReference, array $clipboard, array|null $children, string|null $previousLabel, string|null $nextLabel): string
     {
-        if (isset($arrClipboard['id']) && (int) $arrClipboard['id'] === (int) $row['id']) {
-            return Image::getHtml('pasteafter--disabled.svg').' ';
+        $image = $this->framework->getAdapter(Image::class);
+
+        if (isset($clipboard['id']) && (int) $clipboard['id'] === (int) $row['id']) {
+            return $image->getHtml('pasteafter--disabled.svg').' ';
         }
 
-        $imagePasteAfter = Image::getHtml('pasteafter.svg', $this->translator->trans('DCA.pasteafter.1', [$row['id']], 'contao_default'));
+        $stringUtil = $this->framework->getAdapter(StringUtil::class);
+        $title = $this->translator->trans('DCA.pasteafter.1', [$row['id']], 'contao_default');
+        $href = $this->framework->getAdapter(Backend::class)->addToUrl('act='.$clipboard['mode'].'&amp;mode=1&amp;pid='.$row['id'].(!\is_array($clipboard['id']) ? '&amp;id='.$clipboard['id'] : ''));
 
-        $href = Backend::addToUrl('act='.$arrClipboard['mode'].'&amp;mode=1&amp;pid='.$row['id'].(!\is_array($arrClipboard['id']) ? '&amp;id='.$arrClipboard['id'] : ''));
+        return '<a href="'.$stringUtil->specialcharsUrl($href).'" title="'.$stringUtil->specialchars($title).'" data-action="contao--scroll-offset#store">'.$image->getHtml('pasteafter.svg', $title).'</a> ';
+    }
 
-        return '<a href="'.StringUtil::specialcharsUrl($href).'" title="'.StringUtil::specialchars($this->translator->trans('DCA.pasteafter.1', [$row['id']], 'contao_default')).'" data-action="contao--scroll-offset#store">'.$imagePasteAfter.'</a> ';
+    /**
+     * @throws Exception
+     */
+    private function getAssignedRoleIds(): array
+    {
+        if (null === $this->assignedRoleIds) {
+            $stringUtil = $this->framework->getAdapter(StringUtil::class);
+            $roleIds = [];
+
+            foreach ($this->connection->fetchFirstColumn('SELECT userRole FROM tl_user') as $userRoles) {
+                $roleIds = array_merge($roleIds, $stringUtil->deserialize($userRoles, true));
+            }
+
+            $this->assignedRoleIds = array_values(array_unique($roleIds));
+        }
+
+        return $this->assignedRoleIds;
     }
 }

@@ -15,51 +15,53 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
 use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
 
-class EventFilterForm
+readonly class EventFilterForm
 {
-    public function __construct(private readonly Connection $connection)
-    {
+    public function __construct(
+        private Connection $connection,
+        private ContaoFramework $framework,
+    ) {
     }
 
+    /**
+     * Course sub types grouped by course main type.
+     */
     #[AsCallback(table: 'tl_event_filter_form', target: 'fields.courseType.options', priority: 100)]
     public function getCourseTypes(): array
     {
-        $opt = [];
-        $mainTypes = CourseMainTypeModel::findAll();
+        $courseMainTypeModel = $this->framework->getAdapter(CourseMainTypeModel::class);
+        $courseSubTypeModel = $this->framework->getAdapter(CourseSubTypeModel::class);
 
-        while ($mainTypes->next()) {
-            $opt[$mainTypes->name] = [];
-            $subTypes = CourseSubTypeModel::findByPid($mainTypes->id);
+        $options = [];
 
-            while ($subTypes->next()) {
-                $opt[$mainTypes->name][$subTypes->id] = $subTypes->name;
+        foreach ($courseMainTypeModel->findAll() ?? [] as $mainType) {
+            $options[$mainType->name] = [];
+
+            foreach ($courseSubTypeModel->findByPid($mainType->id) ?? [] as $subType) {
+                $options[$mainType->name][$subType->id] = $subType->name;
             }
         }
 
-        return $opt;
+        return $options;
     }
 
     /**
      * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
      */
     #[AsCallback(table: 'tl_event_filter_form', target: 'fields.organizers.options', priority: 100)]
     public function getOrganizers(): array
     {
-        $arrOptions = [];
-
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_event_organizer WHERE hideInEventFilter = ? ORDER BY sorting', [0], [Types::INTEGER]);
-
-        while (false !== ($arrOrganizer = $stmt->fetchAssociative())) {
-            $arrOptions[$arrOrganizer['id']] = $arrOrganizer['title'];
-        }
-
-        return $arrOptions;
+        return $this->connection->fetchAllKeyValue(
+            'SELECT id, title FROM tl_event_organizer WHERE hideInEventFilter = ? ORDER BY sorting',
+            [0],
+            [Types::INTEGER],
+        );
     }
 }

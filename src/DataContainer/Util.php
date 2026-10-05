@@ -14,19 +14,24 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\DataContainer;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\DBAL\Exception;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 readonly class Util
 {
     public function __construct(
-        private RequestStack $requestStack,
         private Connection $connection,
+        private AuthorizationCheckerInterface $authorizationChecker,
     ) {
     }
 
+    /**
+     * @throws Exception
+     */
     public function listSacSections(): array
     {
         return $this->connection
@@ -35,30 +40,65 @@ readonly class Util
     }
 
     /**
-     * Display the section name instead of the section id 4250,4252 becomes SAC
-     * PILATUS, SAC PILATUS NAPF.
+     * Non-admins may neither create, copy nor delete records and only see the
+     * fields they are allowed to edit.
      */
-    public function decryptSectionIds(array $data, array $row, DataContainer $dc, string $strTable): array
+    public function restrictDcaForNonAdmins(string $table): void
     {
-        if (isset($data[$strTable]) && \is_array($data[$strTable])) {
-            foreach (array_keys($data[$strTable]) as $k) {
-                if (isset($data[$strTable][$k]) && \is_array($data[$strTable][$k])) {
-                    foreach (array_keys($data[$strTable][0]) as $kk) {
-                        if (str_contains($kk, '<small>sectionId</small>')) {
-                            if (isset($row['sectionId'])) {
-                                $arrSections = StringUtil::deserialize($row['sectionId'], true);
-                                $arrSectionNames = [];
+        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            return;
+        }
 
-                                foreach ($arrSections as $id) {
-                                    $result = $this->connection->fetchOne('SELECT name FROM tl_sac_section WHERE sectionId = ?', [$id]);
-                                    $arrSectionNames[] = $result ?: $id;
-                                }
+        $GLOBALS['TL_DCA'][$table]['config']['closed'] = true;
+        $GLOBALS['TL_DCA'][$table]['config']['notCopyable'] = true;
+        $GLOBALS['TL_DCA'][$table]['config']['notDeletable'] = true;
+        unset($GLOBALS['TL_DCA'][$table]['list']['operations']['copy'], $GLOBALS['TL_DCA'][$table]['list']['operations']['delete']);
 
-                                $data[$strTable][$k][$kk] = implode(', ', $arrSectionNames);
-                            }
-                        }
-                    }
-                }
+        foreach (array_keys($GLOBALS['TL_DCA'][$table]['fields']) as $fieldName) {
+            if (!$this->authorizationChecker->isGranted(ContaoCorePermissions::USER_CAN_EDIT_FIELD_OF_TABLE, $table.'::'.$fieldName)) {
+                $GLOBALS['TL_DCA'][$table]['fields'][$fieldName]['eval']['doNotShow'] = true;
+                $GLOBALS['TL_DCA'][$table]['fields'][$fieldName]['sorting'] = false;
+                $GLOBALS['TL_DCA'][$table]['fields'][$fieldName]['filter'] = false;
+                $GLOBALS['TL_DCA'][$table]['fields'][$fieldName]['search'] = false;
+            }
+        }
+    }
+
+    /**
+     * Display the section names instead of the section ids in the "show" view:
+     * 4250,4252 becomes SAC PILATUS, SAC PILATUS NAPF.
+     *
+     * @throws Exception
+     */
+    public function decryptSectionIds(array $data, array $row, DataContainer $dc, string $table): array
+    {
+        if (!isset($row['sectionId']) || !\is_array($data[$table][0] ?? null)) {
+            return $data;
+        }
+
+        $labels = array_filter(
+            array_keys($data[$table][0]),
+            static fn ($label): bool => str_contains((string) $label, '<small>sectionId</small>'),
+        );
+
+        if (empty($labels)) {
+            return $data;
+        }
+
+        $sections = $this->listSacSections();
+        $sectionNames = [];
+
+        foreach (StringUtil::deserialize($row['sectionId'], true) as $sectionId) {
+            $sectionNames[] = $sections[$sectionId] ?? '' ?: $sectionId;
+        }
+
+        foreach ($data[$table] as $key => $record) {
+            if (!\is_array($record)) {
+                continue;
+            }
+
+            foreach ($labels as $label) {
+                $data[$table][$key][$label] = implode(', ', $sectionNames);
             }
         }
 

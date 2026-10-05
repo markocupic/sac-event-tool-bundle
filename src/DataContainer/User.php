@@ -18,7 +18,6 @@ use Contao\BackendUser;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Intl\Countries;
-use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\DataContainer;
 use Contao\Message;
 use Contao\UserModel;
@@ -31,23 +30,31 @@ use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class User
+readonly class User
 {
     public const TABLE = 'tl_user';
 
+    /**
+     * These fields are synchronized from the SAC member database.
+     */
+    private const array MEMBER_FIELDS = ['gender', 'firstname', 'lastname', 'name', 'email', 'phone', 'mobile', 'street', 'postal', 'city', 'dateOfBirth'];
+
     public function __construct(
-        private readonly Connection $connection,
-        private readonly ContaoFramework $framework,
-        private readonly Countries $countries,
-        private readonly BackendUserHomeDirectory $backendUserHomeDirectory,
-        private readonly Packages $packages,
-        private readonly RequestStack $requestStack,
-        private readonly Security $security,
-        private readonly TranslatorInterface $translator,
-        private readonly Util $util,
+        private Connection $connection,
+        private ContaoFramework $framework,
+        private Countries $countries,
+        private BackendUserHomeDirectory $backendUserHomeDirectory,
+        private Packages $packages,
+        private RequestStack $requestStack,
+        private Security $security,
+        private TranslatorInterface $translator,
+        private Util $util,
     ) {
     }
 
+    /**
+     * @throws Exception
+     */
     #[AsCallback(table: 'tl_user', target: 'fields.sectionId.options', priority: 100)]
     public function listSacSections(): array
     {
@@ -57,20 +64,17 @@ class User
     #[AsCallback(table: 'tl_user', target: 'fields.country.options', priority: 100)]
     public function getCountries(): array
     {
-        $arrCountries = $this->countries->getCountries();
+        $countries = $this->countries->getCountries();
 
-        return array_combine(array_map('strtolower', array_keys($arrCountries)), $arrCountries);
+        return array_combine(array_map('strtolower', array_keys($countries)), $countries);
     }
 
-    /**
-     * Add backend assets.
-     */
     #[AsCallback(table: 'tl_user', target: 'config.onload', priority: 100)]
     public function addBackendAssets(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ('user' === $request->query->get('do') && 'edit' === $request->query->get('act') && '' !== $request->query->get('ref')) {
+        if ('user' === $request->query->get('do') && 'edit' === $request->query->get('act')) {
             $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('js/backend_member_autocomplete.js', 'markocupic_sac_event_tool');
         }
     }
@@ -78,34 +82,12 @@ class User
     #[AsCallback(table: 'tl_user', target: 'config.onload', priority: 100)]
     public function checkPermission(DataContainer $dc): void
     {
-        if ($this->security->isGranted('ROLE_ADMIN')) {
-            return;
-        }
-
-        // Adding new records is not allowed to non admins.
-        $GLOBALS['TL_DCA']['tl_user']['config']['closed'] = true;
-        $GLOBALS['TL_DCA']['tl_user']['config']['notCopyable'] = true;
-        unset($GLOBALS['TL_DCA']['tl_user']['list']['operations']['copy']);
-
-        // Deleting records is not allowed to non admins.
-        $GLOBALS['TL_DCA']['tl_user']['config']['notDeletable'] = true;
-        unset($GLOBALS['TL_DCA']['tl_user']['list']['operations']['delete']);
-
-        // Do not show fields without write permission.
-        $arrFieldNames = array_keys($GLOBALS['TL_DCA']['tl_user']['fields']);
-
-        foreach ($arrFieldNames as $fieldName) {
-            if (!$this->security->isGranted(ContaoCorePermissions::USER_CAN_EDIT_FIELD_OF_TABLE, 'tl_user::'.$fieldName)) {
-                $GLOBALS['TL_DCA']['tl_user']['fields'][$fieldName]['eval']['doNotShow'] = true;
-                $GLOBALS['TL_DCA']['tl_user']['fields'][$fieldName]['sorting'] = false;
-                $GLOBALS['TL_DCA']['tl_user']['fields'][$fieldName]['filter'] = false;
-                $GLOBALS['TL_DCA']['tl_user']['fields'][$fieldName]['search'] = false;
-            }
-        }
+        $this->util->restrictDcaForNonAdmins(self::TABLE);
     }
 
     /**
-     * Make fields readonly in backend users profile.
+     * Users that are active SAC members cannot edit their member data in their
+     * profile. The data is synchronized from the SAC member database.
      *
      * @throws Exception
      */
@@ -114,51 +96,41 @@ class User
     {
         $user = $this->security->getUser();
 
-        if (!$user instanceof BackendUser) {
-            return;
-        }
-
-        if (empty($user->sacMemberId)) {
+        if (!$user instanceof BackendUser || empty($user->sacMemberId)) {
             return;
         }
 
         $request = $this->requestStack->getCurrentRequest();
 
-        if (!$dc->id > 0 || 'login' !== $request->get('do') || 'edit' !== $request->get('act')) {
+        if (!$dc->id || 'login' !== $request->query->get('do') || 'edit' !== $request->query->get('act')) {
             return;
         }
 
-        $arrMember = $this->connection->fetchAssociative(
+        $member = $this->connection->fetchAssociative(
             'SELECT * FROM tl_member WHERE sacMemberId = :sacMemberId',
             ['sacMemberId' => $user->sacMemberId],
             ['sacMemberId' => Types::INTEGER],
         );
 
-        if (false === $arrMember || $arrMember['disable']) {
+        if (false === $member || $member['disable']) {
             return;
         }
 
-        if ('' !== $arrMember['stop'] && time() > $arrMember['stop']) {
+        if ('' !== $member['stop'] && time() > $member['stop']) {
             return;
         }
 
-        $arrReadonlyFields = ['gender', 'firstname', 'lastname', 'name', 'email', 'phone', 'mobile', 'street', 'postal', 'city', 'dateOfBirth'];
-
-        foreach ($arrReadonlyFields as $fieldName) {
+        foreach (self::MEMBER_FIELDS as $fieldName) {
             $GLOBALS['TL_DCA']['tl_user']['fields'][$fieldName]['eval']['readonly'] = true;
         }
 
-        // Display a message
-        $messageAdapter = $this->framework->getAdapter(Message::class);
-
-        $messageAdapter->addInfo(
+        $this->framework->getAdapter(Message::class)->addInfo(
             $this->translator->trans('MSC.bhs_dashb_howToEditReadonlyProfileData', [], 'contao_default'),
         );
     }
 
     /**
-     * Display the section name instead of the section id 4250,4252 becomes SAC
-     * PILATUS, SAC PILATUS NAPF.
+     * @throws Exception
      */
     #[AsCallback(table: 'tl_user', target: 'config.onshow', priority: 100)]
     public function decryptSectionIds(array $data, array $row, DataContainer $dc): array
@@ -167,33 +139,37 @@ class User
     }
 
     /**
-     * Set defaults and auto-create backend users home directory when creating a new user.
+     * Create the home directory of the new user. Users inherit the group
+     * permissions and have to set a new password on their first login.
      *
      * @throws Exception
      * @throws \Exception
      */
     #[AsCallback(table: 'tl_user', target: 'config.oncreate', priority: 100)]
-    public function setDefaultsOnCreatingNew(string $strTable, int $id, array $arrSet): void
+    public function setDefaultsOnCreatingNew(string $table, int $id, array $set): void
     {
-        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
+        $user = $this->framework->getAdapter(UserModel::class)->findById($id);
 
-        if (null !== ($objUser = $userModelAdapter->findById($id))) {
-            // Create backend users home directory
-            $this->backendUserHomeDirectory->create($objUser);
-
-            if ('extend' !== ($arrSet['inherit'] ?? null)) {
-                $randomPassword = sha1((string) random_int(0, getrandmax()));
-
-                $set = [
-                    'inherit' => 'extend',
-                    'pwChange' => true,
-                    'password' => password_hash($randomPassword, PASSWORD_DEFAULT),
-                    'tstamp' => 0,
-                ];
-
-                $this->connection->update('tl_user', $set, ['id' => $id]);
-            }
+        if (null === $user) {
+            return;
         }
+
+        $this->backendUserHomeDirectory->create($user);
+
+        if ('extend' === ($set['inherit'] ?? null)) {
+            return;
+        }
+
+        $this->connection->update(
+            'tl_user',
+            [
+                'inherit' => 'extend',
+                'pwChange' => true,
+                'password' => password_hash(bin2hex(random_bytes(32)), PASSWORD_DEFAULT),
+                'tstamp' => 0,
+            ],
+            ['id' => $id],
+        );
     }
 
     /**
@@ -202,14 +178,6 @@ class User
     #[AsCallback(table: 'tl_user', target: 'fields.userRole.options', priority: 100)]
     public function getUserRoles(): array
     {
-        $options = [];
-
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_user_role ORDER BY sorting');
-
-        while (false !== ($row = $stmt->fetchAssociative())) {
-            $options[$row['id']] = $row['title'];
-        }
-
-        return $options;
+        return $this->connection->fetchAllKeyValue('SELECT id, title FROM tl_user_role ORDER BY sorting');
     }
 }

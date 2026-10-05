@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer\AccessDecision;
 
 use Contao\CalendarEventsModel;
-use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\DataContainer\DataContainerOperation;
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;

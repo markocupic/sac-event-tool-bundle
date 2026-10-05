@@ -52,58 +52,41 @@ class EventReleaseLevelUtil
         $this->date = $this->framework->getAdapter(Date::class);
     }
 
-    public function hasValidEventReleaseLevel(CalendarEventsModel $objEvent, int $eventReleaseLevelId): bool
+    /**
+     * The release level must belong to the release level policy package of the
+     * event. 0 is only valid if no package is assigned to the event.
+     */
+    public function hasValidEventReleaseLevel(CalendarEventsModel $event, int $eventReleaseLevelId): bool
     {
-        $maxEventReleaseModel = EventReleaseLevelPolicyModel::findMaxLevelByEventId($objEvent->id);
+        $maxLevel = EventReleaseLevelPolicyModel::findMaxLevelByEventId($event->id);
 
-        if (0 === $eventReleaseLevelId && null === $maxEventReleaseModel) {
-            return true;
+        if (0 === $eventReleaseLevelId) {
+            return null === $maxLevel;
         }
 
-        if (0 === $eventReleaseLevelId && null !== $maxEventReleaseModel) {
-            return false;
-        }
+        $level = EventReleaseLevelPolicyModel::findById($eventReleaseLevelId);
 
-        $eventReleaseModel = EventReleaseLevelPolicyModel::findById($eventReleaseLevelId);
-
-        return $maxEventReleaseModel->pid === $eventReleaseModel->pid;
+        return null !== $maxLevel && null !== $level && $maxLevel->pid === $level->pid;
     }
 
-    public function validateEventReleaseLevelTransition(CalendarEventsModel $objEvent, int $targetEventReleaseLevelId): void
+    public function validateEventReleaseLevelTransition(CalendarEventsModel $event, int $targetEventReleaseLevelId): void
     {
-        $calendar = $objEvent->getRelated('pid');
-
-        $err = \sprintf(
-            'Could not find the parent calendar for event "%s" (ID: %d).',
-            $objEvent->title,
-            $objEvent->id,
-        );
+        $calendar = $event->getRelated('pid');
 
         if (null === $calendar) {
-            throw new \Exception($err);
+            throw new \Exception(\sprintf('Could not find the parent calendar for event "%s" (ID: %d).', $event->title, $event->id));
         }
 
-        $currentEventReleaseModel = EventReleaseLevelPolicyModel::findById($objEvent->eventReleaseLevel);
+        $currentLevel = EventReleaseLevelPolicyModel::findById($event->eventReleaseLevel);
 
-        if (null === $currentEventReleaseModel) {
-            throw new \Exception(\sprintf('Could not find the current event release level for event "%s" (ID %d).', $objEvent->title, $objEvent->id));
+        if (null === $currentLevel) {
+            throw new \Exception(\sprintf('Could not find the current event release level for event "%s" (ID %d).', $event->title, $event->id));
         }
 
-        $targetEventReleaseModel = EventReleaseLevelPolicyModel::findById($targetEventReleaseLevelId);
+        $targetLevel = EventReleaseLevelPolicyModel::findById($targetEventReleaseLevelId);
 
-        if (!$this->hasValidEventReleaseLevel($objEvent, $targetEventReleaseLevelId)) {
-            $err = [
-                'Invalid event release level assigned!',
-                'TL_ERROR',
-                'ERR.selectedEventReleaseLevelIsNotCompatibleWithTheEventType',
-                [
-                    $objEvent->title,
-                    $objEvent->id,
-                    null !== $targetEventReleaseModel ? 'FS '.$targetEventReleaseModel->level : 'undefined',
-                ],
-            ];
-
-            throw new EventReleaseLevelTransitionException(...$err);
+        if (!$this->hasValidEventReleaseLevel($event, $targetEventReleaseLevelId)) {
+            throw new EventReleaseLevelTransitionException('Invalid event release level assigned!', EventReleaseLevelTransitionException::LEVEL_ERROR, 'ERR.selectedEventReleaseLevelIsNotCompatibleWithTheEventType', [$event->title, $event->id, null !== $targetLevel ? 'FS '.$targetLevel->level : 'undefined']);
         }
 
         // Accept 0 if we have no event release level policy package assigned to the event.
@@ -111,148 +94,100 @@ class EventReleaseLevelUtil
             return;
         }
 
-        // Check if we can determine the initial event release level
-        $minEventReleaseModel = EventReleaseLevelPolicyModel::findMinLevelByEventId($objEvent->id);
+        $minLevel = EventReleaseLevelPolicyModel::findMinLevelByEventId($event->id);
 
-        if (null === $minEventReleaseModel) {
-            $except = \sprintf(
-                'Could not determine the initial (lowest) event release level for the event "%s" (ID: %d).',
-                $objEvent->title,
-                $objEvent->id,
-            );
-
-            throw new \RuntimeException($except);
+        if (null === $minLevel) {
+            throw new \RuntimeException(\sprintf('Could not determine the initial (lowest) event release level for the event "%s" (ID: %d).', $event->title, $event->id));
         }
 
-        // Check if we can determine the highest event release level
-        $maxEventReleaseModel = EventReleaseLevelPolicyModel::findMaxLevelByEventId($objEvent->id);
+        $maxLevel = EventReleaseLevelPolicyModel::findMaxLevelByEventId($event->id);
 
-        if (null === $maxEventReleaseModel) {
-            $except = \sprintf(
-                'Could not determine the maximum event release level for the event "%s" (ID: %d).',
-                $objEvent->title,
-                $objEvent->id,
-            );
-
-            throw new \RuntimeException($except);
+        if (null === $maxLevel) {
+            throw new \RuntimeException(\sprintf('Could not determine the maximum event release level for the event "%s" (ID: %d).', $event->title, $event->id));
         }
 
-        // Do not allow non-admins to upgrade the release level above the initial level if a time period is defined in the calendar
-        if ($minEventReleaseModel->id !== $targetEventReleaseLevelId && $objEvent->eventReleaseLevel !== $targetEventReleaseLevelId) {
-            if ($targetEventReleaseModel->level > $currentEventReleaseModel->level) {
-                if ($calendar->enableEventStartDateValidation && ($objEvent->startDate < $calendar->validTimePeriodStart || $objEvent->startDate > $calendar->validTimePeriodStop)) {
-                    if (!$this->security->isGranted('ROLE_ADMIN')) {
-                        $err = [
-                            \sprintf('Can not upgrade release level of event with ID %d. Event start date must be between %s and %s.', $objEvent->id, $this->date->parse($this->config->get('dateFormat'), $calendar->validTimePeriodStart), $this->date->parse($this->config->get('dateFormat'), $calendar->validTimePeriodStop)),
-                            'TL_ERROR',
-                            'ERR.eventReleaseLevelUpgradeFailedEventStartDateMustBeWithinSpecifiedTimePeriod',
-                            [
-                                $objEvent->title,
-                                $objEvent->id,
-                                $targetEventReleaseModel->level,
-                                $this->date->parse($this->config->get('dateFormat'), $calendar->validTimePeriodStart),
-                                $this->date->parse($this->config->get('dateFormat'), $calendar->validTimePeriodStop),
-                            ],
-                        ];
+        // Do not allow non-admins to upgrade the release level above the initial level
+        // if the event start date is outside the time period defined in the calendar.
+        $isUpgradeAboveInitialLevel = $minLevel->id !== $targetEventReleaseLevelId
+            && $event->eventReleaseLevel !== $targetEventReleaseLevelId
+            && $targetLevel->level > $currentLevel->level;
 
-                        throw new EventReleaseLevelTransitionException(...$err);
-                    }
-                    // Show a warning to admins only!
-                    $this->message->addInfo(\sprintf('Event "%s" (ID %d) should not be promoted to FS %d because its start date falls outside the configured time period.', $objEvent->title, $objEvent->id, $targetEventReleaseModel->level));
-                }
+        if ($isUpgradeAboveInitialLevel && $calendar->enableEventStartDateValidation && ($event->startDate < $calendar->validTimePeriodStart || $event->startDate > $calendar->validTimePeriodStop)) {
+            $dateFormat = $this->config->get('dateFormat');
+
+            if (!$this->security->isGranted('ROLE_ADMIN')) {
+                throw new EventReleaseLevelTransitionException(\sprintf('Can not upgrade release level of event with ID %d. Event start date must be between %s and %s.', $event->id, $this->date->parse($dateFormat, $calendar->validTimePeriodStart), $this->date->parse($dateFormat, $calendar->validTimePeriodStop)), EventReleaseLevelTransitionException::LEVEL_ERROR, 'ERR.eventReleaseLevelUpgradeFailedEventStartDateMustBeWithinSpecifiedTimePeriod', [$event->title, $event->id, $targetLevel->level, $this->date->parse($dateFormat, $calendar->validTimePeriodStart), $this->date->parse($dateFormat, $calendar->validTimePeriodStop)]);
             }
+
+            // Show a warning to admins only!
+            $this->message->addInfo(\sprintf('Event "%s" (ID %d) should not be promoted to FS %d because its start date falls outside the configured time period.', $event->title, $event->id, $targetLevel->level));
         }
 
-        // Do not allow non-admins to shift the event release level to the top level.
-        if ($maxEventReleaseModel->id === $targetEventReleaseLevelId) {
-            if (
-                !$this->security->isGranted('ROLE_ADMIN')
-                && $calendar->enableMaxEventReleaseLevelProtection
-                && time() < $calendar->maxEventReleaseLevelTimeLimit
-            ) {
-                $objEvent->published = 0;
+        // Do not allow non-admins to shift the event release level to the top level
+        // before the time limit defined in the calendar.
+        if ($maxLevel->id === $targetEventReleaseLevelId && !$this->security->isGranted('ROLE_ADMIN') && $calendar->enableMaxEventReleaseLevelProtection && time() < $calendar->maxEventReleaseLevelTimeLimit) {
+            $event->published = 0;
 
-                if ($objEvent->isModified()) {
-                    $objEvent->save();
-                }
-
-                $err = [
-                    'Event release level transition not allowed before '.$this->date->parse($this->config->get('datimFormat'), $calendar->maxEventReleaseLevelTimeLimit),
-                    'TL_ERROR',
-                    'ERR.pushingEventReleaseLevelNotAllowedBeforeDate',
-                    [
-                        $objEvent->title,
-                        $objEvent->id,
-                        $this->date->parse($this->config->get('datimFormat'), $calendar->maxEventReleaseLevelTimeLimit),
-                        $targetEventReleaseModel->level,
-                    ],
-                ];
-
-                throw new EventReleaseLevelTransitionException(...$err);
+            if ($event->isModified()) {
+                $event->save();
             }
+
+            $datimFormat = $this->config->get('datimFormat');
+
+            throw new EventReleaseLevelTransitionException('Event release level transition not allowed before '.$this->date->parse($datimFormat, $calendar->maxEventReleaseLevelTimeLimit), EventReleaseLevelTransitionException::LEVEL_ERROR, 'ERR.pushingEventReleaseLevelNotAllowedBeforeDate', [$event->title, $event->id, $this->date->parse($datimFormat, $calendar->maxEventReleaseLevelTimeLimit), $targetLevel->level]);
         }
     }
 
     /**
      * Important! Do not use this method without validating the event release level transition first!
      */
-    public function shiftEventReleaseLevel(CalendarEventsModel $objEvent, EventReleaseLevelPolicyModel $targetEventReleaseLevelModel, string $direction = 'up'): void
+    public function shiftEventReleaseLevel(CalendarEventsModel $event, EventReleaseLevelPolicyModel $targetLevel, string $direction = 'up'): void
     {
         if ('up' !== $direction && 'down' !== $direction) {
             throw new \InvalidArgumentException('Invalid direction given! Must be "up" or "down".');
         }
 
-        $maxEventReleaseLevelModel = EventReleaseLevelPolicyModel::findMaxLevelByEventId($objEvent->id);
-        $currentEventReleaseLevelModel = EventReleaseLevelPolicyModel::findById($objEvent->eventReleaseLevel);
-        $objEvent->eventReleaseLevel = $targetEventReleaseLevelModel->id;
+        $maxLevel = EventReleaseLevelPolicyModel::findMaxLevelByEventId($event->id);
+        $currentLevel = EventReleaseLevelPolicyModel::findById($event->eventReleaseLevel);
+        $event->eventReleaseLevel = $targetLevel->id;
 
-        $isPublished = $objEvent->published;
+        $wasPublished = $event->published;
 
-        if ($objEvent->isModified()) {
-            // Dispatch the ChangeEventReleaseLevelEvent event
-            $event = new ChangeEventReleaseLevelEvent($this->requestStack->getCurrentRequest(), $objEvent, $direction);
-            $this->eventDispatcher->dispatch($event);
+        if ($event->isModified()) {
+            $this->eventDispatcher->dispatch(new ChangeEventReleaseLevelEvent($this->requestStack->getCurrentRequest(), $event, $direction));
 
-            // System log
             $this->contaoGeneralLogger?->info(
                 \sprintf(
                     'Event release level for event with ID %d ["%s"] has been %s from "%s" to "%s".',
-                    $objEvent->id,
-                    $objEvent->title,
+                    $event->id,
+                    $event->title,
                     'up' === $direction ? 'upgraded' : 'downgraded',
-                    $currentEventReleaseLevelModel->title,
-                    $targetEventReleaseLevelModel->title,
+                    $currentLevel?->title,
+                    $targetLevel->title,
                 ),
             );
         }
 
-        if ($maxEventReleaseLevelModel->id === $targetEventReleaseLevelModel->id) {
-            $objEvent->published = 1;
-        } else {
-            $objEvent->published = 0;
+        // Only events on the top level are published
+        $event->published = $maxLevel?->id === $targetLevel->id ? 1 : 0;
+
+        if (!$wasPublished && $event->published) {
+            $this->message->addInfo($this->translator->trans('MSC.publishedEvent', [$event->id], 'contao_default'));
+            $this->eventDispatcher->dispatch(new PublishEventEvent($this->requestStack->getCurrentRequest(), $event));
         }
 
-        if (!$isPublished && $objEvent->published) {
-            $msg = $this->translator->trans('MSC.publishedEvent', [$objEvent->id], 'contao_default');
-            $this->message->addInfo($msg);
-
-            // Dispatch PublishEventEvent
-            $event = new PublishEventEvent($this->requestStack->getCurrentRequest(), $objEvent);
-            $this->eventDispatcher->dispatch($event);
-        }
-
-        if ($isPublished && !$objEvent->published) {
-            $msg = $this->translator->trans('MSC.unpublishedEvent', [$objEvent->id], 'contao_default');
-            $this->message->addInfo($msg);
+        if ($wasPublished && !$event->published) {
+            $this->message->addInfo($this->translator->trans('MSC.unpublishedEvent', [$event->id], 'contao_default'));
         }
 
         // Create a new version
-        if ($objEvent->isModified()) {
-            $objEvent->tstamp = time();
-            $objEvent->save();
-            $objVersions = new Versions('tl_calendar_events', $objEvent->id);
-            $objVersions->initialize();
-            $objVersions->create();
+        if ($event->isModified()) {
+            $event->tstamp = time();
+            $event->save();
+
+            $versions = new Versions('tl_calendar_events', $event->id);
+            $versions->initialize();
+            $versions->create();
         }
     }
 }

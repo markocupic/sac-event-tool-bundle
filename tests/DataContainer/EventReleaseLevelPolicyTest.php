@@ -122,7 +122,7 @@ final class EventReleaseLevelPolicyTest extends ContaoTestCase
             ->willReturnCallback(static fn (string $id): string => $id)
         ;
 
-        return new EventReleaseLevelPolicy($translator, $connection ?? $this->createMock(Connection::class));
+        return new EventReleaseLevelPolicy($translator, $connection ?? $this->createMock(Connection::class), $this->mockContaoFramework());
     }
 
     private function createDataContainer(): DataContainer

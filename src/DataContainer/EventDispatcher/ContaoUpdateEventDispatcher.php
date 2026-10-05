@@ -101,13 +101,18 @@ class ContaoUpdateEventDispatcher
         $this->eventDispatcher->dispatch($event);
     }
 
+    /**
+     * Returns an empty array if the record does not exist (anymore).
+     */
     protected function fetchRecord(string $tableName, int $recordId): array
     {
-        return $this->connection->fetchAssociative(
+        $record = $this->connection->fetchAssociative(
             \sprintf('SELECT * FROM %s WHERE id = ?', $tableName),
             [$recordId],
             [Types::INTEGER],
         );
+
+        return false !== $record ? $record : [];
     }
 
     /**
@@ -116,11 +121,7 @@ class ContaoUpdateEventDispatcher
      */
     protected function validatePreUpdateState(DataContainer $dc): bool
     {
-        if ($this->tableName !== $dc->table || $this->recordId !== (int) $dc->id || 0 === $this->recordId) {
-            return false;
-        }
-
-        return true;
+        return $this->tableName === $dc->table && $this->recordId === (int) $dc->id && 0 !== $this->recordId;
     }
 
     /**

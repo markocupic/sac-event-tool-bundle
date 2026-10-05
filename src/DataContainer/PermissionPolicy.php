@@ -19,13 +19,18 @@ use Contao\DataContainer;
 
 class PermissionPolicy
 {
+    /**
+     * Every permission policy has its own palette, named after its identifier.
+     */
     #[AsCallback(table: 'tl_permission_policy', target: 'config.onload', priority: 90)]
     public function setPalette(DataContainer $dc): void
     {
-        $row = $dc->getCurrentRecord();
+        $identifier = $dc->getCurrentRecord()['identifier'] ?? null;
 
-        if (!empty($row['identifier'])) {
-            $GLOBALS['TL_DCA']['tl_permission_policy']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_permission_policy']['palettes'][$row['identifier']];
+        if (empty($identifier) || !isset($GLOBALS['TL_DCA']['tl_permission_policy']['palettes'][$identifier])) {
+            return;
         }
+
+        $GLOBALS['TL_DCA']['tl_permission_policy']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_permission_policy']['palettes'][$identifier];
     }
 }

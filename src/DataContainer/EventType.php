@@ -19,14 +19,16 @@ use Contao\DataContainer;
 
 class EventType
 {
+    /**
+     * Once the alias has been set, it must not be changed anymore.
+     */
     #[AsCallback(table: 'tl_event_type', target: 'fields.alias.load', priority: 100)]
-    public function loadCallbackAlias(string|null $strValue, DataContainer $dc): string|null
+    public function loadCallbackAlias(string|null $value, DataContainer $dc): string|null
     {
-        // Prevent renaming the alias if it was set
-        if ($strValue) {
+        if ($value) {
             $GLOBALS['TL_DCA']['tl_event_type']['fields']['alias']['eval']['readonly'] = true;
         }
 
-        return $strValue;
+        return $value;
     }
 }

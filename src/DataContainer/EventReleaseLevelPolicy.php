@@ -15,7 +15,9 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
+use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -24,13 +26,16 @@ class EventReleaseLevelPolicy
     public function __construct(
         private readonly TranslatorInterface $translator,
         private readonly Connection $connection,
+        private readonly ContaoFramework $framework,
     ) {
     }
 
     #[AsCallback(table: 'tl_event_release_level_policy', target: 'list.sorting.child_record', priority: 100)]
-    public function listCalendars(array $arrRow): string
+    public function listReleaseLevels(array $row): string
     {
-        return '<div class="tl_content_left"><span class="level">'.$this->translator->trans('MSC.level', [], 'contao_default').': '.$arrRow['level'].'</span> '.$arrRow['title']."</div>\n";
+        $title = $this->framework->getAdapter(StringUtil::class)->specialchars($row['title']);
+
+        return '<div class="tl_content_left"><span class="level">'.$this->translator->trans('MSC.level', [], 'contao_default').': '.$row['level'].'</span> '.$title."</div>\n";
     }
 
     /**

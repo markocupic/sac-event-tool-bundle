@@ -17,81 +17,71 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
 
-class Content
+readonly class Content
 {
-    public function __construct(private readonly Connection $connection)
-    {
+    public function __construct(
+        private Connection $connection,
+        private ContaoFramework $framework,
+    ) {
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * Content element "user_portrait_list": Users are either selected one by one or
+     * by user role. Only show the fields of the selected mode.
+     *
+     * @throws Exception
      */
     #[AsCallback(table: 'tl_content', target: 'config.onload', priority: 100)]
     public function setPalette(DataContainer $dc): void
     {
-        if ($dc->id > 0) {
-            $arrRow = $this->connection->fetchAssociative('SELECT * FROM tl_content WHERE id = ?', [$dc->id]);
-
-            if ($arrRow) {
-                // Set palette for content element "user_portrait_list"
-                if ('user_portrait_list' === $arrRow['type']) {
-                    if ('selectUsers' === $arrRow['userList_selectMode']) {
-                        PaletteManipulator::create()
-                            ->removeField('userList_userRoles')
-                            ->removeField('userList_queryType')
-                            ->applyToPalette(UserPortraitListController::TYPE, $dc->table)
-                        ;
-                    } else {
-                        PaletteManipulator::create()
-                            ->removeField('userList_users')
-                            ->applyToPalette(UserPortraitListController::TYPE, $dc->table)
-                        ;
-                    }
-                }
-            }
+        if ((int) $dc->id <= 0) {
+            return;
         }
+
+        $row = $this->connection->fetchAssociative('SELECT type, userList_selectMode FROM tl_content WHERE id = ?', [$dc->id]);
+
+        if (false === $row || 'user_portrait_list' !== $row['type']) {
+            return;
+        }
+
+        $paletteManipulator = PaletteManipulator::create();
+
+        if ('selectUsers' === $row['userList_selectMode']) {
+            $paletteManipulator
+                ->removeField('userList_userRoles')
+                ->removeField('userList_queryType')
+            ;
+        } else {
+            $paletteManipulator->removeField('userList_users');
+        }
+
+        $paletteManipulator->applyToPalette(UserPortraitListController::TYPE, $dc->table);
     }
 
     /**
-     * Get all user roles.
-     *
      * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
      */
     #[AsCallback(table: 'tl_content', target: 'fields.userList_userRoles.options', priority: 100)]
-    public function optionsCallbackUserRoles(): array
+    public function getUserRoles(): array
     {
-        $options = [];
-
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_user_role ORDER BY sorting ASC', []);
-
-        while (false !== ($arrUserRole = $stmt->fetchAssociative())) {
-            $options[$arrUserRole['id']] = $arrUserRole['title'];
-        }
-
-        return $options;
+        return $this->connection->fetchAllKeyValue('SELECT id, title FROM tl_user_role ORDER BY sorting ASC');
     }
 
-    /**
-     * Return all user portrait list templates as array.
-     */
     #[AsCallback(table: 'tl_content', target: 'fields.userList_template.options', priority: 100)]
     public function getUserListTemplates(): array
     {
-        return Controller::getTemplateGroup('ce_user_portrait_list');
+        return $this->framework->getAdapter(Controller::class)->getTemplateGroup('ce_user_portrait_list');
     }
 
-    /**
-     * Return all user portrait list partial templates as array.
-     */
     #[AsCallback(table: 'tl_content', target: 'fields.userList_partial_template.options', priority: 100)]
     public function getUserListPartialTemplates(): array
     {
-        return Controller::getTemplateGroup('user_portrait_list_partial_');
+        return $this->framework->getAdapter(Controller::class)->getTemplateGroup('user_portrait_list_partial_');
     }
 }

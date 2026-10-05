@@ -27,24 +27,16 @@ readonly class CalendarContainer
     }
 
     /**
-     * Important: To create a new record, the user must have write access to at least
-     * one field in the related table.
+     * Only users who may create calendar containers get the "copy" and "show"
+     * operations. Important: To create a new record, the user must have write
+     * access to at least one field in the related table.
      */
     #[AsCallback(table: 'tl_calendar_container', target: 'list.operations.copy.button')]
-    public function copyButtonCallback(DataContainerOperation $operation): void
+    #[AsCallback(table: 'tl_calendar_container', target: 'list.operations.show.button')]
+    public function disableIfCreateNotGranted(DataContainerOperation $operation): void
     {
         if (!$this->authorizationChecker->isGranted(ContaoCorePermissions::DC_PREFIX.'tl_calendar_container', new CreateAction('tl_calendar_container', $operation->getRecord()))) {
             $operation->disable();
         }
-    }
-
-    /**
-     * Do not display the "show" button if the user has not the permission to create
-     * new records.
-     */
-    #[AsCallback(table: 'tl_calendar_container', target: 'list.operations.show.button')]
-    public function showButtonCallback(DataContainerOperation $operation): void
-    {
-        $this->copyButtonCallback($operation);
     }
 }

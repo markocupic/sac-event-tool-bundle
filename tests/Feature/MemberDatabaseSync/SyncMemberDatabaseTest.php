@@ -26,11 +26,11 @@ use Markocupic\SacEventToolBundle\Feature\MemberDatabaseSync\SyncLogger;
 use Markocupic\SacEventToolBundle\Feature\MemberDatabaseSync\SyncMemberDatabase;
 use Markocupic\SacEventToolBundle\Feature\MemberDatabaseSync\TempMemberTableManager;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\SharedLockInterface;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class SyncMemberDatabaseTest extends TestCase
 {
@@ -219,7 +219,7 @@ class SyncMemberDatabaseTest extends TestCase
             new ContaoMemberWriter($connection, $hasherFactory),
             $lockFactory ?? $this->createMock(LockFactory::class),
             new TempMemberTableManager($connection),
-            new Util(new RequestStack(), $connection),
+            new Util($connection, $this->createMock(AuthorizationCheckerInterface::class)),
             'de',
         );
     }
