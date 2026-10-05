@@ -355,8 +355,6 @@ class CalendarEventsMember
 
     /**
      * Notify the member if the subscription state has been changed manually.
-     *
-     * @throws \Exception
      */
     #[AsEventListener]
     public function notifyMemberOnParticipationStateUpdate(ContaoPostUpdateEvent $event): void
@@ -369,8 +367,12 @@ class CalendarEventsMember
 
         $calendarEvent = $this->calendarEvents->findById($registration['eventId']);
 
+        // The registration has already been saved, so do not throw an exception.
         if (null === $calendarEvent) {
-            throw new \Exception(\sprintf('The event ID %d that is associated with the registration with ID %d does not exist.', $registration['eventId'], $registration['id']));
+            $this->logFailedNotification($registration, new \RuntimeException(\sprintf('The event with ID %d does not exist.', $registration['eventId'])));
+            $this->message->addError($this->translator->trans('ERR.participantCouldNotBeNotifiedAboutTheRegistrationStatusChange', [$registration['firstname'], $registration['lastname']], 'contao_default'));
+
+            return;
         }
 
         if (!$this->validator->isEmail($registration['email'])) {
@@ -385,26 +387,47 @@ class CalendarEventsMember
         $notificationIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_nc_notification WHERE type = ?', [SubscriptionStateChangeNotificationType::NAME], [Types::STRING]);
 
         if (empty($notificationIds)) {
+            $this->message->addInfo($this->translator->trans('MSC.participantNotNotifiedBecauseNoNotificationIsConfigured', [$registration['firstname'], $registration['lastname']], 'contao_default'));
+
             return;
         }
 
-        $tokens = [
-            'participant_state_of_subscription' => $this->stringUtil->revertInputEncoding($this->translator->trans('MSC.'.$registration['stateOfSubscription'], [], 'contao_default')),
-            'event_title' => $this->stringUtil->revertInputEncoding($calendarEvent->title),
-            'participant_uuid' => $registration['uuid'],
-            'participant_name' => $this->stringUtil->revertInputEncoding($registration['firstname'].' '.$registration['lastname']),
-            'participant_email' => $registration['email'],
-            'event_link_detail' => $this->contentUrlGenerator->generate($calendarEvent, [], UrlGeneratorInterface::ABSOLUTE_URL),
-        ];
+        $deliveredCount = 0;
+        $failedCount = 0;
 
-        $messageCount = 0;
+        // The registration has already been saved. If the notification fails, the user
+        // gets an error message instead of an error page.
+        try {
+            $tokens = [
+                'participant_state_of_subscription' => $this->stringUtil->revertInputEncoding($this->translator->trans('MSC.'.$registration['stateOfSubscription'], [], 'contao_default')),
+                'event_title' => $this->stringUtil->revertInputEncoding($calendarEvent->title),
+                'participant_uuid' => $registration['uuid'],
+                'participant_name' => $this->stringUtil->revertInputEncoding($registration['firstname'].' '.$registration['lastname']),
+                'participant_email' => $registration['email'],
+                'event_link_detail' => $this->contentUrlGenerator->generate($calendarEvent, [], UrlGeneratorInterface::ABSOLUTE_URL),
+            ];
 
-        foreach ($notificationIds as $notificationId) {
-            $messageCount += $this->notificationCenter->sendNotification($notificationId, $tokens, $this->sacevtLocale)->count();
+            foreach ($notificationIds as $notificationId) {
+                foreach ($this->notificationCenter->sendNotification((int) $notificationId, $tokens, $this->sacevtLocale) as $receipt) {
+                    if ($receipt->wasDelivered()) {
+                        ++$deliveredCount;
+                    } else {
+                        ++$failedCount;
+                        $this->logFailedNotification($registration, $receipt->getException());
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            ++$failedCount;
+            $this->logFailedNotification($registration, $e);
         }
 
-        if ($messageCount) {
+        if ($deliveredCount > 0) {
             $this->message->addInfo($this->translator->trans('MSC.participantHasBeenNotifiedAboutTheRegistrationStatusChange', [$registration['firstname'], $registration['lastname']], 'contao_default'));
+        }
+
+        if ($failedCount > 0) {
+            $this->message->addError($this->translator->trans('ERR.participantCouldNotBeNotifiedAboutTheRegistrationStatusChange', [$registration['firstname'], $registration['lastname']], 'contao_default'));
         }
     }
 
@@ -654,5 +677,16 @@ class CalendarEventsMember
         $href = $this->stringUtil->ampersand($href);
 
         return \sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->specialcharsUrl($href), $this->stringUtil->specialchars($class), $this->stringUtil->specialchars($title), $attributes, $label);
+    }
+
+    private function logFailedNotification(array $registration, \Throwable|null $exception): void
+    {
+        // The gateway exception (e.g. of the mailer) is wrapped by the notification center
+        $reason = $exception?->getPrevious()?->getMessage() ?? $exception?->getMessage() ?? 'unknown reason';
+
+        $this->contaoGeneralLogger?->error(
+            \sprintf('Could not notify "%s %s" (registration ID %d) about the changed registration state: %s', $registration['firstname'], $registration['lastname'], $registration['id'], $reason),
+            ['contao' => new ContaoContext(__METHOD__, ContaoContext::ERROR)],
+        );
     }
 }
