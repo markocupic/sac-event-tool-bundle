@@ -329,7 +329,7 @@ class CalendarEvents
                             return;
                         }
 
-                        if ('1' === !$request->query->get('fields')) {
+                        if ('1' !== $request->query->get('fields')) {
                             return;
                         }
 
@@ -384,7 +384,7 @@ class CalendarEvents
                     function () use ($request): void {
                         // Do not allow editing write-protected fields in editAll/overrideAll mode Use
                         // input_field_callback to only display the field values without the form input field
-                        if ('1' === !$request->query->get('fields')) {
+                        if ('1' !== $request->query->get('fields')) {
                             return;
                         }
 
