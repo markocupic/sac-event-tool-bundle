@@ -45,7 +45,9 @@
         "symfony/webpack-encore-bundle": "^v2.0",
         "tecnickcom/tcpdf": "^6.4",
         "terminal42/notification_center": "^2.0",
-        "mvo/contao-group-widget": "^1.6"
+        "mvo/contao-group-widget": "^1.6",
+        "rbdwllr/reallysimplejwt": "^4.0",
+        "terminal42/contao-mp_forms": "^5.0"
     },
     "require-dev": {
         "contao/manager-plugin": "^2.12",
@@ -101,4 +103,3 @@
         "unit-tests": "@php tools/phpunit/vendor/bin/phpunit -c tools/phpunit/phpunit.xml.dist"
     }
 }
-

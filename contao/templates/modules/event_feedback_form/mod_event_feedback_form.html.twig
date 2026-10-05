@@ -1,0 +1,65 @@
+{#
+    Event feedback form (frontend module "event_feedback_form").
+    See src/Feature/EventFeedback/Controller/FrontendModule/EventFeedbackFormController.php
+#}
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+    {% set details %}
+        <h4>Auswertungsformular für Event</h4>
+        <h2 class="sac-ev-fb-event-title"><span class="fw-bold">"{{ event.title|default('') }}"</span></h2>
+        <p class="mt-3"><strong>Teilnehmerin/Teilnehmer: </strong>{{ member.firstname|default('') }} {{ member.lastname|default('') }}{% if member.sacMemberId|default(0) > 0 %} [{{ member.sacMemberId }}]{% endif %}</p>
+    {% endset %}
+
+    {% if mode == 'show_form' %}
+        {{ details }}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-lg-6 p-4 bg-white">
+            {% if mode == 'has_warning' %}
+                <h2>Leider ist ein Fehler aufgetreten</h2>
+                <div class="alert alert-warning mt-5 mb-5" role="alert">
+                    <i class="fa-solid fa-exclamation-circle"></i>
+                    <div>{{ warningMsg }}</div>
+                </div>
+            {% elseif mode == 'form_already_filled_out' %}
+                {{ details }}
+                <div class="alert alert-warning mt-5 mb-5" role="alert">
+                    <i class="fa-solid fa-exclamation-circle"></i>
+                    <div>{{ formAlreadyFilledOutMsg }}</div>
+                </div>
+            {% elseif mode == 'show_form' %}
+                <div class="sac-ev-fb-form p-0 p-xl-4">
+                    {# Step indicator #}
+                    <div>Schritt <span class="mp-form-steps-current"><strong>{{ formManager.getCurrentStep() + 1 }}</strong></span> von <span class="mp-form-steps-total">{{ formManager.getNumberOfSteps() + 1 }}</span></div>
+                    {{ form|raw }}
+
+                    <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
+                        // Convert integer option values to their labels in the summary step
+                        let oFormLabels = {{ formLabels|raw }};
+                        Object.keys(oFormLabels).forEach(function (ffName) {
+                            let element = document.querySelector('.sac-ev-fb-summary .value[data-ff-name="' + ffName + '"]');
+                            if (element) {
+                                let i = parseInt(element.innerHTML);
+                                if (!isNaN(i)) {
+                                    element.innerHTML = oFormLabels[ffName][i];
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+            {% elseif mode == 'checkout' %}
+                {{ details }}
+                <div class="alert alert-success mt-4 mb-5" role="alert">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <div>{{ checkoutMsg }}</div>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-lg-6 d-none d-lg-block" style="background: url('{{ asset('images/event_feedback/background_' ~ random(1, 6) ~ '.jpg', 'markocupic_sac_event_tool') }}') no-repeat center center; background-size: cover">
+            {# Empty, display image only #}
+        </div>
+    </div>
+    {{ parent() }}
+{% endblock %}

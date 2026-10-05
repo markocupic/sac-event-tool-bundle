@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 use Markocupic\SacEventToolBundle\Controller\BackendModule\SacBackendUserRolesExportController;
+use Markocupic\SacEventToolBundle\Feature\EventFeedback\Controller\FrontendModule\EventFeedbackFormController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvEventMemberExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvUserExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventDeregistrationController;
@@ -47,6 +48,8 @@ $GLOBALS['TL_LANG']['MOD']['sac_permission_tool'] = ['Permission-Tool'];
 $GLOBALS['TL_LANG']['MOD']['sac_event_completion_reminder_log'] = ['Reminder für Event-Abschluss', 'Versandprotokoll der Reminder an offene Aufgaben nach dem Event-Abschluss.'];
 $GLOBALS['TL_LANG']['MOD']['event_registration_reminder_notification'] = ['Reminder für Event-Anmeldungen', 'Versandprotokoll der Reminder an Leiter mit unbearbeiteten Event-Anmeldungen.'];
 $GLOBALS['TL_LANG']['MOD'][SacBackendUserRolesExportController::BACKEND_MODULE_TYPE] = ['Export Vereinsfunktionen'];
+$GLOBALS['TL_LANG']['MOD']['event_feedback'] = ['Event Feedback', 'Abgegebene Event-Auswertungen der Teilnehmenden.'];
+$GLOBALS['TL_LANG']['MOD']['event_feedback_reminder'] = ['Event Feedback Reminder', 'Geplante Aufforderungen an die Teilnehmenden, die Event-Auswertung auszufüllen.'];
 
 // Contao legacy frontend modules
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'] = ['Event Reader Vorschau'];
@@ -68,3 +71,5 @@ $GLOBALS['TL_LANG']['FMD'][PilatusExportController::TYPE] = ['SAC Event-Export 2
 $GLOBALS['TL_LANG']['FMD'][TourDifficultyListController::TYPE] = ['Schwierigkeitsgrade Tabelle mit Erklärungen als Modalfenster'];
 $GLOBALS['TL_LANG']['FMD'][PrintTourListButtonController::TYPE] = ['Tour-Liste drucken button'];
 $GLOBALS['TL_LANG']['FMD'][EventDeregistrationController::TYPE] = ['SAC Mitgliederkonto Dashboard - Event-Abmeldeformular'];
+$GLOBALS['TL_LANG']['FMD']['event_feedback'] = 'Event Feedback';
+$GLOBALS['TL_LANG']['FMD'][EventFeedbackFormController::TYPE] = ['Event Feedback Formular', 'Zeigt angemeldeten Mitgliedern das Auswertungsformular eines Events (Link mit Token aus der Benachrichtigung).'];
