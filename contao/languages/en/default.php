@@ -310,6 +310,7 @@ $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task_role']['registration_coor
 
 // Participation confirmation (tl_calendar_events_member.hasParticipated)
 $GLOBALS['TL_LANG']['MSC']['participationConfirmationNotAllowed'] = 'Die Teilnahme kann nur bei Anmeldungen mit dem Status «Bestätigt» oder «Warteliste» bestätigt werden.';
+$GLOBALS['TL_LANG']['MSC']['participantHasParticipatedNoNotifications'] = 'Dieser Teilnehmer/diese Teilnehmerin hat am Anlass teilgenommen. Es können deshalb keine Benachrichtigungen versandt werden.';
 $GLOBALS['TL_LANG']['ERR']['participationConfirmationNotAllowed'] = 'Die Teilnahme kann nur bei Anmeldungen mit dem Status «Bestätigt» oder «Warteliste» bestätigt werden.';
 
 // Event registration reminder (labels in the list of unconfirmed registrations)

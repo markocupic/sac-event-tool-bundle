@@ -957,7 +957,7 @@ class CalendarEvents
         $span = $this->calendar->calculateSpan($arrRow['startTime'], $arrRow['endTime']);
         $event = $this->calendarEventsModel->findById($arrRow['id']);
 
-        $date = $this->formatEventDate($arrRow, $span);
+        $date = $this->formatEventDate($arrRow, (int) $span);
 
         // Published icon
         if ($arrRow['published']) {
