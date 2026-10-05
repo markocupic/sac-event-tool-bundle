@@ -88,10 +88,6 @@ class MarkocupicSacEventToolExtension extends Extension
         $container->setParameter($rootKey.'.event_registration.config.reg_start_time_offset', $config['event_registration']['config']['reg_start_time_offset']);
 
         // Features
-        $container->setParameter($rootKey.'.feature.event_feedback.secret', $config['feature']['event_feedback']['secret']);
-        $container->setParameter($rootKey.'.feature.event_feedback.delete_feedbacks_after', $config['feature']['event_feedback']['delete_feedbacks_after']);
-        $container->setParameter($rootKey.'.feature.event_feedback.docx_template', $config['feature']['event_feedback']['docx_template']);
-        $container->setParameter($rootKey.'.feature.event_feedback.configs', $config['feature']['event_feedback']['configs']);
         $container->setParameter($rootKey.'.feature.event_registration_reminder.disable', $config['feature']['event_registration_reminder']['disable']);
         $container->setParameter($rootKey.'.feature.event_registration_reminder.cron_schedule', $config['feature']['event_registration_reminder']['cron_schedule']);
 

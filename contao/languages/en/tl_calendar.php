@@ -63,14 +63,3 @@ $GLOBALS['TL_LANG']['tl_calendar']['enableInstructorReminderNotification'] = ['R
 $GLOBALS['TL_LANG']['tl_calendar']['sendFirstReminderAfter'] = ['Ersten Reminder nach x Tagen senden', 'Nach wie vielen Tagen seit der Anmeldung eine unbearbeitete Anmeldung den Reminder auslöst.'];
 $GLOBALS['TL_LANG']['tl_calendar']['sendReminderEach'] = ['Intervall in Tagen', 'Sind weiterhin Anmeldungen unbearbeitet, wird der Reminder nach so vielen Tagen wiederholt.'];
 $GLOBALS['TL_LANG']['tl_calendar']['sendReminderNotification'] = ['Benachrichtigung', 'Wählen Sie eine Benachrichtigung vom Typ «Reminder für unbearbeitete Event-Anmeldungen».'];
-
-// Event feedback
-// Legends
-$GLOBALS['TL_LANG']['tl_calendar']['sac_event_feedback_legend'] = 'SAC Event-Auswertungs-Formular-Einstellungen';
-
-// Fields
-$GLOBALS['TL_LANG']['tl_calendar']['enableOnlineEventFeedback'] = ['Online Auswertung aktivieren', 'Lassen Sie die Teilnehmer den Event via Onlineformular auswerten.'];
-$GLOBALS['TL_LANG']['tl_calendar']['onlineFeedbackConfiguration'] = ['Konfiguration auswählen.', 'Wählen Sie die Konfiguration aus.'];
-$GLOBALS['TL_LANG']['tl_calendar']['onlineFeedbackNotification'] = ['Benachrichtigung auswählen.', 'Wählen Sie die Benachrichtigung aus.'];
-$GLOBALS['TL_LANG']['tl_calendar']['onlineFeedbackForm'] = ['Auswertungsformular auswählen.', 'Wählen Sie das Auswertungsformular aus.'];
-$GLOBALS['TL_LANG']['tl_calendar']['onlineFeedbackPage'] = ['Seite mit Auswertungsformular auswählen.', 'Wählen Sie die Seite, welche das Auswertungsformular enthält, aus.'];

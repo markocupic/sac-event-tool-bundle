@@ -151,10 +151,3 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_2'] = ['Mässige Lawi
 $GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_3'] = ['Erhebliche Lawinengefahr'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_4'] = ['Grosse Lawinengefahr'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_5'] = ['Sehr grosse Lawinengefahr'];
-
-// Event feedback
-// Legends
-$GLOBALS['TL_LANG']['tl_calendar_events']['sac_event_feedback_legend'] = 'SAC Event-Auswertungs-Formular-Einstellungen';
-
-// Fields
-$GLOBALS['TL_LANG']['tl_calendar_events']['enableOnlineEventFeedback'] = ['Online Auswertung aktivieren', '<strong class="notice">!!! Vor der Event-Durchführung zu aktivieren !!!</strong> Teilnehmende erhalten eine E-Mail mit Link zum Auswertungsformular nachdem ihre Teilnahme am Event bestätigt wurde.'];
