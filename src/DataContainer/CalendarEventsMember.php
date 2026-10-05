@@ -378,7 +378,7 @@ class CalendarEventsMember
         if (!$this->validator->isEmail($registration['email'])) {
             if ($this->scopeMatcher->isBackendRequest($this->requestStack->getCurrentRequest())) {
                 $stateOfSubscription = $this->translator->trans('MSC.'.$registration['stateOfSubscription'], [], 'contao_default');
-                $this->message->addInfo($this->translator->trans('tl_calendar_events_member.bookingStateHasBeenChangedButParticipantWasNotNotifiedDueToMissingEmail', [$stateOfSubscription], 'contao_default'));
+                $this->message->addInfo($this->translator->trans('ERR.bookingStateHasBeenChangedButParticipantWasNotNotifiedDueToMissingEmail', [$stateOfSubscription], 'contao_default'));
             }
 
             return;
@@ -610,7 +610,7 @@ class CalendarEventsMember
         $hasEmail = $this->validator->isEmail($registration->email);
 
         if ($registration->tstamp && !$hasEmail) {
-            $this->message->addInfo($this->translator->trans('tl_calendar_events_member.notificationDueToMissingEmailDisabled', [], 'contao_default'));
+            $this->message->addInfo($this->translator->trans('MSC.notificationDueToMissingEmailDisabled', [], 'contao_default'));
         }
 
         if ($registration->hasParticipated) {
