@@ -89,9 +89,9 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = [
 	'sac_user_role_tool'                                => [
 		'tables' => ['tl_user_role'],
 	],
-	// Read only: see contao/dca/tl_instructor_post_event_task_reminder_log.php
-	'sac_instructor_post_event_task_reminder_log'       => [
-		'tables' => ['tl_instructor_post_event_task_reminder_log'],
+	// Read only: see contao/dca/tl_event_completion_reminder_log.php
+	'sac_event_completion_reminder_log'       => [
+		'tables' => ['tl_event_completion_reminder_log'],
 	],
 	SacBackendUserRolesExportController::BACKEND_MODULE_TYPE => [
 		'hideInNavigation' => true, // User the backend menu listener to handle the visibility

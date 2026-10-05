@@ -44,7 +44,7 @@ $GLOBALS['TL_LANG']['MOD']['sac_tour_difficulty_tool'] = ['Schwierigkeitsgrade f
 $GLOBALS['TL_LANG']['MOD']['sac_tour_type_tool'] = ['Tourentypen'];
 $GLOBALS['TL_LANG']['MOD']['sac_user_role_tool'] = ['Vereinsfunktionen-Tool'];
 $GLOBALS['TL_LANG']['MOD']['sac_permission_tool'] = ['Permission-Tool'];
-$GLOBALS['TL_LANG']['MOD']['sac_instructor_post_event_task_reminder_log'] = ['Reminder für Tourrapport und Teilnahmebestätigungen', 'Versandprotokoll der Erinnerungen an offene Aufgaben nach dem Event (nur lesen).'];
+$GLOBALS['TL_LANG']['MOD']['sac_event_completion_reminder_log'] = ['Reminder für Event-Abschluss', 'Versandprotokoll der Reminder an offene Aufgaben nach dem Event-Abschluss.'];
 $GLOBALS['TL_LANG']['MOD'][SacBackendUserRolesExportController::BACKEND_MODULE_TYPE] = ['Export Vereinsfunktionen'];
 
 // Contao legacy frontend modules

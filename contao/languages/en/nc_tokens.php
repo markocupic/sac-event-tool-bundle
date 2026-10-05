@@ -13,7 +13,7 @@ declare(strict_types=1);
  */
 
 use Markocupic\SacEventToolBundle\Feature\EventReminder\NotificationType\EventReminderNotificationType;
-use Markocupic\SacEventToolBundle\Feature\InstructorPostEventTaskReminder\NotificationType\InstructorPostEventTaskReminderNotificationType;
+use Markocupic\SacEventToolBundle\Feature\EventCompletionReminder\NotificationType\EventCompletionReminderNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\EventDeregistrationNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\EventRegistrationNotificationType;
 use Markocupic\SacEventToolBundle\NotificationType\SubscriptionStateChangeNotificationType;
@@ -148,9 +148,9 @@ $GLOBALS['TL_LANG']['nc_tokens'][$type]['recipient_bcc'] = 'Empfänger für das 
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['reminder_offset_days'] = 'Anzahl Tage vor Event-Start, an denen diese Erinnerung versendet wird (Einstellung im Kalender).';
 
 /*
- * Instructor post-event task reminder
+ * Event completion reminder
  */
-$type = InstructorPostEventTaskReminderNotificationType::NAME;
+$type = EventCompletionReminderNotificationType::NAME;
 
 // Recipient (instructor or registration coordinator)
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['recipient_email'] = 'E-Mail-Adresse des Empfängers (Leiter oder Anmelde-Koordinator). Für das Feld "Empfänger" verwenden.';

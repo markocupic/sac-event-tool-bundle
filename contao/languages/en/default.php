@@ -296,7 +296,7 @@ $GLOBALS['TL_LANG']['ERR']['userWithThisSACMemberIdAlreadyExists'] = 'Es existie
 $GLOBALS['TL_LANG']['ERR']['invalidMinOrMaxMemberValue'] = 'Ungültige Eingabe! Geben Sie eine Zahl zwischen 2 und 999 ein.';
 $GLOBALS['TL_LANG']['ERR']['mustBePositiveCashAmount'] = 'Ungültige Eingabe! Geben Sie einem positiven Geldbetrag ein: z.B. 0 oder 10 oder 5.10';
 
-// Instructor post-event task reminder
+// Event completion reminder
 $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task']['tour_report'] = 'Tourenbericht ausfüllen';
 $GLOBALS['TL_LANG']['MSC']['instructor_post_event_task']['participation_confirmation'] = 'Teilnahme der Teilnehmenden bestätigen';
 // Optional HTML labels for the HTML e-mail (may contain HTML). If missing, the text label above is used.

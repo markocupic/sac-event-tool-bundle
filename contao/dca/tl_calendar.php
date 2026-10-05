@@ -45,14 +45,14 @@ $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['disableGrouping'] = true;
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableMaxEventReleaseLevelProtection'] = 'maxEventReleaseLevelTimeLimit';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['enableEventStartDateValidation'] = 'validTimePeriodStart,validTimePeriodStop';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['sendEventReminder'] = 'eventReminderOffset,eventReminderNotification';
-$GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['sendInstructorPostEventTaskReminder'] = 'instructorPostEventTaskReminderNotification,instructorPostEventTaskReminderEventTypes,instructorPostEventTaskReminderFirstOffset,instructorPostEventTaskReminderInterval';
+$GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['sendEventCompletionReminder'] = 'eventCompletionReminderNotification,eventCompletionReminderEventTypes,eventCompletionReminderFirstOffset,eventCompletionReminderInterval';
 $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['autoPublishEvents'] = 'autoPublishEventsDate,autoPublishEventsStatus';
 
 // Define selectors
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'enableMaxEventReleaseLevelProtection';
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'enableEventStartDateValidation';
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'sendEventReminder';
-$GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'sendInstructorPostEventTaskReminder';
+$GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'sendEventCompletionReminder';
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'autoPublishEvents';
 
 // Palettes
@@ -63,14 +63,14 @@ PaletteManipulator::create()
 	->addLegend('event_type_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_reader_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('event_reminder_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
-	->addLegend('instructor_post_event_task_reminder_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
+	->addLegend('event_completion_reminder_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
 	->addField(['enableEventStartDateValidation'], 'valid_time_period_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['enableMaxEventReleaseLevelProtection'], 'event_release_level_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['autoPublishEvents'], 'auto_publish_events_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['allowedEventTypes,notifyOnEventReleaseLevelChange,notifyOnEventPublish'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['userPortraitJumpTo'], 'event_reader_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['sendEventReminder'], 'event_reminder_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['sendInstructorPostEventTaskReminder'], 'instructor_post_event_task_reminder_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['sendEventCompletionReminder'], 'event_completion_reminder_legend', PaletteManipulator::POSITION_APPEND)
 	->applyToPalette('default', 'tl_calendar');
 
 // Fields
@@ -178,10 +178,10 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['eventReminderOffset'] = [
 	'sql'       => ['type' => 'integer', 'notnull' => true, 'default' => 14, 'unsigned' => true],
 ];
 
-// Instructor post-event task reminder
+// Event completion reminder
 // Reminds instructors and registration coordinators of open tasks (tour report, participation confirmation) after an event.
-// See docs/features/instructor-post-event-task-reminder.md
-$GLOBALS['TL_DCA']['tl_calendar']['fields']['sendInstructorPostEventTaskReminder'] = [
+// See docs/features/event-completion-reminder.md
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['sendEventCompletionReminder'] = [
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'checkbox',
@@ -189,8 +189,8 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['sendInstructorPostEventTaskReminder
 	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
-// Options: only notifications of type "instructor_post_event_task_reminder" (see Feature\InstructorPostEventTaskReminder\DataContainer\Calendar)
-$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderNotification'] = [
+// Options: only notifications of type "event_completion_reminder" (see Feature\EventCompletionReminder\DataContainer\Calendar)
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['eventCompletionReminderNotification'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
 	'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
@@ -199,7 +199,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderNoti
 
 // Only events of these types are checked for open tasks.
 // Which tasks apply to an event type is decided by the task classes (PostEventTaskInterface::supports()).
-$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderEventTypes'] = [
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['eventCompletionReminderEventTypes'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
 	'options'   => EventType::ALL,
@@ -210,7 +210,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderEven
 ];
 
 // Completion period: days after tl_calendar_events.endDate before the first notification is sent
-$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderFirstOffset'] = [
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['eventCompletionReminderFirstOffset'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
 	'options' => range(1, 30),
@@ -219,7 +219,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderFirs
 ];
 
 // Days between two notifications to the same recipient for this calendar
-$GLOBALS['TL_DCA']['tl_calendar']['fields']['instructorPostEventTaskReminderInterval'] = [
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['eventCompletionReminderInterval'] = [
 	'exclude'   => true,
 	'inputType' => 'select',
 	'options' => range(1, 30),
