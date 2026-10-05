@@ -25,6 +25,8 @@ use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\Exception\Even
 use Markocupic\SacEventToolBundle\Event\ChangeEventReleaseLevelEvent;
 use Markocupic\SacEventToolBundle\Event\PublishEventEvent;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
+use Markocupic\SacEventToolBundle\Security\Voter\EventReleaseLevelTransition;
+use Markocupic\SacEventToolBundle\Security\Voter\EventReleaseLevelTransitionVoter;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -45,6 +47,7 @@ class EventReleaseLevelUtil
         private readonly RequestStack $requestStack,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
+        private readonly EventReleaseLevelTimeRules $timeRules,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
         $this->config = $this->framework->getAdapter(Config::class);
@@ -94,47 +97,23 @@ class EventReleaseLevelUtil
             return;
         }
 
-        $minLevel = EventReleaseLevelPolicyModel::findMinLevelByEventId($event->id);
-
-        if (null === $minLevel) {
+        if (null === EventReleaseLevelPolicyModel::findMinLevelByEventId($event->id)) {
             throw new \RuntimeException(\sprintf('Could not determine the initial (lowest) event release level for the event "%s" (ID: %d).', $event->title, $event->id));
         }
 
-        $maxLevel = EventReleaseLevelPolicyModel::findMaxLevelByEventId($event->id);
-
-        if (null === $maxLevel) {
+        if (null === EventReleaseLevelPolicyModel::findMaxLevelByEventId($event->id)) {
             throw new \RuntimeException(\sprintf('Could not determine the maximum event release level for the event "%s" (ID: %d).', $event->title, $event->id));
         }
 
-        // Do not allow non-admins to upgrade the release level above the initial level
-        // if the event start date is outside the time period defined in the calendar.
-        $isUpgradeAboveInitialLevel = $minLevel->id !== $targetEventReleaseLevelId
-            && $event->eventReleaseLevel !== $targetEventReleaseLevelId
-            && $targetLevel->level > $currentLevel->level;
+        $violation = $this->timeRules->getViolation($event, $targetLevel);
 
-        if ($isUpgradeAboveInitialLevel && $calendar->enableEventStartDateValidation && ($event->startDate < $calendar->validTimePeriodStart || $event->startDate > $calendar->validTimePeriodStop)) {
-            $dateFormat = $this->config->get('dateFormat');
-
-            if (!$this->security->isGranted('ROLE_ADMIN')) {
-                throw new EventReleaseLevelTransitionException(\sprintf('Can not upgrade release level of event with ID %d. Event start date must be between %s and %s.', $event->id, $this->date->parse($dateFormat, $calendar->validTimePeriodStart), $this->date->parse($dateFormat, $calendar->validTimePeriodStop)), EventReleaseLevelTransitionException::LEVEL_ERROR, 'ERR.eventReleaseLevelUpgradeFailedEventStartDateMustBeWithinSpecifiedTimePeriod', [$event->title, $event->id, $targetLevel->level, $this->date->parse($dateFormat, $calendar->validTimePeriodStart), $this->date->parse($dateFormat, $calendar->validTimePeriodStop)]);
-            }
-
-            // Show a warning to admins only!
-            $this->message->addInfo(\sprintf('Event "%s" (ID %d) should not be promoted to FS %d because its start date falls outside the configured time period.', $event->title, $event->id, $targetLevel->level));
+        if (!$this->security->isGranted(EventReleaseLevelTransitionVoter::CAN_SWITCH_TO_EVENT_RELEASE_LEVEL, new EventReleaseLevelTransition($event, $targetLevel))) {
+            throw $this->createTransitionDeniedException($event, $targetLevel, $calendar, $violation);
         }
 
-        // Do not allow non-admins to shift the event release level to the top level
-        // before the time limit defined in the calendar.
-        if ($maxLevel->id === $targetEventReleaseLevelId && !$this->security->isGranted('ROLE_ADMIN') && $calendar->enableMaxEventReleaseLevelProtection && time() < $calendar->maxEventReleaseLevelTimeLimit) {
-            $event->published = 0;
-
-            if ($event->isModified()) {
-                $event->save();
-            }
-
-            $datimFormat = $this->config->get('datimFormat');
-
-            throw new EventReleaseLevelTransitionException('Event release level transition not allowed before '.$this->date->parse($datimFormat, $calendar->maxEventReleaseLevelTimeLimit), EventReleaseLevelTransitionException::LEVEL_ERROR, 'ERR.pushingEventReleaseLevelNotAllowedBeforeDate', [$event->title, $event->id, $this->date->parse($datimFormat, $calendar->maxEventReleaseLevelTimeLimit), $targetLevel->level]);
+        // Admins are not bound to the time rules, but get a warning.
+        if (EventReleaseLevelTimeRuleViolation::StartDateOutsideValidTimePeriod === $violation) {
+            $this->message->addInfo(\sprintf('Event "%s" (ID %d) should not be promoted to FS %d because its start date falls outside the configured time period.', $event->title, $event->id, $targetLevel->level));
         }
     }
 
@@ -189,5 +168,35 @@ class EventReleaseLevelUtil
             $versions->initialize();
             $versions->create();
         }
+    }
+
+    /**
+     * The message tells the user why the transition has been denied.
+     */
+    private function createTransitionDeniedException(CalendarEventsModel $event, EventReleaseLevelPolicyModel $targetLevel, object $calendar, EventReleaseLevelTimeRuleViolation|null $violation): EventReleaseLevelTransitionException
+    {
+        $dateFormat = $this->config->get('dateFormat');
+        $datimFormat = $this->config->get('datimFormat');
+
+        return match ($violation) {
+            EventReleaseLevelTimeRuleViolation::StartDateOutsideValidTimePeriod => new EventReleaseLevelTransitionException(
+                \sprintf('Can not upgrade release level of event with ID %d. Event start date must be between %s and %s.', $event->id, $this->date->parse($dateFormat, $calendar->validTimePeriodStart), $this->date->parse($dateFormat, $calendar->validTimePeriodStop)),
+                EventReleaseLevelTransitionException::LEVEL_ERROR,
+                'ERR.eventReleaseLevelUpgradeFailedEventStartDateMustBeWithinSpecifiedTimePeriod',
+                [$event->title, $event->id, $targetLevel->level, $this->date->parse($dateFormat, $calendar->validTimePeriodStart), $this->date->parse($dateFormat, $calendar->validTimePeriodStop)],
+            ),
+            EventReleaseLevelTimeRuleViolation::MaxLevelLocked => new EventReleaseLevelTransitionException(
+                'Event release level transition not allowed before '.$this->date->parse($datimFormat, $calendar->maxEventReleaseLevelTimeLimit),
+                EventReleaseLevelTransitionException::LEVEL_ERROR,
+                'ERR.pushingEventReleaseLevelNotAllowedBeforeDate',
+                [$event->title, $event->id, $this->date->parse($datimFormat, $calendar->maxEventReleaseLevelTimeLimit), $targetLevel->level],
+            ),
+            null => new EventReleaseLevelTransitionException(
+                \sprintf('Missing permissions to change the release level of event with ID %d to FS %d.', $event->id, $targetLevel->level),
+                EventReleaseLevelTransitionException::LEVEL_ERROR,
+                'ERR.missingPermissionsToChangeEventReleaseLevel',
+                [$event->title, $event->id, $targetLevel->level],
+            ),
+        };
     }
 }

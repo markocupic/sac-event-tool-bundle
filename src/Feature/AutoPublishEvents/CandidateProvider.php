@@ -96,7 +96,7 @@ class CandidateProvider
     }
 
     /**
-     * Same rule as EventReleaseLevelUtil::validateEventReleaseLevelTransition() for non-admins.
+     * Same rule as EventReleaseLevelTimeRules::getViolation() (StartDateOutsideValidTimePeriod) for non-admins.
      *
      * @param array<string, mixed> $calendar
      */

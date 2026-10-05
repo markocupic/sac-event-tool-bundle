@@ -477,40 +477,36 @@ class CalendarEventsVoter extends Voter
     }
 
     /**
-     * Grant switch-release-level-access (upgrade/downgrade)...
-     * - to all users, if there is no release package assigned to the calendar (tl_calendar).
-     * - to admins
-     * - to permitted event-authors --> tl_event_release_level_policy.allowWriteAccessToAuthor
-     * - to permitted event-instructors --> tl_event_release_level_policy.allowWriteAccessToInstructors
-     * - to "super-users" --> tl_event_release_level_policy.groupReleaseLevelPerm.
+     * Upgrade or downgrade by one level (the arrows in the event list): Grant access...
+     * - to all users, if the event is not assigned to a release level
+     * - if the user may switch the event to the next or previous level, see EventReleaseLevelTransitionVoter
+     *   (permissions of the release level and time rules of the calendar).
      *
      * @throws \Exception
      */
-    private function canSwitchReleaseLevel(TokenInterface $token, CalendarEventsModel $calEvent, string $direction): bool
+    private function canSwitchReleaseLevel(TokenInterface $token, CalendarEventsModel $calEvent, string $attribute): bool
     {
-        $user = $token->getUser();
-
-        if (!empty($calEvent->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($calEvent->eventReleaseLevel);
-
-            if (null === $releaseLevelPolicy) {
-                $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
-
-                throw new \Exception(\sprintf($msg, $calEvent->id));
-            }
-        } else {
-            // Grant write- or write-access if the event is not assigned to a release level.
+        if (empty($calEvent->eventReleaseLevel)) {
             return true;
         }
 
-        if (self::CAN_UPGRADE_EVENT_RELEASE_LEVEL === $direction) {
-            $direct = 'up';
-        } elseif (self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL === $direction) {
-            $direct = 'down';
-        } else {
-            throw new \LogicException(\sprintf('$direction should be either "%s" or "%s" "%s" given.', self::CAN_UPGRADE_EVENT_RELEASE_LEVEL, self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $direction));
+        $currentLevel = $this->eventReleaseLevelPolicy->findById($calEvent->eventReleaseLevel);
+
+        if (null === $currentLevel) {
+            throw new \Exception(\sprintf('Release-level model not found for tl_calendar_events with ID %d.', $calEvent->id));
         }
 
-        return $this->canChangeReleaseLevel($calEvent, $user, $releaseLevelPolicy, $direct);
+        $targetLevel = match ($attribute) {
+            self::CAN_UPGRADE_EVENT_RELEASE_LEVEL => $this->eventReleaseLevelPolicy->findNextLevel($currentLevel->id),
+            self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL => $this->eventReleaseLevelPolicy->findPrevLevel($currentLevel->id),
+            default => throw new \LogicException(\sprintf('$attribute should be either "%s" or "%s" "%s" given.', self::CAN_UPGRADE_EVENT_RELEASE_LEVEL, self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $attribute)),
+        };
+
+        // The event is already on the highest or the lowest level
+        if (null === $targetLevel) {
+            return false;
+        }
+
+        return $this->accessDecisionManager->decide($token, [EventReleaseLevelTransitionVoter::CAN_SWITCH_TO_EVENT_RELEASE_LEVEL], new EventReleaseLevelTransition($calEvent, $targetLevel));
     }
 }
