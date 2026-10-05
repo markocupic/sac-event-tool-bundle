@@ -17,7 +17,6 @@ use Contao\Config;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\DataContainer;
 use Contao\Date;
-use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\AvalancheLevel;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
@@ -799,11 +798,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = [
 	'eval'       => ['doNotCopy' => false, 'mandatory' => true, 'tl_class' => 'm12 clr'],
 	'sql'        => "int(10) unsigned NOT NULL default 0",
 ];
-
-if (!Input::get('act') || 'select' === Input::get('act')) {
-	// Display the field correctly in the filter menu
-	$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel']['options_callback'] = null;
-}
 
 // Add a new field customizeEventRegistrationConfirmationEmailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customizeEventRegistrationConfirmationEmailText'] = [
