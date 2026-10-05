@@ -66,7 +66,7 @@ class EventStatsController extends AbstractBackendController
         }
 
         $currentYear = (int) date('Y');
-        $years = [$currentYear - 2, $currentYear - 1, $currentYear];
+        $years = [$currentYear - 2, $currentYear - 1, $currentYear, $currentYear, $currentYear + 1];
 
         return $this->render('@MarkocupicSacEventTool/EventStats/be_event_stats.html.twig', [
             'headline' => $this->translator->trans('MOD.'.self::BACKEND_MODULE_TYPE.'.0', [], 'contao_modules'),
