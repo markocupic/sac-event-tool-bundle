@@ -181,8 +181,8 @@ class CalendarEvents
             return;
         }
 
-        // Bypass the versions popup!
-        if (7 !== $request->query->count()) {
+        // Do not change the release level inside a popup (e.g. the versions popup)
+        if ($request->query->has('popup')) {
             return;
         }
 
@@ -300,6 +300,10 @@ class CalendarEvents
     {
         $event = $this->calendarEventsModel->findById($dc->id);
 
+        if (null === $event) {
+            return;
+        }
+
         if (null === $this->eventReleaseLevelPolicyModel->findById($event->eventReleaseLevel)) {
             return;
         }
@@ -332,7 +336,7 @@ class CalendarEvents
             return;
         }
 
-        if ($firstLevel->id !== $event->eventReleaseLevel) {
+        if ((int) $firstLevel->id !== (int) $event->eventReleaseLevel) {
             $this->showFieldValuesOnly(true, true);
         }
     }
@@ -415,8 +419,7 @@ class CalendarEvents
         }
 
         if (!$blnAllow) {
-            $this->message->addError(\sprintf('Keine Berechtigung die Events mit IDS %s zu verschieben.', implode(', ', $arrIDS)));
-            $this->redirectBack();
+            $this->addErrorAndRedirectBack('ERR.missingPermissionsToCutEvents', [implode(', ', $arrIDS)]);
         }
     }
 
@@ -492,7 +495,7 @@ class CalendarEvents
         }
 
         // No restrictions on the first event release level
-        if ($firstLevel->id === $event->eventReleaseLevel) {
+        if ((int) $firstLevel->id === (int) $event->eventReleaseLevel) {
             return;
         }
 

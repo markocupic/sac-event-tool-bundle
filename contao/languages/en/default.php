@@ -143,6 +143,7 @@ $GLOBALS['TL_LANG']['ERR']['missingPermissionsToEditEvent'] = 'Sie haben nicht d
 $GLOBALS['TL_LANG']['ERR']['missingPermissionsToDeleteEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Event mit ID %s zu löschen.';
 $GLOBALS['TL_LANG']['ERR']['missingPermissionsToPublishOrUnpublishEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Event mit ID %s zu veröffentlichen.';
 $GLOBALS['TL_LANG']['ERR']['missingPermissionsToCutEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Event mit ID %d zu verschieben.';
+$GLOBALS['TL_LANG']['ERR']['missingPermissionsToCutEvents'] = 'Keine Berechtigung die Events mit IDS %s zu verschieben.';
 $GLOBALS['TL_LANG']['ERR']['maxMembersShouldNotBeLessThanMinMembers'] = 'Die maximale Teilnehmerzahl darf die minimale Teilnehmerzahl nicht unterschreiten.';
 
 // Backend home screen dashboard
