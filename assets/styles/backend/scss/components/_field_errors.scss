@@ -1,7 +1,41 @@
 // Back end: make field errors easier to spot (see assets/controllers/backend/field_error_highlighter_controller.js)
 
 $sacevt-error-bg: #b3261e; // White text on this red has a contrast ratio of 6.5:1
-$sacevt-error-tint: rgba(179, 38, 30, .08);
+$sacevt-valid: #2e7d32;
+$sacevt-invalid-bg: #f6dcda;
+$sacevt-invalid-bg-dark: #e17971;
+
+// Mark mandatory fields while filling in the form: red = still empty, green = done
+.tl_formbody_edit .widget {
+  --sacevt-invalid-bg: #{$sacevt-invalid-bg};
+
+  :is(input, textarea, select):required:invalid {
+    border-left: 3px solid $sacevt-error-bg !important;
+    background-color: var(--sacevt-invalid-bg);
+  }
+
+  :is(input, textarea, select):required:valid {
+    border-left: 3px solid $sacevt-valid !important;
+  }
+
+  // Chosen hides the <select>, and Contao does not set "required" on multiple
+  // selects. Therefore, mandatory fields are detected by the asterisk in the label
+  // and an empty field by the absence of a selected option with a value.
+  &:has(> h3 .mandatory) select.tl_chosen {
+    &:not(:has(option:checked:not([value=""]))) + .chzn-container :is(.chzn-choices, .chzn-single) {
+      border-left: 3px solid $sacevt-error-bg !important;
+      background-color: var(--sacevt-invalid-bg);
+    }
+
+    &:has(option:checked:not([value=""])) + .chzn-container :is(.chzn-choices, .chzn-single) {
+      border-left: 3px solid $sacevt-valid !important;
+    }
+  }
+}
+
+html[data-color-scheme="dark"] .tl_formbody_edit .widget {
+  --sacevt-invalid-bg: #{$sacevt-invalid-bg-dark};
+}
 
 .tl_formbody_edit {
   // The error message below the field
@@ -28,9 +62,9 @@ $sacevt-error-tint: rgba(179, 38, 30, .08);
   // The whole field with label, input and message
   .widget:has(p.tl_error) {
     border-radius: 4px;
-    background: $sacevt-error-tint;
-    outline: 2px solid $sacevt-error-bg;
-    outline-offset: 2px;
+    //background: $sacevt-error-tint;
+    //outline: 2px solid $sacevt-error-bg;
+    //outline-offset: 2px;
     margin-top: 6px;
   }
 
@@ -40,7 +74,7 @@ $sacevt-error-tint: rgba(179, 38, 30, .08);
     font-weight: 600;
   }
 
-  // The input field: blink three times, then keep the red border
+  // The input field: blink ten times, then keep the red border
   .error.tl_text,
   .error.tl_textarea,
   .error.tl_select,
