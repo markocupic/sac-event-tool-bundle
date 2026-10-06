@@ -72,6 +72,11 @@ class CalendarEventsMemberModel extends Model
 
     public static function findByMemberAndEvent(MemberModel $objMember, CalendarEventsModel $eventModel): Model|null
     {
+        // Registrations without SAC member number (non-members) cannot be assigned to a member
+        if ((int) $objMember->sacMemberId <= 0) {
+            return null;
+        }
+
         /** @var Connection $database */
         $database = System::getContainer()->get('database_connection');
 
@@ -123,31 +128,23 @@ class CalendarEventsMemberModel extends Model
         /** @var Connection $database */
         $database = System::getContainer()->get('database_connection');
 
-        if ($options['blnShowEventsWithParticipationOnly']) {
-            $eventIDS = $database->fetchFirstColumn(
-                'SELECT eventId FROM tl_calendar_events_member WHERE sacMemberId = ? AND hasParticipated = ?',
-                [
-                    $objMember->sacMemberId,
-                    1,
-                ],
-                [
-                    Types::INTEGER,
-                    Types::INTEGER,
-                ],
-            );
-        } else {
-            $eventIDS = $database->fetchFirstColumn(
-                'SELECT eventId FROM tl_calendar_events_member WHERE sacMemberId = ?',
-                [
-                    $objMember->sacMemberId,
-                ],
-                [
-                    Types::INTEGER,
-                ],
-            );
+        // Registrations without SAC member number (sacMemberId = 0) belong to
+        // non-members and must never be assigned to a member.
+        $hasSacMemberId = (int) $objMember->sacMemberId > 0;
+
+        $eventIDS = [];
+
+        if ($hasSacMemberId) {
+            $sql = 'SELECT eventId FROM tl_calendar_events_member WHERE sacMemberId = ?';
+
+            if ($options['blnShowEventsWithParticipationOnly']) {
+                $sql .= ' AND hasParticipated = 1';
+            }
+
+            $eventIDS = $database->fetchFirstColumn($sql, [$objMember->sacMemberId], [Types::INTEGER]);
         }
 
-        if (true === $options['blnInstructorRole']) {
+        if ($hasSacMemberId && true === $options['blnInstructorRole']) {
             $objUser = UserModel::findOneBySacMemberId($objMember->sacMemberId);
 
             if (null !== $objUser) {
