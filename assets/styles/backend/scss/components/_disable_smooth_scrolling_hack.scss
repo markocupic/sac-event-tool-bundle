@@ -1,0 +1,36 @@
+/*
+ * Disable smooth scrolling in the Contao back end
+ *
+ * Why:
+ * The Contao back end theme (core-bundle/contao/themes/flexible/styles/main.css)
+ * sets "scroll-behavior: smooth" on <html>, so that the jump links bar in edit
+ * forms scrolls smoothly to the selected fieldset.
+ *
+ * Side effect: when a mandatory field is left empty, the browser blocks the
+ * submission and scrolls to the invalid field. If the field is outside the
+ * viewport (e.g. on a phone, or on a long form when the save button is at the
+ * bottom), the browser scrolls there smoothly. Chrome/Edge (Chromium) hide the
+ * validation message ("Please fill out this field") while the page is scrolling,
+ * so the message disappears. The form is not submitted, but the user gets no
+ * hint why the save button "does nothing".
+ *
+ * Reproduce (e.g. on https://demo.contao.org/contao):
+ * 1. Create a new member and leave the first name empty.
+ * 2. Scroll down until the first name field is out of the viewport.
+ * 3. Click "Save": the page scrolls up, but no validation message is shown.
+ *    If the field is still in the viewport, the message is shown.
+ *
+ * With "scroll-behavior: auto" the browser jumps to the invalid field instantly
+ * and the validation message stays visible. Trade-off: the jump links bar no
+ * longer scrolls smoothly.
+ *
+ * "html:root" is more specific than the core's "html" selector, so this rule
+ * wins regardless of the order in which the style sheets are loaded.
+ *
+ * Remove this file once Contao drops the global "scroll-behavior: smooth" rule
+ * (e.g. by passing { behavior: 'smooth' } to scrollIntoView() in the core's
+ * jump-targets-controller.js instead).
+ */
+html:root {
+  scroll-behavior: auto;
+}

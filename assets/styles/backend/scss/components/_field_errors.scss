@@ -31,12 +31,7 @@ $sacevt-error-tint: rgba(179, 38, 30, .08);
     background: $sacevt-error-tint;
     outline: 2px solid $sacevt-error-bg;
     outline-offset: 2px;
-  }
-
-  @media (max-width: 767px) {
-    .widget:has(p.tl_error) {
-      margin-top: 8px;
-    }
+    margin-top: 6px;
   }
 
   // Contao adapts --red to the dark color scheme
