@@ -1,0 +1,71 @@
+// Back end: make field errors easier to spot (see assets/controllers/backend/field_error_highlighter_controller.js)
+
+$sacevt-error-bg: #b3261e; // White text on this red has a contrast ratio of 6.5:1
+$sacevt-error-tint: rgba(179, 38, 30, .08);
+
+.tl_formbody_edit {
+  // The error message below the field
+  .widget p.tl_error {
+    // Contao shows the message as a one-line tip and cuts off long messages
+    height: auto;
+    overflow: visible;
+    white-space: normal;
+    cursor: default;
+
+    margin: 6px 0 2px;
+    padding: 6px 10px 6px 32px;
+    border-radius: 4px;
+    background: $sacevt-error-bg url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7.5' fill='%23fff'/%3E%3Crect x='7' y='3.5' width='2' height='6' rx='1' fill='%23b3261e'/%3E%3Ccircle cx='8' cy='11.8' r='1.2' fill='%23b3261e'/%3E%3C/svg%3E") no-repeat 10px center / 16px 16px;
+    color: #fff;
+    font-weight: 600;
+    line-height: 1.4;
+
+    a {
+      color: #fff;
+    }
+  }
+
+  // The whole field with label, input and message
+  .widget:has(p.tl_error) {
+    border-radius: 4px;
+    background: $sacevt-error-tint;
+    outline: 2px solid $sacevt-error-bg;
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 767px) {
+    .widget:has(p.tl_error) {
+      margin-top: 8px;
+    }
+  }
+
+  // Contao adapts --red to the dark color scheme
+  label.error {
+    color: var(--red, $sacevt-error-bg);
+    font-weight: 600;
+  }
+
+  // The input field: blink three times, then keep the red border
+  .error.tl_text,
+  .error.tl_textarea,
+  .error.tl_select,
+  .error.tl_chosen > ul.chzn-choices {
+    border: 2px solid $sacevt-error-bg !important;
+    animation: sacevt-field-error-blink 1s ease-in-out 10;
+  }
+}
+
+@keyframes sacevt-field-error-blink {
+  50% {
+    box-shadow: 0 0 0 4px rgba(179, 38, 30, .45);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tl_formbody_edit .error.tl_text,
+  .tl_formbody_edit .error.tl_textarea,
+  .tl_formbody_edit .error.tl_select,
+  .tl_formbody_edit .error.tl_chosen > ul.chzn-choices {
+    animation: none;
+  }
+}
