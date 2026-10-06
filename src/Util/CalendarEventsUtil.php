@@ -38,6 +38,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\Template;
 use Contao\UserModel;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
@@ -63,358 +64,287 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 #[Autoconfigure(public: true)]
 class CalendarEventsUtil
 {
+    /**
+     * Keys of getEventData() that return a part of the start or end date.
+     */
+    private const array DATE_PARTS = [
+        'startDateDay' => ['d', 'startDate'],
+        'startDateMonth' => ['M', 'startDate'],
+        'startDateYear' => ['y', 'startDate'],
+        'endDateDay' => ['d', 'endDate'],
+        'endDateMonth' => ['M', 'endDate'],
+        'endDateYear' => ['y', 'endDate'],
+    ];
+
+    /**
+     * Subscription state => [CSS class, title] of the badges in getSubscriptionStateBadges().
+     */
+    private const array SUBSCRIPTION_STATE_BADGES = [
+        EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED => ['not-confirmed blink', '%s unbeantwortete Anmeldeanfragen'],
+        EventSubscriptionState::SUBSCRIPTION_ACCEPTED => ['accepted', '%s bestätigte Anmeldungen'],
+        EventSubscriptionState::SUBSCRIPTION_REFUSED => ['refused', '%s abgelehnte Anmeldungen'],
+        EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST => ['on-waiting-list', '%s Anmeldungen auf Warteliste'],
+        EventSubscriptionState::USER_HAS_UNSUBSCRIBED => ['unsubscribed-user', '%s stornierte Anmeldungen'],
+    ];
+
     public function __construct(private readonly ContaoFramework $framework)
     {
     }
 
+    /**
+     * Returns an event property for the templates. Options can be added as a query
+     * string, e.g. "eventImage?size=5".
+     */
     public function getEventData(CalendarEventsModel $objEvent, string $strProperty, Template|null $objTemplate = null): mixed
     {
         $this->framework->initialize();
 
-        // Load language files
-        $this->getAdapter(System::class)->loadLanguageFile('tl_calendar_events');
-        $this->getAdapter(System::class)->loadLanguageFile('default');
+        $system = $this->getAdapter(System::class);
+        $system->loadLanguageFile('tl_calendar_events');
+        $system->loadLanguageFile('default');
 
-        $value = '';
+        [$key, $query] = array_pad(explode('?', $strProperty, 2), 2, '');
+        parse_str(html_entity_decode($query), $options);
 
-        // Add arguments with a query string eventImage?size=5
-        $parts = explode('?', $strProperty, 2);
-        $key = $parts[0];
-        parse_str(html_entity_decode($parts[1] ?? ''), $options);
-
-        // Handle false and true
+        // Convert "true" and "false" to booleans
         $options = array_map(
-            static function ($v) {
-                return match ($v) {
-                    'true' => true,
-                    'false' => false,
-                    default => $v,
-                };
+            static fn ($value) => match ($value) {
+                'true' => true,
+                'false' => false,
+                default => $value,
             },
             $options,
         );
 
+        $date = $this->getAdapter(Date::class);
+        $config = $this->getAdapter(Config::class);
+
+        if (isset(self::DATE_PARTS[$key])) {
+            [$format, $field] = self::DATE_PARTS[$key];
+
+            return $date->parse($format, (int) $objEvent->{$field});
+        }
+
         switch ($key) {
             case 'model':
-                $value = $objEvent;
-                break;
+                return $objEvent;
 
             case 'id':
-                $value = $objEvent->id;
-                break;
+                return $objEvent->id;
 
             case 'eventId':
-                $value = \sprintf('%s-%s', $this->getAdapter(Date::class)->parse('Y', (int) $objEvent->startDate), $objEvent->id);
-                break;
+                return \sprintf('%s-%s', $date->parse('Y', (int) $objEvent->startDate), $objEvent->id);
 
             case 'eventTitle':
-                $value = StringUtil::revertInputEncoding($objEvent->title);
-                break;
+                return StringUtil::revertInputEncoding($objEvent->title);
 
             case 'eventUrl':
-                $blnAbsolute = false;
-
-                $value = $this->getContainer()
+                return $this->getContainer()
                     ->get('contao.routing.content_url_generator')
-                    ->generate(
-                        $objEvent,
-                        [],
-                        $blnAbsolute ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH,
-                    )
+                    ->generate($objEvent, [], UrlGeneratorInterface::ABSOLUTE_PATH)
                 ;
-                break;
 
             case 'tourTypesIds':
-                $value = implode('', StringUtil::deserialize($objEvent->tourType, true));
-                break;
+                return implode('', StringUtil::deserialize($objEvent->tourType, true));
 
             case 'tourTypesShortcuts':
-                $value = implode(' ', $this->getTourTypesAsArray($objEvent, 'shortcut', true));
-                break;
+                return implode(' ', $this->getTourTypesAsArray($objEvent, 'shortcut', true));
 
             case 'tourTypesTitles':
-                $value = implode('<br>', $this->getTourTypesAsArray($objEvent, 'title'));
-                break;
-
-            case 'startDateDay':
-                $value = $this->getAdapter(Date::class)->parse('d', (int) $objEvent->startDate);
-                break;
-
-            case 'startDateMonth':
-                $value = $this->getAdapter(Date::class)->parse('M', (int) $objEvent->startDate);
-                break;
-
-            case 'startDateYear':
-                $value = $this->getAdapter(Date::class)->parse('y', (int) $objEvent->startDate);
-                break;
-
-            case 'endDateDay':
-                $value = $this->getAdapter(Date::class)->parse('d', (int) $objEvent->endDate);
-                break;
-
-            case 'endDateMonth':
-                $value = $this->getAdapter(Date::class)->parse('M', (int) $objEvent->endDate);
-                break;
-
-            case 'endDateYear':
-                $value = $this->getAdapter(Date::class)->parse('y', (int) $objEvent->endDate);
-                break;
+                return implode('<br>', $this->getTourTypesAsArray($objEvent, 'title'));
 
             case 'eventPeriodSmTooltip':
             case 'eventPeriodSm':
-                $value = $this->getEventPeriod($objEvent, 'd.m.Y', false);
-                break;
+                return $this->getEventPeriod($objEvent, 'd.m.Y', false);
 
             case 'eventPeriodLgInline':
-                $value = $this->getEventPeriod($objEvent, 'D, d.m.Y', false, true, true);
-                break;
+                return $this->getEventPeriod($objEvent, 'D, d.m.Y', false, true, true);
 
             case 'eventPeriodLgTooltip':
             case 'eventPeriodLg':
-                $value = $this->getEventPeriod($objEvent, 'D, d.m.Y', false);
-                break;
+                return $this->getEventPeriod($objEvent, 'D, d.m.Y', false);
 
             case 'eventDuration':
-                $value = $this->getEventDuration($objEvent);
-                break;
+                return $this->getEventDuration($objEvent);
 
             case 'registrationStartDateWithOffsetFormatted':
-                $regStartTime = $objEvent->registrationStartDate + $this->getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
-                $value = $this->getAdapter(Date::class)->parse($this->getAdapter(Config::class)->get('dateFormat'), (int) $regStartTime);
-                break;
+                return $date->parse($config->get('dateFormat'), (int) $this->getRegistrationStartTime($objEvent));
 
             case 'registrationStartTimeWithOffsetFormatted':
-                $regStartTime = $objEvent->registrationStartDate + $this->getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
-                $value = $this->getAdapter(Date::class)->parse($this->getAdapter(Config::class)->get('datimFormat'), (int) $regStartTime);
-                break;
+                return $date->parse($config->get('datimFormat'), (int) $this->getRegistrationStartTime($objEvent));
 
             case 'registrationEndDateFormatted':
-                // If registration end time! is set to default --> 23:59 then only show
-                // registration end date!
-                $endDate = $this->getAdapter(Date::class)->parse($this->getAdapter(Config::class)->get('dateFormat'), (int) $objEvent->registrationEndDate);
+                $endDate = $date->parse($config->get('dateFormat'), (int) $objEvent->registrationEndDate);
 
+                // Only show the date if the registration ends at the default time (23:59)
                 if (abs($objEvent->registrationEndDate - strtotime($endDate)) === (24 * 3600) - 60) {
-                    $formatedEndDate = $this->getAdapter(Date::class)->parse($this->getAdapter(Config::class)->get('dateFormat'), (int) $objEvent->registrationEndDate);
-                } else {
-                    $formatedEndDate = $this->getAdapter(Date::class)->parse($this->getAdapter(Config::class)->get('datimFormat'), (int) $objEvent->registrationEndDate);
+                    return $endDate;
                 }
-                $value = $formatedEndDate;
-                break;
+
+                return $date->parse($config->get('datimFormat'), (int) $objEvent->registrationEndDate);
 
             case 'eventState':
-                $value = $this->getEventState($objEvent);
-                break;
+                return $this->getEventState($objEvent);
 
             case 'eventStateIcon':
-                $value = $this->getEventStateIcon($objEvent);
-                break;
+                return $this->getEventStateIcon($objEvent);
 
             case 'eventStateLabel':
-                $value = '' !== $GLOBALS['TL_LANG']['MSC']['calendar_events'][$this->getEventState($objEvent)] ? $GLOBALS['TL_LANG']['MSC']['calendar_events'][$this->getEventState($objEvent)] : $this->getEventState($objEvent);
+                $eventState = $this->getEventState($objEvent);
+                $label = $GLOBALS['TL_LANG']['MSC']['calendar_events'][$eventState] ?? throw new \RuntimeException(\sprintf('Missing translation $GLOBALS[\'TL_LANG\'][\'MSC\'][\'calendar_events\'][\'%s\'].', $eventState));
 
                 if (EventState::STATE_RESCHEDULED === $objEvent->eventState) {
-                    $dateFormat = $this->getAdapter(Config::class)->get('dateFormat');
-                    $newDate = $objEvent->rescheduledEventDate ? $this->getAdapter(Date::class)->parse($dateFormat, (int) $objEvent->rescheduledEventDate) : 'unbest';
-                    $value = \sprintf($GLOBALS['TL_LANG']['MSC']['calendar_events'][$this->getEventState($objEvent)], $newDate);
+                    $newDate = $objEvent->rescheduledEventDate ? $date->parse($config->get('dateFormat'), (int) $objEvent->rescheduledEventDate) : 'unbest';
+
+                    return \sprintf($label, $newDate);
                 }
-                break;
+
+                return '' !== $label ? $label : $eventState;
 
             case 'isLastMinuteTour':
-                $value = EventType::LAST_MINUTE_TOUR === $objEvent->eventType;
-                break;
+                return EventType::LAST_MINUTE_TOUR === $objEvent->eventType;
 
             case 'isTour':
-                $value = EventType::TOUR === $objEvent->eventType;
-                break;
+                return EventType::TOUR === $objEvent->eventType;
 
             case 'isGeneralEvent':
-                $value = EventType::GENERAL_EVENT === $objEvent->eventType;
-                break;
+                return EventType::GENERAL_EVENT === $objEvent->eventType;
 
             case 'isCourse':
-                $value = EventType::COURSE === $objEvent->eventType;
-                break;
+                return EventType::COURSE === $objEvent->eventType;
 
             case 'bookingCounter':
-                $value = $this->getBookingCounter($objEvent);
-                break;
+                return $this->getBookingCounter($objEvent);
 
             case 'bookingCounterAsText':
-                $value = $this->getBookingCounter($objEvent, true);
-                break;
+                return $this->getBookingCounter($objEvent, true);
 
             case 'minMembers':
-                $value = $objEvent->minMembers;
-                break;
+                return $objEvent->minMembers;
+
             case 'tourTechDifficultiesAsGenericArray':
-                $value = $this->getTourTechDifficultiesAsGenericArray($objEvent);
-                break;
+                return $this->getTourTechDifficultiesAsGenericArray($objEvent);
 
             case 'tourTechDifficultiesAsArray':
-                $value = $this->getTourTechDifficultiesAsArray($objEvent, false, false);
-                break;
+                return $this->getTourTechDifficultiesAsArray($objEvent, false, false);
 
             case 'tourTechDifficulties':
-                $value = implode(' ', $this->getTourTechDifficultiesAsArray($objEvent, true, false));
-                break;
+                return implode(' ', $this->getTourTechDifficultiesAsArray($objEvent, true, false));
 
             case 'instructorsWithQualification':
             case 'instructors':
-                $value = implode(', ', $this->getInstructorNamesAsArray($objEvent, $options));
-                break;
+                return implode(', ', $this->getInstructorNamesAsArray($objEvent, $options));
 
             case 'journey':
-                $adapter = $this->getAdapter(CalendarEventsJourneyModel::class);
-                $value = null !== $adapter->findById($objEvent->journey) ? $adapter->findById($objEvent->journey)->title : '';
-                break;
+                $journey = $this->getAdapter(CalendarEventsJourneyModel::class)->findById($objEvent->journey);
+
+                return null !== $journey ? $journey->title : '';
 
             case 'courseTypeLevel1':
-                $value = $objEvent->courseTypeLevel1;
-                break;
+                return $objEvent->courseTypeLevel1;
 
             case 'eventImagePath':
-                $value = $this->getEventImagePath($objEvent);
-                break;
+                return $this->getEventImagePath($objEvent);
 
             case 'eventImage':
-                if (!empty($options['size'])) {
-                    $pictureSize = $options['size'];
-                    $src = $this->getEventImagePath($objEvent);
-                    $parser = $this->getContainer()->get('contao.insert_tag.parser');
-                    $value = $parser->replace(\sprintf('{{picture::%s?size=%s}}', $src, $pictureSize));
+                if (empty($options['size'])) {
+                    return '';
                 }
-                break;
+
+                return $this->getContainer()
+                    ->get('contao.insert_tag.parser')
+                    ->replace(\sprintf('{{picture::%s?size=%s}}', $this->getEventImagePath($objEvent), $options['size']))
+                ;
 
             case 'courseLevelName':
-                $value = $this->getContainer()->get(CourseLevels::class)->get($objEvent->courseLevel);
-                break;
+                return $this->getContainer()->get(CourseLevels::class)->get($objEvent->courseLevel);
 
             case 'courseTypeLevel0Name':
-                $adapter = $this->getAdapter(CourseMainTypeModel::class);
-                $value = $adapter->findById($objEvent->courseTypeLevel0)?->name ?? '';
-                break;
+                return $this->getAdapter(CourseMainTypeModel::class)->findById($objEvent->courseTypeLevel0)?->name ?? '';
 
             case 'courseTypeLevel1Name':
-                $adapter = $this->getAdapter(CourseSubTypeModel::class);
-                $value = $adapter->findById($objEvent->courseTypeLevel1)?->name ?? '';
-                break;
+                return $this->getAdapter(CourseSubTypeModel::class)->findById($objEvent->courseTypeLevel1)?->name ?? '';
 
-            // inside vue.js templates: eventOrganizerLogos?width=60 The first parameter
-            // defines the logo width
+            // Inside vue.js templates: eventOrganizerLogos?width=60 (logo width)
             case 'eventOrganizerLogos':
                 $width = !empty($options['width']) ? $options['width'] : '60';
-                $strInsertTag = '{{image::%s?width='.$width.'&alt=%s}}';
-                $value = $this->getEventOrganizersLogoAsHtml($objEvent, $strInsertTag);
-                break;
+
+                return $this->getEventOrganizersLogoAsHtml($objEvent, '{{image::%s?width='.$width.'&alt=%s}}');
 
             case 'eventOrganizerLogoPaths':
-                $allowDuplicate = !empty($options['allowDuplicate']) && 'true' === $options['allowDuplicate'];
-                $value = $this->getEventOrganizerLogoPaths($objEvent, $allowDuplicate);
-                break;
+                // "true" has already been converted to a boolean
+                $allowDuplicate = true === ($options['allowDuplicate'] ?? false);
+
+                return $this->getEventOrganizerLogoPaths($objEvent, $allowDuplicate);
 
             case 'eventOrganizerModels':
-                $value = $this->getEventOrganizerModels($objEvent);
-                break;
+                return $this->getEventOrganizerModels($objEvent);
 
             case 'eventOrganizers':
-                $value = implode('<br>', $this->getEventOrganizersAsArray($objEvent));
-                break;
+                return implode('<br>', $this->getEventOrganizersAsArray($objEvent));
 
             case 'mainInstructorContactDataFromDb':
-                $value = $this->generateMainInstructorContactDataFromDb($objEvent, $options);
-                break;
+                return $this->generateMainInstructorContactDataFromDb($objEvent, $options);
 
             case 'instructorContactBoxes':
-                $value = $this->generateInstructorContactBoxes($objEvent, $options);
-                break;
+                return $this->generateInstructorContactBoxes($objEvent, $options);
 
             case 'arrTourProfile':
-                $value = $this->getTourProfileAsArray($objEvent);
-                break;
+                return $this->getTourProfileAsArray($objEvent);
 
             case 'geoLink':
-                $value = $objEvent->geoLink;
-                break;
+                return $objEvent->geoLink;
 
             case 'hasCoords':
-                $value = !empty($this->getCoordsCH1903AsArray($objEvent));
-                break;
+                return !empty($this->getCoordsCH1903AsArray($objEvent));
 
             case 'coordsCH1903':
-                $value = $this->getCoordsCH1903AsArray($objEvent);
-                break;
+                return $this->getCoordsCH1903AsArray($objEvent);
 
             case 'geoLinkUrl':
-                $value = $this->getGeoLinkUrl($objEvent);
-                break;
+                return $this->getGeoLinkUrl($objEvent);
 
             case 'linkSacRoutePortal':
-                $value = $this->getSacRoutePortalLink($objEvent);
-                break;
+                return $this->getSacRoutePortalLink($objEvent);
 
             case 'isPublicTransportEvent':
-                $value = $this->isPublicTransportEvent($objEvent);
-                break;
+                return $this->isPublicTransportEvent($objEvent);
 
             case 'getPublicTransportBadge':
-                $value = $this->getPublicTransportBadge();
-                break;
+                return $this->getPublicTransportBadge();
 
             case 'isFavoredEvent':
-                $value = $this->isFavoredEvent($objEvent);
-                break;
+                return $this->isFavoredEvent($objEvent);
 
             case 'gallery':
-                $rowEvent = $objEvent->row();
-                $rowEvent['sortBy'] = 'custom';
-                $rowEvent['perRow'] = 4;
-                $rowEvent['size'] = serialize([400, 400, 'center_center', 'proportional']);
-                $rowEvent['fullsize'] = true;
-                $rowEvent['customTpl'] = 'content_element/gallery/col_4_with_caption';
+                $row = $objEvent->row();
+                $row['sortBy'] = 'custom';
+                $row['perRow'] = 4;
+                $row['size'] = serialize([400, 400, 'center_center', 'proportional']);
+                $row['fullsize'] = true;
+                $row['customTpl'] = 'content_element/gallery/col_4_with_caption';
 
-                $value = $this->getGallery($rowEvent);
-                break;
-
-            default:
-                $arrEvent = $objEvent->row();
-
-                if (null !== $objTemplate && isset($objTemplate->{$key})) {
-                    $value = $objTemplate->{$key};
-                } elseif (isset($arrEvent[$key])) {
-                    $value = $arrEvent[$key];
-                } else {
-                    $value = '';
-                }
+                return $this->getGallery($row);
         }
 
-        return $value;
+        if (null !== $objTemplate && isset($objTemplate->{$key})) {
+            return $objTemplate->{$key};
+        }
+
+        return $objEvent->row()[$key] ?? '';
     }
 
     public function isPublicTransportEvent(CalendarEventsModel $objEvent): bool
     {
         $this->framework->initialize();
 
-        $isPublicTransport = false;
-
-        $database = $this->getContainer()->get('database_connection');
-
-        $idPublicTransportJourney = $database->fetchOne(
+        $publicTransportJourneyId = $this->getDatabase()->fetchOne(
             'SELECT id from tl_calendar_events_journey WHERE alias = ?',
-            [
-                'public-transport',
-            ],
-            [
-                Types::STRING,
-            ],
+            ['public-transport'],
+            [Types::STRING],
         );
 
-        if ($idPublicTransportJourney) {
-            if ((int) $objEvent->journey === (int) $idPublicTransportJourney) {
-                $isPublicTransport = true;
-            }
-        }
-
-        return $isPublicTransport;
+        return $publicTransportJourneyId && (int) $objEvent->journey === (int) $publicTransportJourneyId;
     }
 
     /**
@@ -424,80 +354,56 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $resolver = new OptionsResolver();
-        $resolver->setDefaults([
-            'includeDisabled' => false,
-            'includeHidden' => true,
-        ]);
-        $resolver->setAllowedValues('includeDisabled', [true, false]);
-        $resolver->setAllowedValues('includeHidden', [true, false]);
-        $options = $resolver->resolve($options);
+        $options = $this->resolveInstructorOptions($options);
 
-        $objCalendar = $objEvent->getRelated('pid');
+        $calendar = $objEvent->getRelated('pid');
+
+        if (null === $calendar) {
+            throw new \RuntimeException(\sprintf('The calendar of the event with ID %s does not exist.', $objEvent->id));
+        }
 
         $avatarManager = $this->getContainer()->get(Avatar::class);
+        $userPortraitPage = $this->getAdapter(PageModel::class)->findById($calendar->userPortraitJumpTo);
 
-        $objPage = $this->getAdapter(PageModel::class)->findById($objCalendar->userPortraitJumpTo);
-
-        if (null === $objPage) {
+        if (null === $userPortraitPage) {
             throw new \Exception('Page model not found.');
         }
 
-        $arrInstructors = $this->getInstructorsAsArray($objEvent, $options);
-        $arrItems = [];
+        $contentUrlGenerator = $this->getContainer()->get('contao.routing.content_url_generator');
+        $userModel = $this->getAdapter(UserModel::class);
+        $items = [];
 
-        foreach ($arrInstructors as $userId) {
-            $objUser = $this->getAdapter(UserModel::class)->findById($userId);
+        foreach ($this->getInstructorsAsArray($objEvent, $options) as $userId) {
+            $user = $userModel->findById($userId);
 
-            $contentUrlGenerator = $this->getContainer()->get('contao.routing.content_url_generator');
-
-            if (null === $objUser || $objUser->hideUser) {
+            if (null === $user || $user->hideUser) {
                 continue;
             }
 
-            $arrInstructor = $objUser->row();
-            $arrInstructor['href'] = $contentUrlGenerator->generate($objPage).'?getUpcoming=1&username='.$objUser->username;
-            $arrInstructor['has_link'] = true;
+            $mainQualification = $this->getMainQualification($user);
 
-            $arrInstructor['avatar_path'] = $avatarManager->getAvatarResourcePath($objUser);
-            $arrInstructor['main_qualification'] = !empty($this->getMainQualification($objUser)) ? $this->getMainQualification($objUser) : '';
-            $arrInstructor['contact_options'] = [];
+            $instructor = $user->row();
+            $instructor['href'] = $contentUrlGenerator->generate($userPortraitPage).'?getUpcoming=1&username='.$user->username;
+            $instructor['has_link'] = true;
+            $instructor['avatar_path'] = $avatarManager->getAvatarResourcePath($user);
+            $instructor['main_qualification'] = !empty($mainQualification) ? $mainQualification : '';
+            $instructor['contact_options'] = [];
 
-            $arrContact = ['phone', 'mobile', 'email'];
-
-            foreach ($arrContact as $field) {
-                if ('' === $objUser->{$field}) {
-                    continue;
+            foreach (['phone', 'mobile', 'email'] as $field) {
+                if ('' !== $user->{$field}) {
+                    $instructor['contact_options'][$field] = $user->{$field};
                 }
-
-                $arrInstructor['contact_options'][$field] = $objUser->{$field};
             }
 
-            $arrItems[] = $arrInstructor;
+            $items[] = $instructor;
         }
 
-        $twig = $this->getContainer()->get('twig');
-
-        return $twig->render('@MarkocupicSacEventTool/Calendar/instructor_contact_boxes.html.twig', ['instructors' => $arrItems]);
+        return $this->getContainer()->get('twig')->render('@MarkocupicSacEventTool/Calendar/instructor_contact_boxes.html.twig', ['instructors' => $items]);
     }
 
     public function getEventState(CalendarEventsModel $objEvent): string
     {
         $this->framework->initialize();
-
-        $database = $this->getContainer()->get('database_connection');
-
-        $registrationCount = $database->fetchOne(
-            'SELECT COUNT(id) FROM tl_calendar_events_member WHERE eventId = ? AND stateOfSubscription = ?',
-            [
-                $objEvent->id,
-                EventSubscriptionState::SUBSCRIPTION_ACCEPTED,
-            ],
-            [
-                Types::INTEGER,
-                Types::STRING,
-            ],
-        );
 
         // Event canceled
         if (EventState::STATE_CANCELED === $objEvent->eventState) {
@@ -509,8 +415,7 @@ class CalendarEventsUtil
             return 'event_status_6';
         }
 
-        // Event is fully booked/instructor has explicitly set the "is fully booked"
-        // label in the backend
+        // The instructor has explicitly set the "is fully booked" label in the backend
         if (EventState::STATE_FULLY_BOOKED === $objEvent->eventState) {
             return 'event_status_3';
         }
@@ -521,19 +426,19 @@ class CalendarEventsUtil
         }
 
         // Max participant number reached -> waiting list still possible
-        if ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers) {
+        if ($objEvent->maxMembers > 0 && $this->countAcceptedRegistrations($objEvent) >= $objEvent->maxMembers) {
             return 'event_status_8';
         }
 
-        // If online registration is disabled in the event settings
+        // Online registration is disabled in the event settings
         if ($objEvent->disableOnlineRegistration) {
             return 'event_status_7';
         }
 
         // Booking not possible yet
-        $regStartTime = $objEvent->registrationStartDate + $this->getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
+        $registrationStartTime = $this->getRegistrationStartTime($objEvent);
 
-        if ($objEvent->setRegistrationPeriod && $regStartTime > time()) {
+        if ($objEvent->setRegistrationPeriod && $registrationStartTime > time()) {
             return 'event_status_5';
         }
 
@@ -544,16 +449,15 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $strState = $this->getEventState($objEvent);
-        $strLabel = $GLOBALS['TL_LANG']['MSC']['calendar_events'][$strState] ?? $strState;
+        $eventState = $this->getEventState($objEvent);
 
         /** @var Packages $packages */
         $packages = $this->getContainer()->get('assets.packages');
 
         return \sprintf(
             '<img src="%s" title="%s">',
-            $packages->getUrl("icons/event_states/$strState.svg", 'markocupic_sac_event_tool'),
-            $strLabel,
+            $packages->getUrl("icons/event_states/$eventState.svg", 'markocupic_sac_event_tool'),
+            $GLOBALS['TL_LANG']['MSC']['calendar_events'][$eventState] ?? $eventState,
         );
     }
 
@@ -561,63 +465,41 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $database = $this->getContainer()->get('database_connection');
-
-        $registrationCount = $database->fetchOne(
-            'SELECT COUNT(id) FROM tl_calendar_events_member WHERE eventId = ? AND stateOfSubscription = ?',
-            [
-                $objEvent->id,
-                EventSubscriptionState::SUBSCRIPTION_ACCEPTED,
-            ],
-            [
-                Types::INTEGER,
-                Types::STRING,
-            ],
-        );
-
-        if (EventState::STATE_FULLY_BOOKED === $objEvent->eventState || ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers)) {
+        if (EventState::STATE_FULLY_BOOKED === $objEvent->eventState) {
             return true;
         }
 
-        return false;
+        return $objEvent->maxMembers > 0 && $this->countAcceptedRegistrations($objEvent) >= $objEvent->maxMembers;
     }
 
     public function getMainInstructor(CalendarEventsModel $objEvent): UserModel|null
     {
         $this->framework->initialize();
 
-        $database = $this->getContainer()->get('database_connection');
-
-        $id = $database->fetchOne(
+        $userId = $this->getDatabase()->fetchOne(
             'SELECT userId FROM tl_calendar_events_instructor WHERE pid = ? AND isMainInstructor = ?',
-            [
-                $objEvent->id,
-                1,
-            ],
-            [
-                Types::INTEGER,
-                Types::INTEGER,
-            ],
+            [$objEvent->id, 1],
+            [Types::INTEGER, Types::INTEGER],
         );
 
-        if (false === $id) {
+        if (false === $userId) {
             return null;
         }
 
-        return $this->getAdapter(UserModel::class)?->findById($id);
+        return $this->getAdapter(UserModel::class)->findById($userId);
     }
 
     public function getMainInstructorName(CalendarEventsModel $objEvent): string
     {
         $this->framework->initialize();
 
-        $objUser = $this->getMainInstructor($objEvent);
+        $user = $this->getMainInstructor($objEvent);
 
-        if (null === $objUser) {
+        if (null === $user) {
             return '';
         }
 
-        return implode(' ', array_filter([$objUser->lastname, $objUser->firstname]));
+        return implode(' ', array_filter([$user->lastname, $user->firstname]));
     }
 
     /**
@@ -627,102 +509,76 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $resolver = new OptionsResolver();
-        $resolver->setDefaults([
-            'includeDisabled' => false,
-            'includeHidden' => true,
-        ]);
-        $resolver->setAllowedValues('includeDisabled', [true, false]);
-        $resolver->setAllowedValues('includeHidden', [true, false]);
-        $options = $resolver->resolve($options);
+        $options = $this->resolveInstructorOptions($options);
 
-        $arrInstructors = $this->getInstructorsAsArray($objEvent, $options);
-        $objUser = $this->getAdapter(UserModel::class)->findById($arrInstructors[0]);
+        $instructorIds = $this->getInstructorsAsArray($objEvent, $options);
 
-        if (null === $objUser) {
+        if (empty($instructorIds)) {
             return '';
         }
 
-        $arrContact = [];
-        $arrContact[] = \sprintf('<strong>%s %s</strong>', $objUser->lastname, $objUser->firstname);
+        $user = $this->getAdapter(UserModel::class)->findById($instructorIds[0]);
 
-        if ('' !== $objUser->phone) {
-            $arrContact[] = \sprintf('Tel.: %s', $objUser->phone);
+        if (null === $user) {
+            return '';
         }
 
-        if ('' !== $objUser->mobile) {
-            $arrContact[] = \sprintf('Mobile.: %s', $objUser->mobile);
+        $contact = [\sprintf('<strong>%s %s</strong>', $user->lastname, $user->firstname)];
+
+        if ('' !== $user->phone) {
+            $contact[] = \sprintf('Tel.: %s', $user->phone);
         }
 
-        if ('' !== $objUser->email) {
-            $arrContact[] = \sprintf('E-Mail: %s', StringUtil::specialcharsUrl(StringUtil::encodeEmail($objUser->email)));
+        if ('' !== $user->mobile) {
+            $contact[] = \sprintf('Mobile.: %s', $user->mobile);
         }
 
-        $arrContact = array_filter($arrContact);
+        if ('' !== $user->email) {
+            $contact[] = \sprintf('E-Mail: %s', StringUtil::specialcharsUrl(StringUtil::encodeEmail($user->email)));
+        }
 
-        return implode(', ', $arrContact);
+        return implode(', ', $contact);
     }
 
     /**
+     * Returns the ids of the instructors, the main instructor first.
+     *
      * @param array{includeDisabled?: bool, includeHidden?: bool} $options
      */
     public function getInstructorsAsArray(CalendarEventsModel $objEvent, array $options = []): array
     {
         $this->framework->initialize();
 
-        $resolver = new OptionsResolver();
-        $resolver->setDefaults([
-            'includeDisabled' => false,
-            'includeHidden' => true,
-        ]);
-        $resolver->setAllowedValues('includeDisabled', [true, false]);
-        $resolver->setAllowedValues('includeHidden', [true, false]);
-        $options = $resolver->resolve($options);
+        $options = $this->resolveInstructorOptions($options);
 
-        $arrInstructors = [];
-
-        $database = $this->getContainer()->get('database_connection');
-
-        // Get all instructors from a specific event, list the mainInstructor first
-        $userIds = $database->fetchFirstColumn(
+        $userIds = $this->getDatabase()->fetchFirstColumn(
             'SELECT userId FROM tl_calendar_events_instructor WHERE pid = ? ORDER BY isMainInstructor DESC',
-            [
-                $objEvent->id,
-            ],
-            [
-                Types::INTEGER,
-            ],
+            [$objEvent->id],
+            [Types::INTEGER],
         );
 
-        $userAdapter = $this->getAdapter(UserModel::class);
+        $userModel = $this->getAdapter(UserModel::class);
+        $instructorIds = [];
 
         foreach ($userIds as $userId) {
-            $objUser = $userAdapter->findById($userId);
+            $user = $userModel->findById($userId);
 
-            if (null === $objUser) {
+            if (null === $user) {
                 continue;
             }
 
-            if (false === $options['includeDisabled'] && $objUser->disable) {
+            if (!$options['includeDisabled'] && $this->isUserDisabled($user)) {
                 continue;
             }
 
-            if (false === $options['includeDisabled'] && ('' !== $objUser->stop && $objUser->stop < time())) {
+            if (!$options['includeHidden'] && $user->hideUser) {
                 continue;
             }
 
-            if (false === $options['includeDisabled'] && ('' !== $objUser->start && $objUser->start > time())) {
-                continue;
-            }
-
-            if (false === $options['includeHidden'] && $objUser->hideUser) {
-                continue;
-            }
-
-            $arrInstructors[] = $objUser->id;
+            $instructorIds[] = $user->id;
         }
 
-        return $arrInstructors;
+        return $instructorIds;
     }
 
     /**
@@ -732,57 +588,45 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $resolver = new OptionsResolver();
-        $resolver->setDefaults([
-            'includeDisabled' => false,
-            'includeHidden' => true,
-            'addMainQualification' => false,
-        ]);
-        $resolver->setAllowedValues('includeDisabled', [true, false]);
-        $resolver->setAllowedValues('includeHidden', [true, false]);
-        $resolver->setAllowedValues('addMainQualification', [true, false]);
-        $options = $resolver->resolve($options);
+        $options = $this->resolveInstructorOptions($options, true);
 
-        $arrInstructors = [];
-
-        $arrUsers = $this->getInstructorsAsArray($objEvent, [
+        $userIds = $this->getInstructorsAsArray($objEvent, [
             'includeDisabled' => $options['includeDisabled'],
             'includeHidden' => $options['includeHidden'],
         ]);
 
-        foreach ($arrUsers as $userId) {
-            $objUser = $this->getAdapter(UserModel::class)->findById($userId);
+        $userModel = $this->getAdapter(UserModel::class);
+        $names = [];
 
-            if (null === $objUser) {
+        foreach ($userIds as $userId) {
+            $user = $userModel->findById($userId);
+
+            if (null === $user) {
                 continue;
             }
 
-            $strName = trim($objUser->lastname.' '.$objUser->firstname);
+            $name = trim($user->lastname.' '.$user->firstname);
+            $mainQualification = $options['addMainQualification'] ? $this->getMainQualification($user) : '';
 
-            if (true === $options['addMainQualification'] && '' !== $this->getMainQualification($objUser)) {
-                $arrInstructors[] = $strName.' ('.$this->getMainQualification($objUser).')';
-            } else {
-                $arrInstructors[] = $strName;
-            }
+            $names[] = '' !== $mainQualification ? $name.' ('.$mainQualification.')' : $name;
         }
 
-        return $arrInstructors;
+        return $names;
     }
 
     public function getMainQualification(UserModel $objUser): string
     {
         $this->framework->initialize();
 
-        $strQuali = '';
+        $qualifications = StringUtil::deserialize($objUser->leiterQualifikation, true);
 
-        $arrQuali = StringUtil::deserialize($objUser->leiterQualifikation, true);
-
-        if (!empty($arrQuali[0])) {
-            $this->getAdapter(System::class)->loadLanguageFile('tl_user');
-            $strQuali = $GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][(int) $arrQuali[0]] ?? 'undefined';
+        if (empty($qualifications[0])) {
+            return '';
         }
 
-        return $strQuali;
+        $this->getAdapter(System::class)->loadLanguageFile('tl_user');
+
+        return $GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][(int) $qualifications[0]] ?? 'undefined';
     }
 
     public function getGallery(array $arrData): string
@@ -797,10 +641,10 @@ class CalendarEventsUtil
             $arrData['perRow'] = 4;
         }
 
-        $objModel = new ContentModel();
-        $objModel->setRow($arrData);
+        $contentModel = new ContentModel();
+        $contentModel->setRow($arrData);
 
-        return $this->getAdapter(Controller::class)->getContentElement($objModel);
+        return $this->getAdapter(Controller::class)->getContentElement($contentModel);
     }
 
     public function getEventImagePath(CalendarEventsModel $objEvent): string
@@ -813,73 +657,63 @@ class CalendarEventsUtil
             return $fallbackImage;
         }
 
-        $objFile = $this->getAdapter(FilesModel::class)->findByUuid($objEvent->singleSRC);
+        $file = $this->getAdapter(FilesModel::class)->findByUuid($objEvent->singleSRC);
 
-        if (null === $objFile) {
+        if (null === $file || !is_file(Path::join($this->getProjectDir(), $file->path))) {
             return $fallbackImage;
         }
 
-        $path = Path::join($this->getProjectDir(), $objFile->path);
-
-        if (!is_file($path)) {
-            return $fallbackImage;
-        }
-
-        return $objFile->path;
+        return $file->path;
     }
 
     public function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = '', bool $blnAppendEventDuration = true, bool $blnTooltip = true, bool $blnInline = false): string
     {
         $this->framework->initialize();
 
+        $date = $this->getAdapter(Date::class);
+
         if (empty($dateFormat)) {
             $dateFormat = $this->getAdapter(Config::class)->get('dateFormat');
         }
 
-        $dateFormatShortened = $dateFormat;
+        $timestamps = $this->getEventTimestamps($objEvent);
+        $startTstamp = $this->getStartTstamp($objEvent);
+        $endTstamp = $this->getEndTstamp($objEvent);
 
-        if ('d.m.Y' === $dateFormat) {
-            $dateFormatShortened = 'd.m.';
+        // Calendar::calculateSpan() returns a float
+        $span = (int) Calendar::calculateSpan($startTstamp, $endTstamp) + 1;
+
+        $strEventDuration = $blnAppendEventDuration ? ' ('.$this->getEventDuration($objEvent).')' : '';
+
+        // One day
+        if (1 === \count($timestamps)) {
+            return $date->parse($dateFormat, $startTstamp).$strEventDuration;
         }
 
-        $eventDuration = \count($this->getEventTimestamps($objEvent));
+        // Consecutive days
+        if ($span === \count($timestamps)) {
+            $dateFormatShortened = 'd.m.Y' === $dateFormat ? 'd.m.' : $dateFormat;
 
-        // Typecast is required here, this although PhpCodeSniffer claims the opposite.
-        // Calendar::calculateSpan() returns "double" not "integer"
-        $span = (int) Calendar::calculateSpan($this->getStartTstamp($objEvent), $this->getEndTstamp($objEvent)) + 1;
-
-        if (1 === $eventDuration) {
-            $strEventDuration = $blnAppendEventDuration ? ' ('.$this->getEventDuration($objEvent).')' : '';
-
-            return $this->getAdapter(Date::class)->parse($dateFormat, $this->getStartTstamp($objEvent)).$strEventDuration;
+            return $date->parse($dateFormatShortened, $startTstamp).' - '.$date->parse($dateFormat, $endTstamp).$strEventDuration;
         }
 
-        if ($span === $eventDuration) {
-            $strEventDuration = $blnAppendEventDuration ? ' ('.$this->getEventDuration($objEvent).')' : '';
-
-            return $this->getAdapter(Date::class)->parse($dateFormatShortened, $this->getStartTstamp($objEvent)).' - '.$this->getAdapter(Date::class)->parse($dateFormat, $this->getEndTstamp($objEvent)).$strEventDuration;
-        }
-
-        $arrDates = [];
-        $dates = $this->getEventTimestamps($objEvent);
-
-        foreach ($dates as $date) {
-            $arrDates[] = $this->getAdapter(Date::class)->parse($dateFormat, (int) $date);
-        }
-
+        // Non-consecutive days
         if ($blnTooltip) {
-            $strEventDuration = $blnAppendEventDuration ? ' ('.$this->getEventDuration($objEvent).')' : '';
-            $strTooltip = '<a tabindex="0" class="more-date-infos" data-controller="sacevt--frontend--bs-tooltip" data-bs-tooltip-title="Eventdaten: '.StringUtil::specialchars(implode(', ', $arrDates)).'" data-bs-tooltip-placement="bottom">und weitere</a>';
+            $dates = array_map(static fn ($tstamp) => $date->parse($dateFormat, (int) $tstamp), $timestamps);
+            $strTooltip = '<a tabindex="0" class="more-date-infos" data-controller="sacevt--frontend--bs-tooltip" data-bs-tooltip-title="Eventdaten: '.StringUtil::specialchars(implode(', ', $dates)).'" data-bs-tooltip-placement="bottom">und weitere</a>';
 
-            return $this->getAdapter(Date::class)->parse($dateFormat, $this->getStartTstamp($objEvent)).$strEventDuration.(!$blnInline ? '<br>' : ' ').$strTooltip;
+            return $date->parse($dateFormat, $startTstamp).$strEventDuration.($blnInline ? ' ' : '<br>').$strTooltip;
         }
 
         $dateString = '';
 
-        foreach ($this->getEventTimestamps($objEvent) as $tstamp) {
-            $dateString .= \sprintf('<time datetime="%s">%s</time>', StringUtil::specialchars($this->getAdapter(Date::class)->parse('Y-m-d', (int) $tstamp)), $this->getAdapter(Date::class)->parse('D, d.m.Y', (int) $tstamp));
+        foreach ($timestamps as $tstamp) {
+            $dateString .= \sprintf('<time datetime="%s">%s</time>', StringUtil::specialchars($date->parse('Y-m-d', (int) $tstamp)), $date->parse('D, d.m.Y', (int) $tstamp));
         }
-        $dateString .= $blnAppendEventDuration ? \sprintf('<time>(%s)</time>', $this->getEventDuration($objEvent)) : '';
+
+        if ($blnAppendEventDuration) {
+            $dateString .= \sprintf('<time>(%s)</time>', $this->getEventDuration($objEvent));
+        }
 
         return $dateString;
     }
@@ -888,82 +722,77 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $objEvent = $this->getAdapter(CalendarEventsModel::class)->findById($id);
+        $event = $this->getAdapter(CalendarEventsModel::class)->findById($id);
 
-        if (null === $objEvent) {
+        if (null === $event || !$event->setRegistrationPeriod) {
             return '';
         }
 
-        if (!$objEvent->setRegistrationPeriod) {
-            return '';
-        }
+        $config = $this->getAdapter(Config::class);
+        $date = $this->getAdapter(Date::class);
 
         if ('' === $dateFormatStart) {
-            $dateFormatStart = $this->getAdapter(Config::class)->get('dateFormat');
+            $dateFormatStart = $config->get('dateFormat');
         }
 
         if ('' === $dateFormatEnd) {
-            $dateFormatEnd = $this->getAdapter(Config::class)->get('dateFormat');
+            $dateFormatEnd = $config->get('dateFormat');
         }
 
-        $regStartTime = $objEvent->registrationStartDate + $this->getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
-
-        return $this->getAdapter(Date::class)->parse($dateFormatStart, (int) $regStartTime).' - '.$this->getAdapter(Date::class)->parse($dateFormatEnd, (int) $objEvent->registrationEndDate);
+        return $date->parse($dateFormatStart, (int) $this->getRegistrationStartTime($event)).' - '.$date->parse($dateFormatEnd, (int) $event->registrationEndDate);
     }
 
     public function getEventTimestamps(CalendarEventsModel $objEvent): array
     {
         $this->framework->initialize();
 
-        $arrRepeats = [];
+        $timestamps = [];
 
-        $arrDates = StringUtil::deserialize($objEvent->eventDates, true);
-
-        foreach ($arrDates as $v) {
-            $arrRepeats[] = $v['new_repeat'];
+        foreach (StringUtil::deserialize($objEvent->eventDates, true) as $eventDate) {
+            $timestamps[] = $eventDate['new_repeat'];
         }
 
-        return $arrRepeats;
+        return $timestamps;
     }
 
     public function getStartTstamp(CalendarEventsModel $objEvent): int
     {
         $this->framework->initialize();
 
-        $arrDates = StringUtil::deserialize($objEvent->eventDates);
+        $eventDates = StringUtil::deserialize($objEvent->eventDates);
 
-        if (!\is_array($arrDates) || empty($arrDates)) {
+        if (!\is_array($eventDates) || empty($eventDates)) {
             return 0;
         }
 
-        return (int) $arrDates[0]['new_repeat'];
+        return (int) $eventDates[0]['new_repeat'];
     }
 
     public function getEndTstamp(CalendarEventsModel $objEvent): int
     {
         $this->framework->initialize();
 
-        $arrDates = StringUtil::deserialize($objEvent->eventDates);
+        $eventDates = StringUtil::deserialize($objEvent->eventDates);
 
-        if (!\is_array($arrDates) || empty($arrDates)) {
+        if (!\is_array($eventDates) || empty($eventDates)) {
             return 0;
         }
 
-        return (int) $arrDates[\count($arrDates) - 1]['new_repeat'];
+        return (int) $eventDates[\count($eventDates) - 1]['new_repeat'];
     }
 
     public function getEventDuration(CalendarEventsModel $objEvent): string
     {
         $this->framework->initialize();
 
-        $arrDates = StringUtil::deserialize($objEvent->eventDates);
-
         if ('' !== $objEvent->durationInfo) {
             return (string) $objEvent->durationInfo;
         }
 
-        if (!empty($arrDates) && \is_array($arrDates)) {
-            return \sprintf('%s Tage', \count($arrDates));
+        $eventDates = StringUtil::deserialize($objEvent->eventDates);
+
+        if (!empty($eventDates) && \is_array($eventDates)) {
+            return \sprintf('%s Tage', \count($eventDates));
         }
 
         return '';
@@ -978,308 +807,195 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $arrReturn = [];
+        $tourDifficultyModel = $this->getAdapter(TourDifficultyModel::class);
+        $difficulties = [];
 
-        $arrValues = StringUtil::deserialize($objEvent->tourTechDifficulty, true);
+        foreach (StringUtil::deserialize($objEvent->tourTechDifficulty, true) as $difficulty) {
+            $shortcut = '';
+            $title = '';
 
-        if (empty($arrValues)) {
-            return $arrReturn;
-        }
+            if (\strlen($difficulty['tourTechDifficultyMin'])) {
+                $min = $tourDifficultyModel->findById((int) $difficulty['tourTechDifficultyMin']);
 
-        foreach ($arrValues as $difficulty) {
-            $strDiff = '';
-            $strDiffTitle = '';
-
-            if (\strlen($difficulty['tourTechDifficultyMin']) && \strlen($difficulty['tourTechDifficultyMax'])) {
-                $objDiff = $this->getAdapter(TourDifficultyModel::class)->findById((int) $difficulty['tourTechDifficultyMin']);
-
-                if (null !== $objDiff) {
-                    $strDiff = $objDiff->shortcut;
-                    $strDiffTitle = $objDiff->title;
+                if (null !== $min) {
+                    $shortcut = $min->shortcut;
+                    $title = $min->title;
                 }
 
-                $objDiff = $this->getAdapter(TourDifficultyModel::class)->findById((int) $difficulty['tourTechDifficultyMax']);
+                // Difficulty range, e.g. "T3 - T4"
+                if (\strlen($difficulty['tourTechDifficultyMax'])) {
+                    $max = $tourDifficultyModel->findById((int) $difficulty['tourTechDifficultyMax']);
 
-                if (null !== $objDiff) {
-                    $max = $objDiff->shortcut;
-                    $strDiff .= ' - '.$max;
-                    $strDiffTitle .= ' - '.$objDiff->title;
-                }
-            } elseif (\strlen($difficulty['tourTechDifficultyMin'])) {
-                $objDiff = $this->getAdapter(TourDifficultyModel::class)->findById((int) $difficulty['tourTechDifficultyMin']);
-
-                if (null !== $objDiff) {
-                    $strDiff = $objDiff->shortcut;
-                    $strDiffTitle = $objDiff->title;
+                    if (null !== $max) {
+                        $shortcut .= ' - '.$max->shortcut;
+                        $title .= ' - '.$max->title;
+                    }
                 }
             }
 
-            if ('' === $strDiff) {
+            if ('' === $shortcut) {
                 continue;
             }
 
             if ($tooltip) {
                 $html = '<span class="badge badge-sm badge-pill bg-primary" data-controller="sacevt--frontend--bs-tooltip" data-bs-tooltip-title="Techn. Schwierigkeit: %s" data-bs-tooltip-placement="top">%s</span>';
-                $arrReturn[] = \sprintf($html, StringUtil::specialchars($strDiffTitle), $strDiff);
+                $difficulties[] = \sprintf($html, StringUtil::specialchars($title), $shortcut);
             } elseif ($withTitle) {
-                $arrReturn[] = $strDiff.' ('.$strDiffTitle.')';
+                $difficulties[] = $shortcut.' ('.$title.')';
             } else {
-                $arrReturn[] = $strDiff;
+                $difficulties[] = $shortcut;
             }
         }
 
-        return $arrReturn;
+        return $difficulties;
     }
 
     public function getTourTechDifficultiesAsGenericArray(CalendarEventsModel $objEvent): array
     {
         $this->framework->initialize();
 
-        $arrReturn = [];
+        $tourDifficultyModel = $this->getAdapter(TourDifficultyModel::class);
+        $difficulties = [];
 
-        $arrValues = StringUtil::deserialize($objEvent->tourTechDifficulty, true);
-
-        if (empty($arrValues)) {
-            return $arrReturn;
-        }
-
-        foreach ($arrValues as $difficulty) {
+        foreach (StringUtil::deserialize($objEvent->tourTechDifficulty, true) as $difficulty) {
             $min = [];
             $max = [];
             $isEqual = false;
 
             if (\strlen($difficulty['tourTechDifficultyMin'])) {
-                $objDiffMin = $this->getAdapter(TourDifficultyModel::class)->findById((int) $difficulty['tourTechDifficultyMin']);
+                $minModel = $tourDifficultyModel->findById((int) $difficulty['tourTechDifficultyMin']);
+                $maxModel = $tourDifficultyModel->findById((int) $difficulty['tourTechDifficultyMax']);
 
-                if (null !== $objDiffMin) {
-                    $min['id'] = $objDiffMin->id;
-                    $min['shortcut'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMin->shortcut);
-                    $min['title'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMin->title);
-                    $min['description'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMin->description);
-                    $min['category']['id'] = $objDiffMin->getRelated('pid')?->id;
-                    $min['category']['title'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMin->getRelated('pid')?->title);
-                }
-
-                $objDiffMax = $this->getAdapter(TourDifficultyModel::class)->findById((int) $difficulty['tourTechDifficultyMax']);
-
-                if (null !== $objDiffMax) {
-                    $max['id'] = $objDiffMax->id;
-                    $max['shortcut'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMax->shortcut);
-                    $max['title'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMax->title);
-                    $max['description'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMax->description);
-                    $max['category']['id'] = $objDiffMax->getRelated('pid')?->id;
-                    $max['category']['title'] = $this->getAdapter(StringUtil::class)->revertInputEncoding($objDiffMax->getRelated('pid')?->title);
-                }
-
-                if ($objDiffMin === $objDiffMax) {
-                    $isEqual = true;
-                }
+                $min = $this->getTourDifficultyAsArray($minModel);
+                $max = $this->getTourDifficultyAsArray($maxModel);
+                $isEqual = null !== $minModel && $minModel === $maxModel;
             }
 
-            $arrReturn[] = [
+            $difficulties[] = [
                 'min' => $min,
                 'max' => $max,
                 'isEqual' => $isEqual,
             ];
         }
 
-        return $arrReturn;
+        return $difficulties;
     }
 
     public function getTourTypesAsArray(CalendarEventsModel $objEvent, string $field = 'shortcut', bool $tooltip = false): array
     {
         $this->framework->initialize();
 
-        $arrTourTypes = [];
+        $tourTypeModel = $this->getAdapter(TourTypeModel::class);
+        $tourTypes = [];
 
-        $arrValues = StringUtil::deserialize($objEvent->tourType, true);
+        foreach (StringUtil::deserialize($objEvent->tourType, true) as $id) {
+            $tourType = $tourTypeModel->findById($id);
 
-        if (empty($arrValues)) {
-            return $arrTourTypes;
-        }
-
-        foreach ($arrValues as $id) {
-            $objTourType = $this->getAdapter(TourTypeModel::class)->findById($id);
-
-            if (null === $objTourType) {
+            if (null === $tourType) {
                 continue;
             }
 
             if ($tooltip) {
                 $html = '<span class="badge badge-sm badge-pill bg-secondary" data-controller="sacevt--frontend--bs-tooltip" data-bs-tooltip-title="Typ: %s" data-bs-tooltip-placement="top">%s</span>';
-                $arrTourTypes[] = \sprintf($html, StringUtil::specialchars($objTourType->title), $objTourType->{$field});
+                $tourTypes[] = \sprintf($html, StringUtil::specialchars($tourType->title), $tourType->{$field});
             } else {
-                $arrTourTypes[] = $objTourType->{$field};
+                $tourTypes[] = $tourType->{$field};
             }
         }
 
-        return $arrTourTypes;
+        return $tourTypes;
     }
 
     public function getBookingCounter(CalendarEventsModel $objEvent, bool $withoutTooltip = false): string
     {
         $this->framework->initialize();
 
-        $strBadge = '<span class="badge badge-sm badge-pill bg-%s" data-controller="sacevt--frontend--bs-tooltip" data-bs-tooltip-title="%s" data-bs-tooltip-placement="top">%s</span>';
-
-        if ($withoutTooltip) {
-            $strBadge = '%2$s (%3$s)'; // only text as output, e.g. 'noch 1 freie Plätze (5/6)`
-        }
-
-        $database = $this->getContainer()->get('database_connection');
-
-        $registrationCount = $database->fetchOne(
-            'SELECT COUNT(id) FROM tl_calendar_events_member WHERE eventId = ? && stateOfSubscription = ?',
-            [
-                $objEvent->id,
-                EventSubscriptionState::SUBSCRIPTION_ACCEPTED,
-            ],
-            [
-                Types::INTEGER,
-                Types::STRING,
-            ],
-        );
-
         if (EventState::STATE_CANCELED === $objEvent->eventState) {
-            // Event canceled
             return '';
         }
 
-        if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0) {
-            if ($registrationCount >= $objEvent->maxMembers) {
-                // Event fully booked
-                return \sprintf($strBadge, 'dark', 'ausgebucht', $registrationCount.'/'.$objEvent->maxMembers);
-            }
+        $badge = '<span class="badge badge-sm badge-pill bg-%s" data-controller="sacevt--frontend--bs-tooltip" data-bs-tooltip-title="%s" data-bs-tooltip-placement="top">%s</span>';
 
-            // Free places available
-            return \sprintf($strBadge, 'dark', \sprintf('noch %s freie Plätze', StringUtil::specialchars($objEvent->maxMembers - $registrationCount)), $registrationCount.'/'.$objEvent->maxMembers);
+        if ($withoutTooltip) {
+            // Text only, e.g. "noch 1 freie Plätze (5/6)"
+            $badge = '%2$s (%3$s)';
         }
 
-        // There is no booking limit. Show registered members
-        return \sprintf($strBadge, 'dark', $registrationCount.' bestätigte Plätze', $registrationCount.'/?');
+        $registrationCount = $this->countAcceptedRegistrations($objEvent);
+
+        if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0) {
+            if ($registrationCount >= $objEvent->maxMembers) {
+                return \sprintf($badge, 'dark', 'ausgebucht', $registrationCount.'/'.$objEvent->maxMembers);
+            }
+
+            return \sprintf($badge, 'dark', \sprintf('noch %s freie Plätze', StringUtil::specialchars($objEvent->maxMembers - $registrationCount)), $registrationCount.'/'.$objEvent->maxMembers);
+        }
+
+        // There is no booking limit. Show the registered members.
+        return \sprintf($badge, 'dark', $registrationCount.' bestätigte Plätze', $registrationCount.'/?');
     }
 
     public function getSubscriptionStateBadges(CalendarEventsModel $objEvent): string
     {
         $this->framework->initialize();
 
-        $strRegistrationsBadges = '';
-        $intNotConfirmed = 0;
-        $intAccepted = 0;
-        $intRefused = 0;
-        $intWaitlisted = 0;
-        $intUnsubscribedUser = 0;
+        $registrations = $this->getAdapter(CalendarEventsMemberModel::class)->findByEventId($objEvent->id);
 
-        $eventsMemberModel = $this->getAdapter(CalendarEventsMemberModel::class)->findByEventId($objEvent->id);
+        if (null === $registrations) {
+            return '';
+        }
 
-        if (null !== $eventsMemberModel) {
-            while ($eventsMemberModel->next()) {
-                if (EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED === $eventsMemberModel->stateOfSubscription) {
-                    ++$intNotConfirmed;
-                }
+        $counts = array_fill_keys(array_keys(self::SUBSCRIPTION_STATE_BADGES), 0);
 
-                if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $eventsMemberModel->stateOfSubscription) {
-                    ++$intAccepted;
-                }
-
-                if (EventSubscriptionState::SUBSCRIPTION_REFUSED === $eventsMemberModel->stateOfSubscription) {
-                    ++$intRefused;
-                }
-
-                if (EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST === $eventsMemberModel->stateOfSubscription) {
-                    ++$intWaitlisted;
-                }
-
-                if (EventSubscriptionState::USER_HAS_UNSUBSCRIBED === $eventsMemberModel->stateOfSubscription) {
-                    ++$intUnsubscribedUser;
-                }
-            }
-
-            // Generate the href
-            $router = $this->getContainer()->get('router');
-
-            $href = $router->generate('contao_backend', [
-                'do' => 'calendar',
-                'table' => 'tl_calendar_events_member',
-                'id' => $objEvent->id,
-                'rt' => $this->getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(),
-                'ref' => $this->getContainer()->get('request_stack')->getCurrentRequest()->attributes->get('_contao_referer_id'),
-            ]);
-            $href = StringUtil::ampersand($href);
-            $href = StringUtil::specialcharsUrl($href);
-
-            if ($intNotConfirmed > 0) {
-                $strRegistrationsBadges .= \sprintf('<span class="subscription-badge not-confirmed blink" data-title="%s unbeantwortete Anmeldeanfragen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
-            }
-
-            if ($intAccepted > 0) {
-                $strRegistrationsBadges .= \sprintf('<span class="subscription-badge accepted" data-title="%s bestätigte Anmeldungen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intAccepted, $href, $intAccepted);
-            }
-
-            if ($intRefused > 0) {
-                $strRegistrationsBadges .= \sprintf('<span class="subscription-badge refused" data-title="%s abgelehnte Anmeldungen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intRefused, $href, $intRefused);
-            }
-
-            if ($intWaitlisted > 0) {
-                $strRegistrationsBadges .= \sprintf('<span class="subscription-badge on-waiting-list" data-title="%s Anmeldungen auf Warteliste" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intWaitlisted, $href, $intWaitlisted);
-            }
-
-            if ($intUnsubscribedUser > 0) {
-                $strRegistrationsBadges .= \sprintf('<span class="subscription-badge unsubscribed-user" data-title="%s stornierte Anmeldungen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intUnsubscribedUser, $href, $intUnsubscribedUser);
+        while ($registrations->next()) {
+            if (isset($counts[$registrations->stateOfSubscription])) {
+                ++$counts[$registrations->stateOfSubscription];
             }
         }
 
-        return $strRegistrationsBadges;
+        $href = $this->getContainer()->get('router')->generate('contao_backend', [
+            'do' => 'calendar',
+            'table' => 'tl_calendar_events_member',
+            'id' => $objEvent->id,
+            'rt' => $this->getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(),
+            'ref' => $this->getContainer()->get('request_stack')->getCurrentRequest()->attributes->get('_contao_referer_id'),
+        ]);
+
+        $href = StringUtil::specialcharsUrl(StringUtil::ampersand($href));
+        $badges = '';
+
+        foreach (self::SUBSCRIPTION_STATE_BADGES as $state => [$cssClass, $title]) {
+            if ($counts[$state] > 0) {
+                $badges .= \sprintf('<span class="subscription-badge %s" data-title="%s" role="button" onclick="window.location.href=\'%s\'">%s</span>', $cssClass, \sprintf($title, $counts[$state]), $href, $counts[$state]);
+            }
+        }
+
+        return $badges;
     }
 
     public function getEventOrganizerModels(CalendarEventsModel $objEvent): array
     {
         $this->framework->initialize();
 
-        $arrReturn = [];
+        $eventOrganizerModel = $this->getAdapter(EventOrganizerModel::class);
+        $organizers = [];
 
-        $arrValues = StringUtil::deserialize($objEvent->organizers, true);
+        foreach (StringUtil::deserialize($objEvent->organizers, true) as $id) {
+            $organizer = $eventOrganizerModel->findById($id);
 
-        if (empty($arrValues)) {
-            return $arrReturn;
-        }
-
-        foreach ($arrValues as $id) {
-            $objModel = $this->getAdapter(EventOrganizerModel::class)->findById($id);
-
-            if (null === $objModel) {
-                continue;
+            if (null !== $organizer) {
+                $organizers[] = $organizer;
             }
-
-            $arrReturn[] = $objModel;
         }
 
-        return $arrReturn;
+        return $organizers;
     }
 
     public function getEventOrganizersAsArray(CalendarEventsModel $objEvent, string $field = 'title'): array
     {
         $this->framework->initialize();
 
-        $arrReturn = [];
-
-        $arrValues = StringUtil::deserialize($objEvent->organizers, true);
-
-        if (empty($arrValues)) {
-            return $arrReturn;
-        }
-
-        foreach ($arrValues as $id) {
-            $objModel = $this->getAdapter(EventOrganizerModel::class)->findById($id);
-
-            if (null === $objModel) {
-                continue;
-            }
-
-            $arrReturn[] = $objModel->{$field};
-        }
-
-        return $arrReturn;
+        return array_map(static fn ($organizer) => $organizer->{$field}, $this->getEventOrganizerModels($objEvent));
     }
 
     /**
@@ -1289,56 +1005,26 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $arrEventDates = [];
-        $arrEventRepeats = StringUtil::deserialize($objEvent->eventDates, true);
+        $eventDates = $this->getNonEmptyRepeats($objEvent);
 
-        if (!empty($arrEventRepeats) && \is_array($arrEventRepeats)) {
-            foreach ($arrEventRepeats as $eventRepeat) {
-                if (!empty($eventRepeat['new_repeat'])) {
-                    $arrEventDates[] = $eventRepeat['new_repeat'];
-                }
-            }
-        }
-
-        $database = $this->getContainer()->get('database_connection');
-
-        // Get all upcoming events of the member
-        $arrRegistrations = $database->fetchAllAssociative(
+        // The other events the member is registered for and has not participated yet
+        $registrations = $this->getDatabase()->fetchAllAssociative(
             'SELECT * FROM tl_calendar_events_member WHERE eventId != ? AND contaoMemberId = ? AND stateOfSubscription = ? AND hasParticipated = ?',
-            [
-                $objEvent->id,
-                $objMember->id,
-                EventSubscriptionState::SUBSCRIPTION_ACCEPTED,
-                0,
-            ],
-            [
-                Types::INTEGER,
-                Types::INTEGER,
-                Types::STRING,
-                Types::INTEGER,
-            ],
+            [$objEvent->id, $objMember->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED, 0],
+            [Types::INTEGER, Types::INTEGER, Types::STRING, Types::INTEGER],
         );
 
-        foreach ($arrRegistrations as $arrRegistration) {
-            $objEvent = $this->getAdapter(CalendarEventsModel::class)->findById($arrRegistration['eventId']);
+        $calendarEventsModel = $this->getAdapter(CalendarEventsModel::class);
 
-            if (null === $objEvent) {
+        foreach ($registrations as $registration) {
+            $otherEvent = $calendarEventsModel->findById($registration['eventId']);
+
+            if (null === $otherEvent) {
                 continue;
             }
 
-            $arrRepeats = StringUtil::deserialize($objEvent->eventDates, true);
-
-            if (empty($arrRepeats) || !\is_array($arrRepeats)) {
-                continue;
-            }
-
-            foreach ($arrRepeats as $repeat) {
-                if (empty($repeat['new_repeat'])) {
-                    continue;
-                }
-
-                if (\in_array($repeat['new_repeat'], $arrEventDates, false)) {
-                    // This date is already occupied (do not allow booking)
+            foreach ($this->getNonEmptyRepeats($otherEvent) as $repeat) {
+                if (\in_array($repeat, $eventDates, false)) {
                     return true;
                 }
             }
@@ -1351,33 +1037,31 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        /** @var UriSigner $uriSigner */
-        $uriSigner = $this->getContainer()->get('code4nix_uri_signer.uri_signer');
+        if ('' === $objEvent->eventType) {
+            return '';
+        }
+
+        $eventType = $this->getAdapter(EventTypeModel::class)->findOneBy('alias', $objEvent->eventType);
+
+        if (null === $eventType || !$eventType->previewPage) {
+            return '';
+        }
+
+        $previewPage = $this->getAdapter(PageModel::class)->findById($eventType->previewPage);
+
+        if (!$previewPage instanceof PageModel) {
+            return '';
+        }
 
         /** @var UrlParser $urlParser */
         $urlParser = $this->getContainer()->get(UrlParser::class);
 
-        $eventPreviewUrl = '';
-
-        if ('' === $objEvent->eventType) {
-            return $eventPreviewUrl;
-        }
-
-        $objEventType = $this->getAdapter(EventTypeModel::class)->findOneBy('alias', $objEvent->eventType);
-
-        if (null === $objEventType || !$objEventType->previewPage) {
-            return $eventPreviewUrl;
-        }
-
-        $objPage = $this->getAdapter(PageModel::class)->findById($objEventType->previewPage);
-
-        if (!$objPage instanceof PageModel) {
-            return $eventPreviewUrl;
-        }
+        /** @var UriSigner $uriSigner */
+        $uriSigner = $this->getContainer()->get('code4nix_uri_signer.uri_signer');
 
         $params = \sprintf('/%s', !empty($objEvent->alias) ? $objEvent->alias : $objEvent->id);
 
-        $eventPreviewUrl = $urlParser->addQueryString('event_preview=true', $objPage->getAbsoluteUrl($params));
+        $eventPreviewUrl = $urlParser->addQueryString('event_preview=true', $previewPage->getAbsoluteUrl($params));
         $eventPreviewUrl = StringUtil::specialcharsUrl(StringUtil::ampersand($eventPreviewUrl));
 
         return $uriSigner->sign($eventPreviewUrl, 86400);
@@ -1387,172 +1071,148 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $arrProfile = [];
+        $tourProfile = StringUtil::deserialize($objEvent->tourProfile);
 
-        if (empty($objEvent->tourProfile) || !\is_array(StringUtil::deserialize($objEvent->tourProfile))) {
-            return $arrProfile;
+        if (empty($objEvent->tourProfile) || !\is_array($tourProfile)) {
+            return [];
         }
 
-        $m = 0;
-        $arrTourProfile = StringUtil::deserialize($objEvent->tourProfile, true);
+        $profiles = [];
+        $day = 0;
 
-        foreach ($arrTourProfile as $profile) {
+        foreach ($tourProfile as $profile) {
             if (empty($profile['tourProfileAscentMeters']) && empty($profile['tourProfileAscentTime']) && empty($profile['tourProfileDescentMeters']) && empty($profile['tourProfileDescentTime'])) {
                 continue;
             }
 
-            ++$m;
+            ++$day;
 
-            $arrAsc = [];
-            $arrDesc = [];
-
-            if (\count($arrTourProfile) > 1) {
-                $strProfile = \sprintf('%s. Tag: ', $m);
-            } else {
-                $strProfile = '';
-            }
+            $ascent = [];
+            $descent = [];
 
             if ('' !== $profile['tourProfileAscentMeters']) {
-                $arrAsc[] = \sprintf('%s Hm', $profile['tourProfileAscentMeters']);
+                $ascent[] = \sprintf('%s Hm', $profile['tourProfileAscentMeters']);
             }
 
             if ('' !== $profile['tourProfileAscentTime']) {
-                $arrAsc[] = \sprintf('%s h', $profile['tourProfileAscentTime']);
+                $ascent[] = \sprintf('%s h', $profile['tourProfileAscentTime']);
             }
 
             if ('' !== $profile['tourProfileDescentMeters']) {
-                $arrDesc[] = \sprintf('%s Hm', $profile['tourProfileDescentMeters']);
+                $descent[] = \sprintf('%s Hm', $profile['tourProfileDescentMeters']);
             }
 
             if ('' !== $profile['tourProfileDescentTime']) {
-                $arrDesc[] = \sprintf('%s h', $profile['tourProfileDescentTime']);
+                $descent[] = \sprintf('%s h', $profile['tourProfileDescentTime']);
             }
 
-            if (\count($arrAsc) > 0) {
-                $strProfile .= 'Aufst: '.implode('/', $arrAsc);
+            $strProfile = \count($tourProfile) > 1 ? \sprintf('%s. Tag: ', $day) : '';
+
+            if (!empty($ascent)) {
+                $strProfile .= 'Aufst: '.implode('/', $ascent);
             }
 
-            if (\count($arrDesc) > 0) {
-                $strProfile .= ('' !== $strProfile ? ', ' : '').'Abst: '.implode('/', $arrDesc);
+            if (!empty($descent)) {
+                $strProfile .= ('' !== $strProfile ? ', ' : '').'Abst: '.implode('/', $descent);
             }
 
-            $arrProfile[] = $strProfile;
+            $profiles[] = $strProfile;
         }
 
-        return $arrProfile;
+        return $profiles;
     }
 
     public function getEventOrganizersLogoAsHtml(CalendarEventsModel $objEvent, string $strInsertTag = '{{image::%s&alt=%s}}', bool $allowDuplicate = false): array
     {
         $this->framework->initialize();
 
-        $arrHtml = [];
-        $arrUuids = [];
+        $logos = [];
+        $uuids = [];
 
-        $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
-
-        foreach ($arrOrganizers as $orgId) {
-            $objOrganizer = $this->getAdapter(EventOrganizerModel::class)->findById($orgId);
-
-            if (null === $objOrganizer) {
+        foreach ($this->getEventOrganizerModels($objEvent) as $organizer) {
+            if (!$organizer->addLogo || empty($organizer->singleSRC)) {
                 continue;
             }
 
-            if (!$objOrganizer->addLogo || empty($objOrganizer->singleSRC)) {
+            if (!$allowDuplicate && \in_array($organizer->singleSRC, $uuids, false)) {
                 continue;
             }
 
-            if (\in_array($objOrganizer->singleSRC, $arrUuids, false) && !$allowDuplicate) {
-                continue;
-            }
+            $uuids[] = $organizer->singleSRC;
 
-            $strInsertTag = str_replace('alt=%s', 'alt='.$objOrganizer->title, $strInsertTag);
+            // The image insert tag url-decodes its parameters
+            $insertTag = \sprintf(str_replace('alt=%s', 'alt=%2$s', $strInsertTag), StringUtil::binToUuid($organizer->singleSRC), rawurlencode((string) $organizer->title));
+            $logo = $this->getContainer()->get('contao.insert_tag.parser')->replace($insertTag);
 
-            $arrUuids[] = $objOrganizer->singleSRC;
-            $parser = $this->getContainer()->get('contao.insert_tag.parser');
-
-            $strLogo = $parser->replace(\sprintf($strInsertTag, StringUtil::binToUuid($objOrganizer->singleSRC)));
-
-            if ('' !== $strLogo) {
-                $arrHtml[] = $strLogo;
+            if ('' !== $logo) {
+                $logos[] = $logo;
             }
         }
 
-        return $arrHtml;
+        return $logos;
     }
 
     public function getEventOrganizerLogoPaths(CalendarEventsModel $objEvent, bool $allowDuplicate = false): array
     {
         $this->framework->initialize();
 
-        $arrPaths = [];
+        $filesModel = $this->getAdapter(FilesModel::class);
+        $paths = [];
 
-        $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
-
-        foreach ($arrOrganizers as $orgId) {
-            $objOrganizer = $this->getAdapter(EventOrganizerModel::class)->findById($orgId);
-
-            if (null === $objOrganizer) {
+        foreach ($this->getEventOrganizerModels($objEvent) as $organizer) {
+            if (!$organizer->addLogo || empty($organizer->singleSRC)) {
                 continue;
             }
 
-            if (!$objOrganizer->addLogo || empty($objOrganizer->singleSRC)) {
+            $file = $filesModel->findByUuid($organizer->singleSRC);
+
+            if (null === $file) {
+                throw new \RuntimeException(\sprintf('The logo of the event organizer "%s" (ID %s) does not exist in the file manager.', $organizer->title, $organizer->id));
+            }
+
+            $path = Path::join($this->getProjectDir(), $file->path);
+
+            if (!is_file($path)) {
                 continue;
             }
 
-            $objFiles = $this->getAdapter(FilesModel::class)->findByUuid($objOrganizer->singleSRC);
-
-            $path = Path::join($this->getProjectDir(), $objFiles->path);
-
-            if (null === $objFiles || !is_file($path)) {
-                continue;
-            }
-
-            $arrPaths[] = $path;
+            $paths[] = $path;
         }
 
-        return $allowDuplicate ? $arrPaths : array_unique($arrPaths);
+        return $allowDuplicate ? $paths : array_unique($paths);
     }
 
     public function getEventQrCode(CalendarEventsModel $objEvent, array $arrOptions = [], bool $blnAbsoluteUrl = true, bool $blnCache = true): string|null
     {
         $this->framework->initialize();
 
-        // Generate QR code folder
-        $objFolder = new Folder('system/qrcodes');
+        $projectDir = $this->getProjectDir();
+        $folder = new Folder('system/qrcodes');
 
-        // Symlink
-        $webDir = Path::join($this->getProjectDir(), 'public');
-        $relWebDir = Path::makeRelative($webDir, $this->getProjectDir()); // public
+        // Symlink (target: "system/qrcodes", link: "public/system/qrcodes")
+        $relWebDir = Path::makeRelative(Path::join($projectDir, 'public'), $projectDir);
+        SymlinkUtil::symlink($folder->path, Path::join($relWebDir, $folder->path), $projectDir);
 
-        // Symlink (target: 'system/qrcodes', link: 'public/system/qrcodes')
-        SymlinkUtil::symlink($objFolder->path, Path::join($relWebDir, $objFolder->path), $this->getProjectDir());
+        $filepath = \sprintf($folder->path.'/eventQRcode_%s.png', $objEvent->id);
 
-        // Generate path
-        $filepath = \sprintf($objFolder->path.'/eventQRcode_%s.png', $objEvent->id);
-
-        // Defaults
-        $opt = [
+        $defaults = [
             'version' => Version::AUTO,
             'scale' => 4,
             'outputType' => QRCode::OUTPUT_IMAGE_PNG,
             'eccLevel' => QRCode::ECC_L,
-            'cachefile' => $filepath,
         ];
 
-        if (!$blnCache) {
-            unset($opt['cachefile']);
+        if ($blnCache) {
+            $defaults['cachefile'] = $filepath;
         }
 
-        $options = new QROptions(array_merge($opt, $arrOptions));
+        $options = new QROptions(array_merge($defaults, $arrOptions));
 
-        // Get event reader url
         /** @var ContentUrlGenerator $contentUrlGenerator */
         $contentUrlGenerator = $this->getContainer()->get('contao.routing.content_url_generator');
-
         $url = $contentUrlGenerator->generate($objEvent, [], $blnAbsoluteUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH);
 
-        // Generate QR and return the image path
+        // Generate the QR code and return the image path
         if ((new QRCode($options))->render($url, $filepath)) {
             return $filepath;
         }
@@ -1565,49 +1225,47 @@ class CalendarEventsUtil
         $this->framework->initialize();
 
         $this->getAdapter(System::class)->loadLanguageFile('tl_member');
-        $arrSections = [];
-        $sections = StringUtil::deserialize($objMember->sectionId, true);
 
-        foreach ($sections as $id) {
-            $arrSections[] = $GLOBALS['TL_LANG']['tl_member']['section'][$id] ?? $id;
+        $sections = [];
+
+        foreach (StringUtil::deserialize($objMember->sectionId, true) as $id) {
+            $sections[] = $GLOBALS['TL_LANG']['tl_member']['section'][$id] ?? $id;
         }
 
-        return implode(', ', $arrSections);
+        return implode(', ', $sections);
     }
 
+    /**
+     * Format "2600000, 1200000" (CH1903+) or "600000, 200000" (CH1903).
+     */
     public function getCoordsCH1903AsArray(CalendarEventsModel $objEvent): array
     {
-        // coordsCH1903 (format "2600000, 1200000" (CH1903+) or "600000, 200000" (CH1903))
-        if (!empty($objEvent->coordsCH1903)) {
-            $strCoord = html_entity_decode($objEvent->coordsCH1903);
-
-            // Remove invalid characters (whitespaces, quotes, ...)
-            $strCoord = preg_replace('/[^0-9.,]/', '', $strCoord);
-            $arrCoord = explode(',', $strCoord);
-
-            if (2 === \count($arrCoord)) {
-                return $arrCoord;
-            }
+        if (empty($objEvent->coordsCH1903)) {
+            return [];
         }
 
-        return [];
+        // Remove invalid characters (whitespaces, quotes, ...)
+        $coords = explode(',', preg_replace('/[^0-9.,]/', '', html_entity_decode($objEvent->coordsCH1903)));
+
+        return 2 === \count($coords) ? $coords : [];
     }
 
     public function getGeoLinkUrl(CalendarEventsModel $objEvent): string|null
     {
         $this->framework->initialize();
 
-        $arrCoord = $this->getCoordsCH1903AsArray($objEvent);
+        $coords = $this->getCoordsCH1903AsArray($objEvent);
 
-        if (!empty($arrCoord)) {
-            $strGeoLink = $this->getContainer()->getParameter('sacevt.event.geo_link');
-
-            return \sprintf($strGeoLink, $arrCoord[0], $arrCoord[1]);
+        if (empty($coords)) {
+            return null;
         }
 
-        return null;
+        return \sprintf($this->getContainer()->getParameter('sacevt.event.geo_link'), $coords[0], $coords[1]);
     }
 
+    /**
+     * Only links to a route of the SAC route portal are allowed.
+     */
     public function getSacRoutePortalLink(CalendarEventsModel $objEvent): string|null
     {
         $this->framework->initialize();
@@ -1616,24 +1274,19 @@ class CalendarEventsUtil
             return null;
         }
 
-        $strPortalLink = html_entity_decode($objEvent->linkSacRoutePortal);
+        $portalLink = html_entity_decode($objEvent->linkSacRoutePortal);
 
-        // Validate link
-        if (!filter_var($strPortalLink, FILTER_VALIDATE_URL)) {
+        if (!filter_var($portalLink, FILTER_VALIDATE_URL)) {
             return null;
         }
 
-        // Only links from the SAC route portal are allowed
-        if (!str_starts_with($strPortalLink, $this->getContainer()->getParameter('sacevt.event.sac_route_portal_base_link'))) {
+        $baseLink = $this->getContainer()->getParameter('sacevt.event.sac_route_portal_base_link');
+
+        if (!str_starts_with($portalLink, $baseLink) || $portalLink === $baseLink) {
             return null;
         }
 
-        // Check if the SAC route portal base link is not entered
-        if ($strPortalLink === $this->getContainer()->getParameter('sacevt.event.sac_route_portal_base_link')) {
-            return null;
-        }
-
-        return $strPortalLink;
+        return $portalLink;
     }
 
     public function getEventReleaseLevelAsString(CalendarEventsModel $objEvent): string|null
@@ -1644,18 +1297,16 @@ class CalendarEventsUtil
             return null;
         }
 
-        $strLevel = null;
-        $eventReleaseLevelModel = $this->getAdapter(EventReleaseLevelPolicyModel::class)->findById($objEvent->eventReleaseLevel);
+        $releaseLevel = $this->getAdapter(EventReleaseLevelPolicyModel::class)->findById($objEvent->eventReleaseLevel);
 
-        if (null !== $eventReleaseLevelModel) {
-            $strLevel = \sprintf(
-                'FS: %s',
-                $eventReleaseLevelModel->level,
-            );
+        if (null === $releaseLevel) {
+            return null;
+        }
 
-            if ($eventReleaseLevelModel->level <= 1) {
-                $strLevel .= ' Entwurf';
-            }
+        $strLevel = \sprintf('FS: %s', $releaseLevel->level);
+
+        if ($releaseLevel->level <= 1) {
+            $strLevel .= ' Entwurf';
         }
 
         return $strLevel;
@@ -1671,19 +1322,106 @@ class CalendarEventsUtil
             return false;
         }
 
-        $database = $this->getContainer()->get('database_connection');
-
-        return false !== $database->fetchOne(
+        return false !== $this->getDatabase()->fetchOne(
             'SELECT id FROM tl_favored_events WHERE eventId = ? AND memberId = ?',
-            [
-                $objEvent->id,
-                $user->id,
-            ],
-            [
-                Types::INTEGER,
-                Types::INTEGER,
-            ],
+            [$objEvent->id, $user->id],
+            [Types::INTEGER, Types::INTEGER],
         );
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return array{includeDisabled: bool, includeHidden: bool, addMainQualification?: bool}
+     */
+    private function resolveInstructorOptions(array $options, bool $withMainQualification = false): array
+    {
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            'includeDisabled' => false,
+            'includeHidden' => true,
+        ]);
+        $resolver->setAllowedValues('includeDisabled', [true, false]);
+        $resolver->setAllowedValues('includeHidden', [true, false]);
+
+        if ($withMainQualification) {
+            $resolver->setDefault('addMainQualification', false);
+            $resolver->setAllowedValues('addMainQualification', [true, false]);
+        }
+
+        return $resolver->resolve($options);
+    }
+
+    /**
+     * Disabled users and users whose account is not active (start/stop).
+     */
+    private function isUserDisabled(UserModel $user): bool
+    {
+        return $user->disable
+            || ('' !== $user->stop && $user->stop < time())
+            || ('' !== $user->start && $user->start > time());
+    }
+
+    private function countAcceptedRegistrations(CalendarEventsModel $event): mixed
+    {
+        return $this->getDatabase()->fetchOne(
+            'SELECT COUNT(id) FROM tl_calendar_events_member WHERE eventId = ? AND stateOfSubscription = ?',
+            [$event->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED],
+            [Types::INTEGER, Types::STRING],
+        );
+    }
+
+    /**
+     * The registration starts with an offset (see sacevt.event_registration.config.reg_start_time_offset).
+     */
+    private function getRegistrationStartTime(CalendarEventsModel $event): mixed
+    {
+        return $event->registrationStartDate + $this->getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
+    }
+
+    /**
+     * @return list<mixed>
+     */
+    private function getNonEmptyRepeats(CalendarEventsModel $event): array
+    {
+        $repeats = [];
+
+        foreach (StringUtil::deserialize($event->eventDates, true) as $eventDate) {
+            if (!empty($eventDate['new_repeat'])) {
+                $repeats[] = $eventDate['new_repeat'];
+            }
+        }
+
+        return $repeats;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getTourDifficultyAsArray(TourDifficultyModel|null $tourDifficulty): array
+    {
+        if (null === $tourDifficulty) {
+            return [];
+        }
+
+        $stringUtil = $this->getAdapter(StringUtil::class);
+        $category = $tourDifficulty->getRelated('pid');
+
+        return [
+            'id' => $tourDifficulty->id,
+            'shortcut' => $stringUtil->revertInputEncoding($tourDifficulty->shortcut),
+            'title' => $stringUtil->revertInputEncoding($tourDifficulty->title),
+            'description' => $stringUtil->revertInputEncoding($tourDifficulty->description),
+            'category' => [
+                'id' => $category?->id,
+                'title' => $stringUtil->revertInputEncoding($category?->title),
+            ],
+        ];
+    }
+
+    private function getDatabase(): Connection
+    {
+        return $this->getContainer()->get('database_connection');
     }
 
     private function getProjectDir(): string
