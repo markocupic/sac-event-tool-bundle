@@ -25,7 +25,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
 	'fields' => [
 		'year'                 => [
 			'inputType' => 'select',
-			'options'   => range(2017, (int)date('Y') + 1),
+			'options'   => array_reverse(range(2017, (int)date('Y') + 1)),
 			'eval'      => ['blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['blankOptionLabel'], 'includeBlankOption' => true],
 			'sql'       => "varchar(10) NOT NULL default ''",
 		],
