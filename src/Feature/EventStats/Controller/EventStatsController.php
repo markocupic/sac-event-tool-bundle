@@ -29,7 +29,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Backend page with the event statistics of the current and the two previous years.
+ * Backend page with the event statistics of the two previous, the current and the next year.
  */
 #[Route('/%contao.backend.route_prefix%/sac_pilatus_event_stats', name: self::class, defaults: ['_scope' => 'backend'])]
 class EventStatsController extends AbstractBackendController
@@ -42,7 +42,7 @@ class EventStatsController extends AbstractBackendController
         'total' => 'Total',
         'gender_female' => 'Teiln. weiblich',
         'gender_male' => 'Teiln. männlich',
-        'gender_other' => 'Teiln. divers',
+        'gender_other' => 'Teiln. divers/keine Angabe',
         'age_0_20' => 'Alter: 0-20',
         'age_21_30' => 'Alter: 21-30',
         'age_31_40' => 'Alter: 31-40',
@@ -66,7 +66,7 @@ class EventStatsController extends AbstractBackendController
         }
 
         $currentYear = (int) date('Y');
-        $years = [$currentYear - 2, $currentYear - 1, $currentYear, $currentYear, $currentYear + 1];
+        $years = [$currentYear - 2, $currentYear - 1, $currentYear, $currentYear + 1];
 
         return $this->render('@MarkocupicSacEventTool/EventStats/be_event_stats.html.twig', [
             'headline' => $this->translator->trans('MOD.'.self::BACKEND_MODULE_TYPE.'.0', [], 'contao_modules'),

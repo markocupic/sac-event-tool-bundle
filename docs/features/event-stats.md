@@ -5,7 +5,7 @@ Ort: `src/Feature/EventStats/` (Namespace `Markocupic\SacEventToolBundle\Feature
 
 ## Ziel
 
-Eine Backend-Seite zeigt Kennzahlen zu Events, Leitenden und Teilnehmenden. Die Zahlen stehen für das aktuelle und die zwei vorangehenden Jahre nebeneinander, z. B. `2024 | 2025 | 2026`.
+Eine Backend-Seite zeigt Kennzahlen zu Events, Leitenden und Teilnehmenden. Die Zahlen stehen für die zwei vorangehenden Jahre, das aktuelle und das nächste Jahr nebeneinander: `J-2 | J-1 | J | J+1` (J = aktuelles Jahr). Die Jahre verschieben sich jeweils am 1. Januar automatisch.
 
 ## Fachliche Regeln
 
@@ -24,7 +24,7 @@ Eine Backend-Seite zeigt Kennzahlen zu Events, Leitenden und Teilnehmenden. Die 
 | Ausgeschriebene Events nach Gruppe | Tour, Kurs | Total und pro organisierender Gruppe (`tl_event_organizer`, sortiert wie im Backend). Ein Event mit mehreren Gruppen wird bei jeder Gruppe gezählt. |
 | Leitende | Tour, Kurs | Anzahl verschiedener Leitender (`tl_calendar_events_instructor`, auch deaktivierte Benutzer), davon Bergführer (Qualifikation `TourguideQualification::MOUNTAIN_GUIDE` in `tl_user.leiterQualifikation`) und Nicht-Bergführer |
 | Anmeldungen | Tour, Kurs | Total und pro Anmeldestatus (`EventSubscriptionState::ALL`) |
-| Bestätigte Teilnehmende (FS4) | Tour, Kurs | Anmeldungen mit `hasParticipated = 1`: Total, Geschlecht (weiblich, männlich, divers) und Altersgruppe (0–20, 21–30, 31–40, 41–60, 61–80, 81+, unbekannt). Alter = Event-Jahr minus Geburtsjahr; ohne Geburtsdatum «unbekannt». |
+| Bestätigte Teilnehmende (FS4) | Tour, Kurs | Anmeldungen mit `hasParticipated = 1`: Total, Geschlecht (`female` weiblich, `male` männlich, `other` divers/keine Angabe) und Altersgruppe (0–20, 21–30, 31–40, 41–60, 61–80, 81+, unbekannt). Alter = Event-Jahr minus Geburtsjahr; ohne Geburtsdatum «unbekannt». |
 | Event-Status | Tour | siehe unten |
 
 ### Event-Status (nur Touren)
