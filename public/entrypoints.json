@@ -2,7 +2,7 @@
   "entrypoints": {
     "stimulus_backend": {
       "js": [
-        "/bundles/markocupicsaceventtool/stimulus_backend.8985c9a6.js"
+        "/bundles/markocupicsaceventtool/stimulus_backend.a5668611.js"
       ]
     },
     "stimulus_frontend": {
@@ -22,12 +22,12 @@
     },
     "js/avatar_uploader": {
       "js": [
-        "/bundles/markocupicsaceventtool/js/avatar_uploader.34c669c6.js"
+        "/bundles/markocupicsaceventtool/js/avatar_uploader.d70fb22c.js"
       ]
     },
     "css/be_stylesheet": {
       "css": [
-        "/bundles/markocupicsaceventtool/css/be_stylesheet.fa917d08.css"
+        "/bundles/markocupicsaceventtool/css/be_stylesheet.eab917a0.css"
       ]
     }
   }

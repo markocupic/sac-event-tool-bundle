@@ -3,7 +3,6 @@
 
 // Components
 @import "./components/_my_events_dashboard";
-@import "./components/_field_errors";
 
 .text-decoration-underline {
   text-decoration: underline;
@@ -13,6 +12,19 @@
 .be_main {
   .textarea, .tl_textarea {
     line-height: 2
+  }
+}
+
+.tl_form.tl_edit_form {
+  & .error.tl_chosen > ul.chzn-choices, & .error.tl_select, & .error.tl_text, & .error.tl_textarea {
+    animation: border_color_change_on_widget_error 1s step-start infinite !important;
+    border-width: 2px
+  }
+}
+
+@keyframes border_color_change_on_widget_error {
+  50% {
+    border-color: var(--red)
   }
 }
 
