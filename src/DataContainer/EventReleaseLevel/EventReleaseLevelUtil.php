@@ -22,14 +22,10 @@ use Contao\Date;
 use Contao\Message;
 use Contao\Versions;
 use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\Exception\EventReleaseLevelTransitionException;
-use Markocupic\SacEventToolBundle\Event\ChangeEventReleaseLevelEvent;
-use Markocupic\SacEventToolBundle\Event\PublishEventEvent;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Security\Voter\EventReleaseLevelTransition;
 use Markocupic\SacEventToolBundle\Security\Voter\EventReleaseLevelTransitionVoter;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -43,12 +39,11 @@ class EventReleaseLevelUtil
 
     public function __construct(
         private readonly ContaoFramework $framework,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly EventReleaseLevelChangeNotifier $eventReleaseLevelChangeNotifier,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
-        private readonly TranslatorInterface $translator,
         private readonly EventReleaseLevelTimeRules $timeRules,
-        private readonly LoggerInterface|null $contaoGeneralLogger = null,
+        private readonly TranslatorInterface $translator,
     ) {
         $this->config = $this->framework->getAdapter(Config::class);
         $this->message = $this->framework->getAdapter(Message::class);
@@ -113,61 +108,46 @@ class EventReleaseLevelUtil
 
         // Admins are not bound to the time rules, but get a warning.
         if (EventReleaseLevelTimeRuleViolation::StartDateOutsideValidTimePeriod === $violation) {
-            $this->message->addInfo(\sprintf('Event "%s" (ID %d) should not be promoted to FS %d because its start date falls outside the configured time period.', $event->title, $event->id, $targetLevel->level));
+            $dateFormat = $this->config->get('dateFormat');
+
+            $this->message->addInfo($this->translator->trans('MSC.eventReleaseLevelStartDateOutsideValidTimePeriod', [$event->title, $event->id, $targetLevel->level, $this->date->parse($dateFormat, $calendar->validTimePeriodStart), $this->date->parse($dateFormat, $calendar->validTimePeriodStop)], 'contao_default'));
         }
     }
 
     /**
+     * Moves the event to the target level, publishes it on the highest level and
+     * unpublishes it on the other levels. Saves the event and notifies the change
+     * immediately (see EventReleaseLevelChangeNotifier).
+     *
+     * Not to be used in the save callback of the edit form: The form may still be
+     * invalid and the change must not be saved, see CalendarEvents::saveCallbackEventReleaseLevel().
+     *
      * Important! Do not use this method without validating the event release level transition first!
      */
-    public function shiftEventReleaseLevel(CalendarEventsModel $event, EventReleaseLevelPolicyModel $targetLevel, string $direction = 'up'): void
+    public function shiftEventReleaseLevel(CalendarEventsModel $event, EventReleaseLevelPolicyModel $targetLevel): void
     {
-        if ('up' !== $direction && 'down' !== $direction) {
-            throw new \InvalidArgumentException('Invalid direction given! Must be "up" or "down".');
-        }
-
         $maxLevel = EventReleaseLevelPolicyModel::findMaxLevelByEventId($event->id);
-        $currentLevel = EventReleaseLevelPolicyModel::findById($event->eventReleaseLevel);
+        $previousLevelId = (int) $event->eventReleaseLevel;
+        $wasPublished = (bool) $event->published;
+
         $event->eventReleaseLevel = $targetLevel->id;
 
-        $wasPublished = $event->published;
-
-        if ($event->isModified()) {
-            $this->eventDispatcher->dispatch(new ChangeEventReleaseLevelEvent($this->requestStack->getCurrentRequest(), $event, $direction));
-
-            $this->contaoGeneralLogger?->info(
-                \sprintf(
-                    'Event release level for event with ID %d ["%s"] has been %s from "%s" to "%s".',
-                    $event->id,
-                    $event->title,
-                    'up' === $direction ? 'upgraded' : 'downgraded',
-                    $currentLevel?->title,
-                    $targetLevel->title,
-                ),
-            );
-        }
-
         // Only events on the top level are published
-        $event->published = $maxLevel?->id === $targetLevel->id ? 1 : 0;
+        $event->published = null !== $maxLevel && (int) $maxLevel->id === (int) $targetLevel->id ? 1 : 0;
 
-        if (!$wasPublished && $event->published) {
-            $this->message->addInfo($this->translator->trans('MSC.publishedEvent', [$event->id], 'contao_default'));
-            $this->eventDispatcher->dispatch(new PublishEventEvent($this->requestStack->getCurrentRequest(), $event));
-        }
-
-        if ($wasPublished && !$event->published) {
-            $this->message->addInfo($this->translator->trans('MSC.unpublishedEvent', [$event->id], 'contao_default'));
+        if (!$event->isModified()) {
+            return;
         }
 
         // Create a new version
-        if ($event->isModified()) {
-            $event->tstamp = time();
-            $event->save();
+        $event->tstamp = time();
+        $event->save();
 
-            $versions = new Versions('tl_calendar_events', $event->id);
-            $versions->initialize();
-            $versions->create();
-        }
+        $versions = new Versions('tl_calendar_events', $event->id);
+        $versions->initialize();
+        $versions->create();
+
+        $this->eventReleaseLevelChangeNotifier->notify($this->requestStack->getCurrentRequest(), $event, $previousLevelId, $wasPublished);
     }
 
     /**

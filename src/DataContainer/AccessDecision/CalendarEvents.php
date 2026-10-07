@@ -223,7 +223,7 @@ class CalendarEvents
 
         try {
             $this->eventReleaseLevelUtil->validateEventReleaseLevelTransition($event, $targetLevel->id);
-            $this->eventReleaseLevelUtil->shiftEventReleaseLevel($event, $targetLevel, $isUpgrade ? 'up' : 'down');
+            $this->eventReleaseLevelUtil->shiftEventReleaseLevel($event, $targetLevel);
         } catch (EventReleaseLevelTransitionException $e) {
             $this->message->add($this->translator->trans($e->getTranslatableText(), $e->getParams(), 'contao_default'), $e->getErrorLevel());
         }

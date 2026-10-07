@@ -27,6 +27,15 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
+/**
+ * Decides what a back end user may do with an event (subject: the event ID).
+ *
+ * Events that are not assigned to a release level: every back end user is granted access.
+ *
+ * Events that are assigned to a release level: the permissions are defined in the
+ * release level (tl_event_release_level_policy). Admins are granted access
+ * (except when changing the release level, see EventReleaseLevelTransitionVoter).
+ */
 class CalendarEventsVoter extends Voter
 {
     public const string CAN_DELETE_EVENT = 'sacevt_can_delete_event';
@@ -50,10 +59,9 @@ class CalendarEventsVoter extends Voter
         self::CAN_ADMINISTER_EVENT_REGISTRATIONS,
     ];
 
-    // Adapters
-    private Adapter $calendarEvent;
+    private Adapter $calendarEventsModel;
 
-    private Adapter $eventReleaseLevelPolicy;
+    private Adapter $eventReleaseLevelPolicyModel;
 
     public function __construct(
         private readonly AccessDecisionManagerInterface $accessDecisionManager,
@@ -63,442 +71,186 @@ class CalendarEventsVoter extends Voter
         #[Autowire('%sacevt.event_registration.config.reg_start_time_offset%')]
         private readonly int $regStartTimeOffset,
     ) {
-        // Adapters
-        $this->calendarEvent = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->eventReleaseLevelPolicy = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
+        $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
+        $this->eventReleaseLevelPolicyModel = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
     }
 
     /**
-     * Grant switch-release-level-access (upgrade/downgrade)...
-     * - to all users, if there is no release package assigned to the calendar (tl_calendar).
-     * - do not allow downgrading if the event release level is on the first level
-     * - do not allow upgrading if the event release level is on the last level
-     * but allow upgrading or downgrading...
+     * Decides whether the user may shift the event by one level from the given
+     * release level ($level) in the given direction ("up" or "down").
+     *
+     * Deny access...
+     * - if the event is already on the highest level (up) or on the lowest level (down)
+     * Grant access...
      * - to admins
-     * - to permitted event-authors --> tl_event_release_level_policy.allowWriteAccessToAuthor
-     * - to permitted event-instructors --> tl_event_release_level_policy.allowWriteAccessToInstructors
-     * - to "super-users" --> tl_event_release_level_policy.groupReleaseLevelPerm.
+     * - to authors (allowWriteAccessToAuthor) and instructors (allowWriteAccessToInstructors)
+     *   of the event, if the release level allows switching to the next/previous level
+     *   (allowSwitchingToNextLevel/allowSwitchingToPrevLevel)
+     * - to "super-users" --> tl_event_release_level_policy.groupReleaseLevelPerm (canRelLevelUp/canRelLevelDown).
+     *
+     * Whether the target level belongs to the release level system of the event
+     * type and the time rules of the calendar are checked by EventReleaseLevelTransitionVoter.
      *
      * @throws \Exception
      */
-    public function canChangeReleaseLevel(CalendarEventsModel $eventsModel, BackendUser $user, EventReleaseLevelPolicyModel $eventReleaseLevelPolicyModel, string $direction): bool
+    public function canChangeReleaseLevel(CalendarEventsModel $event, BackendUser $user, EventReleaseLevelPolicyModel $level, string $direction): bool
     {
         if ('up' !== $direction && 'down' !== $direction) {
-            throw new \Exception(\sprintf('Direction must be "up" or "down" "%s" given!', $direction));
+            throw new \InvalidArgumentException(\sprintf('Direction must be "up" or "down" "%s" given!', $direction));
         }
 
-        if ('up' === $direction) {
-            if ((int) $eventReleaseLevelPolicyModel->id === (int) $eventReleaseLevelPolicyModel::findMaxLevelByEventId($eventsModel->id)?->id) {
-                return false;
-            }
-        } else {
-            if ((int) $eventReleaseLevelPolicyModel->id === (int) $eventReleaseLevelPolicyModel::findMinLevelByEventId($eventsModel->id)?->id) {
-                return false;
-            }
+        $isUpgrade = 'up' === $direction;
+
+        // The event is already on the highest or the lowest level
+        $boundaryLevel = $isUpgrade ? $this->eventReleaseLevelPolicyModel->findMaxLevelByEventId($event->id) : $this->eventReleaseLevelPolicyModel->findMinLevelByEventId($event->id);
+
+        if ((int) $level->id === (int) $boundaryLevel?->id) {
+            return false;
         }
 
-        // Allow switching release level to admins.
         if ($this->security->isGranted('ROLE_ADMIN')) {
             return true;
         }
 
-        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($eventsModel);
+        $canSwitch = $isUpgrade ? $level->allowSwitchingToNextLevel : $level->allowSwitchingToPrevLevel;
 
-        if ((int) $user->id === (int) $eventsModel->author || \in_array($user->id, $arrEventInstructors, false)) {
-            if ($eventReleaseLevelPolicyModel->allowWriteAccessToAuthor) {
-                if ('up' === $direction) {
-                    // User is author or instructor and is allowed to upgrade the event
-                    if ($eventReleaseLevelPolicyModel->allowSwitchingToNextLevel) {
-                        return true;
-                    }
-                } else {
-                    if ($eventReleaseLevelPolicyModel->allowSwitchingToPrevLevel) {
-                        return true;
-                    }
-                }
-            }
+        if ($canSwitch && (($level->allowWriteAccessToAuthor && $this->isAuthor($user, $event)) || ($level->allowWriteAccessToInstructors && $this->isInstructor($user, $event)))) {
+            return true;
         }
 
-        // Check if the user is member of an allowed group
-        $arrAllowedGroups = StringUtil::deserialize($eventReleaseLevelPolicyModel->groupReleaseLevelPerm, true);
-        $arrUserGroups = StringUtil::deserialize($user->groups, true);
-
-        foreach ($arrAllowedGroups as $v) {
-            if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
-                $arrPerm = isset($v['permissions']) && \is_array($v['permissions']) ? $v['permissions'] : [];
-
-                if ('up' === $direction) {
-                    if (\in_array('canRelLevelUp', $arrPerm, true)) {
-                        // User is author or instructor and is allowed to upgrade the event
-                        return true;
-                    }
-                } else {
-                    if (\in_array('canRelLevelDown', $arrPerm, true)) {
-                        // User is author or instructor and is allowed to downgrade the event
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
+        return $this->hasGroupPermission($user, $level->groupReleaseLevelPerm, $isUpgrade ? 'canRelLevelUp' : 'canRelLevelDown');
     }
 
-    protected function supports($attribute, $subject): bool
+    protected function supports(string $attribute, mixed $subject): bool
     {
-        return \in_array(
-            $attribute,
-            self::EVENT_PERMISSIONS_ALL,
-            true,
-        );
+        return \in_array($attribute, self::EVENT_PERMISSIONS_ALL, true);
     }
 
     /**
      * @throws \Exception
      */
-    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
 
+        // The user must be logged in to the back end
         if (!$user instanceof BackendUser) {
-            // the user must be logged in; if not, deny access
             return false;
         }
 
-        $calEvent = $this->calendarEvent->findById($subject);
+        $event = $this->calendarEventsModel->findById($subject);
 
-        if (null === $calEvent) {
+        if (null === $event) {
             return false;
+        }
+
+        if (self::CAN_UPGRADE_EVENT_RELEASE_LEVEL === $attribute || self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL === $attribute) {
+            return $this->canSwitchReleaseLevel($token, $event, $attribute);
+        }
+
+        $releaseLevel = $this->getReleaseLevel($event);
+
+        // Grant access to all users if the event is not assigned to a release level
+        if (null === $releaseLevel) {
+            return true;
+        }
+
+        if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
+            return true;
         }
 
         return match ($attribute) {
-            self::CAN_DELETE_EVENT => $this->canDeleteEvent($token, $calEvent),
-            self::CAN_WRITE_EVENT => $this->canWriteEvent($token, $calEvent),
-            self::CAN_CUT_EVENT => $this->canCutEvent($token, $calEvent),
-            self::CAN_UPGRADE_EVENT_RELEASE_LEVEL => $this->canSwitchReleaseLevel($token, $calEvent, $attribute),
-            self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL => $this->canSwitchReleaseLevel($token, $calEvent, $attribute),
-            self::CAN_ADMINISTER_EVENT_REGISTRATIONS => $this->canAdministerEventRegistrations($token, $calEvent),
+            self::CAN_DELETE_EVENT => $this->canDeleteEvent($user, $event, $releaseLevel),
+            self::CAN_WRITE_EVENT => $this->canWriteEvent($user, $event, $releaseLevel),
+            self::CAN_CUT_EVENT => $this->canCutEvent($user, $event, $releaseLevel),
+            self::CAN_ADMINISTER_EVENT_REGISTRATIONS => $this->canAdministerEventRegistrations($user, $event, $releaseLevel),
             default => throw new \LogicException(\sprintf('You vote on a unsupported attribute "%s"!', $attribute)),
         };
     }
 
     /**
-     * Grant delete-access...
-     * - to all users, if there is no release package assigned to the calendar (tl_calendar).
-     * - to admins
-     * - to permitted event-authors --> tl_event_release_level_policy.allowDeleteAccessToAuthor
-     * - to permitted event-instructors --> tl_event_release_level_policy.allowDeleteAccessToInstructors
-     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm.
-     *
-     * @throws \Exception
+     * Grant delete-access (non-admins)...
+     * - to authors --> tl_event_release_level_policy.allowDeleteAccessToAuthor
+     * - to instructors --> tl_event_release_level_policy.allowDeleteAccessToInstructors
+     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm (canDeleteEvent).
      */
-    private function canDeleteEvent(TokenInterface $token, CalendarEventsModel $calEvent): bool
+    private function canDeleteEvent(BackendUser $user, CalendarEventsModel $event, EventReleaseLevelPolicyModel $releaseLevel): bool
     {
-        $user = $token->getUser();
-
-        if (!empty($calEvent->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($calEvent->eventReleaseLevel);
-
-            if (null === $releaseLevelPolicy) {
-                $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
-
-                throw new \Exception(\sprintf($msg, $calEvent->id));
-            }
-        } else {
-            // Grant delete-access if the event is not assigned to a release level.
-            return true;
-        }
-
-        // Allow deletion to admins.
-        if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
-            return true;
-        }
-
-        if ($releaseLevelPolicy->allowDeleteAccessToAuthor) {
-            if ((int) $user->id === (int) $calEvent->author) {
-                // Grant delete-access if... authors have delete-access and the user has the role
-                // "author" on the current event
-                return true;
-            }
-        }
-
-        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($calEvent);
-
-        if ($releaseLevelPolicy->allowDeleteAccessToInstructors) {
-            if (\in_array($user->id, $arrEventInstructors, false)) {
-                // Grant delete-access if... instructors have delete-access and the user has the
-                // role "instructor" on the current event
-                return true;
-            }
-        }
-
-        // Check if the user is member of an allowed group
-        $arrAllowedGroups = StringUtil::deserialize($releaseLevelPolicy->groupEventPerm, true);
-        $arrUserGroups = StringUtil::deserialize($user->groups, true);
-
-        foreach ($arrAllowedGroups as $v) {
-            if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
-                $arrPerm = isset($v['permissions']) && \is_array($v['permissions']) ? $v['permissions'] : [];
-
-                if (\in_array('canDeleteEvent', $arrPerm, true)) {
-                    // Grant delete-access to "super-users"
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return ($releaseLevel->allowDeleteAccessToAuthor && $this->isAuthor($user, $event))
+            || ($releaseLevel->allowDeleteAccessToInstructors && $this->isInstructor($user, $event))
+            || $this->hasGroupPermission($user, $releaseLevel->groupEventPerm, 'canDeleteEvent');
     }
 
     /**
-     * Grant cut-access...
-     * - to all users, if there is no release package assigned to the calendar (tl_calendar).
-     * - to admins
-     * - to permitted event-authors --> tl_event_release_level_policy.allowCutAccessToAuthor
-     * - to permitted event-instructors --> tl_event_release_level_policy.allowCutAccessToInstructors
-     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm.
-     *
-     * @throws \Exception
+     * Grant cut-access (non-admins)...
+     * - to authors --> tl_event_release_level_policy.allowCutAccessToAuthor
+     * - to instructors --> tl_event_release_level_policy.allowCutAccessToInstructors
+     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm (canCutEvent).
      */
-    private function canCutEvent(TokenInterface $token, CalendarEventsModel $calEvent): bool
+    private function canCutEvent(BackendUser $user, CalendarEventsModel $event, EventReleaseLevelPolicyModel $releaseLevel): bool
     {
-        /** @var BackendUser $user */
-        $user = $token->getUser();
-
-        if (!empty($calEvent->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($calEvent->eventReleaseLevel);
-
-            if (null === $releaseLevelPolicy) {
-                $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
-
-                throw new \Exception(\sprintf($msg, $calEvent->id));
-            }
-        } else {
-            // Grant cut-access if the event is not assigned to a release level.
-            return true;
-        }
-
-        // Allow cut event to admins.
-        if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
-            return true;
-        }
-
-        if ($releaseLevelPolicy->allowCutAccessToAuthor) {
-            if ((int) $user->id === (int) $calEvent->author) {
-                // Grant cut-access if... authors have cut-access and the user has the role
-                // "author" on the current event
-                return true;
-            }
-        }
-
-        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($calEvent);
-
-        if ($releaseLevelPolicy->allowCutAccessToInstructors) {
-            if (\in_array($user->id, $arrEventInstructors, false)) {
-                // Grant cut-access if... instructors have cut-access and the user has the role
-                // "instructor" on the current event
-                return true;
-            }
-        }
-
-        // Check if the user is member of an allowed group
-        $arrAllowedGroups = StringUtil::deserialize($releaseLevelPolicy->groupEventPerm, true);
-        $arrUserGroups = StringUtil::deserialize($user->groups, true);
-
-        foreach ($arrAllowedGroups as $v) {
-            if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
-                $arrPerm = isset($v['permissions']) && \is_array($v['permissions']) ? $v['permissions'] : [];
-
-                if (\in_array('canCutEvent', $arrPerm, true)) {
-                    // Grant cut-access to "super-users"
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return ($releaseLevel->allowCutAccessToAuthor && $this->isAuthor($user, $event))
+            || ($releaseLevel->allowCutAccessToInstructors && $this->isInstructor($user, $event))
+            || $this->hasGroupPermission($user, $releaseLevel->groupEventPerm, 'canCutEvent');
     }
 
     /**
-     * Grant write-access...
-     * - to all users, if there is no release package assigned to the calendar (tl_calendar).
-     * - to admins
-     * - to permitted event-authors --> tl_event_release_level_policy.allowWriteAccessToAuthor
-     * - to permitted event-instructors --> tl_event_release_level_policy.allowWriteAccessToInstructors
-     * - if user is charged to do the registration admin work (tl_calendar_events.registrationGoesTo)
-     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm.
-     *
-     * @throws \Exception
+     * Grant write-access (non-admins)...
+     * - to authors --> tl_event_release_level_policy.allowWriteAccessToAuthor
+     * - to instructors --> tl_event_release_level_policy.allowWriteAccessToInstructors
+     * - to the user who is charged to do the registration admin work (tl_calendar_events.registrationGoesTo)
+     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm (canWriteEvent).
      */
-    private function canWriteEvent(TokenInterface $token, CalendarEventsModel $calEvent): bool
+    private function canWriteEvent(BackendUser $user, CalendarEventsModel $event, EventReleaseLevelPolicyModel $releaseLevel): bool
     {
-        $user = $token->getUser();
-
-        if (!empty($calEvent->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($calEvent->eventReleaseLevel);
-
-            if (null === $releaseLevelPolicy) {
-                $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
-
-                throw new \Exception(\sprintf($msg, $calEvent->id));
-            }
-        } else {
-            // Grant write- or write-access if the event is not assigned to a release level.
-            return true;
-        }
-
-        // Allow write-access to admins.
-        if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
-            return true;
-        }
-
-        if ($releaseLevelPolicy->allowWriteAccessToAuthor) {
-            if ((int) $user->id === (int) $calEvent->author) {
-                // Grant write-access if... authors have write-access and the user has the role
-                // "author" on the current event
-                return true;
-            }
-        }
-
-        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($calEvent);
-
-        if ($releaseLevelPolicy->allowWriteAccessToInstructors) {
-            if (\in_array($user->id, $arrEventInstructors, false)) {
-                // Grant write-access if... instructors have write-access and the user has the
-                // role "instructor" on the current event
-                return true;
-            }
-        }
-
-        if (!empty($calEvent->registrationGoesTo)) {
-            if ($user->id === $calEvent->registrationGoesTo) {
-                return true;
-            }
-        }
-
-        // Check if the user is member of an allowed group
-        $arrAllowedGroups = StringUtil::deserialize($releaseLevelPolicy->groupEventPerm, true);
-        $arrUserGroups = StringUtil::deserialize($user->groups, true);
-
-        foreach ($arrAllowedGroups as $v) {
-            if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
-                $arrPerm = isset($v['permissions']) && \is_array($v['permissions']) ? $v['permissions'] : [];
-
-                if (\in_array('canWriteEvent', $arrPerm, true)) {
-                    // Grant write-access to "super-users"
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return ($releaseLevel->allowWriteAccessToAuthor && $this->isAuthor($user, $event))
+            || ($releaseLevel->allowWriteAccessToInstructors && $this->isInstructor($user, $event))
+            || $this->isRegistrationCoordinator($user, $event)
+            || $this->hasGroupPermission($user, $releaseLevel->groupEventPerm, 'canWriteEvent');
     }
 
     /**
      * Allow to administer event registrations (means the user is allowed to add new
-     * event registrations too)...
-     * - if the event is not assigned to an event release level
-     * - to all admins (regardless of the current time)
-     * - to allowed instructors if the registrations start date has expired
-     * - to allowed authors if the registrations start date has expired
-     * - if user is charged to do the registration admin work (tl_calendar_events.registrationGoesTo)
-     * - to allowed super-users.
-     *
-     * @throws \Exception
+     * event registrations too). Non-admins are denied access before the registration
+     * period has started; afterwards access is granted...
+     * - to authors --> tl_event_release_level_policy.allowAdministerEventRegistrationsToAuthors
+     * - to instructors --> tl_event_release_level_policy.allowAdministerEventRegistrationsToInstructors
+     * - to the user who is charged to do the registration admin work (tl_calendar_events.registrationGoesTo)
+     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm (canAdministerEventRegistrations).
      */
-    private function canAdministerEventRegistrations(TokenInterface $token, CalendarEventsModel $calEvent): bool
+    private function canAdministerEventRegistrations(BackendUser $user, CalendarEventsModel $event, EventReleaseLevelPolicyModel $releaseLevel): bool
     {
-        $user = $token->getUser();
+        $registrationStartTime = $event->registrationStartDate + $this->regStartTimeOffset;
 
-        if (!empty($calEvent->eventReleaseLevel)) {
-            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findById($calEvent->eventReleaseLevel);
-
-            if (null === $releaseLevelPolicy) {
-                $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
-
-                throw new \Exception(\sprintf($msg, $calEvent->id));
-            }
-        } else {
-            // Grant access if the event is not assigned to a release level.
-            return true;
-        }
-
-        // Grant action to admins.
-        if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
-            return true;
-        }
-
-        $regStartTime = $calEvent->registrationStartDate + $this->regStartTimeOffset;
-
-        if ($calEvent->setRegistrationPeriod && $regStartTime > time()) {
+        if ($event->setRegistrationPeriod && $registrationStartTime > time()) {
             return false;
         }
 
-        if ($releaseLevelPolicy->allowAdministerEventRegistrationsToAuthors) {
-            if ((int) $user->id === (int) $calEvent->author) {
-                // Grant action if... if authors are allowed and the user has the role "author"
-                // on the current event
-                return true;
-            }
-        }
-
-        $arrEventInstructors = $this->calendarEventsUtil->getInstructorsAsArray($calEvent);
-
-        if ($releaseLevelPolicy->allowAdministerEventRegistrationsToInstructors) {
-            if (\in_array($user->id, $arrEventInstructors, true)) {
-                // Grant action if... instructors are allowed and the user has the role
-                // "instructor" on the current event
-                return true;
-            }
-        }
-
-        if (!empty($calEvent->registrationGoesTo)) {
-            if ($user->id === $calEvent->registrationGoesTo) {
-                return true;
-            }
-        }
-
-        // Check if the user is member of an allowed group
-        $arrAllowedGroups = StringUtil::deserialize($releaseLevelPolicy->groupEventPerm, true);
-        $arrUserGroups = StringUtil::deserialize($user->groups, true);
-
-        foreach ($arrAllowedGroups as $v) {
-            if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
-                $arrPerm = isset($v['permissions']) && \is_array($v['permissions']) ? $v['permissions'] : [];
-
-                if (\in_array('canAdministerEventRegistrations', $arrPerm, true)) {
-                    // Grant write-access to "super-users"
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return ($releaseLevel->allowAdministerEventRegistrationsToAuthors && $this->isAuthor($user, $event))
+            || ($releaseLevel->allowAdministerEventRegistrationsToInstructors && $this->isInstructor($user, $event))
+            || $this->isRegistrationCoordinator($user, $event)
+            || $this->hasGroupPermission($user, $releaseLevel->groupEventPerm, 'canAdministerEventRegistrations');
     }
 
     /**
      * Upgrade or downgrade by one level (the arrows in the event list): Grant access...
      * - to all users, if the event is not assigned to a release level
      * - if the user may switch the event to the next or previous level, see EventReleaseLevelTransitionVoter
-     *   (permissions of the release level and time rules of the calendar).
+     *   (release level system of the event type, permissions of the release level and time rules of the calendar).
      *
      * @throws \Exception
      */
-    private function canSwitchReleaseLevel(TokenInterface $token, CalendarEventsModel $calEvent, string $attribute): bool
+    private function canSwitchReleaseLevel(TokenInterface $token, CalendarEventsModel $event, string $attribute): bool
     {
-        if (empty($calEvent->eventReleaseLevel)) {
+        $currentLevel = $this->getReleaseLevel($event);
+
+        if (null === $currentLevel) {
             return true;
         }
 
-        $currentLevel = $this->eventReleaseLevelPolicy->findById($calEvent->eventReleaseLevel);
-
-        if (null === $currentLevel) {
-            throw new \Exception(\sprintf('Release-level model not found for tl_calendar_events with ID %d.', $calEvent->id));
-        }
-
         $targetLevel = match ($attribute) {
-            self::CAN_UPGRADE_EVENT_RELEASE_LEVEL => $this->eventReleaseLevelPolicy->findNextLevel($currentLevel->id),
-            self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL => $this->eventReleaseLevelPolicy->findPrevLevel($currentLevel->id),
+            self::CAN_UPGRADE_EVENT_RELEASE_LEVEL => $this->eventReleaseLevelPolicyModel->findNextLevel($currentLevel->id),
+            self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL => $this->eventReleaseLevelPolicyModel->findPrevLevel($currentLevel->id),
             default => throw new \LogicException(\sprintf('$attribute should be either "%s" or "%s" "%s" given.', self::CAN_UPGRADE_EVENT_RELEASE_LEVEL, self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $attribute)),
         };
 
@@ -507,6 +259,70 @@ class CalendarEventsVoter extends Voter
             return false;
         }
 
-        return $this->accessDecisionManager->decide($token, [EventReleaseLevelTransitionVoter::CAN_SWITCH_TO_EVENT_RELEASE_LEVEL], new EventReleaseLevelTransition($calEvent, $targetLevel));
+        return $this->accessDecisionManager->decide($token, [EventReleaseLevelTransitionVoter::CAN_SWITCH_TO_EVENT_RELEASE_LEVEL], new EventReleaseLevelTransition($event, $targetLevel));
+    }
+
+    /**
+     * Returns null if the event is not assigned to a release level.
+     *
+     * @throws \Exception if the assigned release level does not exist
+     */
+    private function getReleaseLevel(CalendarEventsModel $event): EventReleaseLevelPolicyModel|null
+    {
+        if (empty($event->eventReleaseLevel)) {
+            return null;
+        }
+
+        $releaseLevel = $this->eventReleaseLevelPolicyModel->findById($event->eventReleaseLevel);
+
+        if (null === $releaseLevel) {
+            throw new \RuntimeException(\sprintf('Release-level model not found for tl_calendar_events with ID %d.', $event->id));
+        }
+
+        return $releaseLevel;
+    }
+
+    private function isAuthor(BackendUser $user, CalendarEventsModel $event): bool
+    {
+        return (int) $user->id === (int) $event->author;
+    }
+
+    private function isInstructor(BackendUser $user, CalendarEventsModel $event): bool
+    {
+        $instructorIds = array_map('intval', $this->calendarEventsUtil->getInstructorsAsArray($event));
+
+        return \in_array((int) $user->id, $instructorIds, true);
+    }
+
+    /**
+     * The user is charged to do the registration admin work (tl_calendar_events.registrationGoesTo).
+     */
+    private function isRegistrationCoordinator(BackendUser $user, CalendarEventsModel $event): bool
+    {
+        return (int) $event->registrationGoesTo > 0 && (int) $user->id === (int) $event->registrationGoesTo;
+    }
+
+    /**
+     * Checks whether the user is member of a group that has the permission.
+     *
+     * @param mixed $groupPermissions Serialized multi column wizard value: [['group' => 1, 'permissions' => ['canWriteEvent', ...]], ...]
+     */
+    private function hasGroupPermission(BackendUser $user, mixed $groupPermissions, string $permission): bool
+    {
+        $userGroups = StringUtil::deserialize($user->groups, true);
+
+        foreach (StringUtil::deserialize($groupPermissions, true) as $groupPermission) {
+            if (empty($groupPermission['group']) || !\in_array($groupPermission['group'], $userGroups, false)) {
+                continue;
+            }
+
+            $permissions = \is_array($groupPermission['permissions'] ?? null) ? $groupPermission['permissions'] : [];
+
+            if (\in_array($permission, $permissions, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

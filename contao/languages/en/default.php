@@ -127,6 +127,7 @@ $GLOBALS['TL_LANG']['MSC']['minusOneReleaseLevelConfirm'] = 'Möchten Sie wirkli
 $GLOBALS['TL_LANG']['MSC']['setEventReleaseLevelTo'] = 'Die Freigabestufe für Event mit ID %s wurde auf Level %s gesetzt.';
 $GLOBALS['TL_LANG']['MSC']['publishedEvent'] = 'Der Event mit ID %s wurde veröffentlicht.';
 $GLOBALS['TL_LANG']['MSC']['unpublishedEvent'] = 'Der Event mit ID %s ist nicht mehr veröffentlicht.';
+$GLOBALS['TL_LANG']['MSC']['eventReleaseLevelStartDateOutsideValidTimePeriod'] = 'Achtung: Das Startdatum von Event "%s" (ID: %d) liegt nicht im vorgesehenen Zeitraum (%4$s bis %5$s). Als Admin können Sie die Freigabestufe trotzdem auf FS %3$s ändern.';
 $GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck'] = 'Das Datum für den Anfang des Anmeldezeitraums musste angepasst werden. Bitte kontrollieren Sie dieses nochmals.';
 $GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck'] = 'Das Datum für das Ende des Anmeldezeitraums musste angepasst werden. Bitte kontrollieren Sie dieses nochmals.';
 $GLOBALS['TL_LANG']['MSC']['writeTourReport'] = 'Möchten Sie den Tourrapport erstellen/bearbeiten?';

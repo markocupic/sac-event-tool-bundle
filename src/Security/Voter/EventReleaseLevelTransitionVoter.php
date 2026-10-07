@@ -19,6 +19,7 @@ use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\EventReleaseLevelTimeRules;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
+use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyPackageModel;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -27,20 +28,21 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  * Decides whether the user may shift an event from its current release level to
  * the target level (subject: EventReleaseLevelTransition).
  *
+ * - The target level must belong to the release level system of the event type
+ *   (tl_event_type.levelAccessPermissionPackage). This also applies to admins.
  * - Keeping the current level is always allowed.
- * - Admins may shift the event to every level.
+ * - Admins may shift the event to every level of the release level system.
  * - Non-admins must respect the time rules of the calendar (see
  *   EventReleaseLevelTimeRules) and need the permission of every level they pass
  *   (see CalendarEventsVoter::canChangeReleaseLevel()).
- *
- * Whether the target level belongs to the release level system of the event is
- * not checked here, see EventReleaseLevelUtil::validateEventReleaseLevelTransition().
  */
 class EventReleaseLevelTransitionVoter extends Voter
 {
     public const string CAN_SWITCH_TO_EVENT_RELEASE_LEVEL = 'sacevt_can_switch_to_event_release_level';
 
     private Adapter $eventReleaseLevelPolicyModel;
+
+    private Adapter $eventReleaseLevelPolicyPackageModel;
 
     public function __construct(
         private readonly AccessDecisionManagerInterface $accessDecisionManager,
@@ -49,6 +51,7 @@ class EventReleaseLevelTransitionVoter extends Voter
         private readonly EventReleaseLevelTimeRules $timeRules,
     ) {
         $this->eventReleaseLevelPolicyModel = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
+        $this->eventReleaseLevelPolicyPackageModel = $this->framework->getAdapter(EventReleaseLevelPolicyPackageModel::class);
     }
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -71,6 +74,13 @@ class EventReleaseLevelTransitionVoter extends Voter
 
         $event = $subject->event;
         $targetLevel = $subject->targetLevel;
+        // The target level must belong to the release level system of the event type (also for admins)
+        $package = $this->eventReleaseLevelPolicyPackageModel->findReleaseLevelPolicyPackageModelByEventId($event->id);
+
+        if (null === $package || (int) $package->id !== (int) $targetLevel->pid) {
+            return false;
+        }
+
         $currentLevel = $this->eventReleaseLevelPolicyModel->findById($event->eventReleaseLevel);
 
         if (null === $currentLevel) {

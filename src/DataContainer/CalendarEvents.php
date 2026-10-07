@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\ArrayUtil;
-use Contao\BackendUser;
 use Contao\Calendar;
 use Contao\CalendarEventsModel;
 use Contao\CalendarModel;
@@ -36,7 +35,6 @@ use Contao\Image;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
-use Contao\UserGroupModel;
 use Contao\UserModel;
 use Contao\Versions;
 use Doctrine\DBAL\ArrayParameterType;
@@ -48,13 +46,13 @@ use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventDurationInfo;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventType;
+use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\EventReleaseLevelChangeNotifier;
 use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\EventReleaseLevelUtil;
 use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\Exception\EventReleaseLevelTransitionException;
 use Markocupic\SacEventToolBundle\Download\CsvDownload;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyPackageModel;
-use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
 use Markocupic\SacEventToolBundle\String\Normalizer\SwisstopoLV95Normalizer;
 use Markocupic\SacEventToolBundle\String\Validator\DateValidator;
@@ -127,8 +125,6 @@ class CalendarEvents
 
     private Adapter $eventReleaseLevelPolicyPackageModel;
 
-    private Adapter $eventTypeModel;
-
     private Adapter $filesModel;
 
     private Adapter $idna;
@@ -143,9 +139,15 @@ class CalendarEvents
 
     private Adapter $tourDifficultyCategoryModel;
 
-    private Adapter $userGroupModel;
-
     private Adapter $userModel;
+
+    /**
+     * Release level changes of the edit form that have passed the validation, see
+     * saveCallbackEventReleaseLevel().
+     *
+     * @var array<int, array{previousLevelId: int, levelId: int}>
+     */
+    private array $releaseLevelChanges = [];
 
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
@@ -153,6 +155,7 @@ class CalendarEvents
         private readonly ContaoFramework $framework,
         private readonly CourseLevels $courseLevels,
         private readonly EventDurationInfo $eventDurationInfo,
+        private readonly EventReleaseLevelChangeNotifier $eventReleaseLevelChangeNotifier,
         private readonly EventReleaseLevelUtil $eventReleaseLevelUtil,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
@@ -170,7 +173,6 @@ class CalendarEvents
         $this->date = $this->framework->getAdapter(Date::class);
         $this->eventReleaseLevelPolicyModel = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
         $this->eventReleaseLevelPolicyPackageModel = $this->framework->getAdapter(EventReleaseLevelPolicyPackageModel::class);
-        $this->eventTypeModel = $this->framework->getAdapter(EventTypeModel::class);
         $this->filesModel = $this->framework->getAdapter(FilesModel::class);
         $this->idna = $this->framework->getAdapter(Idna::class);
         $this->image = $this->framework->getAdapter(Image::class);
@@ -178,7 +180,6 @@ class CalendarEvents
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->system = $this->framework->getAdapter(System::class);
         $this->tourDifficultyCategoryModel = $this->framework->getAdapter(TourDifficultyCategoryModel::class);
-        $this->userGroupModel = $this->framework->getAdapter(UserGroupModel::class);
         $this->userModel = $this->framework->getAdapter(UserModel::class);
     }
 
@@ -896,8 +897,14 @@ class CalendarEvents
     }
 
     /**
-     * Release levels grouped by release level package. Non-admins only get the
-     * packages of the event types allowed in their user groups.
+     * Only the release levels of the release level system of the event type
+     * (tl_event_type.levelAccessPermissionPackage), grouped by release level package.
+     * This applies to admins too.
+     *
+     * - act=edit|editAll: the event that is being edited
+     * - act=overrideAll: the form is shown for all selected events at once
+     *   ($dc->id is 0), so the release levels of all selected events are shown.
+     *   When saving, the options are determined for each event separately.
      *
      * @throws Exception
      */
@@ -912,24 +919,21 @@ class CalendarEvents
             return [];
         }
 
-        $user = $this->security->getUser();
+        $eventIds = $dc->id ? [$dc->id] : ($this->requestStack->getSession()->get('CURRENT')['IDS'] ?? []);
+        $packageIds = [];
 
-        if (!$user instanceof BackendUser) {
-            return [];
-        }
+        foreach ((array) $eventIds as $eventId) {
+            $package = $this->eventReleaseLevelPolicyPackageModel->findReleaseLevelPolicyPackageModelByEventId($eventId);
 
-        if ($this->security->isGranted('ROLE_ADMIN')) {
-            return $this->getReleaseLevelOptions();
+            if (null !== $package) {
+                $packageIds[(int) $package->id] = (int) $package->id;
+            }
         }
 
         $options = [];
 
-        foreach ($this->getEventTypesOfUserGroups($user) as $eventType) {
-            $eventTypeModel = $this->eventTypeModel->findById($eventType);
-
-            if (null !== $eventTypeModel) {
-                $options = array_replace_recursive($options, $this->getReleaseLevelOptions((int) $eventTypeModel->levelAccessPermissionPackage));
-            }
+        foreach ($packageIds as $packageId) {
+            $options = array_replace_recursive($options, $this->getReleaseLevelOptions($packageId));
         }
 
         return $options;
@@ -1143,6 +1147,13 @@ class CalendarEvents
         return $varValue;
     }
 
+    /**
+     * Only validates the transition. Contao saves the new release level together with
+     * the other fields, if all fields of the form are valid (see
+     * syncPublishedWithEventReleaseLevel() for the rest).
+     *
+     * Contao calls the save callback on every submit, even if the value has not changed.
+     */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventReleaseLevel.save', priority: 90)]
     public function saveCallbackEventReleaseLevel(int $targetEventReleaseLevelId, DataContainer $dc): int
     {
@@ -1154,15 +1165,61 @@ class CalendarEvents
 
         try {
             $this->eventReleaseLevelUtil->validateEventReleaseLevelTransition($event, $targetEventReleaseLevelId);
-            $this->eventReleaseLevelUtil->shiftEventReleaseLevel($event, $this->eventReleaseLevelPolicyModel->findById($targetEventReleaseLevelId));
-
-            return $targetEventReleaseLevelId;
         } catch (EventReleaseLevelTransitionException $e) {
             $this->message->add($this->translator->trans($e->getTranslatableText(), $e->getParams(), 'contao_default'), $e->getErrorLevel());
+
+            // Keep the current release level
+            return (int) $event->eventReleaseLevel;
         }
 
-        // Keep the current release level
-        return $event->eventReleaseLevel;
+        if ((int) $event->eventReleaseLevel !== $targetEventReleaseLevelId) {
+            $this->releaseLevelChanges[(int) $event->id] = [
+                'previousLevelId' => (int) $event->eventReleaseLevel,
+                'levelId' => $targetEventReleaseLevelId,
+            ];
+        }
+
+        return $targetEventReleaseLevelId;
+    }
+
+    /**
+     * The release level has been changed in the edit form (edit, editAll, overrideAll)
+     * and saved: Publish the event on the highest level, unpublish it on the other levels.
+     *
+     * The onsubmit callback is only called if all fields of the form are valid. In the
+     * modes editAll and overrideAll, the changes can still be rolled back, so the
+     * notifications are sent at the end of the request (see EventReleaseLevelChangeNotifier).
+     *
+     * Runs after setValidEventReleaseLevel(), which may have reset the release level.
+     *
+     * @throws Exception
+     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: 10)]
+    public function syncPublishedWithEventReleaseLevel(DataContainer $dc): void
+    {
+        $eventId = (int) $dc->id;
+        $change = $this->releaseLevelChanges[$eventId] ?? null;
+
+        unset($this->releaseLevelChanges[$eventId]);
+
+        // The release level has not been changed in the form
+        if (null === $change || 0 === $change['previousLevelId']) {
+            return;
+        }
+
+        $row = $this->connection->fetchAssociative('SELECT eventReleaseLevel, published FROM tl_calendar_events WHERE id = ?', [$eventId], [Types::INTEGER]);
+
+        // The release level has been reset in the meantime (see setValidEventReleaseLevel())
+        if (false === $row || (int) $row['eventReleaseLevel'] !== $change['levelId']) {
+            return;
+        }
+
+        $maxLevel = $this->eventReleaseLevelPolicyModel->findMaxLevelByEventId($eventId);
+        $published = null !== $maxLevel && (int) $maxLevel->id === $change['levelId'];
+
+        $this->connection->update(self::TABLE, ['published' => $published ? 1 : 0], ['id' => $eventId]);
+
+        $this->eventReleaseLevelChangeNotifier->deferNotification($eventId, $change['previousLevelId'], $change['levelId'], (bool) $row['published']);
     }
 
     /**
@@ -1668,44 +1725,18 @@ class CalendarEvents
     }
 
     /**
-     * Event types allowed in the user groups of the user.
-     */
-    private function getEventTypesOfUserGroups(BackendUser $user): array
-    {
-        $eventTypes = [];
-
-        foreach ($this->stringUtil->deserialize($user->groups, true) as $groupId) {
-            $group = $this->userGroupModel->findById($groupId);
-
-            if (null === $group) {
-                continue;
-            }
-
-            foreach ($this->stringUtil->deserialize($group->allowedEventTypes, true) as $eventType) {
-                if (!\in_array($eventType, $eventTypes, false)) {
-                    $eventTypes[] = $eventType;
-                }
-            }
-        }
-
-        return $eventTypes;
-    }
-
-    /**
-     * Release levels of all packages or of one package, grouped by the title of the
-     * package: [package title => [release level id => release level title]].
+     * Release levels of a package, grouped by the title of the package:
+     * [package title => [release level id => release level title]].
      *
      * @throws Exception
      */
-    private function getReleaseLevelOptions(int|null $packageId = null): array
+    private function getReleaseLevelOptions(int $packageId): array
     {
-        $sql = 'SELECT l.id, l.title, p.title AS packageTitle FROM tl_event_release_level_policy l INNER JOIN tl_event_release_level_policy_package p ON p.id = l.pid';
-
-        if (null === $packageId) {
-            $rows = $this->connection->fetchAllAssociative($sql.' ORDER BY l.pid, l.level');
-        } else {
-            $rows = $this->connection->fetchAllAssociative($sql.' WHERE l.pid = ? ORDER BY l.level', [$packageId], [Types::INTEGER]);
-        }
+        $rows = $this->connection->fetchAllAssociative(
+            'SELECT l.id, l.title, p.title AS packageTitle FROM tl_event_release_level_policy l INNER JOIN tl_event_release_level_policy_package p ON p.id = l.pid WHERE l.pid = ? ORDER BY l.level',
+            [$packageId],
+            [Types::INTEGER],
+        );
 
         $options = [];
 
