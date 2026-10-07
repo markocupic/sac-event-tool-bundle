@@ -15,12 +15,12 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Tests\Feature\AutoPublishEvents;
 
 use Doctrine\DBAL\Connection;
+use Markocupic\SacEventToolBundle\EventReleaseLevel\EventReleaseLevelPolicyUtil;
+use Markocupic\SacEventToolBundle\EventReleaseLevel\ReleaseLevel;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\Candidate;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\CandidateProvider;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\PublishResult;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\SkippedEvent;
-use Markocupic\SacEventToolBundle\Util\EventReleaseLevelPolicyUtil;
-use Markocupic\SacEventToolBundle\Util\ReleaseLevel;
 use PHPUnit\Framework\TestCase;
 
 /**

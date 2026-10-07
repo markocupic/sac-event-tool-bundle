@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Feature\AutoPublishEvents;
 
-use Markocupic\SacEventToolBundle\Util\ReleaseLevel;
+use Markocupic\SacEventToolBundle\EventReleaseLevel\ReleaseLevel;
 
 /**
  * An event that is promoted from the second-highest to the highest release level and published.

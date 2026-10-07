@@ -17,7 +17,7 @@ namespace Markocupic\SacEventToolBundle\Security\Voter;
 use Contao\BackendUser;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\EventReleaseLevelTimeRules;
+use Markocupic\SacEventToolBundle\EventReleaseLevel\EventReleaseLevelTimeRules;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyPackageModel;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;

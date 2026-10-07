@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Util;
+namespace Markocupic\SacEventToolBundle\EventReleaseLevel;
 
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;

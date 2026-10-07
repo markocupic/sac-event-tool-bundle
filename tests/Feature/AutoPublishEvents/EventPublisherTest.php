@@ -17,9 +17,9 @@ namespace Markocupic\SacEventToolBundle\Tests\Feature\AutoPublishEvents;
 use Contao\CoreBundle\Cache\EntityCacheTags;
 use Contao\Versions;
 use Doctrine\DBAL\Connection;
+use Markocupic\SacEventToolBundle\EventReleaseLevel\ReleaseLevel;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\Candidate;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\EventPublisher;
-use Markocupic\SacEventToolBundle\Util\ReleaseLevel;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 

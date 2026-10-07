@@ -16,8 +16,8 @@ namespace Markocupic\SacEventToolBundle\Feature\AutoPublishEvents;
 
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
-use Markocupic\SacEventToolBundle\Util\EventReleaseLevelPolicyUtil;
-use Markocupic\SacEventToolBundle\Util\ReleaseLevel;
+use Markocupic\SacEventToolBundle\EventReleaseLevel\EventReleaseLevelPolicyUtil;
+use Markocupic\SacEventToolBundle\EventReleaseLevel\ReleaseLevel;
 
 /**
  * Finds the events of a calendar that are promoted to the highest release level and published.

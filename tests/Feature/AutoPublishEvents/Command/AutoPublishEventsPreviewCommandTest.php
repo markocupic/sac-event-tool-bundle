@@ -15,12 +15,12 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Tests\Feature\AutoPublishEvents\Command;
 
 use Contao\TestCase\ContaoTestCase;
+use Markocupic\SacEventToolBundle\EventReleaseLevel\ReleaseLevel;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\CalendarRunner;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\Candidate;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\Command\AutoPublishEventsPreviewCommand;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\PublishResult;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\SkippedEvent;
-use Markocupic\SacEventToolBundle\Util\ReleaseLevel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 

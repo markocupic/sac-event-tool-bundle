@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel;
+namespace Markocupic\SacEventToolBundle\EventReleaseLevel;
 
 /**
  * The time rules of the calendar that prevent non-admins from changing the

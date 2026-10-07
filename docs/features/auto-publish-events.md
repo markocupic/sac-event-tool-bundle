@@ -51,7 +51,7 @@ Nicht angefasst werden:
 5. Eintrag im Contao-System-Log (`contao.general`, `info`): Event-ID, Titel, alte → neue Stufe. Übersprungene Events mit Grund (`warning`, Fehler als `error`). Keine E-Mail, keine Notification
 6. Jeder Event in einem eigenen `try/catch`: Ein fehlerhafter Event bricht den Lauf nicht ab. Ein Fehler in einem Kalender bricht den Cron nicht ab; dieser Kalender wird nicht als ausgeführt markiert und beim nächsten Lauf erneut versucht.
 
-Der `EventPublisher` verwendet bewusst nicht `EventReleaseLevelUtil::shiftEventReleaseLevel()`: Diese Methode und ihre Events (`ChangeEventReleaseLevelEvent`, `PublishEventEvent`) brauchen einen Backend-Request mit eingeloggtem User, den es im Cron nicht gibt. Aus demselben Grund werden die Modell-Methoden `EventReleaseLevelPolicyModel::findMaxLevelByEventId()` usw. nicht verwendet, sie schreiben Backend-Messages. Die Stufen werden in `Util\EventReleaseLevelPolicyUtil::getLevelsByEventType()` (Rückgabe: `list<Util\ReleaseLevel>`, höchste Stufe zuerst) mit einer Abfrage über `tl_event_type` → `tl_event_release_level_policy` ermittelt.
+Der `EventPublisher` verwendet bewusst nicht `EventReleaseLevelUtil::shiftEventReleaseLevel()`: Diese Methode und ihre Events (`ChangeEventReleaseLevelEvent`, `PublishEventEvent`) brauchen einen Backend-Request mit eingeloggtem User, den es im Cron nicht gibt. Aus demselben Grund werden die Modell-Methoden `EventReleaseLevelPolicyModel::findMaxLevelByEventId()` usw. nicht verwendet, sie schreiben Backend-Messages. Die Stufen werden in `EventReleaseLevel\EventReleaseLevelPolicyUtil::getLevelsByEventType()` (Rückgabe: `list<EventReleaseLevel\ReleaseLevel>`, höchste Stufe zuerst) mit einer Abfrage über `tl_event_type` → `tl_event_release_level_policy` ermittelt.
 
 ### Zeitpunkt
 
@@ -111,8 +111,8 @@ src/Feature/AutoPublishEvents/
 
 Ausserhalb des Feature-Ordners:
 
-- `src/Util/EventReleaseLevelPolicyUtil.php`: Methode `getLevelsByEventType()`, Stufen des Freigabestufen-Systems eines Eventtyps, höchste zuerst
-- `src/Util/ReleaseLevel.php`: Wertobjekt für eine Stufe (`id`, `level`, `title`)
+- `src/EventReleaseLevel/EventReleaseLevelPolicyUtil.php`: Methode `getLevelsByEventType()`, Stufen des Freigabestufen-Systems eines Eventtyps, höchste zuerst
+- `src/EventReleaseLevel/ReleaseLevel.php`: Wertobjekt für eine Stufe (`id`, `level`, `title`)
 
 - `CandidateProvider` lädt die Stufen pro Eventtyp nur einmal pro Lauf.
 - `EventPublisher` ist die einzige Klasse, die Events schreibt. Cron und Vorschau laufen beide über `CalendarRunner`, die Vorschau als Dry Run.
@@ -148,7 +148,7 @@ Die Vorschau zeigt den aktuellen Stand der Events, massgebend ist der Stand am S
 
 ## Tests (`tests/Feature/AutoPublishEvents/`)
 
-- `tests/Util/EventReleaseLevelPolicyUtilTest`: `getLevelsByEventType()`, Mapping der Stufen, Eventtyp ohne System
+- `tests/EventReleaseLevel/EventReleaseLevelPolicyUtilTest`: `getLevelsByEventType()`, Mapping der Stufen, Eventtyp ohne System
 - `CandidateProviderTest`: zweithöchste Stufe, andere Stufen ignoriert (auch höchste Stufe unveröffentlicht), Stufen mit Lücken (1, 2, 5), System mit 2 Stufen (Anfangsstufe wird veröffentlicht), System mit 1 Stufe, ungültige Stufe, Kalender mit gemischten Systemen, Stufen nur einmal pro Eventtyp geladen, Zeitraum `validTimePeriod*` (Grenzen, ausgeschaltet), Abfrage ohne Filter auf `eventState`/`endDate`
 - `EventPublisherTest`: Stufe, `published`, Version, Cache-Tags; Event in der Zwischenzeit geändert
 - `CalendarRunnerTest`: fällige Kalender, Lauf wird markiert (auch ohne Kandidaten), Vorschau (Dry Run) ändert nichts, anstehende Kalender (`findUpcomingCalendarIds()`), geänderter Event, Fehler in einem Event, Log der übersprungenen Events, unbekannter Kalender

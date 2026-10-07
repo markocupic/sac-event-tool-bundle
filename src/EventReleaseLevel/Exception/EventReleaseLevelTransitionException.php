@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevel\Exception;
+namespace Markocupic\SacEventToolBundle\EventReleaseLevel\Exception;
 
 class EventReleaseLevelTransitionException extends \RuntimeException
 {
