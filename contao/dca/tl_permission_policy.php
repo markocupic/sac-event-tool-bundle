@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 use Contao\DC_Table;
 use Contao\DataContainer;
-use Contao\System;
 
 $GLOBALS['TL_DCA']['tl_permission_policy'] = [
 	'config'   => [
@@ -25,7 +24,8 @@ $GLOBALS['TL_DCA']['tl_permission_policy'] = [
 		'doNotDeleteRecords' => true,
 		'sql'                => [
 			'keys' => [
-				'id' => 'primary',
+				'id'         => 'primary',
+				'identifier' => 'index',
 			],
 		],
 	],
@@ -35,7 +35,6 @@ $GLOBALS['TL_DCA']['tl_permission_policy'] = [
 			'fields'          => ['title ASC'],
 			'flag'            => DataContainer::SORT_INITIAL_LETTER_ASC,
 			'panelLayout'     => 'filter;sort,search,limit',
-			'headerFields'    => ['identifier', 'title'],
 			'disableGrouping' => true,
 		],
 		'label'             => [
@@ -66,8 +65,8 @@ $GLOBALS['TL_DCA']['tl_permission_policy'] = [
 			'sorting'   => true,
 			'inputType' => 'select',
 			'options'   => ['calendar_events_instructor_invoice'],
-			'eval'      => ['includeBlankOption' => true, 'mandatory' => true, 'maxlength' => 255, 'submitOnChange' => true],
-			'sql'       => 'blob NULL',
+			'eval'      => ['includeBlankOption' => true, 'mandatory' => true, 'maxlength' => 64, 'submitOnChange' => true],
+			'sql'       => "varchar(64) NOT NULL default ''",
 		],
 		'title'                                    => [
 			'exclude'   => true,
@@ -93,8 +92,8 @@ $GLOBALS['TL_DCA']['tl_permission_policy'] = [
 				],
 				'group'             => [
 					'label'     => &$GLOBALS['TL_LANG']['tl_permission_policy']['calendar_events_instructor_invoice_rules__group'],
-					'inputType' => 'select',
-					'options'   => System::getContainer()->get('database_connection')->fetchAllKeyValue('SELECT id, name FROM tl_user_group'),
+					'inputType'  => 'select',
+					'foreignKey' => 'tl_user_group.name',
 					'eval'      => ['includeBlankOption' => true, 'tl_class' => 'clr'],
 				],
 				'flags'             => [
@@ -104,7 +103,7 @@ $GLOBALS['TL_DCA']['tl_permission_policy'] = [
 					'eval'      => ['chosen' => true, 'multiple' => true, 'tl_class' => 'clr'],
 				]
 			],
-			// disable ordering (on by default)
+			// allow ordering of the rules (default)
 			'order'     => true,
 			// store serialized into a blob (default storage backend)
 			'sql'       => [

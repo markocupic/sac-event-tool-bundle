@@ -18,15 +18,23 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 
+/**
+ * One rule of tl_permission_policy.calendar_events_instructor_invoice_rules.
+ *
+ * The rule grants its flags to the invoice owners, to the instructors of the event
+ * or to the members of a user group. If several of them are selected, the rule
+ * applies to each of them (or).
+ */
 final readonly class InvoicePolicyRule
 {
+    /**
+     * @param list<string> $flags
+     */
     public function __construct(
         private array $flags,
         private bool $appliesToInvoiceOwners,
         private bool $appliesToInstructors,
         private int|null $groupId,
-        private AccessDecisionManagerInterface $accessDecisionManager,
-        private TokenInterface $token,
     ) {
     }
 
@@ -37,20 +45,23 @@ final readonly class InvoicePolicyRule
 
     public function matchesInvoiceOwner(int $userId, CalendarEventsInstructorInvoiceModel $invoice): bool
     {
-        return $this->appliesToInvoiceOwners && $userId === $invoice->userPid;
+        return $this->appliesToInvoiceOwners && $userId === (int) $invoice->userPid;
     }
 
+    /**
+     * @param list<int> $eventInstructorIds
+     */
     public function matchesInstructor(int $userId, array $eventInstructorIds): bool
     {
         return $this->appliesToInstructors && \in_array($userId, $eventInstructorIds, true);
     }
 
-    public function matchesGroup(): bool
+    public function matchesGroup(AccessDecisionManagerInterface $accessDecisionManager, TokenInterface $token): bool
     {
-        if (empty($this->groupId)) {
+        if (null === $this->groupId) {
             return false;
         }
 
-        return $this->accessDecisionManager->decide($this->token, ['contao_user.groups'], $this->groupId);
+        return $accessDecisionManager->decide($token, ['contao_user.groups'], $this->groupId);
     }
 }

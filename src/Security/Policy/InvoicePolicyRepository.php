@@ -16,43 +16,54 @@ namespace Markocupic\SacEventToolBundle\Security\Policy;
 
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 
-final readonly class InvoicePolicyRepository
+final class InvoicePolicyRepository
 {
+    public const string IDENTIFIER = 'calendar_events_instructor_invoice';
+
+    private InvoicePolicy|null $policy = null;
+
     public function __construct(
-        private Connection $connection,
-        private AccessDecisionManagerInterface $accessDecisionManager,
+        private readonly Connection $connection,
+        private readonly AccessDecisionManagerInterface $accessDecisionManager,
     ) {
     }
 
-    public function loadPolicy(TokenInterface $token): InvoicePolicy
+    /**
+     * The rules are loaded once per request, as the voter is called for every
+     * invoice and every button in the list view.
+     */
+    public function loadPolicy(): InvoicePolicy
     {
-        $rows = $this->connection->fetchAllAssociative(
-            'SELECT * FROM tl_permission_policy WHERE identifier = ?',
-            ['calendar_events_instructor_invoice'],
+        if (null !== $this->policy) {
+            return $this->policy;
+        }
+
+        $ruleSets = $this->connection->fetchFirstColumn(
+            'SELECT calendar_events_instructor_invoice_rules FROM tl_permission_policy WHERE identifier = ?',
+            [self::IDENTIFIER],
+            [Types::STRING],
         );
 
         $rules = [];
 
-        foreach ($rows as $row) {
-            $ruleSets = StringUtil::deserialize($row['calendar_events_instructor_invoice_rules'], true);
-
-            foreach ($ruleSets as $rule) {
-                $flags = StringUtil::deserialize($rule['flags'], true);
+        foreach ($ruleSets as $ruleSet) {
+            foreach (StringUtil::deserialize($ruleSet, true) as $rule) {
+                if (!\is_array($rule)) {
+                    continue;
+                }
 
                 $rules[] = new InvoicePolicyRule(
-                    flags: $flags,
+                    flags: array_values(array_map('strval', StringUtil::deserialize($rule['flags'] ?? null, true))),
                     appliesToInvoiceOwners: !empty($rule['invoice_owners']),
                     appliesToInstructors: !empty($rule['event_instructors']),
                     groupId: !empty($rule['group']) ? (int) $rule['group'] : null,
-                    accessDecisionManager: $this->accessDecisionManager,
-                    token: $token,
                 );
             }
         }
 
-        return new InvoicePolicy($rules);
+        return $this->policy = new InvoicePolicy($rules, $this->accessDecisionManager);
     }
 }

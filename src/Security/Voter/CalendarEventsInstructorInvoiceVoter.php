@@ -16,6 +16,8 @@ namespace Markocupic\SacEventToolBundle\Security\Voter;
 
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Framework\Adapter;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
@@ -25,6 +27,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
+/**
+ * Permissions for the tour reports and instructor invoices (tl_calendar_events_instructor_invoice).
+ *
+ * Subject: the event (HAS_ACCESS, CAN_CREATE) or the invoice (all other attributes).
+ * Admins have full access, all other users need a rule in the permission policy
+ * (tl_permission_policy, see InvoicePolicyRepository).
+ */
 class CalendarEventsInstructorInvoiceVoter extends Voter
 {
     public const string HAS_ACCESS = 'sacevt_has_access_to_invoice_list';
@@ -39,116 +48,74 @@ class CalendarEventsInstructorInvoiceVoter extends Voter
 
     public const string CAN_SEND = 'sacevt_can_send_tour_report_and_invoice';
 
-    private const array EVENT_PERMISSIONS_ALL = [
-        self::HAS_ACCESS,
-        self::CAN_CREATE,
-        self::CAN_UPDATE,
-        self::CAN_DELETE,
-        self::CAN_DOWNLOAD,
-        self::CAN_SEND,
+    /**
+     * The flags of the permission policy (tl_permission_policy.calendar_events_instructor_invoice_rules).
+     */
+    private const array POLICY_FLAGS = [
+        self::HAS_ACCESS => 'has_access',
+        self::CAN_CREATE => 'can_create',
+        self::CAN_UPDATE => 'can_update',
+        self::CAN_DELETE => 'can_delete',
+        self::CAN_DOWNLOAD => 'can_download',
+        self::CAN_SEND => 'can_send',
     ];
+
+    private Adapter $calendarEventsModel;
+
+    private Adapter $eventOrganizerModel;
 
     public function __construct(
         private readonly AccessDecisionManagerInterface $accessDecisionManager,
         private readonly CalendarEventsUtil $calendarEventsUtil,
+        private readonly ContaoFramework $framework,
         private readonly InvoicePolicyRepository $policyRepository,
     ) {
+        $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
+        $this->eventOrganizerModel = $this->framework->getAdapter(EventOrganizerModel::class);
     }
 
-    protected function supports($attribute, $subject): bool
+    protected function supports(string $attribute, mixed $subject): bool
     {
-        return \in_array(
-            $attribute,
-            self::EVENT_PERMISSIONS_ALL,
-            true,
-        );
+        return isset(self::POLICY_FLAGS[$attribute]);
     }
 
-    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
 
+        // The user must be logged in to the back end
         if (!$user instanceof BackendUser) {
-            // the user must be logged in; if not, deny access
             return false;
         }
 
-        return match ($attribute) {
-            self::HAS_ACCESS => $this->hasAccess($token, $subject),
-            self::CAN_CREATE => $this->canCreate($token, $subject),
-            self::CAN_UPDATE => $this->canUpdate($token, $subject),
-            self::CAN_DELETE => $this->canDelete($token, $subject),
-            self::CAN_DOWNLOAD => $this->canDownload($token, $subject),
-            self::CAN_SEND => $this->canSend($token, $subject),
-            default => throw new \LogicException(\sprintf('You vote on a unsupported attribute "%s"!', $attribute)),
+        $event = match ($attribute) {
+            self::HAS_ACCESS, self::CAN_CREATE => $subject instanceof CalendarEventsModel ? $subject : null,
+            default => $subject instanceof CalendarEventsInstructorInvoiceModel ? $this->calendarEventsModel->findById($subject->pid) : null,
         };
-    }
 
-    private function hasAccess(TokenInterface $token, CalendarEventsModel $calEvent): bool
-    {
-        return $this->isGranted($token, $calEvent, 'has_access');
-    }
-
-    private function canCreate(TokenInterface $token, CalendarEventsModel $calEvent): bool
-    {
-        return $this->isGranted($token, $calEvent, 'can_create');
-    }
-
-    private function canUpdate(TokenInterface $token, CalendarEventsInstructorInvoiceModel $invoice): bool
-    {
-        return $this->isGranted($token, $invoice, 'can_update');
-    }
-
-    private function canDelete(TokenInterface $token, CalendarEventsInstructorInvoiceModel $invoice): bool
-    {
-        return $this->isGranted($token, $invoice, 'can_delete');
-    }
-
-    private function canDownload(TokenInterface $token, CalendarEventsInstructorInvoiceModel $invoice): bool
-    {
-        return $this->isGranted($token, $invoice, 'can_download');
-    }
-
-    private function canSend(TokenInterface $token, CalendarEventsInstructorInvoiceModel $invoice): bool
-    {
-        $calEvent = CalendarEventsModel::findById($invoice->pid);
-
-        // Report form must be filled out
-        if (!$calEvent->filledInEventReportForm) {
+        // Wrong subject (e.g. the record does not exist) or the event does not exist (anymore)
+        if (null === $event) {
             return false;
         }
 
-        // Organizer must have enabled rapport notification
-        if (!$this->isRapportNotificationEnabled($calEvent)) {
+        // Sending the tour report requires a filled in report form and an organizer with
+        // rapport notifications enabled. This also applies to admins.
+        if (self::CAN_SEND === $attribute && (!$event->filledInEventReportForm || !$this->isRapportNotificationEnabled($event))) {
             return false;
         }
 
-        return $this->isGranted($token, $invoice, 'can_send');
-    }
-
-    private function isGranted(TokenInterface $token, CalendarEventsInstructorInvoiceModel|CalendarEventsModel $model, string $requiredFlag): bool
-    {
         // Admins always have full access
         if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
             return true;
         }
 
-        $calEvent = $model instanceof CalendarEventsModel ? $model : CalendarEventsModel::findById($model->pid);
+        $instructorIds = array_map('intval', $this->calendarEventsUtil->getInstructorsAsArray($event));
 
-        $policy = $this->policyRepository->loadPolicy($token);
-
-        $eventInstructorIds = array_map(
-            'intval',
-            $this->calendarEventsUtil->getInstructorsAsArray($calEvent),
-        );
-
-        $user = $token->getUser();
-
-        return $policy->allows($user->id, $model, $eventInstructorIds, $requiredFlag);
+        return $this->policyRepository->loadPolicy()->allows($token, (int) $user->id, $subject, $instructorIds, self::POLICY_FLAGS[$attribute]);
     }
 
     /**
-     * Check if rapport notification is enabled on the event.
+     * Check if rapport notification is enabled for one of the organizers of the event.
      */
     private function isRapportNotificationEnabled(CalendarEventsModel $event): bool
     {
@@ -158,14 +125,14 @@ class CalendarEventsInstructorInvoiceVoter extends Voter
             return false;
         }
 
-        $organizers = EventOrganizerModel::findByIds($organizerIds);
+        $organizers = $this->eventOrganizerModel->findByIds($organizerIds);
 
         if (null === $organizers) {
             return false;
         }
 
-        while ($organizers->next()) {
-            if ($organizers->enableRapportNotification) {
+        foreach ($organizers as $organizer) {
+            if ($organizer->enableRapportNotification) {
                 return true;
             }
         }
