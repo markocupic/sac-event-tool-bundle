@@ -45,7 +45,6 @@ use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmail
 use Markocupic\SacEventToolBundle\Csv\EventRegistrationListGeneratorCsv;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventRegistrationListGeneratorDocx;
 use Markocupic\SacEventToolBundle\DocxTemplator\OutputType;
-use Markocupic\SacEventToolBundle\Event\DataContainer\ContaoPostUpdateEvent;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\NotificationType\SubscriptionStateChangeNotificationType;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
@@ -55,9 +54,11 @@ use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Asset\Packages;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -93,6 +94,15 @@ class CalendarEventsMember
 
     private Adapter $validator;
 
+    /**
+     * States of the registrations before the submit, see rememberStatesBeforeSubmit().
+     *
+     * @var array<int, array{stateOfSubscription: string, hasParticipated: bool}>
+     */
+    private array $statesBeforeSubmit = [];
+
+    private bool $isResponseListenerRegistered = false;
+
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContentUrlGenerator $contentUrlGenerator,
@@ -101,6 +111,7 @@ class CalendarEventsMember
         private readonly ContaoFramework $framework,
         private readonly EventRegistrationListGeneratorCsv $registrationListGeneratorCsv,
         private readonly EventRegistrationListGeneratorDocx $registrationListGeneratorDocx,
+        private readonly EventDispatcherInterface $eventDispatcher,
         private readonly EventRegistrationUtil $eventRegistrationUtil,
         private readonly NotificationCenter $notificationCenter,
         private readonly Packages $packages,
@@ -354,121 +365,78 @@ class CalendarEventsMember
     }
 
     /**
-     * Notify the member if the subscription state has been changed manually.
+     * Remembers the subscription state and the participation state of the
+     * registration before the changes are saved (edit form, editAll, overrideAll
+     * and toggle). See notifyChangedStates().
      */
-    #[AsEventListener]
-    public function notifyMemberOnParticipationStateUpdate(ContaoPostUpdateEvent $event): void
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onbeforesubmit', priority: 120)]
+    public function rememberStatesBeforeSubmit(array $updatedFields, DataContainer $dc): array
     {
-        if (self::TABLE !== $event->getTableName() || !isset($event->getDiffData()['stateOfSubscription'])) {
-            return;
+        $registrationId = (int) $dc->id;
+
+        // Keep the state from before the first change in this request
+        if (0 === $registrationId || isset($this->statesBeforeSubmit[$registrationId])) {
+            return $updatedFields;
         }
 
-        $registration = $event->getPostUpdateRecord();
+        $registration = $this->connection->fetchAssociative('SELECT stateOfSubscription, hasParticipated FROM tl_calendar_events_member WHERE id = ?', [$registrationId], [Types::INTEGER]);
 
-        $calendarEvent = $this->calendarEvents->findById($registration['eventId']);
-
-        // The registration has already been saved, so do not throw an exception.
-        if (null === $calendarEvent) {
-            $this->logFailedNotification($registration, new \RuntimeException(\sprintf('The event with ID %d does not exist.', $registration['eventId'])));
-            $this->message->addError($this->translator->trans('ERR.participantCouldNotBeNotifiedAboutTheRegistrationStatusChange', [$registration['firstname'], $registration['lastname']], 'contao_default'));
-
-            return;
+        if (false === $registration) {
+            return $updatedFields;
         }
 
-        if (!$this->validator->isEmail($registration['email'])) {
-            if ($this->scopeMatcher->isBackendRequest($this->requestStack->getCurrentRequest())) {
-                $stateOfSubscription = $this->translator->trans('MSC.'.$registration['stateOfSubscription'], [], 'contao_default');
-                $this->message->addInfo($this->translator->trans('ERR.bookingStateHasBeenChangedButParticipantWasNotNotifiedDueToMissingEmail', [$stateOfSubscription], 'contao_default'));
-            }
+        $this->statesBeforeSubmit[$registrationId] = [
+            'stateOfSubscription' => (string) $registration['stateOfSubscription'],
+            'hasParticipated' => (bool) $registration['hasParticipated'],
+        ];
 
-            return;
+        // Registered at runtime, so that this service is not created on every request
+        if (!$this->isResponseListenerRegistered) {
+            $this->eventDispatcher->addListener(KernelEvents::RESPONSE, $this->notifyChangedStates(...));
+            $this->isResponseListenerRegistered = true;
         }
 
-        $notificationIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_nc_notification WHERE type = ?', [SubscriptionStateChangeNotificationType::NAME], [Types::STRING]);
-
-        if (empty($notificationIds)) {
-            $this->message->addInfo($this->translator->trans('MSC.participantNotNotifiedBecauseNoNotificationIsConfigured', [$registration['firstname'], $registration['lastname']], 'contao_default'));
-
-            return;
-        }
-
-        $deliveredCount = 0;
-        $failedCount = 0;
-
-        // The registration has already been saved. If the notification fails, the user
-        // gets an error message instead of an error page.
-        try {
-            $tokens = [
-                'participant_state_of_subscription' => $this->stringUtil->revertInputEncoding($this->translator->trans('MSC.'.$registration['stateOfSubscription'], [], 'contao_default')),
-                'event_title' => $this->stringUtil->revertInputEncoding($calendarEvent->title),
-                'participant_uuid' => $registration['uuid'],
-                'participant_name' => $this->stringUtil->revertInputEncoding($registration['firstname'].' '.$registration['lastname']),
-                'participant_email' => $registration['email'],
-                'event_link_detail' => $this->contentUrlGenerator->generate($calendarEvent, [], UrlGeneratorInterface::ABSOLUTE_URL),
-            ];
-
-            foreach ($notificationIds as $notificationId) {
-                foreach ($this->notificationCenter->sendNotification((int) $notificationId, $tokens, $this->sacevtLocale) as $receipt) {
-                    if ($receipt->wasDelivered()) {
-                        ++$deliveredCount;
-                    } else {
-                        ++$failedCount;
-                        $this->logFailedNotification($registration, $receipt->getException());
-                    }
-                }
-            }
-        } catch (\Throwable $e) {
-            ++$failedCount;
-            $this->logFailedNotification($registration, $e);
-        }
-
-        if ($deliveredCount > 0) {
-            $this->message->addInfo($this->translator->trans('MSC.participantHasBeenNotifiedAboutTheRegistrationStatusChange', [$registration['firstname'], $registration['lastname']], 'contao_default'));
-        }
-
-        if ($failedCount > 0) {
-            $this->message->addError($this->translator->trans('ERR.participantCouldNotBeNotifiedAboutTheRegistrationStatusChange', [$registration['firstname'], $registration['lastname']], 'contao_default'));
-        }
+        return $updatedFields;
     }
 
     /**
-     * Log the confirmation and the removal of the participation in the Contao system log.
+     * Notifies the member about a changed subscription state and logs a changed
+     * participation state.
      *
-     * @throws \Exception
+     * Why at the end of the request (kernel.response):
+     * Contao only saves the edit form if all fields are valid. In the modes editAll
+     * and overrideAll, all registrations are saved in one database transaction, which
+     * is rolled back if one of the registrations is invalid. E-mails cannot be rolled
+     * back. Therefore, only the states that have actually been persisted are compared
+     * with the states from before the submit.
+     *
+     * Runs before the session is saved (priority -1000), so the back end messages are
+     * shown on the next page.
      */
-    #[AsEventListener]
-    public function writeParticipationStateChangeToContaoSystemLog(ContaoPostUpdateEvent $event): void
+    public function notifyChangedStates(ResponseEvent $responseEvent): void
     {
-        $diff = $event->getDiffData();
-
-        if (self::TABLE !== $event->getTableName() || !isset($diff['hasParticipated'])) {
+        if (!$responseEvent->isMainRequest() || [] === $this->statesBeforeSubmit) {
             return;
         }
 
-        $registration = $this->calendarEventsMember->findById($event->getRecordId());
+        $statesBeforeSubmit = $this->statesBeforeSubmit;
+        $this->statesBeforeSubmit = [];
 
-        if (null === $registration) {
-            throw new \Exception(\sprintf('Registration with ID %d not found.', $event->getRecordId()));
+        foreach ($statesBeforeSubmit as $registrationId => $previousStates) {
+            $registration = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events_member WHERE id = ?', [$registrationId], [Types::INTEGER]);
+
+            if (false === $registration) {
+                continue;
+            }
+
+            if ((string) $registration['stateOfSubscription'] !== $previousStates['stateOfSubscription']) {
+                $this->notifyMemberOnSubscriptionStateChange($registration);
+            }
+
+            if ((bool) $registration['hasParticipated'] !== $previousStates['hasParticipated']) {
+                $this->writeParticipationStateChangeToContaoSystemLog($registration);
+            }
         }
-
-        $calendarEvent = $this->calendarEvents->findById($registration->eventId);
-
-        if (null === $calendarEvent) {
-            throw new \Exception(\sprintf('The event ID %d that is associated with the registration with ID %d does not exist.', $registration->eventId, $registration->id));
-        }
-
-        if ((bool) $diff['hasParticipated']) {
-            $logText = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "unconfirmed" to "confirmed".';
-            $context = Log::EVENT_PARTICIPATION_CONFIRM;
-        } else {
-            $logText = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "confirmed" to "unconfirmed".';
-            $context = Log::EVENT_PARTICIPATION_UNCONFIRM;
-        }
-
-        $this->contaoGeneralLogger?->info(
-            \sprintf($logText, $registration->firstname, $registration->lastname, $registration->sacMemberId ?? '0', $calendarEvent->title, $calendarEvent->id),
-            ['contao' => new ContaoContext(__METHOD__, $context)],
-        );
     }
 
     /**
@@ -677,6 +645,103 @@ class CalendarEventsMember
         $href = $this->stringUtil->ampersand($href);
 
         return \sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->specialcharsUrl($href), $this->stringUtil->specialchars($class), $this->stringUtil->specialchars($title), $attributes, $label);
+    }
+
+    /**
+     * Notify the member if the subscription state has been changed manually.
+     *
+     * @param array<string, mixed> $registration the saved registration (tl_calendar_events_member)
+     */
+    private function notifyMemberOnSubscriptionStateChange(array $registration): void
+    {
+        $calendarEvent = $this->calendarEvents->findById($registration['eventId']);
+
+        // The registration has already been saved, so do not throw an exception.
+        if (null === $calendarEvent) {
+            $this->logFailedNotification($registration, new \RuntimeException(\sprintf('The event with ID %d does not exist.', $registration['eventId'])));
+            $this->message->addError($this->translator->trans('ERR.participantCouldNotBeNotifiedAboutTheRegistrationStatusChange', [$registration['firstname'], $registration['lastname']], 'contao_default'));
+
+            return;
+        }
+
+        if (!$this->validator->isEmail($registration['email'])) {
+            if ($this->scopeMatcher->isBackendRequest($this->requestStack->getCurrentRequest())) {
+                $stateOfSubscription = $this->translator->trans('MSC.'.$registration['stateOfSubscription'], [], 'contao_default');
+                $this->message->addInfo($this->translator->trans('ERR.bookingStateHasBeenChangedButParticipantWasNotNotifiedDueToMissingEmail', [$stateOfSubscription], 'contao_default'));
+            }
+
+            return;
+        }
+
+        $notificationIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_nc_notification WHERE type = ?', [SubscriptionStateChangeNotificationType::NAME], [Types::STRING]);
+
+        if (empty($notificationIds)) {
+            $this->message->addInfo($this->translator->trans('MSC.participantNotNotifiedBecauseNoNotificationIsConfigured', [$registration['firstname'], $registration['lastname']], 'contao_default'));
+
+            return;
+        }
+
+        $deliveredCount = 0;
+        $failedCount = 0;
+
+        // The registration has already been saved. If the notification fails, the user
+        // gets an error message instead of an error page.
+        try {
+            $tokens = [
+                'participant_state_of_subscription' => $this->stringUtil->revertInputEncoding($this->translator->trans('MSC.'.$registration['stateOfSubscription'], [], 'contao_default')),
+                'event_title' => $this->stringUtil->revertInputEncoding($calendarEvent->title),
+                'participant_uuid' => $registration['uuid'],
+                'participant_name' => $this->stringUtil->revertInputEncoding($registration['firstname'].' '.$registration['lastname']),
+                'participant_email' => $registration['email'],
+                'event_link_detail' => $this->contentUrlGenerator->generate($calendarEvent, [], UrlGeneratorInterface::ABSOLUTE_URL),
+            ];
+
+            foreach ($notificationIds as $notificationId) {
+                foreach ($this->notificationCenter->sendNotification((int) $notificationId, $tokens, $this->sacevtLocale) as $receipt) {
+                    if ($receipt->wasDelivered()) {
+                        ++$deliveredCount;
+                    } else {
+                        ++$failedCount;
+                        $this->logFailedNotification($registration, $receipt->getException());
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            ++$failedCount;
+            $this->logFailedNotification($registration, $e);
+        }
+
+        if ($deliveredCount > 0) {
+            $this->message->addInfo($this->translator->trans('MSC.participantHasBeenNotifiedAboutTheRegistrationStatusChange', [$registration['firstname'], $registration['lastname']], 'contao_default'));
+        }
+
+        if ($failedCount > 0) {
+            $this->message->addError($this->translator->trans('ERR.participantCouldNotBeNotifiedAboutTheRegistrationStatusChange', [$registration['firstname'], $registration['lastname']], 'contao_default'));
+        }
+    }
+
+    /**
+     * Log the confirmation and the removal of the participation in the Contao system log.
+     *
+     * @param array<string, mixed> $registration the saved registration (tl_calendar_events_member)
+     */
+    private function writeParticipationStateChangeToContaoSystemLog(array $registration): void
+    {
+        // The registration has already been saved, so do not throw an exception
+        $calendarEvent = $this->calendarEvents->findById($registration['eventId']);
+
+        if ($registration['hasParticipated']) {
+            $logText = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "unconfirmed" to "confirmed".';
+            $context = Log::EVENT_PARTICIPATION_CONFIRM;
+        } else {
+            $logText = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "confirmed" to "unconfirmed".';
+            $context = Log::EVENT_PARTICIPATION_UNCONFIRM;
+        }
+
+        $this->contaoGeneralLogger?->info(
+            \sprintf($logText, $registration['firstname'], $registration['lastname'], $registration['sacMemberId'] ?? '0', $calendarEvent?->title ?? 'unknown event', $registration['eventId']),
+            ['contao' => new ContaoContext(__METHOD__, $context)],
+        );
     }
 
     private function logFailedNotification(array $registration, \Throwable|null $exception): void
