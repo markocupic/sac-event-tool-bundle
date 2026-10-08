@@ -107,12 +107,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		'operations'        => [
 			'edit',
 			'delete',
-			'show',
 			// Event history of the participant (see docs/features/participant-event-history.md), the URL is set by ParticipantEventHistoryOperationListener
 			'participantEventHistory'  => [
 				'icon'       => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/list-check.svg', 'markocupic_sac_event_tool'),
 				'attributes' => 'data-turbo="false"',
 			],
+			'show',
 			'toggleParticipationState' => [
 				'href' => 'act=toggle&amp;field=hasParticipated',
 				'icon' => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/square-check.svg', 'markocupic_sac_event_tool'),
