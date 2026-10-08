@@ -549,15 +549,16 @@ class CalendarEventsMember
     {
         $registration = $this->calendarEventsMember->findById($row['id']);
 
-        $args[0] = \sprintf('<div>%s</div>', $this->eventRegistrationUtil->getSubscriptionStateIcon($registration));
+        // The columns may be missing, e.g. if they have been hidden in the list view (column toggle) or removed in a DCA override
+        $fields = $GLOBALS['TL_DCA'][self::TABLE]['list']['label']['fields'] ?? [];
 
-        $index = array_search('J+S/Jugend', $GLOBALS['TL_DCA'][self::TABLE]['list']['label']['fields'], true);
-
-        if (false === $index) {
-            throw new \Exception('The entry "J+S/Jugend" does not exist in the tl_calendar_events_member.list.label.fields (DCA).');
+        if (false !== ($index = array_search('stateOfSubscription', $fields, true))) {
+            $args[$index] = \sprintf('<div>%s</div>', $this->eventRegistrationUtil->getSubscriptionStateIcon($registration));
         }
 
-        $args[$index] = $this->eventRegistrationUtil->getAgeGroup($registration);
+        if (false !== ($index = array_search('J+S/Jugend', $fields, true))) {
+            $args[$index] = $this->eventRegistrationUtil->getAgeGroup($registration);
+        }
 
         return $args;
     }

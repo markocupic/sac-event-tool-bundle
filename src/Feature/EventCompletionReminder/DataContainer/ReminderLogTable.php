@@ -52,14 +52,20 @@ readonly class ReminderLogTable
         $dateAdapter = $this->framework->getAdapter(Date::class);
         $configAdapter = $this->framework->getAdapter(Config::class);
 
-        $columns[0] = $dateAdapter->parse($configAdapter->get('datimFormat'), (int) $row['sentAt']);
-        $columns[1] = $this->getRecipient((int) $row['userId']);
-        $columns[2] = $this->getCalendarTitle((int) $row['calendarId']);
-        // 0: entries written before the column existed
-        $columns[3] = (int) $row['reminderCount'] > 0 ? (string) (int) $row['reminderCount'] : '–';
-        $columns[4] = (string) (int) $row['openTaskCount'];
-        $columns[5] = $this->getEventTitles((string) $row['eventIds']);
-        $columns[6] = $this->translator->trans($row['delivered'] ? 'MSC.yes' : 'MSC.no', [], 'contao_default');
+        // The columns are looked up by field name, as columns may be hidden in the list view (column toggle)
+        foreach ($GLOBALS['TL_DCA']['tl_event_completion_reminder_log']['list']['label']['fields'] ?? [] as $index => $field) {
+            $columns[$index] = match ($field) {
+                'sentAt' => $dateAdapter->parse($configAdapter->get('datimFormat'), (int) $row['sentAt']),
+                'userId' => $this->getRecipient((int) $row['userId']),
+                'calendarId' => $this->getCalendarTitle((int) $row['calendarId']),
+                // 0: entries written before the column existed
+                'reminderCount' => (int) $row['reminderCount'] > 0 ? (string) (int) $row['reminderCount'] : '–',
+                'openTaskCount' => (string) (int) $row['openTaskCount'],
+                'eventIds' => $this->getEventTitles((string) $row['eventIds']),
+                'delivered' => $this->translator->trans($row['delivered'] ? 'MSC.yes' : 'MSC.no', [], 'contao_default'),
+                default => $columns[$index] ?? '',
+            };
+        }
 
         return $columns;
     }
