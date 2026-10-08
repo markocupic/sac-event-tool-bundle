@@ -111,6 +111,6 @@ $GLOBALS['TL_DCA']['tl_permission_policy'] = [
 				'length'  => \Doctrine\DBAL\Platforms\MySQLPlatform::LENGTH_LIMIT_BLOB,
 				'notnull' => false,
 			],
-		]
+		],
 	],
 ];

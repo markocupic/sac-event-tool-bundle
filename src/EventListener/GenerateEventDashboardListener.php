@@ -18,7 +18,6 @@ use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Event\GenerateEventDashboardEvent;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsInstructorInvoiceVoter;
-use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -93,22 +92,20 @@ readonly class GenerateEventDashboardListener
             ;
         }
 
-        // "Go to event participant list" button
-        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $eventId)) {
-            $href = $this->router->generate(
-                'contao_backend',
-                ['do' => $do, 'table' => 'tl_calendar_events_member', 'id' => $eventId, 'rt' => $rt, 'ref' => $refId],
-            );
+        // "Go to event participant list" button: everyone with access to the event may read the registrations
+        $href = $this->router->generate(
+            'contao_backend',
+            ['do' => $do, 'table' => 'tl_calendar_events_member', 'id' => $eventId, 'rt' => $rt, 'ref' => $refId],
+        );
 
-            $menuItem->addChild('Teilnehmerliste', ['uri' => $href])
-                ->setAttribute('role', 'button')
-                ->setLinkAttribute('class', 'tl_submit')
-                ->setLinkAttribute('target', '_blank')
-                ->setLinkAttribute('rel', 'noopener')
-                ->setLinkAttribute('accesskey', 'm')
-                ->setLinkAttribute('title', 'Teilnehmerliste anzeigen und bearbeiten [ALT + m]')
-            ;
-        }
+        $menuItem->addChild('Teilnehmerliste', ['uri' => $href])
+            ->setAttribute('role', 'button')
+            ->setLinkAttribute('class', 'tl_submit')
+            ->setLinkAttribute('target', '_blank')
+            ->setLinkAttribute('rel', 'noopener')
+            ->setLinkAttribute('accesskey', 'm')
+            ->setLinkAttribute('title', 'Teilnehmerliste anzeigen und bearbeiten [ALT + m]')
+        ;
 
         // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und
         // Vergütungsformular drucken und einreichen" button

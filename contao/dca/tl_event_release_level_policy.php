@@ -49,8 +49,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 	'palettes' => [
 		'default' => '
 		{title_legend},level,title,description;
-		{event_grants_legend},allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowDeleteAccessToAuthor,allowDeleteAccessToInstructors,allowCutAccessToAuthor,allowCutAccessToInstructors,allowAdministerEventRegistrationsToInstructors,allowAdministerEventRegistrationsToAuthors,groupEventPerm;
-		{event_release_level_grants_legend},allowSwitchingToPrevLevel,allowSwitchingToNextLevel,groupReleaseLevelPerm;
+		{permission_rules_legend},permissionRules;
 		{event_registrations_grants_legend},allowRegistration',
 	],
 	'fields'   => [
@@ -86,98 +85,44 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 			'eval'      => ['mandatory' => true, 'tl_class' => 'clr'],
 			'sql'       => 'text NULL',
 		],
-		'allowSwitchingToPrevLevel'                      => [
+		// Permissions of the release level (see EventReleaseLevelPermissionRules and CalendarEventsVoter).
+		// They replace the old permission fields (see EventReleaseLevelPermissionRulesMigration).
+		// A rule grants its flags to the selected parties of the event or to the members
+		// of a user group (or).
+		// Important: the names of the group field and its fields must not contain "__", the
+		// group widget uses "__" as separator in the names of its virtual fields.
+		'permissionRules'                                => [
 			'exclude'   => true,
-			'filter'    => true,
-			'inputType' => 'checkbox',
-			'sql'       => ['type' => 'boolean', 'default' => false],
-		],
-		'allowSwitchingToNextLevel'                      => [
-			'exclude'   => true,
-			'filter'    => true,
-			'inputType' => 'checkbox',
-			'sql'       => ['type' => 'boolean', 'default' => false],
-		],
-		'allowWriteAccessToAuthor'                       => [
-			'exclude'   => true,
-			'filter'    => true,
-			'inputType' => 'checkbox',
-			'sql'       => ['type' => 'boolean', 'default' => false],
-		],
-		'allowWriteAccessToInstructors'                  => [
-			'exclude'   => true,
-			'filter'    => true,
-			'inputType' => 'checkbox',
-			'sql'       => ['type' => 'boolean', 'default' => false],
-		],
-		'allowDeleteAccessToAuthor'                      => [
-			'exclude'   => true,
-			'filter'    => true,
-			'inputType' => 'checkbox',
-			'sql'       => ['type' => 'boolean', 'default' => false],
-		],
-		'allowDeleteAccessToInstructors'                 => [
-			'exclude'   => true,
-			'filter'    => true,
-			'inputType' => 'checkbox',
-			'sql'       => ['type' => 'boolean', 'default' => false],
-		],
-		'allowCutAccessToAuthor'                         => [
-			'exclude'   => true,
-			'filter'    => true,
-			'inputType' => 'checkbox',
-			'sql'       => ['type' => 'boolean', 'default' => false],
-		],
-		'allowAdministerEventRegistrationsToInstructors' => [
-			'exclude'   => true,
-			'filter'    => true,
-			'inputType' => 'checkbox',
-			'sql'       => ['type' => 'boolean', 'default' => false],
-		],
-		'allowAdministerEventRegistrationsToAuthors'     => [
-			'exclude'   => true,
-			'filter'    => true,
-			'inputType' => 'checkbox',
-			'sql'       => ['type' => 'boolean', 'default' => false],
-		],
-		'allowCutAccessToInstructors'                    => [
-			'exclude'   => true,
-			'filter'    => true,
-			'inputType' => 'checkbox',
-			'sql'       => ['type' => 'boolean', 'default' => false],
-		],
-		'allowCutAccessToInstructors'                    => [
-			'exclude'   => true,
-			'filter'    => true,
-			'inputType' => 'checkbox',
-			'sql'       => ['type' => 'boolean', 'default' => false],
-		],
-		'groupEventPerm'                                 => [
-			'exclude'   => true,
-			'inputType' => 'multiColumnWizard',
-			'eval'      => [
-				'columnFields' => [
-					'group'       => [
-						'label'      => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['group'],
-						'exclude'    => true,
-						'inputType'  => 'select',
-						'reference'  => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
-						'relation'   => ['type' => 'hasMany', 'load' => 'eager'],
-						'foreignKey' => 'tl_user_group.name',
-						'eval'       => ['includeBlankOption' => true, 'mandatory' => false, 'style' => 'width: 80%'],
-					],
-					'permissions' => [
-						'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissions'],
-						'exclude'   => true,
-						'inputType' => 'select',
-						'options'   => ['canWriteEvent', 'canDeleteEvent', 'canCutEvent', 'canAdministerEventRegistrations'],
-						'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
-						'eval'      => ['chosen' => true, 'mandatory' => false, 'multiple' => true, 'style' => 'width: 80%'],
-					],
+			'inputType' => 'group',
+			'palette'   => ['parties', 'group', 'flags'],
+			'fields'    => [
+				'parties' => [
+					'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_parties'],
+					'inputType' => 'select',
+					'options'   => ['event_author', 'main_instructor', 'event_instructors', 'registration_coordinator'],
+					'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_partyOptions'],
+					'eval'      => ['chosen' => true, 'multiple' => true, 'tl_class' => 'clr'],
 				],
-				'mandatory'    => false,
+				'group'   => [
+					'label'      => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_group'],
+					'inputType'  => 'select',
+					'foreignKey' => 'tl_user_group.name',
+					'eval'       => ['includeBlankOption' => true, 'tl_class' => 'clr'],
+				],
+				'flags'   => [
+					'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flags'],
+					'inputType' => 'select',
+					'options'   => ['can_write_event', 'can_delete_event', 'can_cut_event', 'can_administer_event_registrations', 'can_upgrade_release_level', 'can_downgrade_release_level'],
+					'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flagOptions'],
+					'eval'      => ['chosen' => true, 'mandatory' => true, 'multiple' => true, 'tl_class' => 'clr'],
+				],
 			],
-			'sql'       => 'blob NULL',
+			// allow ordering of the rules (default)
+			'order'     => true,
+			// New release levels start without rules (not NULL, so the migration does not convert them)
+			'default'   => [],
+			// store serialized into a blob (default storage backend)
+			'sql'       => ['type' => 'blob', 'length' => \Doctrine\DBAL\Platforms\MySQLPlatform::LENGTH_LIMIT_BLOB, 'notnull' => false],
 		],
 		'allowRegistration'                              => [
 			'exclude'   => true,
@@ -185,33 +130,21 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		'groupReleaseLevelPerm'                          => [
-			'exclude'   => true,
-			'inputType' => 'multiColumnWizard',
-			'eval'      => [
-				'columnFields' => [
-					'group'       => [
-						'label'      => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['group'],
-						'exclude'    => true,
-						'inputType'  => 'select',
-						'reference'  => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
-						'relation'   => ['type' => 'hasMany', 'load' => 'eager'],
-						'foreignKey' => 'tl_user_group.name',
-						'eval'       => ['includeBlankOption' => true, 'mandatory' => false, 'tl_class' => 'w50'],
-					],
-					'permissions' => [
-						'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissions'],
-						'exclude'   => true,
-						'inputType' => 'select',
-						'options'   => ['canRelLevelUp', 'canRelLevelDown'],
-						'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
-						'eval'      => ['chosen' => true, 'mandatory' => false, 'multiple' => true, 'tl_class' => 'w50'],
-					],
-				],
-				'mandatory'    => false,
-				'tl_class'     => 'mcwColumnCount_4',
-			],
-			'sql'       => 'blob NULL',
-		],
+		// The old permission fields are no longer used (see permissionRules). The columns are kept
+		// until EventReleaseLevelPermissionRulesMigration has converted them, otherwise the schema
+		// update could drop them before (the migration runs after the schema update has created
+		// permissionRules). Remove them in a later version.
+		'allowWriteAccessToAuthor'                       => ['sql' => ['type' => 'boolean', 'default' => false]],
+		'allowWriteAccessToInstructors'                  => ['sql' => ['type' => 'boolean', 'default' => false]],
+		'allowDeleteAccessToAuthor'                      => ['sql' => ['type' => 'boolean', 'default' => false]],
+		'allowDeleteAccessToInstructors'                 => ['sql' => ['type' => 'boolean', 'default' => false]],
+		'allowCutAccessToAuthor'                         => ['sql' => ['type' => 'boolean', 'default' => false]],
+		'allowCutAccessToInstructors'                    => ['sql' => ['type' => 'boolean', 'default' => false]],
+		'allowAdministerEventRegistrationsToAuthors'     => ['sql' => ['type' => 'boolean', 'default' => false]],
+		'allowAdministerEventRegistrationsToInstructors' => ['sql' => ['type' => 'boolean', 'default' => false]],
+		'allowSwitchingToPrevLevel'                      => ['sql' => ['type' => 'boolean', 'default' => false]],
+		'allowSwitchingToNextLevel'                      => ['sql' => ['type' => 'boolean', 'default' => false]],
+		'groupEventPerm'                                 => ['sql' => 'blob NULL'],
+		'groupReleaseLevelPerm'                          => ['sql' => 'blob NULL'],
 	],
 ];

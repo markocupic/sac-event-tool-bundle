@@ -18,7 +18,7 @@ use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\StringUtil;
+use Markocupic\SacEventToolBundle\EventReleaseLevel\EventReleaseLevelPermissionRules;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -30,11 +30,11 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 /**
  * Decides what a back end user may do with an event (subject: the event ID).
  *
- * Events that are not assigned to a release level: every back end user is granted access.
- *
- * Events that are assigned to a release level: the permissions are defined in the
- * release level (tl_event_release_level_policy). Admins are granted access
- * (except when changing the release level, see EventReleaseLevelTransitionVoter).
+ * - Events that are not assigned to a release level: every back end user is granted access.
+ * - Admins are granted access (except when changing the release level, see
+ *   EventReleaseLevelTransitionVoter).
+ * - All other users need a permission rule of the release level of the event
+ *   (tl_event_release_level_policy.permissionRules, see EventReleaseLevelPermissionRules).
  */
 class CalendarEventsVoter extends Voter
 {
@@ -67,6 +67,7 @@ class CalendarEventsVoter extends Voter
         private readonly AccessDecisionManagerInterface $accessDecisionManager,
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
+        private readonly EventReleaseLevelPermissionRules $permissionRules,
         private readonly Security $security,
         #[Autowire('%sacevt.event_registration.config.reg_start_time_offset%')]
         private readonly int $regStartTimeOffset,
@@ -83,10 +84,8 @@ class CalendarEventsVoter extends Voter
      * - if the event is already on the highest level (up) or on the lowest level (down)
      * Grant access...
      * - to admins
-     * - to authors (allowWriteAccessToAuthor) and instructors (allowWriteAccessToInstructors)
-     *   of the event, if the release level allows switching to the next/previous level
-     *   (allowSwitchingToNextLevel/allowSwitchingToPrevLevel)
-     * - to "super-users" --> tl_event_release_level_policy.groupReleaseLevelPerm (canRelLevelUp/canRelLevelDown).
+     * - if a permission rule of the release level grants "can_upgrade_release_level" or
+     *   "can_downgrade_release_level" to the user.
      *
      * Whether the target level belongs to the release level system of the event
      * type and the time rules of the calendar are checked by EventReleaseLevelTransitionVoter.
@@ -112,13 +111,12 @@ class CalendarEventsVoter extends Voter
             return true;
         }
 
-        $canSwitch = $isUpgrade ? $level->allowSwitchingToNextLevel : $level->allowSwitchingToPrevLevel;
-
-        if ($canSwitch && (($level->allowWriteAccessToAuthor && $this->isAuthor($user, $event)) || ($level->allowWriteAccessToInstructors && $this->isInstructor($user, $event)))) {
-            return true;
-        }
-
-        return $this->hasGroupPermission($user, $level->groupReleaseLevelPerm, $isUpgrade ? 'canRelLevelUp' : 'canRelLevelDown');
+        return $this->permissionRules->isGranted(
+            $level,
+            $isUpgrade ? EventReleaseLevelPermissionRules::FLAG_UPGRADE_RELEASE_LEVEL : EventReleaseLevelPermissionRules::FLAG_DOWNGRADE_RELEASE_LEVEL,
+            fn (string $party): bool => $this->isParty($party, $user, $event),
+            fn (int $groupId): bool => $this->security->isGranted('contao_user.groups', $groupId),
+        );
     }
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -159,84 +157,28 @@ class CalendarEventsVoter extends Voter
             return true;
         }
 
+        $isGranted = fn (string $flag): bool => $this->permissionRules->isGranted(
+            $releaseLevel,
+            $flag,
+            fn (string $party): bool => $this->isParty($party, $user, $event),
+            fn (int $groupId): bool => $this->accessDecisionManager->decide($token, ['contao_user.groups'], $groupId),
+        );
+
         return match ($attribute) {
-            self::CAN_DELETE_EVENT => $this->canDeleteEvent($user, $event, $releaseLevel),
-            self::CAN_WRITE_EVENT => $this->canWriteEvent($user, $event, $releaseLevel),
-            self::CAN_CUT_EVENT => $this->canCutEvent($user, $event, $releaseLevel),
-            self::CAN_ADMINISTER_EVENT_REGISTRATIONS => $this->canAdministerEventRegistrations($user, $event, $releaseLevel),
+            self::CAN_DELETE_EVENT => $isGranted(EventReleaseLevelPermissionRules::FLAG_DELETE_EVENT),
+            self::CAN_WRITE_EVENT => $isGranted(EventReleaseLevelPermissionRules::FLAG_WRITE_EVENT),
+            self::CAN_CUT_EVENT => $isGranted(EventReleaseLevelPermissionRules::FLAG_CUT_EVENT),
+            // Non-admins are denied access before the registration period has started
+            self::CAN_ADMINISTER_EVENT_REGISTRATIONS => $this->hasRegistrationPeriodStarted($event) && $isGranted(EventReleaseLevelPermissionRules::FLAG_ADMINISTER_EVENT_REGISTRATIONS),
             default => throw new \LogicException(\sprintf('You vote on a unsupported attribute "%s"!', $attribute)),
         };
-    }
-
-    /**
-     * Grant delete-access (non-admins)...
-     * - to authors --> tl_event_release_level_policy.allowDeleteAccessToAuthor
-     * - to instructors --> tl_event_release_level_policy.allowDeleteAccessToInstructors
-     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm (canDeleteEvent).
-     */
-    private function canDeleteEvent(BackendUser $user, CalendarEventsModel $event, EventReleaseLevelPolicyModel $releaseLevel): bool
-    {
-        return ($releaseLevel->allowDeleteAccessToAuthor && $this->isAuthor($user, $event))
-            || ($releaseLevel->allowDeleteAccessToInstructors && $this->isInstructor($user, $event))
-            || $this->hasGroupPermission($user, $releaseLevel->groupEventPerm, 'canDeleteEvent');
-    }
-
-    /**
-     * Grant cut-access (non-admins)...
-     * - to authors --> tl_event_release_level_policy.allowCutAccessToAuthor
-     * - to instructors --> tl_event_release_level_policy.allowCutAccessToInstructors
-     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm (canCutEvent).
-     */
-    private function canCutEvent(BackendUser $user, CalendarEventsModel $event, EventReleaseLevelPolicyModel $releaseLevel): bool
-    {
-        return ($releaseLevel->allowCutAccessToAuthor && $this->isAuthor($user, $event))
-            || ($releaseLevel->allowCutAccessToInstructors && $this->isInstructor($user, $event))
-            || $this->hasGroupPermission($user, $releaseLevel->groupEventPerm, 'canCutEvent');
-    }
-
-    /**
-     * Grant write-access (non-admins)...
-     * - to authors --> tl_event_release_level_policy.allowWriteAccessToAuthor
-     * - to instructors --> tl_event_release_level_policy.allowWriteAccessToInstructors
-     * - to the user who is charged to do the registration admin work (tl_calendar_events.registrationGoesTo)
-     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm (canWriteEvent).
-     */
-    private function canWriteEvent(BackendUser $user, CalendarEventsModel $event, EventReleaseLevelPolicyModel $releaseLevel): bool
-    {
-        return ($releaseLevel->allowWriteAccessToAuthor && $this->isAuthor($user, $event))
-            || ($releaseLevel->allowWriteAccessToInstructors && $this->isInstructor($user, $event))
-            || $this->isRegistrationCoordinator($user, $event)
-            || $this->hasGroupPermission($user, $releaseLevel->groupEventPerm, 'canWriteEvent');
-    }
-
-    /**
-     * Allow to administer event registrations (means the user is allowed to add new
-     * event registrations too). Non-admins are denied access before the registration
-     * period has started; afterwards access is granted...
-     * - to authors --> tl_event_release_level_policy.allowAdministerEventRegistrationsToAuthors
-     * - to instructors --> tl_event_release_level_policy.allowAdministerEventRegistrationsToInstructors
-     * - to the user who is charged to do the registration admin work (tl_calendar_events.registrationGoesTo)
-     * - to "super-users" --> tl_event_release_level_policy.groupEventPerm (canAdministerEventRegistrations).
-     */
-    private function canAdministerEventRegistrations(BackendUser $user, CalendarEventsModel $event, EventReleaseLevelPolicyModel $releaseLevel): bool
-    {
-        $registrationStartTime = $event->registrationStartDate + $this->regStartTimeOffset;
-
-        if ($event->setRegistrationPeriod && $registrationStartTime > time()) {
-            return false;
-        }
-
-        return ($releaseLevel->allowAdministerEventRegistrationsToAuthors && $this->isAuthor($user, $event))
-            || ($releaseLevel->allowAdministerEventRegistrationsToInstructors && $this->isInstructor($user, $event))
-            || $this->isRegistrationCoordinator($user, $event)
-            || $this->hasGroupPermission($user, $releaseLevel->groupEventPerm, 'canAdministerEventRegistrations');
     }
 
     /**
      * Upgrade or downgrade by one level (the arrows in the event list): Grant access...
      * - to all users, if the event is not assigned to a release level
      * - if the user may switch the event to the next or previous level, see EventReleaseLevelTransitionVoter
-     *   (release level system of the event type, permissions of the release level and time rules of the calendar).
+     *   (release level system of the event type, permission rules of the release level and time rules of the calendar).
      *
      * @throws \Exception
      */
@@ -282,9 +224,40 @@ class CalendarEventsVoter extends Voter
         return $releaseLevel;
     }
 
+    private function hasRegistrationPeriodStarted(CalendarEventsModel $event): bool
+    {
+        if (!$event->setRegistrationPeriod) {
+            return true;
+        }
+
+        return $event->registrationStartDate + $this->regStartTimeOffset <= time();
+    }
+
+    /**
+     * Is the user the given party (see EventReleaseLevelPermissionRules::PARTY_*) of the event?
+     */
+    private function isParty(string $party, BackendUser $user, CalendarEventsModel $event): bool
+    {
+        return match ($party) {
+            EventReleaseLevelPermissionRules::PARTY_EVENT_AUTHOR => $this->isAuthor($user, $event),
+            EventReleaseLevelPermissionRules::PARTY_MAIN_INSTRUCTOR => $this->isMainInstructor($user, $event),
+            EventReleaseLevelPermissionRules::PARTY_EVENT_INSTRUCTORS => $this->isInstructor($user, $event),
+            EventReleaseLevelPermissionRules::PARTY_REGISTRATION_COORDINATOR => $this->isRegistrationCoordinator($user, $event),
+            default => false,
+        };
+    }
+
     private function isAuthor(BackendUser $user, CalendarEventsModel $event): bool
     {
         return (int) $user->id === (int) $event->author;
+    }
+
+    /**
+     * The main instructor is the first instructor of the event (tl_calendar_events.mainInstructor).
+     */
+    private function isMainInstructor(BackendUser $user, CalendarEventsModel $event): bool
+    {
+        return (int) $event->mainInstructor > 0 && (int) $user->id === (int) $event->mainInstructor;
     }
 
     private function isInstructor(BackendUser $user, CalendarEventsModel $event): bool
@@ -300,29 +273,5 @@ class CalendarEventsVoter extends Voter
     private function isRegistrationCoordinator(BackendUser $user, CalendarEventsModel $event): bool
     {
         return (int) $event->registrationGoesTo > 0 && (int) $user->id === (int) $event->registrationGoesTo;
-    }
-
-    /**
-     * Checks whether the user is member of a group that has the permission.
-     *
-     * @param mixed $groupPermissions Serialized multi column wizard value: [['group' => 1, 'permissions' => ['canWriteEvent', ...]], ...]
-     */
-    private function hasGroupPermission(BackendUser $user, mixed $groupPermissions, string $permission): bool
-    {
-        $userGroups = StringUtil::deserialize($user->groups, true);
-
-        foreach (StringUtil::deserialize($groupPermissions, true) as $groupPermission) {
-            if (empty($groupPermission['group']) || !\in_array($groupPermission['group'], $userGroups, false)) {
-                continue;
-            }
-
-            $permissions = \is_array($groupPermission['permissions'] ?? null) ? $groupPermission['permissions'] : [];
-
-            if (\in_array($permission, $permissions, true)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

@@ -21,6 +21,7 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
+use Contao\Image;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
@@ -68,6 +69,8 @@ class CalendarEvents
 
     private Adapter $eventReleaseLevelPolicyPackageModel;
 
+    private Adapter $image;
+
     private Adapter $message;
 
     private Adapter $stringUtil;
@@ -90,6 +93,7 @@ class CalendarEvents
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->eventReleaseLevelPolicyModel = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
         $this->eventReleaseLevelPolicyPackageModel = $this->framework->getAdapter(EventReleaseLevelPolicyPackageModel::class);
+        $this->image = $this->framework->getAdapter(Image::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->system = $this->framework->getAdapter(System::class);
@@ -252,6 +256,11 @@ class CalendarEvents
 
         if (!$isGranted || !$levelExists) {
             $operation->disable();
+        }
+
+        // Tell the user why the event cannot be shifted (e.g. the start date is outside the valid time period)
+        if (!$isGranted && $levelExists && null !== $currentLevel) {
+            $this->addTransitionDeniedReason($operation, (int) $row['id'], $currentLevel, $isUpgrade);
         }
     }
 
@@ -528,6 +537,28 @@ class CalendarEvents
         $arrIDS = $this->requestStack->getSession()->get('CURRENT')['IDS'] ?? [];
 
         return \is_array($arrIDS) ? $arrIDS : [];
+    }
+
+    /**
+     * Shows the reason as the title (tooltip) of the disabled operation.
+     */
+    private function addTransitionDeniedReason(DataContainerOperation $operation, int $eventId, EventReleaseLevelPolicyModel $currentLevel, bool $isUpgrade): void
+    {
+        $event = $this->calendarEventsModel->findById($eventId);
+        $targetLevel = $isUpgrade ? $this->eventReleaseLevelPolicyModel->findNextLevel($currentLevel->id) : $this->eventReleaseLevelPolicyModel->findPrevLevel($currentLevel->id);
+
+        if (null === $event || null === $targetLevel) {
+            return;
+        }
+
+        $reason = $this->eventReleaseLevelUtil->getTransitionDeniedReason($event, $targetLevel);
+
+        if (null === $reason) {
+            return;
+        }
+
+        // Same markup as a disabled operation in DataContainer::generateButtons(), plus the title
+        $operation->setHtml($this->image->getHtml($operation['icon'], $operation['label'], 'title="'.$this->stringUtil->specialchars($reason).'"').' ');
     }
 
     private function disableIfNotGranted(string $voterAttribute, DataContainerOperation $operation): void

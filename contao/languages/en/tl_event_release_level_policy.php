@@ -23,40 +23,31 @@ $GLOBALS['TL_LANG']['tl_event_release_level_policy']['show'] = ['Ansehen', 'Frei
 
 // Legends
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['title_legend'] = 'Titel-Einstellungen';
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['event_grants_legend'] = 'Rechte-Vergabe für Event';
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['event_release_level_grants_legend'] = 'Rechte-Vergabe für Änderung Freigabestufe';
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['event_registrations_grants_legend'] = 'Rechte-Vergabe für Event-Registrierungen';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['event_registrations_grants_legend'] = 'Online-Anmeldung-Frontend';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permission_rules_legend'] = 'Rechte-Regeln';
 
 // Fields
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['level'] = ['Veröffentlichungsstufe', 'Wählen Sie die Veröffentlichungsstufe aus. Jede Stufe darf pro Freigabestufen-System nur einmal vorkommen, und die Stufen müssen lückenlos bei 1 beginnen (1, 2, 3, …).'];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['title'] = ['Titel', 'Geben Sie für die Freigabestufe einen Namen an. Der Name darf pro Freigabestufen-System nur einmal vorkommen.'];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['description'] = ['Beschreibung', 'Geben Sie für die Freigabestufe einen Namen ein.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['groupReleaseLevelPerm'] = ['Weitere berechtigten Gruppen', 'Geben Sie die berechtigten Gruppen an. Der Event-Besitzer (Autor) und der/die Event-Leiter müssen nicht angegeben werden.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['groupEventPerm'] = ['Weitere berechtigten Gruppen', 'Geben Sie die berechtigten Gruppen an. Der Event-Besitzer (Autor) und der/die Event-Leiter müssen nicht angegeben werden.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['group'] = ['Backend-Gruppen', 'Wählen Sie die Gruppen mit erweiterten Rechten aus.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissions'] = ['Rechte', 'Wählen Sie die Rechte aus, die Mitgliedern der Gruppe zugewiesen werden.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowWriteAccessToAuthor'] = ['Dem Event-Autor Schreibzugriff auf diesem Level gewähren.', 'Mit dieser Einstellung gewähren Sie auf diesem Level dem Autor Schreibzugriff.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowWriteAccessToInstructors'] = ['Den Event-Leitern Schreibzugriff auf diesem Level gewähren.', 'Mit dieser Einstellung gewähren Sie auf diesem Level den Event-Leitern Schreibzugriff.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowCutAccessToAuthor'] = ['Dem Event-Autor das Verschieben auf diesem Level gewähren.', 'Mit dieser Einstellung ermöglichen Sie auf diesem Level dem Event-Autor das Verschieben eines Events in einen anderen Container.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowCutAccessToInstructors'] = ['Den Event-Leitern das Verschieben auf diesem Level gewähren.', 'Mit dieser Einstellung ermöglichen Sie auf diesem Level den Event-Leitern das Verschieben eines Events in einen anderen Container.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowDeleteAccessToAuthor'] = ['Dem Event-Autor Löschzugriff auf diesem Level gewähren.', 'Mit dieser Einstellung gewähren Sie auf diesem Level dem Autor Löschzugriff.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowDeleteAccessToInstructors'] = ['Den Event-Leitern Löschzugriff auf diesem Level gewähren.', 'Mit dieser Einstellung gewähren Sie auf diesem Level den Event-Leitern Löschzugriff.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowAdministerEventRegistrationsToInstructors'] = ['Den Event-Leitern das Administrieren und das manuelle Registrieren von Teilnehmern auf diesem Level gewähren.', 'Mit dieser Einstellung gewähren Sie auf diesem Level den Event-Leitern das Administrieren und das manuelle Registrieren von Teilnehmern zu einem Anlass.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowAdministerEventRegistrationsToAuthors'] = ['Dem Event-Autor das Administrieren und das manuelle Registrieren von Teilnehmern auf diesem Level gewähren.', 'Mit dieser Einstellung gewähren Sie auf diesem Level dem Event-Autor das Administrieren und das manuelle Registrieren von Teilnehmern zu einem Anlass.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowSwitchingToPrevLevel'] = ['Dem Event-Besitzer und dem Event-Leiter das Herabstufen erlauben', 'Dem Event-Besitzer (Autor) und dem Event-Leiter das Herabstufen erlauben.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowSwitchingToNextLevel'] = ['Dem Event-Besitzer und dem Event-Leiter das Hochstufen erlauben', 'Dem Event-Besitzer (Autor) und dem Event-Leiter das Hochstufen erlauben.'];
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowRegistration'] = ['Online Anmeldung zu Event ermöglichen.', ''];
-
-// References
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['canWriteEvent'] = 'Event bearbeiten';
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['canDeleteEvent'] = 'Event löschen';
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['canCutEvent'] = 'Event verschieben';
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['canRelLevelUp'] = 'Freigabestufe hochstufen';
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['canRelLevelDown'] = 'Freigabestufe herabstufen';
-$GLOBALS['TL_LANG']['tl_event_release_level_policy']['canAdministerEventRegistrations'] = 'Event-Anmeldungen administrieren';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowRegistration'] = ['Online Anmeldung zu Event im Frontend ermöglichen.', 'Wenn diese Option aktiviert ist, können sich Teilnehmer für den Event im Frontend über das Buchungsformular anmelden.'];
 
 // Errors
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['errLevelMin'] = 'Die Stufe %s ist nicht zulässig: Die tiefste Stufe ist immer 1.';
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['errLevelExists'] = 'Die Stufe %s ist in diesem Freigabestufen-System bereits vergeben.';
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['errLevelGap'] = 'Die Stufe %s ist nicht zulässig: Die Stufen müssen lückenlos bei 1 beginnen. Mit dieser Stufe wären es: %s.';
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['errTitleExists'] = 'Der Titel "%s" ist in diesem Freigabestufen-System bereits vergeben.';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules'] = ['Rechte-Regeln', 'Eine Regel gewährt die ausgewählten Rechte auf dieser Freigabestufe den ausgewählten Parteien des Events oder den Mitgliedern einer Benutzergruppe.'];
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_parties'] = ['Parteien', 'Auf welche Parteien des Events soll die Regel angewendet werden?'];
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_group'] = ['Benutzergruppe', 'Soll die Regel auf die Mitglieder einer Benutzergruppe angewendet werden?'];
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flags'] = ['Rechte', 'Wählen Sie die Rechte aus, die gewährt werden sollen.'];
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_partyOptions']['event_author'] = 'Event-Autor';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_partyOptions']['main_instructor'] = 'Nur Hauptleiter';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_partyOptions']['event_instructors'] = 'Alle Event-Leiter';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_partyOptions']['registration_coordinator'] = 'Anmeldungs-Koordinator';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flagOptions']['can_write_event'] = 'Event bearbeiten';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flagOptions']['can_delete_event'] = 'Event löschen';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flagOptions']['can_cut_event'] = 'Event verschieben';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flagOptions']['can_administer_event_registrations'] = 'Event-Anmeldungen administrieren';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flagOptions']['can_upgrade_release_level'] = 'Freigabestufe hochstufen';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flagOptions']['can_downgrade_release_level'] = 'Freigabestufe herabstufen';

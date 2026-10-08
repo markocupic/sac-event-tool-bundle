@@ -115,6 +115,28 @@ class EventReleaseLevelUtil
     }
 
     /**
+     * Explains why the user may not shift the event to the target level (e.g. as
+     * the title of the disabled upgrade/downgrade operation). Returns null if the
+     * transition is allowed.
+     */
+    public function getTransitionDeniedReason(CalendarEventsModel $event, EventReleaseLevelPolicyModel $targetLevel): string|null
+    {
+        if ($this->security->isGranted(EventReleaseLevelTransitionVoter::CAN_SWITCH_TO_EVENT_RELEASE_LEVEL, new EventReleaseLevelTransition($event, $targetLevel))) {
+            return null;
+        }
+
+        $calendar = $event->getRelated('pid');
+
+        if (null === $calendar) {
+            return null;
+        }
+
+        $exception = $this->createTransitionDeniedException($event, $targetLevel, $calendar, $this->timeRules->getViolation($event, $targetLevel));
+
+        return $this->translator->trans($exception->getTranslatableText(), $exception->getParams(), 'contao_default');
+    }
+
+    /**
      * Moves the event to the target level, publishes it on the highest level and
      * unpublishes it on the other levels. Saves the event and notifies the change
      * immediately (see EventReleaseLevelChangeNotifier).
