@@ -26,6 +26,7 @@ use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\Date;
 use Contao\PageModel;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
+use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Config\Log;
@@ -142,7 +143,7 @@ class ParticipantEventHistoryController extends AbstractBackendController
     }
 
     /**
-     * @return array{date: string, title: string, url: string|null, event_type: string, main_instructor: string, main_instructor_url: string|null, mountain_guide: string, difficulty: string}
+     * @return array{date: string, title: string, substitution: string, url: string|null, event_type: string, main_instructor: string, main_instructor_url: string|null, mountain_guide: string, difficulty: string}
      */
     private function getRow(CalendarEventsModel $event): array
     {
@@ -152,6 +153,7 @@ class ParticipantEventHistoryController extends AbstractBackendController
             'date' => $this->getDate($event),
             // Contao stores the title input-encoded (e.g. "&amp;"); Twig escapes it itself
             'title' => html_entity_decode((string) $event->title, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            'substitution' => $this->getSubstitution($event),
             'url' => $this->getEventUrl($event),
             'event_type' => '' !== (string) $event->eventType ? $this->translator->trans('MSC.'.$event->eventType.'_short', [], 'contao_default') : '',
             'main_instructor' => $mainInstructor,
@@ -224,6 +226,18 @@ class ParticipantEventHistoryController extends AbstractBackendController
         }
 
         return [$name, $url.'?getUpcoming=1&username='.rawurlencode((string) $user->username)];
+    }
+
+    /**
+     * Substitute tour from the tour report, if the event has not been executed as planned.
+     */
+    private function getSubstitution(CalendarEventsModel $event): string
+    {
+        if (EventExecutionState::STATE_NOT_EXECUTED_LIKE_PREDICTED !== $event->executionState) {
+            return '';
+        }
+
+        return trim(html_entity_decode((string) $event->eventSubstitutionText, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
     }
 
     /**

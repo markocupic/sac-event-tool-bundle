@@ -41,6 +41,9 @@
                                 {% else %}
                                     {{ row.title }}
                                 {% endif %}
+                                {% if row.substitution %}
+                                    <br><small class="participant-event-history__substitution">{{ 'MSC.participantEventHistorySubstitution'|trans([row.substitution], 'contao_default') }}</small>
+                                {% endif %}
                             </td>
                             <td class="tl_file_list">{{ row.event_type }}</td>
                             <td class="tl_file_list">
@@ -71,6 +74,10 @@
 
         .participant-event-history__link {
             text-decoration: underline;
+        }
+
+        .participant-event-history__substitution {
+            color: #c00;
         }
 
         .participant-event-history__date {
