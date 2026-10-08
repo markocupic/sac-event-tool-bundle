@@ -242,6 +242,7 @@ class RegisterStepTest extends ContaoTestCase
             $formFactory,
             $memberProvider,
             $this->createMock(TranslatorInterface::class),
+            'SAC Sektion Pilatus',
             $logger,
         );
     }

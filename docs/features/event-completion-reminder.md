@@ -155,7 +155,8 @@ Backend-Modul «Reminder für Event-Abschluss» (`sac_event_completion_reminder_
 | `Feature\EventCompletionReminder\Task\ParticipationConfirmationTask` | Aufgabe Teilnahmebestätigung |
 | `Feature\EventCompletionReminder\OpenTask` | DTO: eventId, title, eventType, startDate (bei verschobenen Events `rescheduledEventDate`), endDate (massgebendes Enddatum, bei verschobenen Events das verschobene), role (`instructor` oder `registration_coordinator`), tasks (Liste aus name, label, url) |
 | `Feature\EventCompletionReminder\TaskEvaluator` | erhält alle Tasks per `#[AutowireIterator('sacevt.instructor_post_event_task')]`, liefert die offenen Aufgaben eines Events |
-| `Feature\EventCompletionReminder\ReminderSchedule` | reine Logik: Fälligkeit nach Bearbeitungsfrist, massgebendes bzw. verschobenes Start- und Enddatum (`getEffectiveStartDate()`, `getEffectiveEndDate()`, `getRescheduledEndDate()`), Versand fällig? (lastSentAt, interval, now) |
+| `Feature\EventCompletionReminder\ReminderSchedule` | reine Logik: Fälligkeit nach Bearbeitungsfrist, Versand fällig? (lastSentAt, interval, now) |
+| `Util\EventDateUtil` | reine Logik: massgebendes bzw. verschobenes Start- und Enddatum (`getEffectiveStartDate()`, `getEffectiveEndDate()`, `getRescheduledEndDate()`), auch von der Teilnahme-Historie verwendet |
 | `Feature\EventCompletionReminder\OpenTaskProvider` | lädt die in Frage kommenden Events per SQL (`fetchCandidateEvents()`), bestimmt in PHP das massgebende Enddatum und die Fälligkeit (`findDueEvents()`), prüft sie über den `TaskEvaluator` und ordnet sie den Empfängern zu (Leiter ∪ Koordinator). Öffentlich: `getOpenTasksByRecipient(calendar, now)`, `getOpenTasks(userId, calendar, now)`, `getRecipientIdsWithOpenTasks(calendar, now)`, `getRecipient(userId)` (aktiv, mit E-Mail). Nicht readonly (mockbar) |
 | `Feature\EventCompletionReminder\TaskItem` | DTO einer offenen Aufgabe: name, label, url |
 | `Feature\EventCompletionReminder\DataContainer\ReminderLogTable` | Label-Callback für das Backend-Modul des Logs (nur lesen) |
@@ -262,11 +263,12 @@ HTML-Mail im Worker: Das Notification Center wandelt im HTML relative URLs mit `
 - `ParticipationConfirmationTaskTest`: `supports()` je Eventtyp; keine akzeptierten oder Wartelisten-Anmeldungen, keine Bestätigung, mindestens eine Bestätigung; Abfrage berücksichtigt nur akzeptierte und Wartelisten-Anmeldungen
 - `TaskEvaluatorTest`: nur unterstützte und offene Tasks, Reihenfolge nach Priorität (mit Dummy-Tasks)
 - `OpenTaskProviderTest`: Zuordnung zu den Empfängern: Leiter, Koordinator ohne Leiterrolle, Koordinator gleichzeitig Leiter (keine Duplikate), deaktivierte User und User ohne E-Mail, Events ohne offene Aufgaben, mehrere Events pro Empfänger, verschobene Events (fällig, noch nicht fällig, ohne Verschiebedatum), Sortierung nach massgebendem Enddatum, Eventtypen des Kalenders (keine gewählt, Übergabe an die Abfrage)
-- `ReminderScheduleTest`: Bearbeitungsfrist an den Tagesgrenzen (inkl. Zeitumstellung), verschobenes Enddatum (eintägig, mehrtägig, zwei Wochenenden, Zeitumstellung, ohne Verschiebedatum), erste Mail, Intervall nicht erreicht oder erreicht
+- `ReminderScheduleTest`: Bearbeitungsfrist an den Tagesgrenzen (inkl. Zeitumstellung), erste Mail, Intervall nicht erreicht oder erreicht
+- `EventDateUtilTest` (`tests/Util/`): verschobenes Enddatum (eintägig, mehrtägig, zwei Wochenenden, Zeitumstellung, ohne Verschiebedatum)
 - `SendEventCompletionReminderHandlerTest` (Mocks): Feature deaktiviert, keine Notification, ungültiger Empfänger, Intervall nicht abgelaufen, alles erledigt, Lock belegt, Log vor Versand (`logNotification()`) und Tokens (inkl. `reminder_count`)
 - `EventCompletionReminderCronTest`: eine Message pro fälligem Empfänger und Kalender, Intervall wird beachtet
 
-Nicht durch Unit-Tests abgedeckt: das SQL in `ReminderLog` (u. a. `ON DUPLICATE KEY UPDATE`), die SQL-Abfrage in `OpenTaskProvider::fetchCandidateEvents()` (Eventtyp, veröffentlicht, nicht abgesagt, `endDate`, Verschiebedatum) und die Abfrage in `ParticipationConfirmationTask::isOpen()` gegen eine echte Datenbank. Die Datumsgrenzen dazu prüft `ReminderScheduleTest`.
+Nicht durch Unit-Tests abgedeckt: das SQL in `ReminderLog` (u. a. `ON DUPLICATE KEY UPDATE`), die SQL-Abfrage in `OpenTaskProvider::fetchCandidateEvents()` (Eventtyp, veröffentlicht, nicht abgesagt, `endDate`, Verschiebedatum) und die Abfrage in `ParticipationConfirmationTask::isOpen()` gegen eine echte Datenbank. Die Datumsgrenzen dazu prüfen `ReminderScheduleTest` und `EventDateUtilTest`.
 
 ## Konfiguration
 

@@ -30,7 +30,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 /**
  * Decides what a back end user may do with an event (subject: the event ID).
  *
- * - Events that are not assigned to a release level: every back end user is granted access.
+ * - Events that are not assigned to a release level: every back end user is granted access
+ *   (except CAN_VIEW_PARTICIPANT_EVENT_HISTORY: admins, instructors and registration coordinator only).
  * - Admins are granted access (except when changing the release level, see
  *   EventReleaseLevelTransitionVoter).
  * - All other users need a permission rule of the release level of the event
@@ -50,6 +51,12 @@ class CalendarEventsVoter extends Voter
 
     public const string CAN_ADMINISTER_EVENT_REGISTRATIONS = 'sacevt_can_administer_event_registrations';
 
+    /**
+     * May the user see the event history of the participants (see Feature\ParticipantEventHistory)?
+     * The access period after the event is checked by ParticipantEventHistoryVoter.
+     */
+    public const string CAN_VIEW_PARTICIPANT_EVENT_HISTORY = 'sacevt_can_view_participant_event_history';
+
     private const array EVENT_PERMISSIONS_ALL = [
         self::CAN_DELETE_EVENT,
         self::CAN_WRITE_EVENT,
@@ -57,6 +64,7 @@ class CalendarEventsVoter extends Voter
         self::CAN_UPGRADE_EVENT_RELEASE_LEVEL,
         self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL,
         self::CAN_ADMINISTER_EVENT_REGISTRATIONS,
+        self::CAN_VIEW_PARTICIPANT_EVENT_HISTORY,
     ];
 
     private Adapter $calendarEventsModel;
@@ -148,8 +156,14 @@ class CalendarEventsVoter extends Voter
 
         $releaseLevel = $this->getReleaseLevel($event);
 
-        // Grant access to all users if the event is not assigned to a release level
         if (null === $releaseLevel) {
+            // The event history of the participants contains personal data: without a release level,
+            // only admins, the instructors and the registration coordinator of the event have access
+            if (self::CAN_VIEW_PARTICIPANT_EVENT_HISTORY === $attribute) {
+                return $this->accessDecisionManager->decide($token, ['ROLE_ADMIN']) || $this->isInstructor($user, $event) || $this->isRegistrationCoordinator($user, $event);
+            }
+
+            // Grant access to all users if the event is not assigned to a release level
             return true;
         }
 
@@ -170,6 +184,7 @@ class CalendarEventsVoter extends Voter
             self::CAN_CUT_EVENT => $isGranted(EventReleaseLevelPermissionRules::FLAG_CUT_EVENT),
             // Non-admins are denied access before the registration period has started
             self::CAN_ADMINISTER_EVENT_REGISTRATIONS => $this->hasRegistrationPeriodStarted($event) && $isGranted(EventReleaseLevelPermissionRules::FLAG_ADMINISTER_EVENT_REGISTRATIONS),
+            self::CAN_VIEW_PARTICIPANT_EVENT_HISTORY => $isGranted(EventReleaseLevelPermissionRules::FLAG_VIEW_PARTICIPANT_EVENT_HISTORY),
             default => throw new \LogicException(\sprintf('You vote on a unsupported attribute "%s"!', $attribute)),
         };
     }

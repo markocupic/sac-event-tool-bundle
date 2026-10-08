@@ -22,6 +22,7 @@ use Contao\UserModel;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Config\EventState;
+use Markocupic\SacEventToolBundle\Util\EventDateUtil;
 
 /**
  * Finds the open post-event tasks of a calendar and assigns them to the recipients.
@@ -29,7 +30,7 @@ use Markocupic\SacEventToolBundle\Config\EventState;
  * Applies the filters that are common to all tasks:
  * event type selected in the calendar, published, not canceled, completion period expired.
  * Rescheduled events are only checked if a new date has been entered; their end date
- * is shifted accordingly (see ReminderSchedule::getEffectiveEndDate()).
+ * is shifted accordingly (see EventDateUtil::getEffectiveEndDate()).
  * All events of the calendar are checked, no matter how long ago they ended.
  * Whether a task applies to an event type and whether it is still open
  * is decided by the task building blocks (via TaskEvaluator).
@@ -85,7 +86,7 @@ class OpenTaskProvider
             $title = html_entity_decode((string) $event->title, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
             // Rescheduled events: the shifted dates are shown in the notification
-            $effectiveStartDate = ReminderSchedule::getEffectiveStartDate(
+            $effectiveStartDate = EventDateUtil::getEffectiveStartDate(
                 (int) $event->startDate,
                 (string) $event->eventState,
                 $event->rescheduledEventDate ? (int) $event->rescheduledEventDate : null,
@@ -159,7 +160,7 @@ class OpenTaskProvider
         $dueEvents = [];
 
         foreach ($this->fetchCandidateEvents($calendar, $eventTypes, $dueEndDateMax) as $row) {
-            $effectiveEndDate = ReminderSchedule::getEffectiveEndDate(
+            $effectiveEndDate = EventDateUtil::getEffectiveEndDate(
                 (int) $row['startDate'],
                 (int) $row['endDate'],
                 (string) $row['eventState'],

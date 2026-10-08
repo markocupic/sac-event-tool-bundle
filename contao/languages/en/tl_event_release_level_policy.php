@@ -51,3 +51,4 @@ $GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flagOption
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flagOptions']['can_administer_event_registrations'] = 'Event-Anmeldungen administrieren';
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flagOptions']['can_upgrade_release_level'] = 'Freigabestufe hochstufen';
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flagOptions']['can_downgrade_release_level'] = 'Freigabestufe herabstufen';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flagOptions']['can_view_participant_event_history'] = 'Teilnahme-Historie der Angemeldeten ansehen';

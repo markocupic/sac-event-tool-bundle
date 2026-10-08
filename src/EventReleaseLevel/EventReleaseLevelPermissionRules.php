@@ -46,6 +46,8 @@ final class EventReleaseLevelPermissionRules
 
     public const string FLAG_DOWNGRADE_RELEASE_LEVEL = 'can_downgrade_release_level';
 
+    public const string FLAG_VIEW_PARTICIPANT_EVENT_HISTORY = 'can_view_participant_event_history';
+
     /**
      * The rules are parsed once per request and release level.
      *

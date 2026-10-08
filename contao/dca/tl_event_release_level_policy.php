@@ -112,7 +112,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 				'flags'   => [
 					'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flags'],
 					'inputType' => 'select',
-					'options'   => ['can_write_event', 'can_delete_event', 'can_cut_event', 'can_administer_event_registrations', 'can_upgrade_release_level', 'can_downgrade_release_level'],
+					'options'   => ['can_write_event', 'can_delete_event', 'can_cut_event', 'can_administer_event_registrations', 'can_upgrade_release_level', 'can_downgrade_release_level', 'can_view_participant_event_history'],
 					'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flagOptions'],
 					'eval'      => ['chosen' => true, 'mandatory' => true, 'multiple' => true, 'tl_class' => 'clr'],
 				],

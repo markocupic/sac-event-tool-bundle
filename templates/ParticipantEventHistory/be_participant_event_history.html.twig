@@ -1,0 +1,76 @@
+{#
+    Backend: events the participant of a registration has participated in.
+    See src/Feature/ParticipantEventHistory/Controller/ParticipantEventHistoryController.php
+#}
+{% extends "@Contao/be_main" %}
+
+{% block main_content %}
+    <div id="tl_buttons">
+        <a href="{{ back_url }}" class="header_back" title="{{ 'MSC.participantEventHistoryBack'|trans({}, 'contao_default') }}" accesskey="b">{{ 'MSC.backBTTitle'|trans({}, 'contao_default') }}</a>
+    </div>
+
+    <div class="tl_listing_container participant-event-history">
+        <h2 class="participant-event-history__title">{{ list_title }}</h2>
+
+        <p class="participant-event-history__info">
+            {{ 'MSC.participantEventHistorySacMemberId'|trans([sac_member_id], 'contao_default') }}<br>
+            {{ 'MSC.participantEventHistoryCount'|trans([rows|length], 'contao_default') }}
+        </p>
+
+        {% if rows is empty %}
+            <p class="tl_empty">{{ 'MSC.participantEventHistoryNoParticipations'|trans([years], 'contao_default') }}</p>
+        {% else %}
+            <table class="tl_listing showColumns">
+                <thead>
+                    <tr>
+                        <th class="tl_folder_tlist">{{ 'MSC.participantEventHistoryColumnDate'|trans({}, 'contao_default') }}</th>
+                        <th class="tl_folder_tlist">{{ 'MSC.participantEventHistoryColumnEvent'|trans({}, 'contao_default') }}</th>
+                        <th class="tl_folder_tlist">{{ 'MSC.participantEventHistoryColumnEventType'|trans({}, 'contao_default') }}</th>
+                        <th class="tl_folder_tlist">{{ 'MSC.participantEventHistoryColumnMainInstructor'|trans({}, 'contao_default') }}</th>
+                        <th class="tl_folder_tlist">{{ 'MSC.participantEventHistoryColumnMountainGuide'|trans({}, 'contao_default') }}</th>
+                        <th class="tl_folder_tlist">{{ 'MSC.participantEventHistoryColumnDifficulty'|trans({}, 'contao_default') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr class="hover-row">
+                            <td class="tl_file_list participant-event-history__date">{{ row.date }}</td>
+                            <td class="tl_file_list">
+                                {% if row.url %}
+                                    <a href="{{ row.url }}" target="_blank" rel="noopener">{{ row.title }}</a>
+                                {% else %}
+                                    {{ row.title }}
+                                {% endif %}
+                            </td>
+                            <td class="tl_file_list">{{ row.event_type }}</td>
+                            <td class="tl_file_list">
+                                {% if row.main_instructor_url %}
+                                    <a href="{{ row.main_instructor_url }}" target="_blank" rel="noopener">{{ row.main_instructor }}</a>
+                                {% else %}
+                                    {{ row.main_instructor }}
+                                {% endif %}
+                            </td>
+                            <td class="tl_file_list">{{ row.mountain_guide }}</td>
+                            <td class="tl_file_list">{{ row.difficulty }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+    <style{{ attrs().setIfExists('nonce', csp_nonce('style-src')) }}>
+        .participant-event-history__title {
+            margin: 16px 0 8px 0;
+            font-size: 1.2rem;
+        }
+
+        .participant-event-history__info {
+            margin: 16px 0;
+            line-height: 1.5;
+        }
+
+        .participant-event-history__date {
+            white-space: nowrap;
+        }
+    </style>
+{% endblock %}

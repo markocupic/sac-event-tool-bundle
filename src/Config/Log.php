@@ -119,4 +119,16 @@ class Log
      * directory has been deleted.
      */
     public const string DELETE_FRONTEND_USER_AVATAR_DIRECTORY = 'DELETE_FRONTEND_USER_AVATAR_DIRECTORY';
+
+    /**
+     * PARTICIPANT_EVENT_HISTORY_ACCESS: Log type when a backend user has opened the event
+     * history of a participant (see Feature\ParticipantEventHistory).
+     */
+    public const string PARTICIPANT_EVENT_HISTORY_ACCESS = 'PARTICIPANT_EVENT_HISTORY_ACCESS';
+
+    /**
+     * PARTICIPANT_EVENT_HISTORY_ACCESS_DENIED: Log type when the access to the event history
+     * of a participant has been denied.
+     */
+    public const string PARTICIPANT_EVENT_HISTORY_ACCESS_DENIED = 'PARTICIPANT_EVENT_HISTORY_ACCESS_DENIED';
 }

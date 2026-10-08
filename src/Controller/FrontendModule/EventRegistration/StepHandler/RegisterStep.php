@@ -29,6 +29,7 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\Ev
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\LoggedInMemberProvider;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\Exception\EventRegistrationException;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
+use Markocupic\SacEventToolBundle\Feature\ParticipantEventHistory\ParticipantEventHistoryQuery;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Psr\Log\LoggerInterface;
@@ -62,6 +63,7 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         private readonly EventRegistrationFormFactory $eventRegistrationFormFactory,
         private readonly LoggedInMemberProvider $loggedInMemberProvider,
         private readonly TranslatorInterface $translator,
+        private readonly string $sacevtSectionName,
         private readonly LoggerInterface|null $contaoErrorLogger = null,
     ) {
     }
@@ -109,6 +111,9 @@ class RegisterStep implements StepHandlerInterface, ValidationStepInterface
         }
 
         $template = ['event_model' => $eventModel->current()];
+
+        // Hint below the "notes" field: the instructors see the participations of the last years (see Feature\ParticipantEventHistory)
+        $template['notes_explanation'] = $this->translator->trans('FORM.evt_reg_ffield_expl_notes', [ParticipantEventHistoryQuery::HISTORY_YEARS, $this->sacevtSectionName], 'contao_default');
 
         try {
             // Throws an EventRegistrationException if the member may not register

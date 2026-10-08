@@ -104,7 +104,7 @@
                                 <div class="mt-4 mb-2" data-reg-widget="notes">
                                     {{ form.getWidget('notes').parse()|raw }}
                                     <div data-ffield-explanation="notes">
-                                        {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: 'FORM.evt_reg_ffield_expl_notes'|trans } %}
+                                        {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-check-circle', text: notes_explanation } %}
                                     </div>
                                 </div>
                             {% endif %}

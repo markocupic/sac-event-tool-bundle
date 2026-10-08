@@ -260,7 +260,7 @@ $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED]
 // Event registration frontend module form explanations
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ffield_expl_mobile'] = 'Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leer gelassen werden. Damit der/die Leiter/in dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine Mobilnummer zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ffield_expl_ahvNumber'] = 'Sämtliche Daten werden lediglich für interne Zwecke verwendet. Die AHV-Nummer wird ausschliesslich für die Abrechnung oder Rückforderung von J+S-Geldern verwendet. Deine persönlichen Daten werden vertraulich behandelt. Eine Weitergabe an Drittorganisationen ist ausgeschlossen.';
-$GLOBALS['TL_LANG']['FORM']['evt_reg_ffield_expl_notes'] = 'Bitte beschreibe und beantworte in wenigen Worten die erforderlichen Angaben für den Event wie: <ul class="list-bullet ps-3"><li>dein <strong>Leistungsniveau und Erfahrungen</strong></li><li>bereits <strong>absolvierte Referenztouren</strong> in den letzten paar Jahren (inkl. Angabe mit/ohne Bergführer/in)</li><li><strong>zusätzlich verlangte Angaben</strong> in den Anmeldebestimmungen</li><li>und <strong>weitere Anmerkungen, Wichtiges etc.</strong> nach Bedarf</li></ul><small>Hinweis: Die Leitenden haben keine Übersicht über deine absolvierten Touren und Kurse.</small>';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_ffield_expl_notes'] = 'Bitte beschreibe und beantworte in wenigen Worten die erforderlichen Angaben für den Event wie: <ul class="list-bullet ps-3"><li>dein <strong>Leistungsniveau und Erfahrungen</strong></li><li>bereits <strong>absolvierte Referenztouren</strong> in den letzten paar Jahren (inkl. Angabe mit/ohne Bergführer/in)</li><li><strong>zusätzlich verlangte Angaben</strong> in den Anmeldebestimmungen</li><li>und <strong>weitere Anmerkungen, Wichtiges etc.</strong> nach Bedarf</li></ul><small>Hinweis: Die Leitenden haben Einsicht in die Liste der Touren und Kurse, die du in den letzten %d Jahren mit der %s absolviert hast.</small>';// OLD: $GLOBALS['TL_LANG']['FORM']['evt_reg_ffield_expl_notes'] = 'Bitte beschreibe und beantworte in wenigen Worten die erforderlichen Angaben für den Event wie: <ul class="list-bullet ps-3"><li>dein <strong>Leistungsniveau und Erfahrungen</strong></li><li>bereits <strong>absolvierte Referenztouren</strong> in den letzten paar Jahren (inkl. Angabe mit/ohne Bergführer/in)</li><li><strong>zusätzlich verlangte Angaben</strong> in den Anmeldebestimmungen</li><li>und <strong>weitere Anmerkungen, Wichtiges etc.</strong> nach Bedarf</li></ul><small>Hinweis: Die Leitenden haben keine Übersicht über deine absolvierten Touren und Kurse.</small>';
 
 // Event Instructor Invoice
 $GLOBALS['TL_LANG']['ERR']['invalidNumberOfPrivateArrivals'] = 'Die Zahl der privat angereisten Teilnehmer (%s) ist nicht zulässig und übersteigt die Gesamtanzahl der Teilnehmer und Leiter (%s). Bitte korrigieren Sie diese Zahl im Vergütungsformular.';
@@ -327,6 +327,26 @@ $GLOBALS['TL_LANG']['MSC']['serr_these_registrations_are_also_pending'] = 'Diese
 $GLOBALS['TL_LANG']['MSC']['serr_days_registered'] = 'seit %d Tag/en';
 $GLOBALS['TL_LANG']['MSC']['serr_sac_member_id'] = 'Mitglieder-Nr.: %d';
 $GLOBALS['TL_LANG']['MSC']['serr_link_member_list'] = 'Zur Teilnehmerliste';
+
+// Participant event history (see docs/features/participant-event-history.md)
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryHeadline'] = 'Teilgenommene Events der letzten %d Jahre von %s';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryTitle'] = 'Liste der Touren/Kurse der letzten %d Jahre von %s';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistorySacMemberId'] = 'SAC-Mitgliedernummer: %s';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryCount'] = 'Anzahl Teilnahmen: %s';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryNoParticipations'] = 'Keine Teilnahmen in den letzten %d Jahren.';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryBack'] = 'Zurück zur Teilnehmerliste';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryColumnDate'] = 'Datum';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryColumnEvent'] = 'Event';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryColumnEventType'] = 'Eventtyp';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryColumnMainInstructor'] = 'Hauptleiter';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryColumnMountainGuide'] = 'Mit Bergführer';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryColumnDifficulty'] = 'Schwierigkeit / Kursstufe';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryWithoutMountainGuide'] = 'nein';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryWithMountainGuide'] = 'mit Bergführer/in';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryWithMountainGuideOffer'] = 'mit Bergführerangebot';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryNoSacMemberId'] = 'Teilnahme-Historie nicht verfügbar: Die Registrierung hat keine gültige SAC-Mitgliedernummer.';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryAccessExpired'] = 'Teilnahme-Historie nicht mehr verfügbar: Die Einsicht war bis am %s möglich.';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryNoPermission'] = 'Sie haben keine Berechtigung, die Teilnahme-Historie dieser Registrierung anzusehen.';
 
 // Event feedback
 // Errors

@@ -20,6 +20,7 @@ Ausführliche Beschreibungen (Regeln, Datenmodell, Klassen, Tests) liegen unter 
 - [Event-Erinnerung vor Event-Start](docs/features/event-reminder.md): erinnert Leiter und Teilnehmer x Tage vor dem Event-Start mit einer E-Mail pro Event (An: Kontaktperson, CC: Leiter, BCC: Teilnehmer).
 - [Leiter-Erinnerung an offene Aufgaben nach dem Event](docs/features/event-completion-reminder.md): erinnert Leiter und Anmelde-Koordinatoren per Benachrichtigung an fehlende Tourenberichte und Teilnahmebestätigungen.
 - [Reminder für unbearbeitete Event-Anmeldungen](docs/features/event-registration-reminder.md): erinnert Anmelde-Koordinator bzw. Hauptleiter an Anmeldungen, die noch nicht angenommen, abgelehnt oder auf die Warteliste gesetzt wurden.
+- [Teilnahme-Historie](docs/features/participant-event-history.md): Leitende sehen in der Teilnehmerliste, an welchen Events ein angemeldetes Mitglied in den letzten 5 Jahren teilgenommen hat; jeder Zugriff wird protokolliert.
 - [Event Feedback](docs/features/event-feedback.md): Teilnehmende werten einen Event nach der Teilnahme online aus; Leiter sehen die Auswertungen anonym zusammengefasst im Backend.
 - [Event-Statistik](docs/features/event-stats.md): Backend-Seite mit Kennzahlen zu ausgeschriebenen Events, Leitenden, Anmeldungen und Teilnehmenden für das aktuelle und die zwei vorangehenden Jahre.
 - [Events automatisch veröffentlichen](docs/features/auto-publish-events.md): setzt an einem Stichtag pro Kalender die Events von der zweithöchsten auf die höchste Freigabestufe und veröffentlicht sie.

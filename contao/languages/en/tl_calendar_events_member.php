@@ -30,6 +30,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['toggleParticipationState'] = [
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['edit'] = ['Registrierung bearbeiten', 'Registrierung mit ID %s bearbeiten.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['delete'] = ['Registrierung löschen', 'Löschen der Registrierung mit ID %s.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['show'] = ['Details der Registrierung ansehen', 'Details der Registrierung mit ID %s anzeigen.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['participantEventHistory'] = ['Teilnahme-Historie', 'Teilgenommene Events des Mitglieds der Registrierung mit ID %s anzeigen.'];
 
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['stateOfSubscription_legend'] = 'Anmeldestatus-Einstellungen';
