@@ -159,6 +159,11 @@ class CalendarEventsMember
     {
         $registration = $operation->getRecord();
 
+        // Already greyed out because the user may not change the participation state (see AccessDecision\CalendarEventsMember)
+        if (null !== $operation->getHtml()) {
+            return;
+        }
+
         if (\in_array($registration['stateOfSubscription'] ?? '', EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED, true)) {
             return;
         }

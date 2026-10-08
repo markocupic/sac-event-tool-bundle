@@ -22,6 +22,8 @@ use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
+use Contao\Image;
+use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
@@ -29,14 +31,16 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsInstructorInvoiceVoter;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Access checks for the event registrations (tl_calendar_events_member) in the backend:
  * - checkPermission(): non-admins may only work on the registrations of events they administer
  * - makeFieldsReadonly(): the personal data of online registrations cannot be changed
  * - setGlobalOperations(): only shows the global operations the user is allowed to use
- * - editButton(), deleteButton(): disable the operations the user is not allowed to use
+ * - editButton(), deleteButton(), toggleParticipationStateButton(): disable the operations the user is not allowed to use
  */
 class CalendarEventsMember
 {
@@ -81,14 +85,22 @@ class CalendarEventsMember
 
     private Adapter $calendarEventsMemberModel;
 
+    private Adapter $image;
+
+    private Adapter $stringUtil;
+
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly Packages $packages,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
+        private readonly TranslatorInterface $translator,
     ) {
         // Adapters
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsMemberModel = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+        $this->image = $this->framework->getAdapter(Image::class);
+        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }
 
     /**
@@ -110,10 +122,9 @@ class CalendarEventsMember
 
         // List view: $dc->id is the event id
         if (!$request->query->has('act') && $request->query->has('id')) {
+            // Users who do not administer the registrations see the participation state greyed out (see toggleParticipationStateButton())
             if ($this->canAdministerRegistrations($dc->id)) {
                 $this->setPermissions(closed: false, notCreatable: false, notEditable: false, notDeletable: false);
-            } else {
-                unset($GLOBALS['TL_DCA'][self::TABLE]['list']['operations']['toggleParticipationState']);
             }
         }
 
@@ -269,6 +280,32 @@ class CalendarEventsMember
         if (!$isAllowed) {
             $operation->disable();
         }
+    }
+
+    /**
+     * Show the participation state greyed out and without link, if the user does not administer
+     * the registrations of the event. The toggle itself is denied in checkPermission().
+     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'list.operations.toggleParticipationState.button', priority: 110)]
+    public function toggleParticipationStateButton(DataContainerOperation $operation): void
+    {
+        $row = $operation->getRecord();
+
+        if ($this->security->isGranted('ROLE_ADMIN') || $this->canAdministerRegistrations($row['eventId'])) {
+            return;
+        }
+
+        // Greyed out icon that still shows the current state
+        $icon = !empty($row['hasParticipated']) ? 'icons/fontawesome/square-check--disabled.svg' : 'icons/fontawesome/square-check_--disabled.svg';
+        $title = $this->translator->trans('MSC.participationStateNoPermission', [], 'contao_default');
+
+        $operation->setHtml(
+            $this->image->getHtml(
+                $this->packages->getUrl($icon, 'markocupic_sac_event_tool'),
+                $title,
+                'title="'.$this->stringUtil->specialchars($title).'"',
+            ),
+        );
     }
 
     /**
