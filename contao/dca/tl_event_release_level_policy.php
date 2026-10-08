@@ -53,33 +53,33 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 		{event_registrations_grants_legend},allowRegistration',
 	],
 	'fields'   => [
-		'id'                                             => [
+		'id'                => [
 			'sql' => 'int(10) unsigned NOT NULL auto_increment',
 		],
-		'pid'                                            => [
+		'pid'               => [
 			'foreignKey' => 'tl_event_release_level_policy_package.title',
 			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 		],
-		'tstamp'                                         => [
+		'tstamp'            => [
 			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		// NULL instead of 0 for new, not yet saved records: the unique index pid,level allows several NULL values.
 		// doNotCopy: a copy would otherwise violate the unique index.
-		'level'                                          => [
+		'level'             => [
 			'exclude'   => true,
 			'inputType' => 'select',
 			'options'   => range(1, 10),
 			'eval'      => ['doNotCopy' => true, 'includeBlankOption' => true, 'mandatory' => true, 'nullIfEmpty' => true, 'tl_class' => 'clr'],
 			'sql'       => 'smallint(2) unsigned NULL',
 		],
-		'title'                                          => [
+		'title'             => [
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
-		'description'                                    => [
+		'description'       => [
 			'exclude'   => true,
 			'inputType' => 'textarea',
 			'eval'      => ['mandatory' => true, 'tl_class' => 'clr'],
@@ -91,7 +91,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 		// of a user group (or).
 		// Important: the names of the group field and its fields must not contain "__", the
 		// group widget uses "__" as separator in the names of its virtual fields.
-		'permissionRules'                                => [
+		'permissionRules'   => [
 			'exclude'   => true,
 			'inputType' => 'group',
 			'palette'   => ['parties', 'group', 'flags'],
@@ -124,27 +124,11 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 			// store serialized into a blob (default storage backend)
 			'sql'       => ['type' => 'blob', 'length' => \Doctrine\DBAL\Platforms\MySQLPlatform::LENGTH_LIMIT_BLOB, 'notnull' => false],
 		],
-		'allowRegistration'                              => [
+		'allowRegistration' => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
-		// The old permission fields are no longer used (see permissionRules). The columns are kept
-		// until EventReleaseLevelPermissionRulesMigration has converted them, otherwise the schema
-		// update could drop them before (the migration runs after the schema update has created
-		// permissionRules). Remove them in a later version.
-		'allowWriteAccessToAuthor'                       => ['sql' => ['type' => 'boolean', 'default' => false]],
-		'allowWriteAccessToInstructors'                  => ['sql' => ['type' => 'boolean', 'default' => false]],
-		'allowDeleteAccessToAuthor'                      => ['sql' => ['type' => 'boolean', 'default' => false]],
-		'allowDeleteAccessToInstructors'                 => ['sql' => ['type' => 'boolean', 'default' => false]],
-		'allowCutAccessToAuthor'                         => ['sql' => ['type' => 'boolean', 'default' => false]],
-		'allowCutAccessToInstructors'                    => ['sql' => ['type' => 'boolean', 'default' => false]],
-		'allowAdministerEventRegistrationsToAuthors'     => ['sql' => ['type' => 'boolean', 'default' => false]],
-		'allowAdministerEventRegistrationsToInstructors' => ['sql' => ['type' => 'boolean', 'default' => false]],
-		'allowSwitchingToPrevLevel'                      => ['sql' => ['type' => 'boolean', 'default' => false]],
-		'allowSwitchingToNextLevel'                      => ['sql' => ['type' => 'boolean', 'default' => false]],
-		'groupEventPerm'                                 => ['sql' => 'blob NULL'],
-		'groupReleaseLevelPerm'                          => ['sql' => 'blob NULL'],
 	],
 ];

@@ -244,7 +244,7 @@ Absage-Hinweis bei Kursen und allgemeinen Events:
 - Abgesagte Events werden übersprungen, die Erinnerung entfällt damit. Der Hinweis ist keine Aufgabe und zählt nicht in `open_task_count`.
 - Die Eventtypen stehen in `SendEventCompletionReminderHandler::EVENT_TYPES_WITH_CANCEL_HINT`, die URLs werden dort erzeugt und als `cancel_hint_urls` (eventId → URL) ans Template übergeben.
 - Texte: `MSC.instructor_post_event_task_cancel_hint`, `MSC.instructor_post_event_task_cancel_hint_link` («Zum Event»).
-- Damit der Leiter den Status setzen kann, braucht er Schreibrecht auf das Event in der aktuellen Freigabestufe (`allowWriteAccessToInstructors`).
+- Damit der Leiter den Status setzen kann, braucht er Schreibrecht auf das Event in der aktuellen Freigabestufe (Recht `can_write_event` in den Rechte-Regeln der Freigabestufe).
 
 URL-Erzeugung wie im `MyEventsDashboardController`. Der Cron läuft per CLI, daher muss der Router-Kontext konfiguriert sein: entweder `framework.router.default_uri` (z. B. `https://www.sac-pilatus.ch`) oder `router.request_context.host`/`scheme` in `parameters.yaml`.
 

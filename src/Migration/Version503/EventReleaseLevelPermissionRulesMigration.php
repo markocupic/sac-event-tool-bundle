@@ -37,8 +37,11 @@ use Doctrine\DBAL\Types\Types;
  *
  * Only release levels without rules (permissionRules IS NULL) are converted, existing rules
  * are never overwritten. New release levels start with an empty rule set (DCA default), they
- * are not converted either. The old fields are no longer used, only their columns are kept
- * for this migration (see the DCA).
+ * are not converted either.
+ *
+ * The old fields have been removed from the DCA. The migration only runs as long as their
+ * columns still exist, i.e. the schema update must not drop them before (contao:migrate
+ * --no-interaction skips DROP statements unless --with-deletes is given).
  *
  * @internal
  */
