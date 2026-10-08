@@ -1,6 +1,6 @@
 {#
-    Backend: events the participant of a registration has participated in.
-    See src/Feature/ParticipantEventHistory/Controller/ParticipantEventHistoryController.php
+Backend: events the participant of a registration has participated in.
+See src/Feature/ParticipantEventHistory/Controller/ParticipantEventHistoryController.php
 #}
 {% extends "@Contao/be_main" %}
 
@@ -20,8 +20,10 @@
         {% if rows is empty %}
             <p class="tl_empty">{{ 'MSC.participantEventHistoryNoParticipations'|trans([years], 'contao_default') }}</p>
         {% else %}
-            <table class="tl_listing showColumns">
-                <thead>
+            {# Scrolls horizontally if the backend is too narrow for the table #}
+            <div class="participant-event-history__scroll">
+                <table class="tl_listing showColumns participant-event-history__table">
+                    <thead>
                     <tr>
                         <th class="tl_folder_tlist">{{ 'MSC.participantEventHistoryColumnDate'|trans({}, 'contao_default') }}</th>
                         <th class="tl_folder_tlist">{{ 'MSC.participantEventHistoryColumnEvent'|trans({}, 'contao_default') }}</th>
@@ -30,8 +32,8 @@
                         <th class="tl_folder_tlist">{{ 'MSC.participantEventHistoryColumnMountainGuide'|trans({}, 'contao_default') }}</th>
                         <th class="tl_folder_tlist">{{ 'MSC.participantEventHistoryColumnDifficulty'|trans({}, 'contao_default') }}</th>
                     </tr>
-                </thead>
-                <tbody>
+                    </thead>
+                    <tbody>
                     {% for row in rows %}
                         <tr class="hover-row">
                             <td class="tl_file_list participant-event-history__date">{{ row.date }}</td>
@@ -57,8 +59,9 @@
                             <td class="tl_file_list">{{ row.difficulty }}</td>
                         </tr>
                     {% endfor %}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         {% endif %}
     </div>
     <style{{ attrs().setIfExists('nonce', csp_nonce('style-src')) }}>
@@ -78,6 +81,22 @@
 
         .participant-event-history__substitution {
             color: #c00;
+        }
+
+        .participant-event-history__scroll {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Below this width the columns would become unreadable: scroll instead */
+        .participant-event-history__table {
+            min-width: 900px;
+        }
+
+        /* Contao shows the cells of .showColumns tables below each other on small screens (max-width: 767px): keep the columns side by side */
+        .participant-event-history__table.showColumns td,
+        .participant-event-history__table.showColumns th {
+            display: table-cell;
         }
 
         .participant-event-history__date {
