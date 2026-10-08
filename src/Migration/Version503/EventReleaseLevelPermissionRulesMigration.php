@@ -136,7 +136,7 @@ class EventReleaseLevelPermissionRulesMigration extends AbstractMigration
 
     /**
      * Returns the rules in the format of the group widget (serialized storage):
-     * [1 => ['parties' => [...], 'group' => '', 'flags' => [...]], 2 => ...].
+     * [1 => ['parties' => [...], 'groups' => [...], 'flags' => [...]], 2 => ...].
      *
      * @param array<string, mixed> $row            the release level (tl_event_release_level_policy)
      * @param bool                 $isHighestLevel whether it is the highest level of its release level system
@@ -148,7 +148,7 @@ class EventReleaseLevelPermissionRulesMigration extends AbstractMigration
         // Author and instructors have the same rights
         $partyFlags = array_intersect(self::getPartyFlags($row, 'Author'), self::getPartyFlags($row, 'Instructors'));
 
-        $rules[] = ['parties' => self::PARTIES, 'group' => '', 'flags' => self::sortFlags($partyFlags)];
+        $rules[] = ['parties' => self::PARTIES, 'groups' => [], 'flags' => self::sortFlags($partyFlags)];
 
         // The registration coordinator edits the event and administers the registrations
         $coordinatorFlags = ['can_write_event'];
@@ -157,7 +157,7 @@ class EventReleaseLevelPermissionRulesMigration extends AbstractMigration
             $coordinatorFlags[] = 'can_administer_event_registrations';
         }
 
-        $rules[] = ['parties' => ['registration_coordinator'], 'group' => '', 'flags' => self::sortFlags($coordinatorFlags)];
+        $rules[] = ['parties' => ['registration_coordinator'], 'groups' => [], 'flags' => self::sortFlags($coordinatorFlags)];
 
         // User groups
         $groupFlags = [];
@@ -177,7 +177,7 @@ class EventReleaseLevelPermissionRulesMigration extends AbstractMigration
         }
 
         foreach ($groupFlags as $group => $flags) {
-            $rules[] = ['parties' => [], 'group' => (string) $group, 'flags' => self::sortFlags($flags)];
+            $rules[] = ['parties' => [], 'groups' => [(string) $group], 'flags' => self::sortFlags($flags)];
         }
 
         // The group widget uses the keys 1, 2, 3, ... as element IDs

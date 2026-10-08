@@ -37,7 +37,7 @@
                             <td class="tl_file_list participant-event-history__date">{{ row.date }}</td>
                             <td class="tl_file_list">
                                 {% if row.url %}
-                                    <a href="{{ row.url }}" target="_blank" rel="noopener">{{ row.title }}</a>
+                                    <a href="{{ row.url }}" class="participant-event-history__link" target="_blank" rel="noopener">{{ row.title }}</a>
                                 {% else %}
                                     {{ row.title }}
                                 {% endif %}
@@ -45,7 +45,7 @@
                             <td class="tl_file_list">{{ row.event_type }}</td>
                             <td class="tl_file_list">
                                 {% if row.main_instructor_url %}
-                                    <a href="{{ row.main_instructor_url }}" target="_blank" rel="noopener">{{ row.main_instructor }}</a>
+                                    <a href="{{ row.main_instructor_url }}" class="participant-event-history__link" target="_blank" rel="noopener">{{ row.main_instructor }}</a>
                                 {% else %}
                                     {{ row.main_instructor }}
                                 {% endif %}
@@ -67,6 +67,10 @@
         .participant-event-history__info {
             margin: 16px 0;
             line-height: 1.5;
+        }
+
+        .participant-event-history__link {
+            text-decoration: underline;
         }
 
         .participant-event-history__date {

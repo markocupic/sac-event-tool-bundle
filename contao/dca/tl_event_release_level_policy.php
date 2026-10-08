@@ -88,13 +88,13 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 		// Permissions of the release level (see EventReleaseLevelPermissionRules and CalendarEventsVoter).
 		// They replace the old permission fields (see EventReleaseLevelPermissionRulesMigration).
 		// A rule grants its flags to the selected parties of the event or to the members
-		// of a user group (or).
+		// of the selected user groups (or).
 		// Important: the names of the group field and its fields must not contain "__", the
 		// group widget uses "__" as separator in the names of its virtual fields.
 		'permissionRules'   => [
 			'exclude'   => true,
 			'inputType' => 'group',
-			'palette'   => ['parties', 'group', 'flags'],
+			'palette'   => ['parties', 'groups', 'flags'],
 			'fields'    => [
 				'parties' => [
 					'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_parties'],
@@ -103,11 +103,11 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 					'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_partyOptions'],
 					'eval'      => ['chosen' => true, 'multiple' => true, 'tl_class' => 'clr'],
 				],
-				'group'   => [
-					'label'      => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_group'],
+				'groups'  => [
+					'label'      => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_groups'],
 					'inputType'  => 'select',
 					'foreignKey' => 'tl_user_group.name',
-					'eval'       => ['includeBlankOption' => true, 'tl_class' => 'clr'],
+					'eval'       => ['chosen' => true, 'multiple' => true, 'tl_class' => 'clr'],
 				],
 				'flags'   => [
 					'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissionRules_flags'],

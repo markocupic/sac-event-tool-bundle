@@ -21,7 +21,7 @@ use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
  * Evaluates the permission rules of a release level (tl_event_release_level_policy.permissionRules).
  *
  * A rule grants its flags to the selected parties of the event (author, main instructor,
- * instructors, registration coordinator) or to the members of a user group (or).
+ * instructors, registration coordinator) or to the members of the selected user groups (or).
  * Admins are not covered by the rules, see CalendarEventsVoter.
  */
 final class EventReleaseLevelPermissionRules
@@ -51,7 +51,7 @@ final class EventReleaseLevelPermissionRules
     /**
      * The rules are parsed once per request and release level.
      *
-     * @var array<int, list<array{parties: list<string>, group: int|null, flags: list<string>}>>
+     * @var array<int, list<array{parties: list<string>, groups: list<int>, flags: list<string>}>>
      */
     private array $rulesByLevel = [];
 
@@ -77,8 +77,10 @@ final class EventReleaseLevelPermissionRules
                 }
             }
 
-            if (null !== $rule['group'] && $isGroupMember($rule['group'])) {
-                return true;
+            foreach ($rule['groups'] as $groupId) {
+                if ($isGroupMember($groupId)) {
+                    return true;
+                }
             }
         }
 
@@ -86,7 +88,7 @@ final class EventReleaseLevelPermissionRules
     }
 
     /**
-     * @return list<array{parties: list<string>, group: int|null, flags: list<string>}>
+     * @return list<array{parties: list<string>, groups: list<int>, flags: list<string>}>
      */
     private function getRules(EventReleaseLevelPolicyModel $level): array
     {
@@ -98,7 +100,7 @@ final class EventReleaseLevelPermissionRules
 
         $rules = [];
 
-        // Group widget: [1 => ['parties' => [...], 'group' => '3', 'flags' => [...]], ...]
+        // Group widget: [1 => ['parties' => [...], 'groups' => ['3', '5'], 'flags' => [...]], ...]
         foreach (StringUtil::deserialize($level->permissionRules, true) as $rule) {
             if (!\is_array($rule)) {
                 continue;
@@ -106,11 +108,25 @@ final class EventReleaseLevelPermissionRules
 
             $rules[] = [
                 'parties' => array_values(array_map('strval', StringUtil::deserialize($rule['parties'] ?? null, true))),
-                'group' => !empty($rule['group']) ? (int) $rule['group'] : null,
+                'groups' => self::getGroupIds($rule),
                 'flags' => array_values(array_map('strval', StringUtil::deserialize($rule['flags'] ?? null, true))),
             ];
         }
 
         return $this->rulesByLevel[$levelId] = $rules;
+    }
+
+    /**
+     * IDs of the user groups of a rule.
+     *
+     * @param array<string, mixed> $rule
+     *
+     * @return list<int>
+     */
+    private static function getGroupIds(array $rule): array
+    {
+        $groupIds = StringUtil::deserialize($rule['groups'] ?? null, true);
+
+        return array_values(array_unique(array_filter(array_map('intval', $groupIds), static fn (int $groupId): bool => $groupId > 0)));
     }
 }

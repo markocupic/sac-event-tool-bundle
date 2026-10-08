@@ -23,7 +23,7 @@ final class EventReleaseLevelPermissionRulesTest extends ContaoTestCase
     public function testGrantsTheFlagToTheParties(): void
     {
         $level = $this->createLevel([
-            1 => ['parties' => ['event_author', 'event_instructors'], 'group' => '', 'flags' => ['can_write_event']],
+            1 => ['parties' => ['event_author', 'event_instructors'], 'groups' => [], 'flags' => ['can_write_event']],
         ]);
 
         $rules = new EventReleaseLevelPermissionRules();
@@ -36,20 +36,21 @@ final class EventReleaseLevelPermissionRulesTest extends ContaoTestCase
     public function testGrantsTheFlagToTheMembersOfTheGroup(): void
     {
         $level = $this->createLevel([
-            1 => ['parties' => [], 'group' => '3', 'flags' => ['can_cut_event']],
+            1 => ['parties' => [], 'groups' => ['3', '7'], 'flags' => ['can_cut_event']],
         ]);
 
         $rules = new EventReleaseLevelPermissionRules();
 
         $this->assertTrue($rules->isGranted($level, 'can_cut_event', static fn (): bool => false, static fn (int $groupId): bool => 3 === $groupId));
+        $this->assertTrue($rules->isGranted($level, 'can_cut_event', static fn (): bool => false, static fn (int $groupId): bool => 7 === $groupId));
         $this->assertFalse($rules->isGranted($level, 'can_cut_event', static fn (): bool => false, static fn (int $groupId): bool => 4 === $groupId));
     }
 
     public function testOnlyChecksThePartiesOfTheRulesWithTheFlag(): void
     {
         $level = $this->createLevel([
-            1 => ['parties' => ['event_instructors'], 'group' => '', 'flags' => ['can_delete_event']],
-            2 => ['parties' => ['event_author'], 'group' => '', 'flags' => ['can_write_event']],
+            1 => ['parties' => ['event_instructors'], 'groups' => [], 'flags' => ['can_delete_event']],
+            2 => ['parties' => ['event_author'], 'groups' => [], 'flags' => ['can_write_event']],
         ]);
 
         $checkedParties = [];

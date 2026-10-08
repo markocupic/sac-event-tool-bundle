@@ -62,22 +62,22 @@ final class EventReleaseLevelPermissionRulesMigrationTest extends TestCase
             [
                 1 => [
                     'parties' => ['event_author', 'event_instructors'],
-                    'group' => '',
+                    'groups' => [],
                     'flags' => ['can_write_event', 'can_cut_event', 'can_administer_event_registrations', 'can_upgrade_release_level'],
                 ],
                 2 => [
                     'parties' => ['registration_coordinator'],
-                    'group' => '',
+                    'groups' => [],
                     'flags' => ['can_write_event'],
                 ],
                 3 => [
                     'parties' => [],
-                    'group' => '3',
+                    'groups' => ['3'],
                     'flags' => ['can_write_event', 'can_delete_event', 'can_downgrade_release_level'],
                 ],
                 4 => [
                     'parties' => [],
-                    'group' => '5',
+                    'groups' => ['5'],
                     'flags' => ['can_upgrade_release_level', 'can_downgrade_release_level'],
                 ],
             ],
@@ -112,8 +112,8 @@ final class EventReleaseLevelPermissionRulesMigrationTest extends TestCase
     {
         $this->assertSame(
             [
-                1 => ['parties' => ['event_author', 'event_instructors'], 'group' => '', 'flags' => []],
-                2 => ['parties' => ['registration_coordinator'], 'group' => '', 'flags' => ['can_write_event']],
+                1 => ['parties' => ['event_author', 'event_instructors'], 'groups' => [], 'flags' => []],
+                2 => ['parties' => ['registration_coordinator'], 'groups' => [], 'flags' => ['can_write_event']],
             ],
             EventReleaseLevelPermissionRulesMigration::createRules([]),
         );
@@ -133,7 +133,7 @@ final class EventReleaseLevelPermissionRulesMigrationTest extends TestCase
             'groupEventPerm' => serialize([['group' => '3', 'permissions' => ['canAdministerEventRegistrations']]]),
         ]);
 
-        $this->assertSame('3', $rules[3]['group']);
+        $this->assertSame(['3'], $rules[3]['groups']);
         $this->assertSame(['can_administer_event_registrations'], $rules[3]['flags']);
     }
 

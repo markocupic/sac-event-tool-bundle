@@ -113,16 +113,18 @@ class ParticipantEventHistoryController extends AbstractBackendController
             $rows[] = $this->getRow($event);
         }
 
+        $name = trim($registration->firstname.' '.$registration->lastname);
+
         $this->logAccess(Log::PARTICIPANT_EVENT_HISTORY_ACCESS, \sprintf(
-            'User "%s" (ID %d) opened the event history of SAC member %d (registration ID %d, event ID %d).',
+            'User "%s" (ID %d) opened the event history of "%s" (SAC member %d) (registration ID %d, event ID %d).',
             $this->getUsername(),
             $this->getUserId(),
+            $name,
             $sacMemberId,
             $registrationId,
             (int) $registration->eventId,
         ));
 
-        $name = trim($registration->firstname.' '.$registration->lastname);
         $years = ParticipantEventHistoryQuery::HISTORY_YEARS;
 
         return $this->render('@MarkocupicSacEventTool/ParticipantEventHistory/be_participant_event_history.html.twig', [

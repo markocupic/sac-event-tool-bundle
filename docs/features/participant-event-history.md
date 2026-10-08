@@ -73,7 +73,7 @@ Zusätzlich lehnt der Controller Aufrufe von fremden Websites ab (Header `Sec-Fe
 
 Contao-System-Log (`contao.general`):
 
-- Jeder Aufruf: Aktion `PARTICIPANT_EVENT_HISTORY_ACCESS`, z. B. `User "jdoe" (ID 12) opened the event history of SAC member 123456 (registration ID 345, event ID 67).`
+- Jeder Aufruf: Aktion `PARTICIPANT_EVENT_HISTORY_ACCESS`, z. B. `User "jdoe" (ID 12) opened the event history of "Jonas Müller" (SAC member 123456) (registration ID 345, event ID 67).`
 - Jeder verweigerte Aufruf (keine Berechtigung bzw. Frist abgelaufen, unbekannte Anmeldung, Aufruf von einer fremden Website): Aktion `PARTICIPANT_EVENT_HISTORY_ACCESS_DENIED`. Danach zeigt Contao die Fehlerseite (`AccessDeniedException`).
 
 ### Anmeldeformular
