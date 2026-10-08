@@ -331,6 +331,7 @@ $GLOBALS['TL_LANG']['MSC']['serr_link_member_list'] = 'Zur Teilnehmerliste';
 
 // Participant event history (see docs/features/participant-event-history.md)
 $GLOBALS['TL_LANG']['MSC']['participantEventHistoryHeadline'] = 'Teilgenommene Events der letzten %d Jahre von %s';
+$GLOBALS['TL_LANG']['MSC']['participantEventHistoryPageTitle'] = 'Teilnahme-Historie von %s';
 $GLOBALS['TL_LANG']['MSC']['participantEventHistoryTitle'] = 'Liste der Events der letzten %d Jahre von %s';
 $GLOBALS['TL_LANG']['MSC']['participantEventHistorySacMemberId'] = 'SAC-Mitgliedernummer: %s';
 $GLOBALS['TL_LANG']['MSC']['participantEventHistoryCount'] = 'Anzahl Teilnahmen: %s';

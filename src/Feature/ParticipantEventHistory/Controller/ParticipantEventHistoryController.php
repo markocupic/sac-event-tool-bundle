@@ -25,6 +25,7 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\Date;
 use Contao\PageModel;
+use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
@@ -65,6 +66,8 @@ class ParticipantEventHistoryController extends AbstractBackendController
 
     private Adapter $pageModel;
 
+    private Adapter $stringUtil;
+
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
@@ -81,6 +84,7 @@ class ParticipantEventHistoryController extends AbstractBackendController
         $this->config = $this->framework->getAdapter(Config::class);
         $this->date = $this->framework->getAdapter(Date::class);
         $this->pageModel = $this->framework->getAdapter(PageModel::class);
+        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }
 
     public function __invoke(Request $request, int $registrationId): Response
@@ -129,6 +133,8 @@ class ParticipantEventHistoryController extends AbstractBackendController
         $years = ParticipantEventHistoryQuery::HISTORY_YEARS;
 
         return $this->render('@MarkocupicSacEventTool/ParticipantEventHistory/be_participant_event_history.html.twig', [
+            // Browser title (be_main outputs it unescaped)
+            'title' => $this->stringUtil->specialchars($this->translator->trans('MSC.participantEventHistoryPageTitle', [$name], 'contao_default')),
             'headline' => $this->translator->trans('MSC.participantEventHistoryHeadline', [$years, $name], 'contao_default'),
             'list_title' => $this->translator->trans('MSC.participantEventHistoryTitle', [$years, $name], 'contao_default'),
             'years' => $years,
