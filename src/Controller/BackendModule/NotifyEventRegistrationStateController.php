@@ -176,9 +176,9 @@ class NotifyEventRegistrationStateController
             ],
             EventSubscriptionState::USER_HAS_UNSUBSCRIBED => [
                 'formId' => strtolower(EventSubscriptionState::USER_HAS_UNSUBSCRIBED).'_form',
-                'headline' => 'Anmeldeanfrage stornieren',
+                'headline' => 'Anmeldeanfrage zurückziehen',
                 'stateOfSubscription' => EventSubscriptionState::USER_HAS_UNSUBSCRIBED,
-                'backendMessage' => 'Die Anmeldeanfrage wurde storniert und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
+                'backendMessage' => 'Die Anmeldeanfrage wurde vom Teilnehmenden zurückgezogen und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'templatePath' => $this->sacevtEventRegistrationConfigEmailCancelTemplPath,
             ],
             EventSubscriptionState::SUBSCRIPTION_REFUSED => [

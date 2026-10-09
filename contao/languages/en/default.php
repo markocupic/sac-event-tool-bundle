@@ -254,7 +254,7 @@ $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED] =
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_ACCEPTED] = 'Anmeldeanfrage bestätigt';
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_REFUSED] = 'Anmeldeanfrage abgelehnt';
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST] = 'Anmeldeanfrage auf Warteliste';
-$GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::USER_HAS_UNSUBSCRIBED] = 'Anmeldeanfrage storniert';
+$GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::USER_HAS_UNSUBSCRIBED] = 'Anmeldeanfrage vom Teiln. zurückgezogen';
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED] = 'Status der Anmeldeanfrage unbekannt';
 
 // Event registration frontend module form explanations
