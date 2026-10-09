@@ -1,17 +1,81 @@
 # SAC Pilatus Event Tool
 
-Dieses Bundle enthält alle Contao-Erweiterungen für das aktuelle SAC Pilatus Event Tool.
+Das SAC Pilatus Event Tool ist ein Bundle für das Content-Management-System [Contao](https://contao.org). Es baut auf der Kalender-Erweiterung von Contao auf und erweitert sie um alles, was eine SAC-Sektion für ihr Touren- und Kursprogramm braucht.
+
+Das Event-Tool ist die Plattform, mit der die [SAC Sektion Pilatus](https://www.sac-pilatus.ch) ihr gesamtes Touren-, Kurs- und Veranstaltungsprogramm organisiert: vom ersten Entwurf eines Leiters über die Prüfung und Veröffentlichung bis zur Anmeldung der Mitglieder, der Durchführung und dem Abschluss mit Tourenbericht und Vergütung.
+
+## Was das Event-Tool kann
+
+### Touren, Kurse und Veranstaltungen ausschreiben
+
+- Leitende erfassen ihre Events selbst: Touren, Last Minute Touren, Kurse und allgemeine Veranstaltungen (z. B. Trainings, Vorträge).
+- Zu jedem Event gehören Daten (auch mehrtägig oder über mehrere Wochenenden), Leitende, organisierende Gruppen, Schwierigkeit, Tourentyp, Anforderungen, Ausrüstung, Anreise (z. B. mit öffentlichem Verkehr), Kosten, Treffpunkt, Karte und Höhenprofil.
+- Kurse werden nach Kursart und Kursstufe eingeteilt, Touren nach den SAC-Schwierigkeitsgraden.
+- Events lassen sich kopieren und ganze Programme um ein Jahr verschieben, damit die Planung für das nächste Jahr schnell geht.
+
+### Freigabe und Veröffentlichung
+
+- Jeder Event durchläuft mehrere Freigabestufen, z. B. «Entwurf», «zur Prüfung eingereicht», «geprüft» und «veröffentlicht».
+- Pro Stufe ist festgelegt, wer den Event bearbeiten, löschen, hoch- oder herabstufen darf und ob die Online-Anmeldung offen ist.
+- Auf Wunsch werden die Events eines Kalenders an einem Stichtag automatisch veröffentlicht.
+- Die zuständigen Personen werden per E-Mail informiert, wenn sich die Freigabestufe ändert.
+
+Mehr dazu: [Freigabestufen](docs/event-release-levels.md).
+
+### Programm auf der Website
+
+- Eventlisten mit Filter (z. B. nach Jahr, Tour- oder Kurstyp, organisierender Gruppe, «für Einsteiger geeignet», «Anreise mit ÖV», Merkliste oder Suchbegriff) und Detailseiten zu jedem Event.
+- Porträts der Leitenden mit ihren nächsten Events.
+- Karte des Tourengebiets, Erklärung der Schwierigkeitsgrade, Merkliste für Lieblings-Events.
+- Tourenliste zum Ausdrucken, Kursprogramm als PDF sowie Exporte für das Jahresprogramm und die Vereinszeitschrift.
+
+### Online-Anmeldung
+
+- Mitglieder melden sich mit ihrem SAC-Login direkt auf der Website an; ihre Personendaten sind bereits ausgefüllt.
+- Anmeldefristen, minimale und maximale Teilnehmerzahl, Warteliste und Abmeldefrist werden pro Event festgelegt.
+- Ausgebuchte Events werden als solche angezeigt, und Mitglieder können sich innerhalb der Frist selbst wieder abmelden.
+
+### Teilnehmerverwaltung für Leitende
+
+- Leitende sehen alle Anmeldungen ihres Events, nehmen sie an, lehnen sie ab oder setzen sie auf die Warteliste. Die Teilnehmenden werden dabei automatisch per E-Mail benachrichtigt.
+- Anmeldungen können auch manuell erfasst werden, z. B. für telefonische Anmeldungen.
+- Teilnehmerliste als Word- oder Excel-Datei, E-Mail an alle Teilnehmenden direkt aus der Liste.
+- Leitende sehen, an welchen Touren und Kursen ein angemeldetes Mitglied in den letzten Jahren teilgenommen hat. Das hilft bei der Einschätzung, ob eine Tour passt.
+- Leitende werden erinnert, wenn Anmeldungen noch nicht bearbeitet sind.
+
+### Nach dem Event
+
+- Leitende bestätigen, wer teilgenommen hat, und füllen den Tourenbericht aus (Durchführung, Verhältnisse, Ausweichtour, besondere Vorkommnisse).
+- Das Vergütungsformular für die Leitenden wird direkt aus dem Tourenbericht erstellt und eingereicht.
+- Fehlen Tourenbericht oder Teilnahmebestätigung, erinnert das Tool die Leitenden automatisch.
+- Teilnehmende können den Event online auswerten. Die Leitenden sehen die Rückmeldungen anonym zusammengefasst.
+- Kursteilnehmende erhalten eine Kursbestätigung.
+
+### Mitgliederbereich
+
+- Mitglieder sehen ihre Anmeldungen und ihre absolvierten Touren und Kurse und können Teilnahmebestätigungen herunterladen.
+- Sie pflegen ihr Profil und ihr Profilbild, melden sich von Events ab und können ihr Profil löschen.
+
+### Verwaltung
+
+- Die Mitgliederdaten werden täglich mit der Mitgliederdatenbank des SAC Zentralverbands abgeglichen und in die Benutzerkonten und Anmeldungen übernommen.
+- Vereinsfunktionen, Sektionen und Ortsgruppen werden zentral verwaltet. Die Rechte der Backend-Benutzer laufen über Benutzergruppen.
+- Statistiken zu Events, Leitenden, Anmeldungen und Teilnehmenden der letzten Jahre.
+- Erinnerungen an Leitende und Teilnehmende vor dem Event.
 
 **Projektstart**: 2017
 
-**Projektende**: 2018
+**Erste Version**: 2018
 
-## Projektkernteam:
-Marko Cupic
+## Projektkernteam
 
-Christoph Marbach
+- Marko Cupic
+- Christoph Marbach
+- Dan Straub
 
-Dan Straub
+## Weiterentwicklung
+
+Jonas Müller und Marko Cupic sind an der Weiterentwicklung des Event-Tools beteiligt.
 
 ## Features
 
@@ -35,57 +99,4 @@ Ausführliche Beschreibungen (Regeln, Datenmodell, Klassen, Tests) liegen unter 
 
 ## Einrichtung und Konfiguration
 
-### Symfony Friendly Configuration
-```yaml
-# config/config.yml
-# see src/DependencyInjection/Configuration.php for more options
-sacevt:
-  locale: 'de'
-  section_name: 'SAC Sektion Pilatus'
-  member_sync_credentials:
-    hostname: ftpserver.sac-cas.ch
-    username: ****
-    password: ******
-  mailer_transports:
-    system_admin:
-      transport_name: 'system_admin'
-      sender_name: 'Web-Administrator SAC Sektion Pilatus'
-      sender_email: 'internet@sac-pilatus.ch'
-    event_admin:
-      transport_name: 'touren_und_kursadministration'
-      sender_name: 'Touren- und Kursadministration SAC Sektion Pilatus'
-      sender_email: 'touren-und-kurs-administration@sac-pilatus.ch'
-
-framework:
-  router:
-    # Pflicht für Cron-Jobs und Message Handler (kein Request auf der Kommandozeile):
-    # - Basis-URL für absolute Links in E-Mails
-    # - ohne diesen Eintrag scheitert der Versand von HTML-Mails im Notification Center ("Unable to parse URI")
-    # Mit "www", da sac-pilatus.ch auf www.sac-pilatus.ch umleitet.
-    default_uri: 'https://www.sac-pilatus.ch'
-```
-
-```yaml
-#config/parameters.yaml
-
-parameters:
-    # Used for command line requests see: https://docs.contao.org/dev/framework/cron/
-    # or
-    # Symfony messenger
-    # We redirect https://sac-pilatus.ch to https://www.sac-pilatus.ch (Cyon domain settings)
-    # Because of this be sure to add the www in front of the hostname (router.request_context.host: 'www.sac-pilatus.ch')
-    # otherwise the router would generate an absolute url without the www
-    # and UrlSigner::checkRequest() would fail.
-    router.request_context.host: 'www.sac-pilatus.ch'
-    router.request_context.scheme: 'https'
-```
-
-### SAC Sektionen und OG
-Im Contao Backend die Sektionen und OGs eintragen, für die die Webseite erstellt wird.
-Die 4-stellige Sektions ID bekommt man in Bern.
-
-```
-4250 -> SAC PILATUS,
-4251 -> SAC PILATUS SURENTAL,
-etc.
-```
+Die Konfiguration des Bundles (Sektionsname, Zugang zur Mitgliederdatenbank, E-Mail-Versand, Basis-URL) und die Erfassung der Sektionen und Ortsgruppen sind in [Einrichtung und Konfiguration](docs/configuration.md) beschrieben.
