@@ -178,7 +178,7 @@ class NotifyEventRegistrationStateController
                 'formId' => strtolower(EventSubscriptionState::USER_HAS_UNSUBSCRIBED).'_form',
                 'headline' => 'Anmeldeanfrage zurückziehen',
                 'stateOfSubscription' => EventSubscriptionState::USER_HAS_UNSUBSCRIBED,
-                'backendMessage' => 'Die Anmeldeanfrage wurde vom Teilnehmenden zurückgezogen und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
+                'backendMessage' => 'Die Anmeldeanfrage wurde von der teilnehmenden Person zurückgezogen, und sie wurde entsprechend per E‑Mail benachrichtigt.',
                 'templatePath' => $this->sacevtEventRegistrationConfigEmailCancelTemplPath,
             ],
             EventSubscriptionState::SUBSCRIPTION_REFUSED => [
@@ -192,7 +192,7 @@ class NotifyEventRegistrationStateController
                 'formId' => strtolower(EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST).'_form',
                 'headline' => 'Anmeldestatus auf "Warteliste" ändern',
                 'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST,
-                'backendMessage' => 'Der Status dieser Registrierung wurde erfolgreich auf "Warteliste" gesetzt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
+                'backendMessage' => 'Der Status dieser Registrierung wurde erfolgreich „auf Warteliste“ gesetzt, und die Person wurde per E‑Mail darüber informiert.',
                 'templatePath' => $this->sacevtEventRegistrationConfigEmailWaitinglistTemplPath,
             ],
         ];
