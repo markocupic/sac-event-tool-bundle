@@ -3,9 +3,9 @@
 Hallo {{ participantFirstname }} {{ participantLastname }}
 
 {% if eventType == 'course' %}
-Deine Anmeldeanfrage für den Kurs {% if courseId|default != '' %}{{ courseId }} {% endif %}"{{ eventName }}" hast du zurückgezogen. Die Registrierung wurde damit storniert. 
+Du hast deine Anmeldeanfrage für den Kurs {% if courseId|default != '' %}{{ courseId }} {% endif %}"{{ eventName }}" zurückgezogen. Die Registrierung ist somit storniert. 
 {% else %}
-Deine Anmeldeanfrage für den Event "{{ eventName }}" hast du zurückgezogen. Die Registrierung wurde damit storniert. 
+Du hast deine Anmeldeanfrage für den Event "{{ eventName }}" zurückgezogen. Die Registrierung ist somit storniert. 
 {% endif %}
 Vielen Dank für Deine Kenntnisnahme.
 
