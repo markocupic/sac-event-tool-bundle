@@ -23,7 +23,7 @@
         "eluceo/ical": "^2.5",
         "league/csv": "^9.7",
         "markocupic/cloudconvert-bundle": "^2.0",
-        "markocupic/composer-file-copier-plugin": "^0.2",
+        "markocupic/composer-file-copier-plugin": "^0.3",
         "markocupic/contao-component-fontawesome-free": "^6.0",
         "markocupic/contao-custom-global-operation": "^1.0",
         "markocupic/contao-filepond-uploader": "^1.0",
