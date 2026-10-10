@@ -1,0 +1,166 @@
+{% extends '@Contao/mod_jahresprogramm_export.html.twig' %}
+
+{% block courses %}
+    {% if 'course' == eventType %}
+        <table class="event-export-table table table-sm">
+            <tbody>
+            {% set courseTypeLevel0 = '' %}
+            {% set courseTypeLevel1 = '' %}
+            {% for event in events %}
+                {% if courseTypeLevel0 != event.courseTypeLevel0 %}
+                    <tr class="event-export-row-body">
+                        <td class="event-export-course-type-level-0" colspan="5" style="text-align:center"><strong>{{ event.courseTypeLevel0|upper }}</strong></td>
+                    </tr>
+                {% endif %}
+                {% set courseTypeLevel0 = event.courseTypeLevel0 %}
+
+                {% if courseTypeLevel1 != event.courseTypeLevel1 %}
+                    <tr class="event-export-row-body">
+                        <td class="event-export-course-type-level-1" colspan="5" style="text-align:center"><strong>{{ event.courseTypeLevel1 }}</strong></td>
+                    </tr>
+                {% endif %}
+                {% set courseTypeLevel1 = event.courseTypeLevel1 %}
+
+                <tr class="event-export-row-headline">
+                    <td class="event-export-date" style="min-width:220px;">{{ event.date }}</td>
+                    <td class="event-export-title" colspan="3">{{ event.title }} / Kursstufe {{ event.courseLevel }}</td>
+                    <td class="event-export-organizer-title">{{ event.organizerTitle }}</td>
+                </tr>
+                <tr class="event-export-row-subheadline">
+                    <td class="event-export-date">{{ event.courseTypeLevel1 }}</td>
+                    <td class="event-export-instructors" colspan="3">{{ event.instructors }}</td>
+                    <td class="event-export-instructors" style="min-width:150px;">{{ event.courseId }}</td>
+                </tr>
+
+                <tr class="event-export-row-teaser">
+                    <td class="event-export-date">Einführungstext</td>
+                    <td class="event-export-title" colspan="4">{{ event.teaser|nl2br }}</td>
+                </tr>
+
+                <tr class="event-export-row-details">
+                    <td class="event-export-terms font-italic">Kursziel</td>
+                    <td class="event-export-terms do-not-show-row-when-empty" colspan="4">{{ event.terms|nl2br }}</td>
+                </tr>
+
+                <tr class="event-export-row-details">
+                    <td class="event-export-requirements font-italic">Voraussetzung</td>
+                    <td class="event-export-requirements do-not-show-row-when-empty" colspan="4">{{ event.requirements|nl2br }}</td>
+                </tr>
+
+                <tr class="event-export-row-details">
+                    <td class="event-export-min-max-members font-italic">Teilnehmer</td>
+                    <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{{ event.minMaxMembers }}</td>
+                </tr>
+
+                <tr class="event-export-row-details">
+                    <td class="event-export-leistungen font-italic">Preis/Leistung</td>
+                    <td class="event-export-leistungen do-not-show-row-when-empty" colspan="4">{{ event.leistungen|nl2br }}</td>
+                </tr>
+
+                <tr class="event-export-row-details">
+                    <td class="event-export-leistungen font-italic">Anmeldung</td>
+                    <td class="event-export-booking-info do-not-show-row-when-empty" colspan="4">{{ event.bookingInfo }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block tours %}
+    {% if eventType in ['tour', 'lastMinuteTour', 'generalEvent'] %}
+        {% set isGeneralEvent = 'generalEvent' == eventType %}
+        <table class="event-export-table table table-sm">
+            <tbody>
+            {% set month = '' %}
+            {% for event in events %}
+                {% if month != event.month %}
+                    <tr class="event-export-row-month">
+                        <td class="event-export-month" colspan="5"><strong>{{ event.month|upper }}</strong></td>
+                    </tr>
+                {% endif %}
+                {% set month = event.month %}
+
+                <tr class="event-export-row-headline">
+                    <td class="event-export-date" style="min-width:{{ isGeneralEvent ? 120 : 220 }}px;">{{ event.date }}</td>
+                    <td class="event-export-title" colspan="3">{{ event.title }}</td>
+                    <td class="event-export-tour-difficulty" style="min-width:150px;">{{ event.difficulty }}</td>
+                </tr>
+                <tr class="event-export-row-subheadline">
+                    <td class="event-export-date"></td>
+                    <td class="event-export-instructors" colspan="3">{{ event.instructors }}</td>
+                    <td class="event-export-instructors">{{ isGeneralEvent ? 'VK' : event.tourType }}</td>
+                </tr>
+
+                <tr class="event-export-row-teaser">
+                    <td class="event-export-date">Beschreibung</td>
+                    <td class="event-export-title" colspan="4">{{ event.teaser|nl2br }}</td>
+                </tr>
+
+                <tr class="event-export-row-{{ isGeneralEvent ? 'details' : 'profile' }}">
+                    <td class="event-export-profile font-italic">Profil</td>
+                    <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{% for profile in event.arrTourProfile|default([]) %}{{ profile }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td>
+                </tr>
+
+                <tr class="event-export-row-{{ isGeneralEvent ? 'details' : 'tour-detail-text' }}">
+                    <td class="event-export-{{ isGeneralEvent ? 'tour-detail-text' : 'profile' }} font-italic">Details</td>
+                    <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{{ event.tourDetailText|default|nl2br }}</td>
+                </tr>
+
+                <tr class="event-export-row-details">
+                    <td class="event-export-requirements font-italic">Voraussetzung</td>
+                    <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{{ event.requirements|nl2br }}</td>
+                </tr>
+
+                {% if isGeneralEvent %}
+                    <tr class="event-export-row-details">
+                        <td class="event-export-meeting-point font-italic">Treffpunkt/Zeit</td>
+                        <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{{ event.meetingPoint|nl2br }}</td>
+                    </tr>
+
+                    <tr class="event-export-row-details">
+                        <td class="event-export-journey font-italic">Anfahrt</td>
+                        <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{{ event.journey }}</td>
+                    </tr>
+
+                    <tr class="event-export-row-details">
+                        <td class="event-export-min-max-members font-italic">Teilnehmer</td>
+                        <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{{ event.minMaxMembers }}</td>
+                    </tr>
+
+                    <tr class="event-export-row-details">
+                        <td class="event-export-equipment font-italic">Ausrüstung</td>
+                        <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{{ event.equipment|nl2br }}</td>
+                    </tr>
+
+                    <tr class="event-export-row-details">
+                        <td class="event-export-leistungen font-italic">Preis/Leistung</td>
+                        <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{{ event.leistungen|nl2br }}</td>
+                    </tr>
+                {% endif %}
+
+                <tr class="event-export-row-details">
+                    <td class="event-export-leistungen font-italic">Anmeldung</td>
+                    <td class="event-export-booking-info do-not-show-row-when-empty" colspan="4">
+                        {{ event.bookingInfo }}
+                        {% if (isGeneralEvent ? event.bookingInfo : event.bookingDetails)|default %}
+                            <br>{{ event.bookingDetails|nl2br }}
+                        {% endif %}
+                    </td>
+                </tr>
+
+                {% if not isGeneralEvent %}
+                    <tr class="event-export-row-miscellaneous">
+                        <td class="event-export-sonstiges font-italic">Sonstiges</td>
+                        <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{{ event.miscellaneous|nl2br }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% block special_users_headline %}Verantwortliche (Ausgabe anhand gewählter Benutzerrolle){% endblock %}
+
+{% block instructors_headline %}Leiter*innen{% endblock %}

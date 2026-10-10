@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\Tests\Feature\MemberDatabaseSync;
 
 use Markocupic\SacEventToolBundle\Feature\MemberDatabaseSync\CsvMemberDto;
 use Markocupic\SacEventToolBundle\String\Formatter\PhoneNumberFormatter;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CsvMemberDtoTest extends TestCase
@@ -54,6 +55,7 @@ class CsvMemberDtoTest extends TestCase
     /**
      * @dataProvider honoraryMemberProvider
      */
+    #[DataProvider('honoraryMemberProvider')]
     public function testHonoraryMemberMapping(string $raw, int $expected): void
     {
         $line = $this->baseLine();
@@ -97,6 +99,7 @@ class CsvMemberDtoTest extends TestCase
     /**
      * @dataProvider genderProvider
      */
+    #[DataProvider('genderProvider')]
     public function testGenderMapping(string $rawUtf8, string $expected): void
     {
         $line = $this->baseLine();
@@ -120,6 +123,7 @@ class CsvMemberDtoTest extends TestCase
     /**
      * @dataProvider countryProvider
      */
+    #[DataProvider('countryProvider')]
     public function testCountryNormalization(string $raw, string $expected): void
     {
         $line = $this->baseLine();
@@ -153,6 +157,7 @@ class CsvMemberDtoTest extends TestCase
     /**
      * @dataProvider languageProvider
      */
+    #[DataProvider('languageProvider')]
     public function testLanguageMapping(string $raw, string $expected): void
     {
         $line = $this->baseLine();

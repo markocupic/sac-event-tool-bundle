@@ -19,6 +19,7 @@ use Contao\CoreBundle\Security\DataContainer\DeleteAction;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 
 /**
  * Only the highest level of a release level system may be deleted, so the levels stay
@@ -52,7 +53,7 @@ class EventReleaseLevelPolicyDeleteVoter implements CacheableVoterInterface
         return DeleteAction::class === $subjectType;
     }
 
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    public function vote(TokenInterface $token, mixed $subject, array $attributes, Vote|null $vote = null): int
     {
         if (!$subject instanceof DeleteAction || !\in_array(ContaoCorePermissions::DC_PREFIX.self::TABLE, $attributes, true)) {
             return self::ACCESS_ABSTAIN;

@@ -22,6 +22,7 @@ use Markocupic\SacEventToolBundle\Config\TicketInfo;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\EventRegistrationFormFactory;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventRegistrationFormFactoryTest extends ContaoTestCase
@@ -46,6 +47,7 @@ class EventRegistrationFormFactoryTest extends ContaoTestCase
     /**
      * @dataProvider consecutiveDaysProvider
      */
+    #[DataProvider('consecutiveDaysProvider')]
     public function testAreConsecutiveDays(string $start, string $end, int $numberOfDates, bool $expected): void
     {
         $this->assertSame($expected, EventRegistrationFormFactory::areConsecutiveDays(strtotime($start), strtotime($end), $numberOfDates));

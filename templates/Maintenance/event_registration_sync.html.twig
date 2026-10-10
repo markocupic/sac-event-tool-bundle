@@ -76,7 +76,7 @@
         %}
         <script{{ attributes }}></script>
         <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-            document.addEventListener('DOMContentLoaded', () => {
+            ((callback) => 'loading' === document.readyState ? document.addEventListener('DOMContentLoaded', callback) : callback())(() => { // Turbo-safe DOM ready (Contao 6)
                 new EventRegistrationSyncMaintenance('#eventRegistrationSyncApp');
             });
 

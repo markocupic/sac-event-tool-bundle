@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Messenger\Message;
 
-use Contao\CoreBundle\Messenger\Message\LowPriorityMessageInterface;
 use Contao\FrontendUser;
 use Markocupic\SacEventToolBundle\DocxTemplator\OutputType;
 

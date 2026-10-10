@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Tests\Feature\ParticipantEventHistory;
 
 use Markocupic\SacEventToolBundle\Feature\ParticipantEventHistory\ParticipantEventHistoryAccessPeriod;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class ParticipantEventHistoryAccessPeriodTest extends TestCase
@@ -39,6 +40,7 @@ final class ParticipantEventHistoryAccessPeriodTest extends TestCase
     /**
      * @dataProvider accessEndProvider
      */
+    #[DataProvider('accessEndProvider')]
     public function testAccessEnd(string $start, string $end, string $eventState, string|null $rescheduled, int $days, string|null $expected): void
     {
         $accessEnd = ParticipantEventHistoryAccessPeriod::getAccessEnd(

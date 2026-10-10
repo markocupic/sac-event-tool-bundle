@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Tests\String\Validator;
 
 use Markocupic\SacEventToolBundle\String\Validator\CashAmountValidator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class CashAmountValidatorTest extends TestCase
@@ -22,6 +23,7 @@ final class CashAmountValidatorTest extends TestCase
     /**
      * @dataProvider provideValidAmounts
      */
+    #[DataProvider('provideValidAmounts')]
     public function testIsValidPositiveAmountWithValidValues(float|int|string $amount): void
     {
         $this->assertTrue(CashAmountValidator::isPositiveCashAmount($amount));
@@ -30,6 +32,7 @@ final class CashAmountValidatorTest extends TestCase
     /**
      * @dataProvider provideInvalidAmounts
      */
+    #[DataProvider('provideInvalidAmounts')]
     public function testIsValidPositiveAmountWithInvalidValues(mixed $amount): void
     {
         $this->assertFalse(CashAmountValidator::isPositiveCashAmount($amount));

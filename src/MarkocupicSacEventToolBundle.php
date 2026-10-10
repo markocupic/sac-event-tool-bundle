@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle;
 
 use Markocupic\SacEventToolBundle\DependencyInjection\Compiler\AddSessionBagsPass;
+use Markocupic\SacEventToolBundle\DependencyInjection\Compiler\CacheTagManagerPass;
 use Markocupic\SacEventToolBundle\DependencyInjection\MarkocupicSacEventToolExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
@@ -31,5 +32,6 @@ class MarkocupicSacEventToolBundle extends AbstractBundle
         parent::build($container);
 
         $container->addCompilerPass(new AddSessionBagsPass());
+        $container->addCompilerPass(new CacheTagManagerPass());
     }
 }

@@ -24,7 +24,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/calendar_event/favor_event/{eventId}', name: self::class, defaults: ['_scope' => 'frontend', '_token_check' => true], methods: ['POST'])]
 class FavorEventController extends AbstractController

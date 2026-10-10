@@ -30,7 +30,7 @@ Beide Downloads stehen nur eingeloggten Mitgliedern zur Verfügung. Nicht eingel
 
 ### Inhalt einer Kursseite
 
-Template `contao/templates/tcpdf/tcpdf_template_sac_kurse.html5` mit: Titel, Daten, Dauer, Kursart und Kursstufe, Organisatoren, Teaser, Kursziele, Kursinhalte, Voraussetzungen, Ort, Leiter, Leistungen, Anmeldung, Material, Treffpunkt, Weiteres.
+Template `contao/templates/tcpdf/tcpdf_template_sac_kurse.html.twig` mit: Titel, Daten, Dauer, Kursart und Kursstufe, Organisatoren, Teaser, Kursziele, Kursinhalte, Voraussetzungen, Ort, Leiter, Leistungen, Anmeldung, Material, Treffpunkt, Weiteres.
 
 Hintergrund: das Bild aus dem Event-Feld `singleSRCBroschuere`, sonst `public/images/events/course/booklet/fallback.jpg`. Dazu unten `background.png`. Das Inhaltsverzeichnis hat `toc.jpg` als Hintergrund.
 
@@ -61,7 +61,7 @@ sacevt:
 
 - **Titelbild:** eigenes Bild als Pfad relativ zum Projektverzeichnis in `booklet_cover_image`
 - **Kursbild:** im Event (Kurs) das Feld `singleSRCBroschuere` setzen, sonst wird `fallback.jpg` verwendet
-- **Layout einer Kursseite:** Template `tcpdf_template_sac_kurse.html5` in `templates/` des Projekts überschreiben
+- **Layout einer Kursseite:** Template `tcpdf_template_sac_kurse.html.twig` in `templates/` des Projekts überschreiben
 
 ## Klassen und Dateien
 
@@ -72,7 +72,7 @@ src/Feature/WorkshopBooklet/
 ├── Controller/WorkshopBookletDownloadController.php        # die beiden Download-Routen
 └── fonts/opensans/                                         # Schriften für das PDF
 
-contao/templates/tcpdf/tcpdf_template_sac_kurse.html5      # Inhalt einer Kursseite
+contao/templates/tcpdf/tcpdf_template_sac_kurse.html.twig      # Inhalt einer Kursseite
 public/images/events/course/booklet/                        # cover.jpg, toc.jpg, fallback.jpg, background.png
 ```
 

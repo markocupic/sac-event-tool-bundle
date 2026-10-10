@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Tests\String\Formatter;
 
 use Markocupic\SacEventToolBundle\String\Formatter\PhoneNumberFormatter;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class PhoneNumberFormatterTest extends TestCase
@@ -22,6 +23,7 @@ class PhoneNumberFormatterTest extends TestCase
     /**
      * @dataProvider validNumberProvider
      */
+    #[DataProvider('validNumberProvider')]
     public function testFormatsValidNumbers(string $input, string $expected): void
     {
         $this->assertSame($expected, PhoneNumberFormatter::format($input));
@@ -61,6 +63,7 @@ class PhoneNumberFormatterTest extends TestCase
     /**
      * @dataProvider invalidNumberProvider
      */
+    #[DataProvider('invalidNumberProvider')]
     public function testReturnsOriginalOnInvalidInput(string $input): void
     {
         // Invalid input must be returned untouched (no partial mangling).

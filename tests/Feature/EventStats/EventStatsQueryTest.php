@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Tests\Feature\EventStats;
 
 use Markocupic\SacEventToolBundle\Feature\EventStats\EventStatsQuery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class EventStatsQueryTest extends TestCase
@@ -22,6 +23,7 @@ final class EventStatsQueryTest extends TestCase
     /**
      * @dataProvider ageGroupProvider
      */
+    #[DataProvider('ageGroupProvider')]
     public function testGetAgeGroup(int|null $age, string $expected): void
     {
         $this->assertSame($expected, EventStatsQuery::getAgeGroup($age));

@@ -23,6 +23,7 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 /**
@@ -56,7 +57,7 @@ class ParticipantEventHistoryVoter extends Voter
         return self::CAN_VIEW_PARTICIPANT_EVENT_HISTORY_OF_REGISTRATION === $attribute && is_numeric($subject);
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, Vote|null $vote = null): bool
     {
         if (!$token->getUser() instanceof BackendUser) {
             return false;

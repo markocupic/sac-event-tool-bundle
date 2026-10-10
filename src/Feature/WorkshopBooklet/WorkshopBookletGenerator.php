@@ -270,22 +270,13 @@ class WorkshopBookletGenerator
         return $strDates;
     }
 
-    private function nl2br(string|null $string = ''): string
-    {
-        if (null === $string) {
-            return '';
-        }
-
-        return nl2br($string);
-    }
-
     private function generateHtmlContent(): string
     {
         System::loadLanguageFile('tl_calendar_events');
         $objEvent = CalendarEventsModel::findById($this->pdf->objEvent->id);
         $this->pdf->Bookmark(html_entity_decode($objEvent->title), 0, 0, '', 'I', [0, 0, 0]);
 
-        // Create template object
+        // Create template object (line breaks are converted in the Twig template)
         $objPartial = new FrontendTemplate('tcpdf_template_sac_kurse');
 
         // Title
@@ -320,19 +311,19 @@ class WorkshopBookletGenerator
         $objPartial->organizers = implode(', ', $arrItems);
 
         // Teaser text
-        $objPartial->teaser = $this->nl2br($objEvent->teaser);
+        $objPartial->teaser = (string) $objEvent->teaser;
 
         // Event terms
-        $objPartial->terms = $this->nl2br($objEvent->terms);
+        $objPartial->terms = (string) $objEvent->terms;
 
         // Event Issues
-        $objPartial->issues = $this->nl2br($objEvent->issues);
+        $objPartial->issues = (string) $objEvent->issues;
 
         // Requirements
-        $objPartial->requirements = $this->nl2br($objEvent->requirements);
+        $objPartial->requirements = (string) $objEvent->requirements;
 
         // Event location
-        $objPartial->location = $this->nl2br($objEvent->location);
+        $objPartial->location = (string) $objEvent->location;
 
         // Instructors
         $arrInstructors = $this->calendarEventsUtil->getInstructorsAsArray($objEvent);
@@ -356,19 +347,19 @@ class WorkshopBookletGenerator
         $objPartial->instructor = implode(', ', $arrItems);
 
         // Services/Leistungen
-        $objPartial->leistungen = $this->nl2br($objEvent->leistungen);
+        $objPartial->leistungen = (string) $objEvent->leistungen;
 
         // Sign in
-        $objPartial->bookingDetails = str_replace('(at)', '@', html_entity_decode($this->nl2br((string) $objEvent->bookingDetails)));
+        $objPartial->bookingDetails = str_replace('(at)', '@', (string) $objEvent->bookingDetails);
 
         // Equipment
-        $objPartial->equipment = $this->nl2br($objEvent->equipment);
+        $objPartial->equipment = (string) $objEvent->equipment;
 
         // Meeting point
-        $objPartial->meetingPoint = $this->nl2br($objEvent->meetingPoint);
+        $objPartial->meetingPoint = (string) $objEvent->meetingPoint;
 
         // Miscellaneous
-        $objPartial->miscellaneous = $this->nl2br($objEvent->miscellaneous);
+        $objPartial->miscellaneous = (string) $objEvent->miscellaneous;
 
         // Styles
         $objPartial->titleStyle = "color:#000000; font-family: 'opensansbold'; font-size: 20px";

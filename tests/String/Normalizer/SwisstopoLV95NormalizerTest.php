@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Tests\String\Normalizer;
 
 use Markocupic\SacEventToolBundle\String\Normalizer\SwisstopoLV95Normalizer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class SwisstopoLV95NormalizerTest extends TestCase
@@ -24,6 +25,7 @@ final class SwisstopoLV95NormalizerTest extends TestCase
      *
      * @dataProvider provideNormalizableCoords
      */
+    #[DataProvider('provideNormalizableCoords')]
     public function testNormalizeReturnsNormalizedCoords(string $input, string $expected): void
     {
         $this->assertSame($expected, SwisstopoLV95Normalizer::normalize($input));
@@ -34,6 +36,7 @@ final class SwisstopoLV95NormalizerTest extends TestCase
      *
      * @dataProvider provideUnsanitizableCoords
      */
+    #[DataProvider('provideUnsanitizableCoords')]
     public function testNormalizeReturnsEmptyStringForInvalidInput(string $input): void
     {
         $this->assertSame('', SwisstopoLV95Normalizer::normalize($input));

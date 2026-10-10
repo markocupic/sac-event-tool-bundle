@@ -55,7 +55,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		'global_operations' => [
 			'all',
 			'backToEventSettings'               => [
-				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
+				'attributes'             => 'data-turbo="false" data-action="contao--scroll-offset#store" accesskey="e"',
 				'class'                  => 'back_to_event_settings',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 100],
@@ -65,14 +65,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			],
 			'sendEmail'                         => [
 				// use a button_callback for generating the url
-				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
+				'attributes'             => 'data-turbo="false" data-action="contao--scroll-offset#store" accesskey="e"',
 				'class'                  => 'send_email',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 90],
 				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/at-regular.svg', 'markocupic_sac_event_tool'),
 			],
 			'downloadEventRegistrationListCsv'  => [
-				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
+				'attributes'             => 'data-turbo="false" data-action="contao--scroll-offset#store" accesskey="e"',
 				'class'                  => 'download_event_registration_list_csv',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 80],
@@ -80,7 +80,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/file-excel-regular.svg', 'markocupic_sac_event_tool'),
 			],
 			'downloadEventRegistrationListDocx' => [
-				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
+				'attributes'             => 'data-turbo="false" data-action="contao--scroll-offset#store" accesskey="e"',
 				'class'                  => 'download_event_registration_list_docx',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 70],
@@ -88,7 +88,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/file-word-regular.svg', 'markocupic_sac_event_tool'),
 			],
 			'writeTourReport'                   => [
-				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
+				'attributes'             => 'data-turbo="false" data-action="contao--scroll-offset#store" accesskey="e"',
 				'class'                  => 'write_tour_report',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'tour_report', 'sorting' => 100],
@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 				'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/pencil-regular.svg', 'markocupic_sac_event_tool'),
 			],
 			'printInstructorInvoice'            => [
-				'attributes'             => 'data-turbo="false" onclick="Backend.getScrollOffset()" accesskey="e"',
+				'attributes'             => 'data-turbo="false" data-action="contao--scroll-offset#store" accesskey="e"',
 				'class'                  => 'print_instructor_invoice',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'tour_report', 'sorting' => 90],

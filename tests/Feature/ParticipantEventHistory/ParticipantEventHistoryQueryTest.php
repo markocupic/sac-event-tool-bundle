@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\Tests\Feature\ParticipantEventHistory;
 
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Feature\ParticipantEventHistory\ParticipantEventHistoryQuery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class ParticipantEventHistoryQueryTest extends TestCase
@@ -40,6 +41,7 @@ final class ParticipantEventHistoryQueryTest extends TestCase
     /**
      * @dataProvider historyStartProvider
      */
+    #[DataProvider('historyStartProvider')]
     public function testHistoryStart(string $now, string $expected): void
     {
         $this->assertSame($expected, ParticipantEventHistoryQuery::getHistoryStart(new \DateTimeImmutable($now))->format('Y-m-d H:i:s'));

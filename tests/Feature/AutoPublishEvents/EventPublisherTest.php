@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Tests\Feature\AutoPublishEvents;
 
-use Contao\CoreBundle\Cache\EntityCacheTags;
 use Contao\Versions;
 use Doctrine\DBAL\Connection;
+use Markocupic\SacEventToolBundle\Cache\CacheTagInvalidator;
 use Markocupic\SacEventToolBundle\EventReleaseLevel\ReleaseLevel;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\Candidate;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\EventPublisher;
@@ -50,14 +50,14 @@ final class EventPublisherTest extends TestCase
             ->method('create')
         ;
 
-        $entityCacheTags = $this->createMock(EntityCacheTags::class);
-        $entityCacheTags
+        $cacheTagInvalidator = $this->createMock(CacheTagInvalidator::class);
+        $cacheTagInvalidator
             ->expects($this->once())
-            ->method('invalidateTagsFor')
+            ->method('invalidateTags')
             ->with(['contao.db.tl_calendar_events.5', 'contao.db.tl_calendar.7'])
         ;
 
-        $this->assertTrue($this->createPublisher($connection, $entityCacheTags, $versions)->publish($this->candidate()));
+        $this->assertTrue($this->createPublisher($connection, $cacheTagInvalidator, $versions)->publish($this->candidate()));
     }
 
     public function testDoesNothingIfTheEventChangedInTheMeantime(): void
@@ -74,19 +74,19 @@ final class EventPublisherTest extends TestCase
             ->method('create')
         ;
 
-        $entityCacheTags = $this->createMock(EntityCacheTags::class);
-        $entityCacheTags
+        $cacheTagInvalidator = $this->createMock(CacheTagInvalidator::class);
+        $cacheTagInvalidator
             ->expects($this->never())
-            ->method('invalidateTagsFor')
+            ->method('invalidateTags')
         ;
 
-        $this->assertFalse($this->createPublisher($connection, $entityCacheTags, $versions)->publish($this->candidate()));
+        $this->assertFalse($this->createPublisher($connection, $cacheTagInvalidator, $versions)->publish($this->candidate()));
     }
 
-    private function createPublisher(Connection $connection, EntityCacheTags $entityCacheTags, Versions $versions): EventPublisher
+    private function createPublisher(Connection $connection, CacheTagInvalidator $cacheTagInvalidator, Versions $versions): EventPublisher
     {
         $publisher = $this->getMockBuilder(EventPublisher::class)
-            ->setConstructorArgs([$connection, $entityCacheTags, $this->createMock(RouterInterface::class)])
+            ->setConstructorArgs([$connection, $cacheTagInvalidator, $this->createMock(RouterInterface::class)])
             ->onlyMethods(['createVersions'])
             ->getMock()
         ;

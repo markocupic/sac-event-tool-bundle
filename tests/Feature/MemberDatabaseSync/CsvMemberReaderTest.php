@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\Tests\Feature\MemberDatabaseSync;
 
 use Markocupic\SacEventToolBundle\Feature\MemberDatabaseSync\CsvMemberDto;
 use Markocupic\SacEventToolBundle\Feature\MemberDatabaseSync\CsvMemberReader;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CsvMemberReaderTest extends TestCase
@@ -51,6 +52,7 @@ class CsvMemberReaderTest extends TestCase
     /**
      * @dataProvider skippableFirstFieldProvider
      */
+    #[DataProvider('skippableFirstFieldProvider')]
     public function testReadStreamSkipsInvalidMemberIds(string $rawId): void
     {
         $content = implode("\n", [

@@ -15,7 +15,7 @@
  * Selected fields (tl_calendar_events) can be saved in the users session,
  * when using the Contao backend in the "editAll" or "overrideAll" mode.
  */
-document.addEventListener('DOMContentLoaded', () => {
+const initEditAllNavbarHelper = () => {
     const urlParams = new URLSearchParams(window.location.search);
 
     if (!urlParams.has('do')) {
@@ -34,8 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Initialize only once per page
+    if (document.body.dataset.sacevtEditAllNavbarHelper) {
+        return;
+    }
+
+    document.body.dataset.sacevtEditAllNavbarHelper = '1';
+
     new EditAllNavbarHelper();
-});
+};
 
 class EditAllNavbarHelper {
 
@@ -68,8 +75,8 @@ class EditAllNavbarHelper {
             }
         }).then(json => {
             if (json['status'] === 'success') {
-                // Append the button markup to the body
-                document.querySelector('body').insertAdjacentHTML('afterend', json['navbar']);
+                // Append the button markup to the body (inside the body, so that Turbo removes it on navigation)
+                document.body.insertAdjacentHTML('beforeend', json['navbar']);
 
                 // Add event listener to the get button
                 document.querySelector('#editAllNavbarHelperGetSettings').addEventListener('click', () => {
@@ -168,3 +175,14 @@ class EditAllNavbarHelper {
         })
     }
 }
+
+// Contao 5.3 renders the back end without Turbo, Contao 6 uses Turbo Drive. With
+// Turbo, DOMContentLoaded only fires once, so initialize on turbo:load as well.
+// The initializer itself makes sure it does not run twice on the same page.
+if ('loading' === document.readyState) {
+    document.addEventListener('DOMContentLoaded', initEditAllNavbarHelper);
+} else {
+    initEditAllNavbarHelper();
+}
+
+document.addEventListener('turbo:load', initEditAllNavbarHelper);

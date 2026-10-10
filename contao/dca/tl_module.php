@@ -32,24 +32,24 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListCo
 use Markocupic\SacEventToolBundle\Feature\EventFeedback\Controller\FrontendModule\EventFeedbackFormController;
 
 // Add palettes (Contao 4 style)
-$GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventPreviewReader'] = '{title_legend},name,headline,type;{template_legend:hide},cal_template,customTpl;{image_legend},imgSize;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventPreviewReader'] = '{title_legend},name,headline,type;{template_legend:hide},cal_template,customTpl;{image_legend},imgSize;{protected_legend:hide},protected;{expert_legend:hide},cssID';
 
 // Add palettes (Contao 5 ready)
-$GLOBALS['TL_DCA']['tl_module']['palettes'][CsvEventMemberExportController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][CsvUserExportController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][EventFilterFormController::TYPE] = '{title_legend},name,headline,type;{config_legend},eventFilterBoardFields;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][EventListController::TYPE] = '{title_legend},name,headline,type;{config_legend},applyCalFilter,eventType,showFavoredEventsOnly,cal_readerModule,eventListLimitPerRequest;{template_legend:hide},eventListPartialTpl;{image_legend:hide},imgSize;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][EventRegistrationCheckoutLinkController::TYPE] = '{title_legend},name,headline,type;{jumpTo_legend},eventRegCheckoutLinkPage,eventRegCheckoutLinkLabel;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][EventRegistrationController::TYPE] = '{title_legend},name,headline,type;{eventRegloginModule_legend},eventRegLoginModule;{notification_legend},receiptEventRegistrationNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][JahresprogrammExportController::TYPE] = '{title_legend},name,headline,type,print_export_allowedEventTypes;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardAvatarUploadController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardDeleteProfileController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardEditProfileController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardPastEventsController::TYPE] = '{title_legend},name,headline,type;{member_dashboard_event_type_filter_legend},eventType;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][EventDeregistrationController::TYPE] = '{title_legend},name,headline,type;{member_dashboard_upcoming_events_legend},eventDeregistrationNotification;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][PilatusExportController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][TourDifficultyListController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][PrintTourListButtonController::TYPE] = '{title_legend},name,headline,type;{config_legend},watchEventListModule;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][CsvEventMemberExportController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][CsvUserExportController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][EventFilterFormController::TYPE] = '{title_legend},name,headline,type;{config_legend},eventFilterBoardFields;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][EventListController::TYPE] = '{title_legend},name,headline,type;{config_legend},applyCalFilter,eventType,showFavoredEventsOnly,cal_readerModule,eventListLimitPerRequest;{template_legend:hide},eventListPartialTpl;{image_legend:hide},imgSize;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][EventRegistrationCheckoutLinkController::TYPE] = '{title_legend},name,headline,type;{jumpTo_legend},eventRegCheckoutLinkPage,eventRegCheckoutLinkLabel;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][EventRegistrationController::TYPE] = '{title_legend},name,headline,type;{eventRegloginModule_legend},eventRegLoginModule;{notification_legend},receiptEventRegistrationNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][JahresprogrammExportController::TYPE] = '{title_legend},name,headline,type,print_export_allowedEventTypes;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardAvatarUploadController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardDeleteProfileController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardEditProfileController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardPastEventsController::TYPE] = '{title_legend},name,headline,type;{member_dashboard_event_type_filter_legend},eventType;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][EventDeregistrationController::TYPE] = '{title_legend},name,headline,type;{member_dashboard_upcoming_events_legend},eventDeregistrationNotification;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][PilatusExportController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][TourDifficultyListController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][PrintTourListButtonController::TYPE] = '{title_legend},name,headline,type;{config_legend},watchEventListModule;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
 
 // Add selectors
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'applyCalFilter';
@@ -188,4 +188,4 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['watchEventListModule'] = [
 ];
 
 // Event feedback form, see docs/features/event-feedback.md
-$GLOBALS['TL_DCA']['tl_module']['palettes'][EventFeedbackFormController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][EventFeedbackFormController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';

@@ -46,6 +46,11 @@ services:
         resource: ../src/
         exclude: ../src/{ContaoManager,Session,Event,DependencyInjection,Model}
 
+    # Contao 5.3 (EntityCacheTags) and Contao 6 (CacheTagManager), see CacheTagManagerPass
+    Markocupic\SacEventToolBundle\Cache\CacheTagInvalidator:
+        arguments:
+            - '@?sacevt.contao_cache_tag_manager'
+
     # Member sync: resolve the remote CSV finder interface to the FTP implementation
     Markocupic\SacEventToolBundle\Feature\MemberDatabaseSync\RemoteCsvFileFinderInterface:
         alias: Markocupic\SacEventToolBundle\Feature\MemberDatabaseSync\FtpCsvFileFinder

@@ -18,6 +18,7 @@ use Contao\DataContainer;
 use Contao\TestCase\ContaoTestCase;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevelPolicy;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EventReleaseLevelPolicyTest extends ContaoTestCase
@@ -27,6 +28,7 @@ final class EventReleaseLevelPolicyTest extends ContaoTestCase
      *
      * @param list<int> $otherLevels
      */
+    #[DataProvider('validLevelsProvider')]
     public function testValidLevels(int $level, array $otherLevels): void
     {
         $this->createCallback()->checkLevel($level, $otherLevels);
@@ -47,6 +49,7 @@ final class EventReleaseLevelPolicyTest extends ContaoTestCase
      *
      * @param list<int> $otherLevels
      */
+    #[DataProvider('invalidLevelsProvider')]
     public function testInvalidLevels(int $level, array $otherLevels, string $expectedError): void
     {
         $this->expectException(\RuntimeException::class);

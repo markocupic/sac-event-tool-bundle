@@ -19,7 +19,7 @@
 
 "use strict";
 
-document.addEventListener('DOMContentLoaded', () => {
+const initSwisstopoLocationSearch = () => {
 
   // Every input the panel is attached to.
   const FIELD_SELECTOR = 'input[name^="coordsCH1903"]';
@@ -58,6 +58,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (field.readOnly || field.disabled) {
       return;
     }
+
+    // Initialize only once per field
+    if (field.dataset.sacevtLocationSearch) {
+      return;
+    }
+
+    field.dataset.sacevtLocationSearch = '1';
 
     new LocationSearch(field);
   });
@@ -486,4 +493,15 @@ html[data-color-scheme="dark"] .swisstopo-location-search {
 
     document.head.appendChild(style);
   }
-});
+};
+
+// Contao 5.3 renders the back end without Turbo, Contao 6 uses Turbo Drive. With
+// Turbo, DOMContentLoaded only fires once, so initialize on turbo:load as well.
+// The initializer itself makes sure it does not run twice on the same page.
+if ('loading' === document.readyState) {
+  document.addEventListener('DOMContentLoaded', initSwisstopoLocationSearch);
+} else {
+  initSwisstopoLocationSearch();
+}
+
+document.addEventListener('turbo:load', initSwisstopoLocationSearch);

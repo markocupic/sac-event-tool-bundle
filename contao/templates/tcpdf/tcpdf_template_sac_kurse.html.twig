@@ -1,0 +1,86 @@
+{# Course page of the workshop booklet (rendered by TCPDF, see WorkshopBookletGenerator) #}
+<h1 style="{{ titleStyle|raw }}">{{ title }}</h1>
+<table cellpadding="5">
+    <tr style="{{ rowStyleB|raw }}">
+        <td style="width:170mm; {{ cellStyleC|raw }}">{{ teaser|nl2br }}<br><br></td>
+    </tr>
+</table>
+
+<table cellpadding="5" style="border-collapse:collapse">
+    <tr style="{{ rowStyleA|raw }}">
+        <td style="{{ cellStyleA|raw }}">Kursdaten</td>
+        <td style="{{ cellStyleB|raw }}">{{ date }}{% if durationInfo|default %}<br>Dauer: {{ durationInfo }}{% endif %}</td>
+    </tr>
+
+    <tr style="{{ rowStyleA|raw }}">
+        <td style="{{ cellStyleA|raw }}">Kursart</td>
+        <td style="{{ cellStyleB|raw }}">{{ courseTypeLevel0|upper }}<br>{{ courseTypeLevel1 }}</td>
+    </tr>
+
+    <tr style="{{ rowStyleA|raw }}">
+        <td style="{{ cellStyleA|raw }}">Kursstufe</td>
+        <td style="{{ cellStyleB|raw }}">{{ courseLevel }}</td>
+    </tr>
+
+    <tr style="{{ rowStyleA|raw }}">
+        <td style="{{ cellStyleA|raw }}">Organisierende Gruppe</td>
+        <td style="{{ cellStyleB|raw }}">{{ organizers }}</td>
+    </tr>
+
+    <tr style="{{ rowStyleA|raw }}">
+        <td style="{{ cellStyleA|raw }}">Kursziele</td>
+        <td style="{{ cellStyleB|raw }}">{{ terms|nl2br }}</td>
+    </tr>
+
+    <tr style="{{ rowStyleA|raw }}">
+        <td style="{{ cellStyleA|raw }}">Kursinhalte</td>
+        <td style="{{ cellStyleB|raw }}">{{ issues|nl2br }}</td>
+    </tr>
+
+    <tr style="{{ rowStyleA|raw }}">
+        <td style="{{ cellStyleA|raw }}">Voraussetzungen</td>
+        <td style="{{ cellStyleB|raw }}">{{ requirements|nl2br }}</td>
+    </tr>
+
+    <tr style="{{ rowStyleA|raw }}">
+        <td style="{{ cellStyleA|raw }}">Kursort</td>
+        <td style="{{ cellStyleB|raw }}">{{ location|nl2br }}</td>
+    </tr>
+
+    <tr style="{{ rowStyleA|raw }}">
+        <td style="{{ cellStyleA|raw }}">Kursleitung</td>
+        <td style="{{ cellStyleB|raw }}">{{ instructor }}</td>
+    </tr>
+
+    <tr style="{{ rowStyleA|raw }}">
+        <td style="{{ cellStyleA|raw }}">Preis/Leistungen</td>
+        <td style="{{ cellStyleB|raw }}">{{ leistungen|nl2br }}</td>
+    </tr>
+
+    <tr style="{{ rowStyleA|raw }}">
+        <td style="{{ cellStyleA|raw }}">Anmeldung</td>
+        <td style="{{ cellStyleB|raw }}">{{ bookingDetails|nl2br }}</td>
+    </tr>
+
+    {% if equipment|default %}
+        <tr style="{{ rowStyleA|raw }}">
+            <td style="{{ cellStyleA|raw }}">Material</td>
+            <td style="{{ cellStyleB|raw }}">{{ equipment|nl2br }}</td>
+        </tr>
+    {% endif %}
+
+    {% if meetingPoint|default %}
+        <tr style="{{ rowStyleA|raw }}">
+            <td style="{{ cellStyleA|raw }}">Zeit und Treffpunkt</td>
+            <td style="{{ cellStyleB|raw }}">{{ meetingPoint|nl2br }}</td>
+        </tr>
+    {% endif %}
+
+    {% if miscellaneous|default %}
+        <tr style="{{ rowStyleA|raw }}">
+            <td style="{{ cellStyleA|raw }}">Weiteres</td>
+            <td style="{{ cellStyleB|raw }}">{{ miscellaneous|nl2br }}</td>
+        </tr>
+    {% endif %}
+
+</table>

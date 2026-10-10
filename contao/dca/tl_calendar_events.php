@@ -13,7 +13,6 @@ declare(strict_types=1);
  */
 
 use Contao\BackendUser;
-use Contao\Config;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\DataContainer;
 use Contao\Date;
@@ -179,7 +178,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year
 	'href'                   => 'transformDates=plus52weeks',
 	'class'                  => 'global_op_icon_class',
 	'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/calendar-plus-regular.svg', 'markocupic_sac_event_tool'),
-	'attributes'             => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
+	'attributes'             => 'data-action="contao--scroll-offset#store" onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] ?? null) . '\'))return false" accesskey="e"',
 	'custom_glob_op'         => true,
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => 10],
 ];
@@ -188,7 +187,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1yea
 	'href'                   => 'transformDates=minus52weeks',
 	'class'                  => 'global_op_icon_class',
 	'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/calendar-minus-regular.svg', 'markocupic_sac_event_tool'),
-	'attributes'             => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
+	'attributes'             => 'data-action="contao--scroll-offset#store" onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] ?? null) . '\'))return false" accesskey="e"',
 	'custom_glob_op'         => true,
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => 8],
 ];
@@ -197,7 +196,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCal
 	'href'                   => 'action=onloadCallbackExportCalendar',
 	'class'                  => 'header_icon',
 	'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/file-excel-regular.svg', 'markocupic_sac_event_tool'),
-	'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
+	'attributes'             => 'data-action="contao--scroll-offset#store" accesskey="e"',
 	'custom_glob_op'         => true,
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => -10],
 ];
@@ -206,7 +205,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCal
 	'href'                   => 'action=onloadCallbackExportCalendar',
 	'class'                  => 'header_icon',
 	'icon'                   => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/file-excel-regular.svg', 'markocupic_sac_event_tool'),
-	'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
+	'attributes'             => 'data-action="contao--scroll-offset#store" accesskey="e"',
 	'custom_glob_op'         => true,
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => -10],
 ];
@@ -568,7 +567,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['meetingPoint'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['singleSRCBroschuere'] = [
 	'exclude'   => true,
 	'inputType' => 'fileTree',
-	'eval'      => ['extensions' => Config::get('validImageTypes'), 'fieldType' => 'radio', 'filesOnly' => true, 'mandatory' => false, 'tl_class' => 'm12 clr'],
+	'eval'      => ['extensions' => '%contao.image.valid_extensions%', 'fieldType' => 'radio', 'filesOnly' => true, 'mandatory' => false, 'tl_class' => 'm12 clr'],
 	'sql'       => 'binary(16) NULL',
 ];
 

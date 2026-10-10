@@ -47,7 +47,7 @@ Nicht angefasst werden:
 2. `UPDATE tl_calendar_events SET eventReleaseLevel = <höchste Stufe>, published = 1, tstamp = <jetzt> WHERE id = ? AND eventReleaseLevel = <zweithöchste Stufe> AND published = 0`
    Die WHERE-Bedingung schützt vor gleichzeitigen Änderungen im Backend. Wurde keine Zeile geändert, gilt der Event als «in der Zwischenzeit geändert» und wird übersprungen.
 3. `Versions::create()` mit Benutzername `Auto Publish Events`, User-ID 0 und Backend-Link auf den Event (im Cron gibt es keinen eingeloggten User und keinen Request)
-4. Cache-Tags invalidieren wie beim Speichern im Backend: `contao.db.tl_calendar_events.<id>`, `contao.db.tl_calendar.<pid>` (`EntityCacheTags::invalidateTagsFor()`)
+4. Cache-Tags invalidieren wie beim Speichern im Backend: `contao.db.tl_calendar_events.<id>`, `contao.db.tl_calendar.<pid>` (`CacheTagInvalidator::invalidateTags()`, nutzt je nach Contao-Version `EntityCacheTags` bzw. `CacheTagManager`)
 5. Eintrag im Contao-System-Log (`contao.general`, `info`): Event-ID, Titel, alte → neue Stufe. Übersprungene Events mit Grund (`warning`, Fehler als `error`). Keine E-Mail, keine Notification
 6. Jeder Event in einem eigenen `try/catch`: Ein fehlerhafter Event bricht den Lauf nicht ab. Ein Fehler in einem Kalender bricht den Cron nicht ab; dieser Kalender wird nicht als ausgeführt markiert und beim nächsten Lauf erneut versucht.
 

@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Feature\AutoPublishEvents;
 
-use Contao\CoreBundle\Cache\EntityCacheTags;
 use Contao\Versions;
 use Doctrine\DBAL\Connection;
+use Markocupic\SacEventToolBundle\Cache\CacheTagInvalidator;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -35,7 +35,7 @@ class EventPublisher
 
     public function __construct(
         private readonly Connection $connection,
-        private readonly EntityCacheTags $entityCacheTags,
+        private readonly CacheTagInvalidator $cacheTagInvalidator,
         private readonly RouterInterface $router,
     ) {
     }
@@ -72,7 +72,7 @@ class EventPublisher
         $versions->create();
 
         // Same tags as DataContainer::invalidateCacheTags() when an event is saved in the back end
-        $this->entityCacheTags->invalidateTagsFor([
+        $this->cacheTagInvalidator->invalidateTags([
             'contao.db.tl_calendar_events.'.$candidate->eventId,
             'contao.db.tl_calendar.'.$candidate->calendarId,
         ]);

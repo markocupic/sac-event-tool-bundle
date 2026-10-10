@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Tests\Util;
 
 use Markocupic\SacEventToolBundle\Util\EventDateUtil;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class EventDateUtilTest extends TestCase
@@ -39,6 +40,7 @@ final class EventDateUtilTest extends TestCase
     /**
      * @dataProvider effectiveEndDateProvider
      */
+    #[DataProvider('effectiveEndDateProvider')]
     public function testEffectiveEndDate(string $start, string $end, string $eventState, string|null $rescheduled, string|null $expected): void
     {
         $result = EventDateUtil::getEffectiveEndDate(

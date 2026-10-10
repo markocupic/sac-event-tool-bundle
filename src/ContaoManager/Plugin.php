@@ -51,14 +51,14 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
         // Controllers of the features (src/Feature/<FeatureName>/Controller/). Loaded first, so that
         // catch-all routes in src/Controller/ (e.g. "/_download/{slug}") do not shadow them.
         $routes = $resolver
-            ->resolve(__DIR__.'/../Feature')
-            ->load(__DIR__.'/../Feature')
+            ->resolve(__DIR__.'/../Feature', 'attribute')
+            ->load(__DIR__.'/../Feature', 'attribute')
         ;
 
         $routes->addCollection(
             $resolver
-                ->resolve(__DIR__.'/../Controller')
-                ->load(__DIR__.'/../Controller'),
+                ->resolve(__DIR__.'/../Controller', 'attribute')
+                ->load(__DIR__.'/../Controller', 'attribute'),
         );
 
         return $routes;

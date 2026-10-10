@@ -13,8 +13,6 @@ declare(strict_types=1);
  */
 
 use Contao\CoreBundle\Controller\BackendCsvImportController;
-use Contao\ListWizard;
-use Contao\TableWizard;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventRegistrationStateController;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\SacBackendUserRolesExportController;
 use Markocupic\SacEventToolBundle\Feature\BackendUserPermissionReset\BackendUserPermissionReset;
@@ -68,24 +66,24 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = [
 	],
 	'sac_tour_difficulty_tool'                               => [
 		'tables' => ['tl_tour_difficulty_category', 'tl_tour_difficulty'],
-		'table'  => [TableWizard::class, 'importTable'],
-		'list'   => [ListWizard::class, 'importList'],
+		'table'  => [BackendCsvImportController::class, 'importTableWizardAction'],
+		'list'   => [BackendCsvImportController::class, 'importListWizardAction'],
 	],
 	'sac_tour_type_tool'                                     => [
 		'tables' => ['tl_tour_type'],
 	],
 	'sac_event_release_tool'                                 => [
 		'tables' => ['tl_event_release_level_policy_package', 'tl_event_release_level_policy'],
-		'table'  => [TableWizard::class, 'importTable'],
-		'list'   => [ListWizard::class, 'importList'],
+		'table'  => [BackendCsvImportController::class, 'importTableWizardAction'],
+		'list'   => [BackendCsvImportController::class, 'importListWizardAction'],
 	],
 	'sac_permission_tool'                                    => [
 		'tables' => ['tl_permission_policy'],
 	],
 	'sac_event_organizer_tool'                               => [
 		'tables' => ['tl_event_organizer'],
-		'table'  => [TableWizard::class, 'importTable'],
-		'list'   => [ListWizard::class, 'importList'],
+		'table'  => [BackendCsvImportController::class, 'importTableWizardAction'],
+		'list'   => [BackendCsvImportController::class, 'importListWizardAction'],
 	],
 	'sac_event_journey_tool'                                 => [
 		'tables' => ['tl_calendar_events_journey'],

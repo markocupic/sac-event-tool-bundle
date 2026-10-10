@@ -12,7 +12,6 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Contao\Config;
 use Contao\DC_Table;
 use Contao\DataContainer;
 
@@ -184,7 +183,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
 		'singleSRC'                          => [
 			'exclude'   => true,
 			'inputType' => 'fileTree',
-			'eval'      => ['extensions' => Config::get('validImageTypes'), 'fieldType' => 'radio', 'filesOnly' => true, 'mandatory' => true, 'tl_class' => 'clr'],
+			'eval'      => ['extensions' => '%contao.image.valid_extensions%', 'fieldType' => 'radio', 'filesOnly' => true, 'mandatory' => true, 'tl_class' => 'clr'],
 			'sql'       => 'binary(16) NULL',
 		],
 		'annualProgramShowHeadline'          => [

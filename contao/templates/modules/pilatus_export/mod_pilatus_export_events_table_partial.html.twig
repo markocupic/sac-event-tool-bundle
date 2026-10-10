@@ -1,0 +1,42 @@
+{% if eventTable|default %}
+    <table class="event-export-table table table-sm">
+        <thead>
+        <tr class="event-export-row-header">
+            <th class="event-export-date">Datum</th>
+            <th class="event-export-weekday">Zeit</th>
+            <th class="event-export-title">Titel</th>
+            {% if not isCourse|default %}
+                <th class="event-export-tour-type">Veranstaltungsart</th>
+            {% endif %}
+            <th class="event-export-instructors">Leiter</th>
+            <th class="event-export-organizers">Gruppe</th>
+            <th style="min-width:100px" class="event-export-organizers">Event-ID</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% set week = 0 %}
+        {% for event in eventTable %}
+            {% if week != event.week %}
+                {% set week = event.week %}
+                <tr class="event-export-row-body">
+                    <td class="event-export-weeknumber text-center" colspan="7"><strong>Woche {{ event.week }}</strong></td>
+                </tr>
+            {% endif %}
+            <tr class="event-export-row-body" data-recurringevent="{{ event.isRecurringEvent|default ? 'true' : 'false' }}">
+                <td class="event-export-date">{{ event.eventDates }}</td>
+                <td class="event-export-weekday">{{ event.weekday }}</td>
+                <td class="event-export-title">{{ event.title }}</td>
+                {% if not isCourse|default %}
+                    <td class="event-export-tour-type">
+                        {{ event.tourType }}{% if event.journey == 'ÖV' %}, ÖV{% endif %}
+                        {% if event.mountainguide == constant('Markocupic\\SacEventToolBundle\\Config\\EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER') %}, BF-A{% endif %}
+                    </td>
+                {% endif %}
+                <td class="event-export-instructors">{{ event.instructors }}</td>
+                <td class="event-export-organizers">{{ event.organizers }}</td>
+                <td class="event-export-event-id">{{ event.eventId }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

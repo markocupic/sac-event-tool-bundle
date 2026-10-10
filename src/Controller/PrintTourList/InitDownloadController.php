@@ -22,7 +22,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/_print_tour_list/init_download', name: self::class, defaults: ['_scope' => 'frontend', '_token_check' => false])]
 class InitDownloadController extends AbstractController

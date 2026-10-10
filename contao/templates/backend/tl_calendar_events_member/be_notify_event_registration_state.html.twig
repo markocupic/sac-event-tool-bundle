@@ -1,5 +1,5 @@
 <div id="tl_buttons">
-    <a href="{{ back }}" class="header_back" title="" accesskey="b" onclick="Backend.getScrollOffset()">{{ 'MSC.backBTTitle'|trans({}, 'contao_default') }}</a>
+    <a href="{{ back }}" class="header_back" title="" accesskey="b">{{ 'MSC.backBTTitle'|trans({}, 'contao_default') }}</a>
 </div>
 
 <div class="notify-event_participant_form">
@@ -54,7 +54,7 @@
      * Prevent multiple clicks
      * Disable Submit Button Upon Form Submission
      */
-    window.addEventListener('DOMContentLoaded', (event) => {
+    ((callback) => 'loading' === document.readyState ? document.addEventListener('DOMContentLoaded', callback) : callback())((event) => { // Turbo-safe DOM ready (Contao 6)
         document.getElementById('tl_calendar_events_member').addEventListener('submit', () => {
             if (document.getElementById('ctrl_subject').value != '' && document.getElementById('ctrl_text').value != '') {
                 document.getElementById('ctrl_submit').disabled = 1;

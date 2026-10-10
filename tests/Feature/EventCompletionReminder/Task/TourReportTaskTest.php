@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\Tests\Feature\EventCompletionReminder\Ta
 use Contao\CalendarEventsModel;
 use Contao\TestCase\ContaoTestCase;
 use Markocupic\SacEventToolBundle\Feature\EventCompletionReminder\Task\TourReportTask;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -26,6 +27,7 @@ final class TourReportTaskTest extends ContaoTestCase
     /**
      * @dataProvider supportsProvider
      */
+    #[DataProvider('supportsProvider')]
     public function testSupports(string $eventType, bool $expected): void
     {
         $event = $this->mockClassWithProperties(CalendarEventsModel::class, ['eventType' => $eventType]);

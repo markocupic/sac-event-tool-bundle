@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Feature\EventFeedback\Messenger\Message;
 
-use Contao\CoreBundle\Messenger\Message\LowPriorityMessageInterface;
+use Markocupic\SacEventToolBundle\Messenger\Message\LowPriorityMessageInterface;
 
 /**
  * Dispatched by SendFeedbackRemindersCron: one message = one feedback request

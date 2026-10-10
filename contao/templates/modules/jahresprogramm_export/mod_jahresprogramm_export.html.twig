@@ -1,0 +1,218 @@
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+    {% set mountainGuideOffer = constant('Markocupic\\SacEventToolBundle\\Config\\EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER') %}
+
+    {{ form.generate()|raw }}
+
+    <h3 class="content-headline">Jahresprogramm</h3>
+    <h4 class="content-headline">Event-Art: {{ eventTypeLabel|default }}</h4>
+    <h4 class="content-headline">Organisierende Gruppe: {{ organizer|default }}</h4>
+
+    {% if not events|default %}
+        <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
+    {% else %}
+
+        {% block courses %}
+            {% if 'course' == eventType %}
+                <table class="event-export-table table table-sm">
+                    <tbody>
+                    {% set courseTypeLevel0 = '' %}
+                    {% set courseTypeLevel1 = '' %}
+                    {% for event in events %}
+                        {% if courseTypeLevel0 != event.courseTypeLevel0 %}
+                            <tr class="event-export-row-body">
+                                <td class="event-export-course-type-level-0" colspan="5" style="text-align:center"><strong>{{ event.courseTypeLevel0|upper }}</strong></td>
+                            </tr>
+                        {% endif %}
+                        {% set courseTypeLevel0 = event.courseTypeLevel0 %}
+
+                        {% if courseTypeLevel1 != event.courseTypeLevel1 %}
+                            <tr class="event-export-row-body">
+                                <td class="event-export-course-type-level-1" colspan="5" style="text-align:center"><strong>{{ event.courseTypeLevel1 }}</strong></td>
+                            </tr>
+                        {% endif %}
+                        {% set courseTypeLevel1 = event.courseTypeLevel1 %}
+
+                        <tr class="event-export-row-headline">
+                            <td class="event-export-date" style="min-width:220px;">{{ event.date }}</td>
+                            <td class="event-export-title" colspan="3">{{ event.title }} / Kursstufe {{ event.courseLevel }}</td>
+                            <td class="event-export-organizer-title">{{ event.organizerTitle }}</td>
+                        </tr>
+                        <tr class="event-export-row-subheadline">
+                            <td class="event-export-date">
+                                {{ event.courseTypeLevel1 }}{% if event.mountainguide == mountainGuideOffer %}, BF-A{% endif %}
+                            </td>
+                            <td class="event-export-instructors" colspan="3">{{ event.instructors ?: 'Leiter wurde gelöscht' }}</td>
+                            <td class="event-export-instructors" style="min-width:150px;">{{ event.courseId }}</td>
+                        </tr>
+
+                        <tr class="event-export-row-teaser">
+                            <td class="event-export-teaser" colspan="5">{{ event.teaser|nl2br }}</td>
+                        </tr>
+
+                        <tr class="event-export-row-details">
+                            <td class="event-export-terms font-italic">Kursziel</td>
+                            <td class="event-export-terms do-not-show-row-when-empty" colspan="4">{{ event.terms|nl2br }}</td>
+                        </tr>
+
+                        <tr class="event-export-row-details">
+                            <td class="event-export-requirements font-italic">Voraussetzung</td>
+                            <td class="event-export-requirements do-not-show-row-when-empty" colspan="4">{{ event.requirements|nl2br }}</td>
+                        </tr>
+
+                        <tr class="event-export-row-details">
+                            <td class="event-export-leistungen font-italic">Preis/Leistung</td>
+                            <td class="event-export-leistungen do-not-show-row-when-empty" colspan="4">{{ event.leistungen|nl2br }}</td>
+                        </tr>
+
+                        <tr class="event-export-row-details">
+                            <td class="event-export-leistungen font-italic">Anmeldung</td>
+                            <td class="event-export-booking-info do-not-show-row-when-empty" colspan="4">{{ event.bookingInfo }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        {% endblock %}
+
+        {% block tours %}
+            {% if eventType in ['tour', 'lastMinuteTour', 'generalEvent'] %}
+                {% set isGeneralEvent = 'generalEvent' == eventType %}
+                <table class="event-export-table table table-sm">
+                    <tbody>
+                    {% set month = '' %}
+                    {% for event in events %}
+                        {% if month != event.month %}
+                            <tr class="event-export-row-month">
+                                <td class="event-export-month" colspan="5"><strong>{{ event.month|upper }}</strong></td>
+                            </tr>
+                        {% endif %}
+                        {% set month = event.month %}
+
+                        {% if event.showHeadline %}
+                            <tr class="event-export-row-headline">
+                                <td class="event-export-date" style="min-width:{{ isGeneralEvent ? 120 : 220 }}px;">{{ event.date }}</td>
+                                <td class="event-export-title" colspan="3">{{ event.title }}</td>
+                                <td class="event-export-tour-difficulty" style="min-width:150px;">{{ event.difficulty }}</td>
+                            </tr>
+                            <tr class="event-export-row-subheadline">
+                                <td class="event-export-date">
+                                    {{ isGeneralEvent ? 'VK' : event.tourType }}{% if not isGeneralEvent and event.journey == 'ÖV' %}, ÖV{% endif %}{% if event.mountainguide == mountainGuideOffer %}, BF-A{% endif %}
+                                </td>
+                                <td class="event-export-instructors" colspan="3">{{ event.instructors ?: 'Leiter wurde gelöscht' }}</td>
+                                <td class="event-export-instructors">{{ event.eventId }}</td>
+                            </tr>
+                        {% endif %}
+
+                        {% if event.showTeaser %}
+                            <tr class="event-export-row-teaser">
+                                <td class="event-export-date"></td>
+                                <td class="event-export-title" colspan="4">{{ event.teaser|nl2br }}</td>
+                            </tr>
+                        {% endif %}
+
+                        {% if event.showDetails %}
+                            <tr class="event-export-row-details">
+                                <td class="event-export-profile font-italic">Profil</td>
+                                <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{% for profile in event.arrTourProfile|default([]) %}{{ profile }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td>
+                            </tr>
+
+                            <tr class="event-export-row-details">
+                                <td class="event-export-requirements font-italic">Voraussetzung</td>
+                                <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{{ event.requirements|nl2br }}</td>
+                            </tr>
+
+                            <tr class="event-export-row-details">
+                                <td class="event-export-equipment font-italic">Ausrüstung</td>
+                                <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{{ event.equipment|nl2br }}</td>
+                            </tr>
+
+                            <tr class="event-export-row-details">
+                                <td class="event-export-leistungen font-italic">Preis/Leistung</td>
+                                <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4">{{ event.leistungen|nl2br }}</td>
+                            </tr>
+
+                            <tr class="event-export-row-details">
+                                <td class="event-export-leistungen font-italic">Anmeldung</td>
+                                <td class="event-export-booking-info do-not-show-row-when-empty" colspan="4">
+                                    {{ event.bookingInfo }}
+                                    {% if (isGeneralEvent ? event.bookingInfo : event.bookingDetails)|default %}
+                                        <br>{{ event.bookingDetails|nl2br }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        {% endblock %}
+
+    {% endif %}
+
+    {% if specialUsers|default %}
+        <h3>{% block special_users_headline %}Funktionäre (Ausgabe anhand gewählter Benutzerrolle){% endblock %}</h3>
+        <table class="event-export-table table table-sm">
+            <tbody>
+            {% for specialUser in specialUsers %}
+                <tr class="event-export-row-body">
+                    <th class="event-export-instuctors-headline" colspan="2"><strong>{{ specialUser.title }}</strong></th>
+                </tr>
+                {% for user in specialUser.users %}
+                    <tr class="event-export-row-header">
+                        <td class="event-export-instructor-name">{{ user.leftCol }}</td>
+                        <td class="event-export-instructor-contact">{{ user.rightCol }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if instructors|default %}
+        <h3>{% block instructors_headline %}Leiter{% endblock %}</h3>
+        <table class="event-export-table table table-sm">
+            <tbody>
+            {% for instructor in instructors %}
+                <tr class="event-export-row-header">
+                    <td class="event-export-instructor-name">{{ instructor.leftCol }}</td>
+                    <td class="event-export-instructor-contact">{{ instructor.rightCol }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% add to head %}
+        <link rel="stylesheet" href="{{ asset('choices.js/styles/choices.min.css', 'markocupic_sac_event_tool') }}">
+    {% endadd %}
+
+    {% add to body %}
+        <script src="{{ asset('choices.js/scripts/choices.min.js', 'markocupic_sac_event_tool') }}"></script>
+    {% endadd %}
+
+    <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
+        document.addEventListener('DOMContentLoaded', () => {
+            'use strict';
+
+            // Remove empty detail rows
+            for (const element of document.querySelectorAll('.do-not-show-row-when-empty')) {
+                if (element.innerText.trim() === '') {
+                    element.closest('tr').remove();
+                }
+            }
+
+            // Initialize choices.js for the user role select menu
+            const selectField = document.querySelector('#ctrl_userRoles');
+
+            if (null !== selectField && 'undefined' !== typeof Choices) {
+                new Choices(selectField, {
+                    removeItems: true,
+                    removeItemButton: true,
+                });
+            }
+        });
+    </script>
+
+{% endblock %}

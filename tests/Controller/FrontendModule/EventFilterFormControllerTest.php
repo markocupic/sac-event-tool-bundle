@@ -81,25 +81,28 @@ class EventFilterFormControllerTest extends TestCase
     public function testSanitizeUrlRemovesDateParamsWhenGetUpcomingIsSet(): void
     {
         $invokedCount = $this->exactly(3);
+        $invocation = 0;
 
         $this->urlParserMock
             ->expects($invokedCount)
             ->method('removeQueryString')
             ->willReturnCallback(
-                function ($queryKey, $url) use ($invokedCount): string {
-                    if (1 === $invokedCount->getInvocationCount()) {
+                function ($queryKey, $url) use (&$invocation): string {
+                    ++$invocation;
+
+                    if (1 === $invocation) {
                         $this->assertSame([['dateStart'], 'https://localhost/test?dateEnd=2025-12-31&dateStart=2025-01-01&getUpcoming=1&year=2025'], [$queryKey, $url]);
 
                         return 'https://localhost/test?dateEnd=2025-12-31&getUpcoming=1&year=2025';
                     }
 
-                    if (2 === $invokedCount->getInvocationCount()) {
+                    if (2 === $invocation) {
                         $this->assertSame([['dateEnd'], 'https://localhost/test?dateEnd=2025-12-31&getUpcoming=1&year=2025'], [$queryKey, $url]);
 
                         return 'https://localhost/test?getUpcoming=1&year=2025';
                     }
 
-                    if (3 === $invokedCount->getInvocationCount()) {
+                    if (3 === $invocation) {
                         $this->assertSame([['year'], 'https://localhost/test?getUpcoming=1&year=2025'], [$queryKey, $url]);
 
                         return 'https://localhost/test?getUpcoming=1';
@@ -197,19 +200,22 @@ class EventFilterFormControllerTest extends TestCase
         ;
 
         $invokedCount = $this->exactly(2);
+        $invocation = 0;
 
         $this->urlParserMock
             ->expects($invokedCount)
             ->method('addQueryString')
             ->willReturnCallback(
-                function ($queryString, $url) use ($invokedCount): string {
-                    if (1 === $invokedCount->getInvocationCount()) {
+                function ($queryString, $url) use (&$invocation): string {
+                    ++$invocation;
+
+                    if (1 === $invocation) {
                         $this->assertSame(['dateEnd=2025-12-31', 'https://localhost/test?dateStart=2025-01-01'], [$queryString, $url]);
 
                         return 'https://localhost/test?dateEnd=2025-12-31&dateStart=2025-01-01';
                     }
 
-                    if (2 === $invokedCount->getInvocationCount()) {
+                    if (2 === $invocation) {
                         $this->assertSame(['year=2025', 'https://localhost/test?dateEnd=2025-12-31&dateStart=2025-01-01'], [$queryString, $url]);
 
                         return 'https://localhost/test?dateEnd=2025-12-31&dateStart=2025-01-01&year=2025';
@@ -237,19 +243,22 @@ class EventFilterFormControllerTest extends TestCase
         ;
 
         $invokedCount = $this->exactly(2);
+        $invocation = 0;
 
         $this->urlParserMock
             ->expects($invokedCount)
             ->method('addQueryString')
             ->willReturnCallback(
-                function ($queryString, $url) use ($invokedCount): string {
-                    if (1 === $invokedCount->getInvocationCount()) {
+                function ($queryString, $url) use (&$invocation): string {
+                    ++$invocation;
+
+                    if (1 === $invocation) {
                         $this->assertSame(['dateEnd=2025-12-31', 'https://localhost/test?dateStart=2025-02-01'], [$queryString, $url]);
 
                         return 'https://localhost/test?dateStart=2025-02-01&dateEnd=2025-12-31';
                     }
 
-                    if (2 === $invokedCount->getInvocationCount()) {
+                    if (2 === $invocation) {
                         $this->assertSame(['year=2025', 'https://localhost/test?dateStart=2025-02-01&dateEnd=2025-12-31'], [$queryString, $url]);
 
                         return 'https://localhost/test?dateStart=2025-02-01&dateEnd=2025-12-31&year=2025';
@@ -277,19 +286,22 @@ class EventFilterFormControllerTest extends TestCase
         ;
 
         $invokedCount = $this->exactly(2);
+        $invocation = 0;
 
         $this->urlParserMock
             ->expects($invokedCount)
             ->method('addQueryString')
             ->willReturnCallback(
-                function ($queryString, $url) use ($invokedCount): string {
-                    if (1 === $invokedCount->getInvocationCount()) {
+                function ($queryString, $url) use (&$invocation): string {
+                    ++$invocation;
+
+                    if (1 === $invocation) {
                         $this->assertSame(['dateStart=2025-01-01', 'https://localhost/test?dateEnd=2025-12-31'], [$queryString, $url]);
 
                         return 'https://localhost/test?dateEnd=2025-12-31&dateStart=2025-01-01';
                     }
 
-                    if (2 === $invokedCount->getInvocationCount()) {
+                    if (2 === $invocation) {
                         $this->assertSame(['year=2025', 'https://localhost/test?dateEnd=2025-12-31&dateStart=2025-01-01'], [$queryString, $url]);
 
                         return 'https://localhost/test?dateEnd=2025-12-31&dateStart=2025-01-01&year=2025';

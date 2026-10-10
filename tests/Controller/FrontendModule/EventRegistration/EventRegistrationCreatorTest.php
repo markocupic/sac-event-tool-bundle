@@ -24,6 +24,7 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\Ev
 use Markocupic\SacEventToolBundle\Feature\EventRegistrationDatabaseSync\SyncEventRegistrationDatabase;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -39,6 +40,7 @@ class EventRegistrationCreatorTest extends ContaoTestCase
      *
      * @param array<string, mixed> $eventOverrides
      */
+    #[DataProvider('subscriptionStateProvider')]
     public function testResolveSubscriptionState(array $eventOverrides, bool $fullyBooked, string $expectedState): void
     {
         $creator = $this->createCreator(fullyBooked: $fullyBooked);

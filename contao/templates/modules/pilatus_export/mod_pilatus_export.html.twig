@@ -1,0 +1,21 @@
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+
+    {{ form.generate()|raw }}
+
+    <h3 class="content-headline">Quartalsprogramm Kurse</h3>
+    {% if htmlCourseTable|default|trim %}
+        {{ htmlCourseTable|raw }}
+    {% else %}
+        <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
+    {% endif %}
+
+    <h3 class="content-headline">Quartalsprogramm Touren</h3>
+    {% if htmlTourTable|default|trim %}
+        {{ htmlTourTable|raw }}
+    {% else %}
+        <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
+    {% endif %}
+
+{% endblock %}

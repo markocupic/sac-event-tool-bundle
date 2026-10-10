@@ -23,6 +23,7 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\Ev
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\Exception\EventRegistrationException;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class EventRegistrationEligibilityTest extends ContaoTestCase
 {
@@ -35,6 +36,7 @@ class EventRegistrationEligibilityTest extends ContaoTestCase
      *
      * @param array<string, mixed> $eventOverrides
      */
+    #[DataProvider('ineligibleEventProvider')]
     public function testThrowsForIneligibleEvents(array $eventOverrides, string $expectedText, string $expectedLevel): void
     {
         $this->assertThrows($this->createEligibility(), $this->makeEvent($eventOverrides), $this->validMember(), $expectedText, $expectedLevel);

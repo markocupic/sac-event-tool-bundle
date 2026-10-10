@@ -10,7 +10,7 @@
 {% block main_content %}
     <div id="eventParticipantEmail">
         <div id="tl_buttons">
-            <a href="{{ back }}" class="header_back" title="" accesskey="b" onclick="Backend.getScrollOffset()">{{ 'MSC.backBTTitle'|trans }}</a>
+            <a href="{{ back }}" class="header_back" title="" accesskey="b">{{ 'MSC.backBTTitle'|trans }}</a>
         </div>
 
         <div class="notify-event_participant_form">
@@ -53,7 +53,7 @@
     <script{{ attributes }}></script>
 
     <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-        window.addEventListener('DOMContentLoaded', (event) => {
+        ((callback) => 'loading' === document.readyState ? document.addEventListener('DOMContentLoaded', callback) : callback())((event) => { // Turbo-safe DOM ready (Contao 6)
 
             const requestToken = '{{ request_token }}';
             const allowedExtensions = ['{{ allowed_extensions|join("','")|raw }}'];
@@ -320,7 +320,7 @@
          * Prevent multiple form submits
          * Disable submit button upon form submission
          */
-        window.addEventListener('DOMContentLoaded', (event) => {
+        ((callback) => 'loading' === document.readyState ? document.addEventListener('DOMContentLoaded', callback) : callback())((event) => { // Turbo-safe DOM ready (Contao 6)
             document.querySelector('.hasteform_email_app_form form').addEventListener('submit', () => {
                 document.getElementById('ctrl_submit').disabled = 1;
                 window.setTimeout(() => {
@@ -332,7 +332,7 @@
         /**
          * Inject select and unselect all button
          */
-        window.addEventListener('DOMContentLoaded', (event) => {
+        ((callback) => 'loading' === document.readyState ? document.addEventListener('DOMContentLoaded', callback) : callback())((event) => { // Turbo-safe DOM ready (Contao 6)
 
             const template = document.createElement('template');
             template.innerHTML = `<div id='selectAllBox'><a href="#" id="selectAllBtn">{{ 'MSC.evt_epe_selectAll'|trans([], 'contao_default') }}</a> <a href="#" id="unselectAllBtn">{{ 'MSC.evt_epe_unselectAll'|trans([], 'contao_default') }}</a></div>`;
@@ -387,7 +387,7 @@
     <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
         const suggestions = {{ user_role_emails|json_encode|raw }};
 
-        document.addEventListener('DOMContentLoaded', () => {
+        ((callback) => 'loading' === document.readyState ? document.addEventListener('DOMContentLoaded', callback) : callback())(() => { // Turbo-safe DOM ready (Contao 6)
             const input = document.getElementById('ctrl_recipientsCc');
 
             if (!input) return;

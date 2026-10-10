@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
-use Contao\CoreBundle\Controller\BackendController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\Template;
@@ -47,8 +46,9 @@ class ParseTemplateListener
             return;
         }
 
-        // Do not show the dashboard when using custom routes/controllers
-        if ($request->attributes->get('_controller') !== BackendController::class.'::mainAction') {
+        // Do not show the dashboard when using custom routes/controllers. The route
+        // name is used, because the controller class was moved in Contao 6.
+        if ('contao_backend' !== $request->attributes->get('_route')) {
             return;
         }
 

@@ -69,7 +69,7 @@
             .set('src', asset('vue/dist/vue.global.prod.js', 'markocupic_sac_event_tool')) %}
         <script{{ attributes }}></script>
         <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-          document.addEventListener('DOMContentLoaded', () => {
+          ((callback) => 'loading' === document.readyState ? document.addEventListener('DOMContentLoaded', callback) : callback())(() => { // Turbo-safe DOM ready (Contao 6)
             new MemberDatabaseSyncMaintenance('#memberDatabaseSyncApp');
           });
 

@@ -15,13 +15,36 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DependencyInjection;
 
 use Markocupic\SacEventToolBundle\Feature\EventRegistrationReminder\Cron\EventRegistrationReminderCron;
+use Markocupic\SacEventToolBundle\Messenger\Message\LowPriorityMessageInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-class MarkocupicSacEventToolExtension extends Extension
+class MarkocupicSacEventToolExtension extends Extension implements PrependExtensionInterface
 {
+    /**
+     * Route the low priority messages of this bundle to the "contao_prio_low"
+     * transport. Contao 6 no longer ships the LowPriorityMessageInterface of
+     * Contao 5 and the AsMessage attribute requires Symfony 7.2+, so the routing
+     * is configured here to support Contao 5.3 and Contao 6.
+     */
+    public function prepend(ContainerBuilder $container): void
+    {
+        if (!$container->hasExtension('framework')) {
+            return;
+        }
+
+        $container->prependExtensionConfig('framework', [
+            'messenger' => [
+                'routing' => [
+                    LowPriorityMessageInterface::class => 'contao_prio_low',
+                ],
+            ],
+        ]);
+    }
+
     public function getAlias(): string
     {
         return Configuration::ROOT_KEY;

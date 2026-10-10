@@ -10,7 +10,7 @@
 
 "use strict";
 
-document.addEventListener('DOMContentLoaded', () => {
+const initMemberAutocomplete = () => {
 
 	let globalTimeout = null;
 
@@ -22,6 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (document.querySelector('input[name="sacMemberId"][readonly]')) {
 		return;
 	}
+
+	// Initialize only once per page
+	if (document.querySelector('input[name="sacMemberId"]').dataset.sacevtAutocomplete) {
+		return;
+	}
+
+	document.querySelector('input[name="sacMemberId"]').dataset.sacevtAutocomplete = '1';
 
 	document.querySelector('input[name="sacMemberId"]').addEventListener('keyup', () => {
 		if (globalTimeout !== null) {
@@ -140,4 +147,15 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		}, 400);
 	});
-});
+};
+
+// Contao 5.3 renders the back end without Turbo, Contao 6 uses Turbo Drive. With
+// Turbo, DOMContentLoaded only fires once, so initialize on turbo:load as well.
+// The initializer itself makes sure it does not run twice on the same page.
+if ('loading' === document.readyState) {
+	document.addEventListener('DOMContentLoaded', initMemberAutocomplete);
+} else {
+	initMemberAutocomplete();
+}
+
+document.addEventListener('turbo:load', initMemberAutocomplete);

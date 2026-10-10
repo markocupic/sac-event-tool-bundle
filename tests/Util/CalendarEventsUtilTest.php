@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\Tests\Util;
 use Contao\CalendarEventsModel;
 use Contao\TestCase\ContaoTestCase;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class CalendarEventsUtilTest extends ContaoTestCase
 {
@@ -34,6 +35,7 @@ class CalendarEventsUtilTest extends ContaoTestCase
      *
      * @dataProvider coordsProvider
      */
+    #[DataProvider('coordsProvider')]
     public function testGetCoordsCH1903AsArray(string $raw, array $expected): void
     {
         $event = $this->mockEvent(['coordsCH1903' => $raw]);

@@ -21,6 +21,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Feature\EventCompletionReminder\Task\ParticipationConfirmationTask;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -29,6 +30,7 @@ final class ParticipationConfirmationTaskTest extends ContaoTestCase
     /**
      * @dataProvider supportsProvider
      */
+    #[DataProvider('supportsProvider')]
     public function testSupports(string $eventType, bool $expected): void
     {
         $event = $this->mockClassWithProperties(CalendarEventsModel::class, ['eventType' => $eventType]);
@@ -50,6 +52,7 @@ final class ParticipationConfirmationTaskTest extends ContaoTestCase
      *
      * @dataProvider isOpenProvider
      */
+    #[DataProvider('isOpenProvider')]
     public function testIsOpen(int $registrations, int $confirmed, bool $expectedOpen): void
     {
         $event = $this->mockClassWithProperties(CalendarEventsModel::class, ['id' => 42, 'eventType' => 'course']);

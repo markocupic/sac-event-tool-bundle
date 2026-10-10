@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Tests\String\Validator;
 
 use Markocupic\SacEventToolBundle\String\Validator\DateValidator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class DateValidatorTest extends TestCase
@@ -22,6 +23,7 @@ final class DateValidatorTest extends TestCase
     /**
      * @dataProvider provideValidDates
      */
+    #[DataProvider('provideValidDates')]
     public function testIsValidDateWithValidValues(string $value, string $format): void
     {
         $this->assertTrue(DateValidator::isValidDate($value, $format));
@@ -30,6 +32,7 @@ final class DateValidatorTest extends TestCase
     /**
      * @dataProvider provideInvalidDates
      */
+    #[DataProvider('provideInvalidDates')]
     public function testIsValidDateWithInvalidValues(mixed $value, string $format): void
     {
         $this->assertFalse(DateValidator::isValidDate($value, $format));
@@ -41,6 +44,7 @@ final class DateValidatorTest extends TestCase
      *
      * @dataProvider provideLenientlyParsedDates
      */
+    #[DataProvider('provideLenientlyParsedDates')]
     public function testIsValidDateAcceptsLenientlyParsedValues(string $value, string $format): void
     {
         $this->assertTrue(DateValidator::isValidDate($value, $format));
@@ -49,6 +53,7 @@ final class DateValidatorTest extends TestCase
     /**
      * @dataProvider provideValidTimestamps
      */
+    #[DataProvider('provideValidTimestamps')]
     public function testIsValidTimestampWithValidValues(int|string $value): void
     {
         $this->assertTrue(DateValidator::isValidTimestamp($value));
@@ -57,6 +62,7 @@ final class DateValidatorTest extends TestCase
     /**
      * @dataProvider provideInvalidTimestamps
      */
+    #[DataProvider('provideInvalidTimestamps')]
     public function testIsValidTimestampWithInvalidValues(mixed $value): void
     {
         $this->assertFalse(DateValidator::isValidTimestamp($value));

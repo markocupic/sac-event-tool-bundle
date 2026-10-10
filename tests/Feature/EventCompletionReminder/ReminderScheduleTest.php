@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Tests\Feature\EventCompletionReminder;
 
 use Markocupic\SacEventToolBundle\Feature\EventCompletionReminder\ReminderSchedule;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class ReminderScheduleTest extends TestCase
@@ -39,6 +40,7 @@ final class ReminderScheduleTest extends TestCase
     /**
      * @dataProvider dueEndDateProvider
      */
+    #[DataProvider('dueEndDateProvider')]
     public function testDueEndDateMax(string $endDate, string $now, int $firstOffset, bool $expectedDue): void
     {
         $max = ReminderSchedule::getDueEndDateMax($firstOffset, new \DateTimeImmutable($now));
@@ -59,6 +61,7 @@ final class ReminderScheduleTest extends TestCase
     /**
      * @dataProvider notificationDueProvider
      */
+    #[DataProvider('notificationDueProvider')]
     public function testIsNotificationDue(string|null $lastSentAt, string $now, int $interval, bool $expected): void
     {
         $lastSentTstamp = null === $lastSentAt ? null : strtotime($lastSentAt);

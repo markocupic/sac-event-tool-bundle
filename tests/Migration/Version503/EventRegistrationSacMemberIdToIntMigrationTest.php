@@ -21,6 +21,7 @@ use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Types\Type;
 use Markocupic\SacEventToolBundle\Migration\Version503\EventRegistrationSacMemberIdToIntMigration;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -29,6 +30,7 @@ final class EventRegistrationSacMemberIdToIntMigrationTest extends TestCase
     /**
      * @dataProvider sacMemberIdProvider
      */
+    #[DataProvider('sacMemberIdProvider')]
     public function testToSacMemberId(string $value, int $expected): void
     {
         $this->assertSame($expected, EventRegistrationSacMemberIdToIntMigration::toSacMemberId($value));
