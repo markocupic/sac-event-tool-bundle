@@ -81,6 +81,11 @@ services:
         tags:
             - { name: security.voter, priority: 20 }
 
+    # Keeps tl_tour_type a flat list (MODE_TREE is only used for manual sorting). Only denies or abstains.
+    Markocupic\SacEventToolBundle\Security\Voter\TourTypeFlatListVoter:
+        tags:
+            - { name: security.voter, priority: 20 }
+
     # Add a session bag
     Markocupic\SacEventToolBundle\Session\Attribute\ArrayAttributeBag:
         arguments:

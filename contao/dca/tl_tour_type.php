@@ -23,16 +23,20 @@ $GLOBALS['TL_DCA']['tl_tour_type'] = [
 		'switchToEdit'     => true,
 		'sql'              => [
 			'keys' => [
-				'id' => 'primary',
+				'id'          => 'primary',
+				'pid,sorting' => 'index',
 			],
 		],
 	],
 	'list'     => [
+		// Flat list, manually sortable via the "sorting" field (cut & paste).
+		// DC_Table only supports manual sorting in MODE_PARENT and MODE_TREE. Since this table has no parent
+		// table, MODE_TREE is used, with all records on the root level (pid = 0). Nesting is prevented by
+		// the TourTypeFlatListVoter.
 		'sorting'           => [
 			'mode'        => DataContainer::MODE_TREE,
-			'fields'      => ['sorting'],
-			'flag'        => DataContainer::SORT_INITIAL_LETTER_ASC,
-			'panelLayout' => 'filter;search,limit',
+			'rootPaste'   => true,
+			'panelLayout' => 'filter;search',
 		],
 		'label'             => [
 			'fields' => ['shortcut', 'title'],
@@ -40,6 +44,13 @@ $GLOBALS['TL_DCA']['tl_tour_type'] = [
 		],
 		'global_operations' => [
 			'all',
+		],
+		'operations'        => [
+			'edit',
+			'copy',
+			'cut',
+			'delete',
+			'show',
 		],
 	],
 	'palettes' => [
