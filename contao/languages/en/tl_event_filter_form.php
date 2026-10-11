@@ -26,7 +26,7 @@ $GLOBALS['TL_LANG']['tl_event_filter_form']['favoredEvent'] = ['Aus Merkliste', 
 $GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'] = ['Kursnummer', 'Kursnummer eingeben.'];
 
 // Labels
-$GLOBALS['TL_LANG']['tl_event_filter_form']['blankOptionLabel'] = 'alle zukünftigen Anlässe anzeigen';
+$GLOBALS['TL_LANG']['tl_event_filter_form']['blankOptionLabel'] = 'alle zukünftigen Events anzeigen';
 $GLOBALS['TL_LANG']['tl_event_filter_form']['showAll'] = 'alle anzeigen';
 $GLOBALS['TL_LANG']['tl_event_filter_form']['enterSearchTerms'] = 'Suchbegriffe eingeben';
 
