@@ -13,17 +13,17 @@ declare(strict_types=1);
  */
 
 // Fields
-$GLOBALS['TL_LANG']['tl_event_filter_form']['year'] = ['Jahr', 'Wähle das Jahr aus.'];
-$GLOBALS['TL_LANG']['tl_event_filter_form']['dateStart'] = ['Anzeigen ab', 'Wähle den Zeitraum aus, ab wann die Events gelistet werden sollen.'];
-$GLOBALS['TL_LANG']['tl_event_filter_form']['tourType'] = ['Tour-/Anlasstyp', 'Wähle den Tour-/Anlasstyp aus.'];
-$GLOBALS['TL_LANG']['tl_event_filter_form']['courseType'] = ['Kurstyp', 'Wähle den Kurstyp aus.'];
-$GLOBALS['TL_LANG']['tl_event_filter_form']['textSearch'] = ['Im Text suchen', 'Setze Suchbegriffe ein, nach denen in der Datenbank gesucht werden soll.'];
-$GLOBALS['TL_LANG']['tl_event_filter_form']['organizers'] = ['Organisierende Gruppe', 'Organisierende Gruppe auswählen.'];
-$GLOBALS['TL_LANG']['tl_event_filter_form']['eventId'] = ['Eventnummer', 'Eventnummer eingeben.'];
+$GLOBALS['TL_LANG']['tl_event_filter_form']['year'] = ['Jahr auswählen', 'Wähle das Jahr aus.'];
+$GLOBALS['TL_LANG']['tl_event_filter_form']['dateStart'] = ['Anzeigen ab', 'Wähle den Zeitraum aus, ab dem die Events angezeigt werden.'];
+$GLOBALS['TL_LANG']['tl_event_filter_form']['tourType'] = ['Tour-Typ', 'Wähle den Tour-Typ aus.'];
+$GLOBALS['TL_LANG']['tl_event_filter_form']['courseType'] = ['Kurs-Typ', 'Wähle den Kurs-Typ aus.'];
+$GLOBALS['TL_LANG']['tl_event_filter_form']['textSearch'] = ['Im Text suchen', 'Gib Suchbegriffe ein, nach denen in der Datenbank gesucht wird.'];
+$GLOBALS['TL_LANG']['tl_event_filter_form']['organizers'] = ['Organisierende Gruppe', 'Wähle die organisierende Gruppe aus.'];
+$GLOBALS['TL_LANG']['tl_event_filter_form']['eventId'] = ['Event-Nummer', 'Event-Nummer eingeben.'];
 $GLOBALS['TL_LANG']['tl_event_filter_form']['suitableForBeginners'] = ['Für Einsteiger geeignet', 'Für Einsteiger geeignet'];
 $GLOBALS['TL_LANG']['tl_event_filter_form']['publicTransportEvent'] = ['Anreise mit ÖV', 'Anreise mit ÖV'];
 $GLOBALS['TL_LANG']['tl_event_filter_form']['favoredEvent'] = ['Aus Merkliste', 'Aus Merkliste'];
-$GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'] = ['Kursnummer', 'Kursnummer eingeben.'];
+$GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'] = ['Kurs-Nummer', 'Kurs-Nummer eingeben.'];
 
 // Labels
 $GLOBALS['TL_LANG']['tl_event_filter_form']['blankOptionLabel'] = 'alle zukünftigen Events anzeigen';
