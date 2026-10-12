@@ -17,7 +17,7 @@ namespace Markocupic\SacEventToolBundle\Tests\Feature\EventReminder\Messenger\Me
 use Contao\CalendarEventsModel;
 use Contao\CalendarModel;
 use Contao\Date;
-use Contao\Events;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\System;
 use Contao\TestCase\ContaoTestCase;
 use Doctrine\DBAL\Connection;
@@ -30,6 +30,7 @@ use Markocupic\SacEventToolBundle\Feature\EventReminder\RecipientResolver;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Terminal42\NotificationCenterBundle\NotificationCenter;
 use Terminal42\NotificationCenterBundle\Receipt\ReceiptCollection;
@@ -53,6 +54,11 @@ final class SendEventReminderHandlerTest extends ContaoTestCase
 
     private LoggerInterface&MockObject $logger;
 
+    /**
+     * Thrown by the content URL generator if set (e.g. the calendar has no reader page).
+     */
+    private \Throwable|null $eventUrlException = null;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -64,6 +70,7 @@ final class SendEventReminderHandlerTest extends ContaoTestCase
         $this->connection = $this->createMock(Connection::class);
         $this->notificationCenter = $this->createMock(NotificationCenter::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->eventUrlException = null;
     }
 
     public function testDoesNothingIfReminderWasAlreadySent(): void
@@ -219,6 +226,43 @@ final class SendEventReminderHandlerTest extends ContaoTestCase
         $this->assertSame(['update', 'send'], $this->calls, 'The sent flag must be set before the notification is sent');
     }
 
+    public function testSendsReminderWithoutLinkIfEventUrlCannotBeGenerated(): void
+    {
+        $this->eventUrlException = new RouteNotFoundException('No reader page');
+
+        $handler = $this->createHandler();
+
+        $this->connection
+            ->method('update')
+            ->willReturn(1)
+        ;
+
+        $this->logger
+            ->expects($this->once())
+            ->method('error')
+            ->with($this->stringContains('could not generate the event URL'))
+        ;
+
+        $this->notificationCenter
+            ->expects($this->once())
+            ->method('sendNotification')
+            ->with(
+                self::NOTIFICATION_ID,
+                $this->callback(
+                    function (array $tokens): bool {
+                        $this->assertSame('', $tokens['event_link_detail']);
+
+                        return true;
+                    },
+                ),
+                'de',
+            )
+            ->willReturn(new ReceiptCollection([]))
+        ;
+
+        $handler(new SendEventReminderMessage(self::EVENT_ID));
+    }
+
     /**
      * @param array<string, mixed>   $eventProperties
      * @param array<string, mixed>   $calendarProperties
@@ -276,16 +320,23 @@ final class SendEventReminderHandlerTest extends ContaoTestCase
             ->willReturnCallback(static fn (string $format, int|string $tstamp): string => date($format, (int) $tstamp))
         ;
 
-        $eventsAdapter = $this->mockAdapter(['generateEventUrl']);
-        $eventsAdapter
-            ->method('generateEventUrl')
-            ->willReturn('https://example.org/event')
+        $contentUrlGenerator = $this->createMock(ContentUrlGenerator::class);
+        $contentUrlGenerator
+            ->method('generate')
+            ->willReturnCallback(
+                function (): string {
+                    if (null !== $this->eventUrlException) {
+                        throw $this->eventUrlException;
+                    }
+
+                    return 'https://example.org/event';
+                },
+            )
         ;
 
         $framework = $this->mockContaoFramework([
             CalendarEventsModel::class => $eventAdapter,
             CalendarModel::class => $calendarAdapter,
-            Events::class => $eventsAdapter,
             Date::class => $dateAdapter,
         ]);
 
@@ -327,6 +378,7 @@ final class SendEventReminderHandlerTest extends ContaoTestCase
             new CalendarEventsUtil($framework),
             $this->connection,
             $framework,
+            $contentUrlGenerator,
             $this->notificationCenter,
             $personProvider,
             new RecipientResolver(),

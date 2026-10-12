@@ -1061,7 +1061,10 @@ class CalendarEventsUtil
 
         $params = \sprintf('/%s', !empty($event->alias) ? $event->alias : $event->id);
 
-        $eventPreviewUrl = $urlParser->addQueryString('event_preview=true', $previewPage->getAbsoluteUrl($params));
+        /** @var ContentUrlGenerator $contentUrlGenerator */
+        $contentUrlGenerator = $this->getContainer()->get('contao.routing.content_url_generator');
+
+        $eventPreviewUrl = $urlParser->addQueryString('event_preview=true', $contentUrlGenerator->generate($previewPage, ['parameters' => $params], UrlGeneratorInterface::ABSOLUTE_URL));
         $eventPreviewUrl = $this->getAdapter(StringUtil::class)->specialcharsUrl(StringUtil::ampersand($eventPreviewUrl));
 
         return $uriSigner->sign($eventPreviewUrl, 86400);

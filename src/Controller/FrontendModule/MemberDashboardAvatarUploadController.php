@@ -22,6 +22,7 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Dbafs;
 use Contao\Environment;
@@ -55,6 +56,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
     public function __construct(
         private readonly BinaryFileDownload $binaryFileDownload,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly ContaoFramework $framework,
         private readonly RotateImage $rotateImage,
         private readonly TokenStorageInterface $tokenStorage,
@@ -87,7 +89,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
             if ('rotate-image' === $request->query->get('do')) {
                 $this->rotateImage->rotate(Path::join($this->projectDir, $files->path), 90);
-                $this->framework->getAdapter(Controller::class)->redirect($page->getFrontendUrl());
+                $this->framework->getAdapter(Controller::class)->redirect($this->contentUrlGenerator->generate($page));
             }
 
             if ('download-image' === $request->query->get('do')) {
@@ -96,7 +98,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
             if ('delete-image' === $request->query->get('do')) {
                 $this->deleteAvatar();
-                $this->framework->getAdapter(Controller::class)->redirect($page->getFrontendUrl());
+                $this->framework->getAdapter(Controller::class)->redirect($this->contentUrlGenerator->generate($page));
             }
         }
 

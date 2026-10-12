@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\Feature\EventFeedback\Messenger\MessageH
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\Feature\EventFeedback\EventFeedbackHelper;
@@ -29,6 +30,7 @@ use Markocupic\SacEventToolBundle\Model\EventFeedbackReminderModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Terminal42\NotificationCenterBundle\NotificationCenter;
 
 /**
@@ -43,6 +45,7 @@ readonly class SendEventFeedbackReminderHandler
     public function __construct(
         private CalendarEventsUtil $calendarEventsUtil,
         private ContaoFramework $framework,
+        private ContentUrlGenerator $contentUrlGenerator,
         private EventFeedbackHelper $eventFeedbackHelper,
         private FeedbackReminder $feedbackReminder,
         private FeedbackToken $feedbackToken,
@@ -147,7 +150,7 @@ readonly class SendEventFeedbackReminderHandler
             'participant_email' => (string) $registration->email,
             'participant_uuid' => (string) $registration->uuid,
             'event_title' => StringUtil::revertInputEncoding((string) $event->title),
-            'feedback_url' => \sprintf('%s?token=%s', $page->getAbsoluteUrl(), $token),
+            'feedback_url' => \sprintf('%s?token=%s', $this->contentUrlGenerator->generate($page, [], UrlGeneratorInterface::ABSOLUTE_URL), $token),
         ];
     }
 

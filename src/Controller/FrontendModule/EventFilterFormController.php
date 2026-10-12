@@ -20,6 +20,7 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\ModuleModel;
 use Contao\PageModel;
@@ -41,6 +42,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
 
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly TranslatorInterface $translator,
         private readonly UrlParser $urlParser,
         private readonly string $sacevtLocale,
@@ -91,7 +93,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
 
         // Set the action attribute
         $objPage = $request->attributes->get('pageModel');
-        $url = $objPage->getFrontendUrl();
+        $url = $this->contentUrlGenerator->generate($objPage);
         $objForm->setAction($url);
 
         $objForm->addFieldsFromDca(

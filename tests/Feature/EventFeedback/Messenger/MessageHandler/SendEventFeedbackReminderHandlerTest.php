@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\Tests\Feature\EventFeedback\Messenger\Me
 
 use Contao\CalendarEventsModel;
 use Contao\Config;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\PageModel;
 use Contao\TestCase\ContaoTestCase;
 use Markocupic\SacEventToolBundle\Feature\EventFeedback\EventFeedbackHelper;
@@ -28,6 +29,7 @@ use Markocupic\SacEventToolBundle\Model\EventFeedbackModel;
 use Markocupic\SacEventToolBundle\Model\EventFeedbackReminderModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Terminal42\NotificationCenterBundle\NotificationCenter;
 use Terminal42\NotificationCenterBundle\Receipt\ReceiptCollection;
 
@@ -159,8 +161,11 @@ final class SendEventFeedbackReminderHandlerTest extends ContaoTestCase
         ]);
 
         $page = $this->mockClassWithProperties(PageModel::class, ['adminEmail' => '']);
-        $page
-            ->method('getAbsoluteUrl')
+
+        $contentUrlGenerator = $this->createMock(ContentUrlGenerator::class);
+        $contentUrlGenerator
+            ->method('generate')
+            ->with($page, [], UrlGeneratorInterface::ABSOLUTE_URL)
             ->willReturn('https://example.org/feedback.html')
         ;
 
@@ -194,6 +199,7 @@ final class SendEventFeedbackReminderHandlerTest extends ContaoTestCase
         return new SendEventFeedbackReminderHandler(
             $calendarEventsUtil,
             $framework,
+            $contentUrlGenerator,
             $helper,
             $this->feedbackReminder,
             new FeedbackToken('Sec!ret12345Ab'),

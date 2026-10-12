@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\PageModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
@@ -27,6 +28,7 @@ class ReplaceInsertTagsListener
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly Connection $connection,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
     ) {
     }
 
@@ -69,7 +71,7 @@ class ReplaceInsertTagsListener
                 $objPage = $pageModelAdapter->findByIdOrAlias($elements[1]);
 
                 if (null !== $objPage) {
-                    $strLocation = \sprintf('%s%s', $objPage->getFrontendUrl(), $params);
+                    $strLocation = \sprintf('%s%s', $this->contentUrlGenerator->generate($objPage), $params);
                     $controllerAdapter->redirect($strLocation);
                 }
             }

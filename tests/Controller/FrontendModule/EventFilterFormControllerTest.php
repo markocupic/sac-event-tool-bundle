@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\Tests\Controller\FrontendModule;
 
 use Codefog\HasteBundle\UrlParser;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventFilterFormController;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -33,6 +34,7 @@ class EventFilterFormControllerTest extends TestCase
         $this->urlParserMock = $this->createMock(UrlParser::class);
         $this->controller = new EventFilterFormController(
             $this->createMock(ContaoFramework::class),
+            $this->createMock(ContentUrlGenerator::class),
             $this->createMock(TranslatorInterface::class),
             $this->urlParserMock,
             'en',
