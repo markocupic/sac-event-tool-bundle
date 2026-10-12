@@ -2,12 +2,13 @@
     <a href="{{ back }}" class="header_back" title="" accesskey="b">{{ 'MSC.backBTTitle'|trans({}, 'contao_default') }}</a>
 </div>
 
-<div class="notify-event_participant_form">
+{# The Stimulus controller prevents the email from being sent twice (double click) #}
+<div class="notify-event_participant_form" data-controller="sacevt--backend--prevent-double-submit">
     <h1 class="headline">{{ headline }}</h1>
     {{ form|raw }}
 </div>
 
-<style{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
+<style{{ attrs().setIfExists('nonce', csp_nonce('style-src')) }}>
     .notify-event_participant_form {
         border-top: 1px solid #e6e6e8;
     }
@@ -48,17 +49,3 @@
     }
 
 </style>
-
-<script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-    /**
-     * Prevent multiple clicks
-     * Disable Submit Button Upon Form Submission
-     */
-    ((callback) => 'loading' === document.readyState ? document.addEventListener('DOMContentLoaded', callback) : callback())((event) => { // Turbo-safe DOM ready (Contao 6)
-        document.getElementById('tl_calendar_events_member').addEventListener('submit', () => {
-            if (document.getElementById('ctrl_subject').value != '' && document.getElementById('ctrl_text').value != '') {
-                document.getElementById('ctrl_submit').disabled = 1;
-            }
-        });
-    });
-</script>

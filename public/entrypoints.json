@@ -2,7 +2,7 @@
   "entrypoints": {
     "stimulus_backend": {
       "js": [
-        "/bundles/markocupicsaceventtool/stimulus_backend.b6b86b0a.js"
+        "/bundles/markocupicsaceventtool/stimulus_backend.98d4aed9.js"
       ]
     },
     "stimulus_frontend": {

@@ -21,9 +21,10 @@ use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Events;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\StringUtil;
@@ -31,7 +32,9 @@ use Contao\Validator;
 use Contao\Versions;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
+use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -39,6 +42,7 @@ use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
@@ -66,8 +70,6 @@ class NotifyEventRegistrationStateController
 
     private Adapter $controller;
 
-    private Adapter $events;
-
     private Adapter $member;
 
     private Adapter $message;
@@ -79,6 +81,7 @@ class NotifyEventRegistrationStateController
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly Environment $twig,
         private readonly MailerInterface $mailer,
         #[Autowire(param: 'sacevt.mailer_transports.event_admin')]
@@ -92,12 +95,12 @@ class NotifyEventRegistrationStateController
         private readonly string $sacevtEventRegistrationConfigEmailCancelTemplPath,
         private readonly string $sacevtEventRegistrationConfigEmailRefuseTemplPath,
         private readonly string $sacevtEventRegistrationConfigEmailWaitinglistTemplPath,
+        private readonly LoggerInterface|null $contaoErrorLogger = null,
     ) {
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->config = $this->framework->getAdapter(Config::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
-        $this->events = $this->framework->getAdapter(Events::class);
         $this->member = $this->framework->getAdapter(MemberModel::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
@@ -132,34 +135,40 @@ class NotifyEventRegistrationStateController
         $id = $request->query->get('id');
 
         if (!$this->uriSigner->checkRequest($request)) {
-            $this->message->addInfo('Zugriff verweigert.');
+            $this->message->addError('Zugriff verweigert.');
             $this->controller->redirect($this->getErrorUri());
         }
 
         $this->registration = $this->calendarEventsMember->findById($id);
 
         if (null === $this->registration) {
-            $this->message->addInfo('Es wurde keine gültige Event-Registrierung gefunden.');
+            $this->message->addError('Es wurde keine gültige Event-Registrierung gefunden.');
             $this->controller->redirect($this->getErrorUri());
         }
 
         $this->event = $this->calendarEvents->findById($this->registration->eventId);
 
         if (null === $this->event) {
-            $this->message->addInfo('Es wurde kein zur Registrierung gehörender Event gefunden.');
+            $this->message->addError('Es wurde kein zur Registrierung gehörender Event gefunden.');
             $this->controller->redirect($this->getErrorUri());
         }
 
         $this->user = $this->security->getUser();
 
         if (!$this->user instanceof BackendUser) {
-            throw new \Exception('Access denied! User has to be a logged in as a Contao backend user.');
+            throw new AccessDeniedException('Access denied! User has to be a logged in as a Contao backend user.');
+        }
+
+        // The signed URL is not bound to a user: check the permission to administer
+        // the registrations of this event.
+        if (!$this->security->isGranted('ROLE_ADMIN') && !$this->security->isGranted(CalendarEventsVoter::CAN_ADMINISTER_EVENT_REGISTRATIONS, (int) $this->event->id)) {
+            throw new AccessDeniedException(\sprintf('Access denied! User "%s" is not allowed to administer the registrations of event ID %d.', $this->user->username, $this->event->id));
         }
 
         $this->action = $request->query->get('action', null);
 
         if (empty($this->action) || !\in_array($this->action, EventSubscriptionState::ALL, true) || null === ($this->configuration = $this->getActionConfig($this->action))) {
-            $this->message->addInfo(\sprintf('Ungültiger Query-Parameter "action" => "%s".', $this->action));
+            $this->message->addError(\sprintf('Ungültiger Query-Parameter "action" => "%s".', (string) $this->action));
             $this->controller->redirect($this->getErrorUri());
         }
     }
@@ -168,28 +177,28 @@ class NotifyEventRegistrationStateController
     {
         $configs = [
             EventSubscriptionState::SUBSCRIPTION_ACCEPTED => [
-                'formId' => strtolower(EventSubscriptionState::SUBSCRIPTION_ACCEPTED).'_form',
+                'formId' => EventSubscriptionState::SUBSCRIPTION_ACCEPTED.'_form',
                 'headline' => 'Anmeldeanfrage bestätigen',
                 'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_ACCEPTED,
                 'backendMessage' => 'Die Anmeldeanfrage wurde erfolgreich bestätigt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'templatePath' => $this->sacevtEventRegistrationConfigEmailAcceptTemplPath,
             ],
             EventSubscriptionState::USER_HAS_UNSUBSCRIBED => [
-                'formId' => strtolower(EventSubscriptionState::USER_HAS_UNSUBSCRIBED).'_form',
+                'formId' => EventSubscriptionState::USER_HAS_UNSUBSCRIBED.'_form',
                 'headline' => 'Anmeldeanfrage zurückziehen',
                 'stateOfSubscription' => EventSubscriptionState::USER_HAS_UNSUBSCRIBED,
                 'backendMessage' => 'Die Anmeldeanfrage wurde von der teilnehmenden Person zurückgezogen, und sie wurde entsprechend per E‑Mail benachrichtigt.',
                 'templatePath' => $this->sacevtEventRegistrationConfigEmailCancelTemplPath,
             ],
             EventSubscriptionState::SUBSCRIPTION_REFUSED => [
-                'formId' => strtolower(EventSubscriptionState::SUBSCRIPTION_REFUSED).'_form',
+                'formId' => EventSubscriptionState::SUBSCRIPTION_REFUSED.'_form',
                 'headline' => 'Anmeldeanfrage ablehnen',
                 'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_REFUSED,
                 'backendMessage' => 'Die Anmeldeanfrage wurde abgelehnt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'templatePath' => $this->sacevtEventRegistrationConfigEmailRefuseTemplPath,
             ],
             EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST => [
-                'formId' => strtolower(EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST).'_form',
+                'formId' => EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST.'_form',
                 'headline' => 'Anmeldestatus auf "Warteliste" ändern',
                 'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST,
                 'backendMessage' => 'Der Status dieser Registrierung wurde erfolgreich „auf Warteliste“ gesetzt, und die Person wurde per E‑Mail darüber informiert.',
@@ -238,8 +247,7 @@ class NotifyEventRegistrationStateController
                 $emailText = $this->event->customEventRegistrationConfirmationEmailText;
 
                 foreach ($textTokens as $k => $v) {
-                    $strPattern = '/##'.$k.'##/i';
-                    $emailText = preg_replace($strPattern, $v, $emailText);
+                    $emailText = str_ireplace('##'.$k.'##', (string) $v, $emailText);
                 }
             } else {
                 // Render the email body text from a twig template
@@ -253,7 +261,7 @@ class NotifyEventRegistrationStateController
             // Add value to fields
             $subjectTokens = [
                 'eventType' => $eventType,
-                'eventTitle' => $this->event->title,
+                'eventTitle' => $this->decode($this->event->title),
                 'renderEmailSubject' => true,
             ];
 
@@ -298,7 +306,7 @@ class NotifyEventRegistrationStateController
 
         $email->subject($subject);
         $email->text($text);
-        $email->html('<p>'.nl2br(htmlspecialchars($text)).'</p>');
+        $email->html('<p>'.nl2br($this->stringUtil->specialchars($text)).'</p>');
 
         // Add some headers to prevent the email from being marked as spam
         $email->getHeaders()->addTextHeader(
@@ -338,7 +346,7 @@ class NotifyEventRegistrationStateController
         } elseif ($this->validator->isEmail($this->registration->email)) {
             try {
                 // Send email notification
-                $email = $email->to(new Address($this->registration->email, $this->registration->firstname.' '.$this->registration->lastname));
+                $email = $email->to(new Address($this->registration->email, $this->decode($this->registration->firstname.' '.$this->registration->lastname)));
                 $this->mailer->send($email);
 
                 $this->registration->stateOfSubscription = $this->configuration['stateOfSubscription'];
@@ -358,13 +366,18 @@ class NotifyEventRegistrationStateController
                 return true;
             } catch (\Exception $e) {
                 $hasError = true;
+
+                $this->contaoErrorLogger?->error(
+                    \sprintf('Could not notify the participant of event registration ID %d about the new subscription state "%s": %s', $this->registration->id, $this->action, $e->getMessage()),
+                    ['exception' => $e],
+                );
             }
         } else {
             $hasError = true;
         }
 
         if ($hasError) {
-            $this->message->addInfo(
+            $this->message->addError(
                 'Es ist ein Fehler aufgetreten. '.
                 'Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.',
             );
@@ -389,26 +402,31 @@ class NotifyEventRegistrationStateController
         );
 
         return [
-            'participantFirstname' => $this->registration->firstname,
-            'participantLastname' => $this->registration->lastname,
+            'participantFirstname' => $this->decode($this->registration->firstname),
+            'participantLastname' => $this->decode($this->registration->lastname),
             'participant_uuid' => $this->registration->uuid,
-            'eventName' => $this->event->title,
-            'eventIban' => $this->event->addIban ? $this->event->iban : '',
-            'eventIbanBeneficiary' => $this->event->addIban ? $this->event->ibanBeneficiary : '',
-            'courseId' => $this->event->courseId,
+            'eventName' => $this->decode($this->event->title),
+            'eventIban' => $this->event->addIban ? $this->decode((string) $this->event->iban) : '',
+            'eventIbanBeneficiary' => $this->event->addIban ? $this->decode((string) $this->event->ibanBeneficiary) : '',
+            'courseId' => $this->decode((string) $this->event->courseId),
             'eventType' => $this->event->eventType,
-            'eventUrl' => $this->events->generateEventUrl($this->event, true),
+            'eventUrl' => $this->contentUrlGenerator->generate($this->event, [], UrlGeneratorInterface::ABSOLUTE_URL),
             'eventDates' => $strDates,
-            'instructorName' => $this->user->name,
-            'instructorFirstname' => $this->user->firstname,
-            'instructorLastname' => $this->user->lastname,
-            'instructorPhone' => $this->user->phone,
-            'instructorMobile' => $this->user->mobile,
-            'instructorStreet' => $this->user->street,
+            'instructorName' => $this->decode($this->user->name),
+            'instructorFirstname' => $this->decode($this->user->firstname),
+            'instructorLastname' => $this->decode($this->user->lastname),
+            'instructorPhone' => $this->decode($this->user->phone),
+            'instructorMobile' => $this->decode($this->user->mobile),
+            'instructorStreet' => $this->decode($this->user->street),
             'instructorPostal' => $this->user->postal,
-            'instructorCity' => $this->user->city,
+            'instructorCity' => $this->decode($this->user->city),
             'instructorEmail' => $this->user->email,
         ];
+    }
+
+    private function decode(string $value): string
+    {
+        return $this->stringUtil->revertInputEncoding($value);
     }
 
     private function getBackUri(): string

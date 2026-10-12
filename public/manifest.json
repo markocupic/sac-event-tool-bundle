@@ -1,5 +1,5 @@
 {
-  "stimulus_backend.js": "/bundles/markocupicsaceventtool/stimulus_backend.b6b86b0a.js",
+  "stimulus_backend.js": "/bundles/markocupicsaceventtool/stimulus_backend.98d4aed9.js",
   "stimulus_frontend.js": "/bundles/markocupicsaceventtool/stimulus_frontend.e7a19ae7.js",
   "swisstopo_event_map.js": "/bundles/markocupicsaceventtool/swisstopo_event_map.01670117.js",
   "member_dashboard_my_event_registrations.js": "/bundles/markocupicsaceventtool/member_dashboard_my_event_registrations.23f9efd8.js",
@@ -99,7 +99,7 @@
   "icons/my_events_dashboard/more--dark.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more--dark.svg",
   "icons/my_events_dashboard/more.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more.svg",
   "../assets/ts/avatar_uploader.d.ts": "/bundles/markocupicsaceventtool/../assets/ts/avatar_uploader.d.ts",
-  "stimulus_backend.b6b86b0a.js.map": "/bundles/markocupicsaceventtool/stimulus_backend.b6b86b0a.js.map",
+  "stimulus_backend.98d4aed9.js.map": "/bundles/markocupicsaceventtool/stimulus_backend.98d4aed9.js.map",
   "stimulus_frontend.e7a19ae7.js.map": "/bundles/markocupicsaceventtool/stimulus_frontend.e7a19ae7.js.map",
   "swisstopo_event_map.01670117.js.map": "/bundles/markocupicsaceventtool/swisstopo_event_map.01670117.js.map",
   "member_dashboard_my_event_registrations.23f9efd8.js.map": "/bundles/markocupicsaceventtool/member_dashboard_my_event_registrations.23f9efd8.js.map",
