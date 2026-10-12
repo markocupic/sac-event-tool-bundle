@@ -138,16 +138,18 @@ class CalendarEventsMember
     }
 
     /**
-     * Load the backend assets (autocomplete of members).
+     * Render the Stimulus controller for the member autocomplete next to the sacMemberId field.
+     *
+     * @see assets/controllers/backend/member_autocomplete_controller.js
      */
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
-    public function loadBackendAssets(): void
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.sacMemberId.wizard', priority: 100)]
+    public function addMemberAutocomplete(DataContainer $dc): string
     {
-        $request = $this->requestStack->getCurrentRequest();
-
-        if ('calendar' === $request->query->get('do') && $request->query->get('ref')) {
-            $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('js/backend_member_autocomplete.js', 'markocupic_sac_event_tool');
+        if ('calendar' !== $this->requestStack->getCurrentRequest()?->query->get('do')) {
+            return '';
         }
+
+        return '<span hidden data-controller="sacevt--backend--member-autocomplete"></span>';
     }
 
     /**

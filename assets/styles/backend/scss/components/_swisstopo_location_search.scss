@@ -1,0 +1,97 @@
+// Location search panel of the coordsCH1903 field (tl_calendar_events)
+// @see assets/controllers/backend/swisstopo_location_search_controller.js
+.swisstopo-location-search {
+	/* Contao provides these in both colour schemes; the fallbacks are only
+	   used if the backend stylesheet ever drops them. */
+	--sls-bg: var(--content-bg, #fff);
+	--sls-border: var(--content-border, #ddd);
+	--sls-text: var(--text, #1d1d1d);
+	--sls-hover: var(--panel-bg, #eef3fb);
+	--sls-shadow: rgba(0, 0, 0, .12);
+
+	position: relative;
+	margin-top: 6px;
+	margin-bottom: 4px;
+	padding: 10px;
+	border: 1px solid var(--sls-border);
+	border-radius: 3px;
+	background: var(--sls-bg);
+	color: var(--sls-text);
+	box-shadow: 0 2px 6px var(--sls-shadow);
+}
+/* Fallbacks for a dark backend without the Contao variables. */
+@media (prefers-color-scheme: dark) {
+	html:not([data-color-scheme="light"]) .swisstopo-location-search {
+		--sls-bg: var(--content-bg, #23262b);
+		--sls-border: var(--content-border, #3a3f47);
+		--sls-text: var(--text, #e6e6e6);
+		--sls-hover: var(--panel-bg, #2f343c);
+		--sls-shadow: rgba(0, 0, 0, .5);
+	}
+}
+html[data-color-scheme="dark"] .swisstopo-location-search {
+	--sls-bg: var(--content-bg, #23262b);
+	--sls-border: var(--content-border, #3a3f47);
+	--sls-text: var(--text, #e6e6e6);
+	--sls-hover: var(--panel-bg, #2f343c);
+	--sls-shadow: rgba(0, 0, 0, .5);
+}
+.swisstopo-location-search__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 6px;
+	font-size: 12px;
+	color: var(--sls-text);
+}
+.swisstopo-location-search__close {
+	padding: 0 4px;
+	border: 0;
+	background: none;
+	color: var(--sls-text);
+	font-size: 18px;
+	line-height: 1;
+	cursor: pointer;
+	opacity: .6;
+}
+.swisstopo-location-search__close:hover {
+	opacity: 1;
+}
+.swisstopo-location-search__input {
+	width: 100%;
+	box-sizing: border-box;
+}
+.swisstopo-location-search__status {
+	margin-top: 6px;
+	color: var(--sls-text);
+	font-size: 11px;
+	opacity: .7;
+}
+.swisstopo-location-search__list {
+	margin: 6px 0 0;
+	padding: 0;
+	max-height: 260px;
+	overflow-y: auto;
+	list-style: none;
+}
+.swisstopo-location-search__item {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 5px 6px;
+	border-radius: 2px;
+	color: var(--sls-text);
+	font-size: 12px;
+	cursor: pointer;
+}
+.swisstopo-location-search__item.is-active {
+	background: var(--sls-hover);
+}
+.swisstopo-location-search__coords {
+	flex: 0 0 auto;
+	color: var(--sls-text);
+	font-size: 11px;
+	white-space: nowrap;
+	opacity: .7;
+}

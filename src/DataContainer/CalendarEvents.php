@@ -1010,6 +1010,17 @@ class CalendarEvents
     }
 
     /**
+     * Render the Stimulus controller for the swisstopo location search next to the coordsCH1903 field.
+     *
+     * @see assets/controllers/backend/swisstopo_location_search_controller.js
+     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.coordsCH1903.wizard', priority: 100)]
+    public function addSwisstopoLocationSearch(DataContainer $dc): string
+    {
+        return '<span hidden data-controller="sacevt--backend--swisstopo-location-search"></span>';
+    }
+
+    /**
      * Return the Swisstopo coordinates in a more human‑readable format, e.g. "2'600'000, 2'000'000".
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.coordsCH1903.load', priority: 100)]

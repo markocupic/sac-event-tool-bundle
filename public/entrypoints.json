@@ -2,12 +2,12 @@
   "entrypoints": {
     "stimulus_backend": {
       "js": [
-        "/bundles/markocupicsaceventtool/stimulus_backend.a5668611.js"
+        "/bundles/markocupicsaceventtool/stimulus_backend.b6b86b0a.js"
       ]
     },
     "stimulus_frontend": {
       "js": [
-        "/bundles/markocupicsaceventtool/stimulus_frontend.cc4df52f.js"
+        "/bundles/markocupicsaceventtool/stimulus_frontend.e7a19ae7.js"
       ]
     },
     "swisstopo_event_map": {
@@ -22,12 +22,12 @@
     },
     "js/avatar_uploader": {
       "js": [
-        "/bundles/markocupicsaceventtool/js/avatar_uploader.d70fb22c.js"
+        "/bundles/markocupicsaceventtool/js/avatar_uploader.34c669c6.js"
       ]
     },
     "css/be_stylesheet": {
       "css": [
-        "/bundles/markocupicsaceventtool/css/be_stylesheet.f5c2d3cd.css"
+        "/bundles/markocupicsaceventtool/css/be_stylesheet.e3276eee.css"
       ]
     }
   }

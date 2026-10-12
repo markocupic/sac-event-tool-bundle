@@ -1,6 +1,22 @@
-class TextInputTokenizer {
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/sac-event-tool-bundle
+ */
+
+/**
+ * Turns a text input into a token input (e.g. for a comma separated list of email addresses).
+ *
+ * Used by the Stimulus controller "sacevt--backend--text-input-tokenizer".
+ * The styles live in assets/text_input_tokenizer/css/style.css.
+ */
+export default class TextInputTokenizer {
     /**
-     * @param {Element} element - the input element
+     * @param {HTMLInputElement} element - the input element
      * @param {Object} options - Configuration options
      * @param {string[]} options.suggestions - Array of suggestions
      * @param {Function} options.validator - Custom validation function (value) => boolean
@@ -11,7 +27,7 @@ class TextInputTokenizer {
         this.input = element;
 
         if (!this.input) {
-            console.error(`TextInputTokenizer: Input element not found`);
+            console.error('TextInputTokenizer: Input element not found');
             return;
         }
 
@@ -19,12 +35,19 @@ class TextInputTokenizer {
             suggestions: options.suggestions || [],
             validator: options.validator || null,
             onTokenAdd: options.onTokenAdd || null,
-            onTokenRemove: options.onTokenRemove || null
+            onTokenRemove: options.onTokenRemove || null,
         };
 
         this.wrapper = null;
         this.tokenContainer = null;
         this.suggestBox = null;
+        this.form = null;
+
+        this.onClick = () => this.showSuggest();
+        this.onInput = this.#onInput.bind(this);
+        this.onKeydown = this.#onKeydown.bind(this);
+        this.onSubmit = this.#onSubmit.bind(this);
+        this.onDocumentClick = this.#onDocumentClick.bind(this);
 
         this.init();
     }
@@ -58,28 +81,27 @@ class TextInputTokenizer {
 
     initializeTokensFromInput() {
         const raw = this.input.value.trim();
-        if (!raw) return;
+
+        if (!raw) {
+            return;
+        }
 
         raw.split(',')
-            .map(v => v.trim())
-            .filter(v => v.length > 0)
-            .forEach(value => this.addToken(value));
+            .map((v) => v.trim())
+            .filter((v) => v.length > 0)
+            .forEach((value) => this.addToken(value, false));
 
         this.input.value = '';
     }
 
     getTokens() {
-        return Array.from(this.tokenContainer.querySelectorAll('.token'))
-            .map(t => t.dataset.value);
+        return Array.from(this.tokenContainer.querySelectorAll('.token')).map((t) => t.dataset.value);
     }
 
-    addToken(value) {
-        value = value.trim();
-        if (!value) {
-            return;
-        }
+    addToken(value, focus = true) {
+        value = (value ?? '').trim();
 
-        if (this.getTokens().includes(value)) {
+        if (!value || this.getTokens().includes(value)) {
             return;
         }
 
@@ -100,25 +122,23 @@ class TextInputTokenizer {
         remove.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg"><path d="M5 5L19 19M5 19L19 5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
         remove.addEventListener('click', () => {
             token.remove();
-            if (this.options.onTokenRemove) {
-                this.options.onTokenRemove(value);
-            }
+            this.options.onTokenRemove?.(value);
         });
 
         token.appendChild(remove);
         this.tokenContainer.appendChild(token);
 
         this.input.value = '';
-        this.input.focus();
 
-        if (this.options.onTokenAdd) {
-            this.options.onTokenAdd(value, isValid);
+        if (focus) {
+            this.input.focus();
         }
+
+        this.options.onTokenAdd?.(value, isValid);
     }
 
     removeToken(value) {
-        const tokens = this.tokenContainer.querySelectorAll('.token');
-        tokens.forEach(token => {
+        this.tokenContainer.querySelectorAll('.token').forEach((token) => {
             if (token.dataset.value === value) {
                 token.remove();
             }
@@ -127,10 +147,10 @@ class TextInputTokenizer {
 
     getRemainingSuggestions(query = '') {
         const selected = this.getTokens();
-        return this.options.suggestions.filter(s =>
-            !selected.includes(s) &&
-            s.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 20);
+
+        return this.options.suggestions
+            .filter((s) => !selected.includes(s) && s.toLowerCase().includes(query.toLowerCase()))
+            .slice(0, 20);
     }
 
     showSuggest() {
@@ -138,17 +158,18 @@ class TextInputTokenizer {
         const remaining = this.getRemainingSuggestions(query);
 
         if (remaining.length === 0) {
-            this.suggestBox.style.display = 'none';
+            this.hideSuggest();
             return;
         }
 
-        this.suggestBox.innerHTML = '';
-        remaining.forEach(suggestion => {
+        this.suggestBox.replaceChildren();
+
+        remaining.forEach((suggestion) => {
             const item = document.createElement('div');
             item.textContent = suggestion;
             item.addEventListener('click', () => {
                 this.addToken(suggestion);
-                this.suggestBox.style.display = 'none';
+                this.hideSuggest();
             });
             this.suggestBox.appendChild(item);
         });
@@ -156,73 +177,63 @@ class TextInputTokenizer {
         this.suggestBox.style.display = 'block';
     }
 
-    attachEventListeners() {
-        this.input.addEventListener('click', () => {
-            this.showSuggest();
-        });
-
-        // Input event
-        this.input.addEventListener('input', () => {
-            let val = this.input.value.trim();
-
-            // Add the token if the user enters a comma or whitespace or ...
-            if (val.endsWith(',') || val.endsWith(' ') || val.endsWith('\n') || val.endsWith('\t') || val.endsWith('\r') || val.endsWith(';')) {
-                const value = val.slice(0, -1).trim();
-
-                if (value.length > 0) {
-                    this.addToken(value);
-                }
-
-                this.input.value = '';
-                return;
-            }
-
-            this.showSuggest();
-        });
-
-        // Keydown event
-        this.input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.code === 'Space') {
-                e.preventDefault();
-                const value = this.input.value.trim();
-
-                if (value.length > 0) {
-                    this.addToken(value);
-                }
-
-                this.input.value = '';
-                this.suggestBox.style.display = 'none';
-            }
-        });
-
-        // Form submit event
-        this.updateInputValueOnSubmit();
-
-        // Close the suggest box on outside-click
-        document.addEventListener('click', (e) => {
-            if (!this.wrapper.contains(e.target)) {
-                this.addToken(this.input.value.trim());
-                this.suggestBox.style.display = 'none';
-            }
-        });
+    hideSuggest() {
+        this.suggestBox.style.display = 'none';
     }
 
-    updateInputValueOnSubmit() {
-        const form = this.input.closest('form');
+    attachEventListeners() {
+        this.input.addEventListener('click', this.onClick);
+        this.input.addEventListener('input', this.onInput);
+        this.input.addEventListener('keydown', this.onKeydown);
 
-        if (!form) {
+        // Write the tokens back into the input before the form is submitted
+        this.form = this.input.closest('form');
+        this.form?.addEventListener('submit', this.onSubmit);
+
+        // Close the suggest box on outside-click
+        document.addEventListener('click', this.onDocumentClick);
+    }
+
+    #onInput() {
+        const val = this.input.value.trim();
+
+        // Add the token if the user enters a comma, a semicolon or whitespace
+        if (/[,;\s]$/.test(this.input.value) && !/^[,;\s]*$/.test(this.input.value)) {
+            const value = val.replace(/[,;]$/, '').trim();
+
+            if (value.length > 0) {
+                this.addToken(value);
+            }
+
+            this.input.value = '';
             return;
         }
 
-        form.addEventListener('submit', () => {
-            this.input.classList.add('submitting');
-            window.setTimeout(() => this.input.classList.remove('submitting'), 5000);
+        this.showSuggest();
+    }
 
-            this.addToken(this.input.value.trim());
+    #onKeydown(e) {
+        if ('Enter' === e.key || 'Space' === e.code) {
+            e.preventDefault();
+            this.addToken(this.input.value);
+            this.input.value = '';
+            this.hideSuggest();
+        }
+    }
 
-            const tokens = this.getTokens();
-            this.input.value = tokens.join(', ');
-        });
+    #onSubmit() {
+        this.input.classList.add('submitting');
+        window.setTimeout(() => this.input.classList.remove('submitting'), 5000);
+
+        this.addToken(this.input.value, false);
+        this.input.value = this.getTokens().join(', ');
+    }
+
+    #onDocumentClick(e) {
+        if (!this.wrapper.contains(e.target)) {
+            this.addToken(this.input.value, false);
+            this.hideSuggest();
+        }
     }
 
     /**
@@ -234,27 +245,39 @@ class TextInputTokenizer {
     }
 
     /**
-     * Get all current tokens
      * @returns {string[]}
      */
     getValues() {
         return this.getTokens();
     }
 
-    /**
-     * Clear all tokens
-     */
     clear() {
-        this.tokenContainer.innerHTML = '';
+        this.tokenContainer.replaceChildren();
     }
 
     /**
-     * Destroy the tokenizer instance
+     * Remove the tokenizer and write the tokens back into the input, so that the
+     * value survives e.g. the Turbo page cache.
      */
     destroy() {
-        if (this.wrapper && this.wrapper.parentNode) {
-            this.wrapper.parentNode.insertBefore(this.input, this.wrapper);
-            this.wrapper.remove();
+        if (!this.wrapper) {
+            return;
         }
+
+        // Tokens plus whatever is still in the input (it may already hold the tokens after a submit)
+        const values = [...new Set([...this.getTokens(), ...this.input.value.split(',').map((v) => v.trim())].filter(Boolean))];
+
+        this.input.removeEventListener('click', this.onClick);
+        this.input.removeEventListener('input', this.onInput);
+        this.input.removeEventListener('keydown', this.onKeydown);
+        this.form?.removeEventListener('submit', this.onSubmit);
+        document.removeEventListener('click', this.onDocumentClick);
+
+        this.wrapper.parentNode?.insertBefore(this.input, this.wrapper);
+        this.wrapper.remove();
+        this.wrapper = null;
+
+        this.input.classList.remove('text-input-tokenizer', 'submitting');
+        this.input.value = values.join(', ');
     }
 }

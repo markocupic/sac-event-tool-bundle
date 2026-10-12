@@ -17,14 +17,17 @@ namespace Markocupic\SacEventToolBundle\EventSubscriber;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Twig\Environment;
 
 class BackendAssetsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly Packages $packages,
         private readonly ScopeMatcher $scopeMatcher,
+        private readonly Environment $twig,
     ) {
     }
 
@@ -44,10 +47,13 @@ class BackendAssetsSubscriber implements EventSubscriberInterface
             // Stimulus
             $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('stimulus_backend.js', 'markocupic_sac_event_tool');
 
-            // Add backend javascript
-            $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('js/backend_edit_all_navbar_helper.js', 'markocupic_sac_event_tool');
-
-            $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('js/backend_swisstopo_location_search.js', 'markocupic_sac_event_tool');
+            // Field selection helper (Stimulus controller "sacevt--backend--edit-all-navbar-helper")
+            // on the field selection page of the "editAll" and "overrideAll" mode.
+            // TL_MOOTOOLS is rendered inside <body> (Contao 5.3, 5.7 and 6), so Turbo
+            // removes the markup again when navigating away.
+            if ($e->isMainRequest() && $this->isEditAllFieldSelection($request)) {
+                $GLOBALS['TL_MOOTOOLS'][] = $this->twig->render('@Contao/be_edit_all_navbar_helper.html.twig');
+            }
 
             // Load Font Awesome Free GLOBALS['TL_JAVASCRIPT'][] =
             // $this->packages->getUrl('fontawesomefree/js/all.js',
@@ -58,5 +64,14 @@ class BackendAssetsSubscriber implements EventSubscriberInterface
             // Stimulus
             $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('stimulus_backend.js', 'markocupic_sac_event_tool');
         }
+    }
+
+    private function isEditAllFieldSelection(Request $request): bool
+    {
+        if ($request->isXmlHttpRequest() || !$request->query->has('do') || $request->query->has('fields')) {
+            return false;
+        }
+
+        return \in_array($request->query->get('act'), ['editAll', 'overrideAll'], true);
     }
 }

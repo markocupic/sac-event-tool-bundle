@@ -23,10 +23,6 @@ Encore
       to: 'eventlist/[path][name].[hash:8].[ext]',
     })
     .copyFiles({
-      from: './assets/js',
-      to: 'js/[path][name].[hash:8].[ext]',
-    })
-    .copyFiles({
       from: './assets/icons/event_states',
       to: 'icons/event_states/[path][name].[ext]',
     })

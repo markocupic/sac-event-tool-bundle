@@ -194,7 +194,7 @@
                                 {% if not get_event_data(model, 'disableOnlineRegistration') %}
                                     <div class="d-inline me-2 mt-3 mb-3">
                                         {# "book event" button #}
-                                        {{ "{{insert_module::408}}" }}
+                                        {{ frontend_module(408) }}
                                     </div>
                                 {% endif %}
                                 {# Display the like button for the current event #}
@@ -251,26 +251,15 @@
                             {% for diff in diffs %}
                                 <li>
                                     {% if diff.isEqual or diff.max is empty %}
-                                        <span class="bs-popover-trigger link-primary text-decoration-underline" role="button" data-bs-title="{{ diff.min.category.title|e }}:[br]{{ diff.min.title|e }} [{{ diff.min.shortcut|e }}]" data-bs-content="{{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
+                                        <span class="bs-popover-trigger link-primary text-decoration-underline" role="button" data-controller="sacevt--frontend--bs-popover" data-bs-title="{{ diff.min.category.title|e }}:[br]{{ diff.min.title|e }} [{{ diff.min.shortcut|e }}]" data-bs-content="{{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
                                     {% else %}
-                                        <span class="bs-popover-trigger link-primary text-decoration-underline" role="button" data-bs-title="{{ diff.min.category.title|e }}:[br]{{ diff.min.title|e }} [{{ diff.min.shortcut|e }}]" data-bs-content="{{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
+                                        <span class="bs-popover-trigger link-primary text-decoration-underline" role="button" data-controller="sacevt--frontend--bs-popover" data-bs-title="{{ diff.min.category.title|e }}:[br]{{ diff.min.title|e }} [{{ diff.min.shortcut|e }}]" data-bs-content="{{ diff.min.description|e }}">{{ diff.min.shortcut }}</span>
                                         <span>&nbsp;-&nbsp;</span>
-                                        <span class="bs-popover-trigger link-primary text-decoration-underline" role="button" data-bs-title="{{ diff.max.category.title|e }}:[br]{{ diff.max.title|e }} [{{ diff.max.shortcut|e }}]" data-bs-content="{{ diff.max.description|e }}">{{ diff.max.shortcut }}</span>
+                                        <span class="bs-popover-trigger link-primary text-decoration-underline" role="button" data-controller="sacevt--frontend--bs-popover" data-bs-title="{{ diff.max.category.title|e }}:[br]{{ diff.max.title|e }} [{{ diff.max.shortcut|e }}]" data-bs-content="{{ diff.max.description|e }}">{{ diff.max.shortcut }}</span>
                                     {% endif %}
                                 </li>
                             {% endfor %}
-                            {# Programmaticaly bootstrap popover initialization. #}
-                            {# We want the current popover to be closed before opening a new one. #}
-                            {% add to body %}
-                                {% set attributes = attrs()
-                                    .setIfExists('nonce', csp_nonce('script-src'))
-                                    .set('src', asset('js/BootstrapPopoverManager.js','markocupic_sac_event_tool')) %}
-                                <script{{ attributes }}></script>
-                                <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-                                  const popover = new BootstrapPopoverManager();
-                                  popover.init();
-                                </script>
-                            {% endadd %}
+                            {# The popovers are initialized by the Stimulus controller "sacevt--frontend--bs-popover" #}
                         </ul>
                     </div>
                     <!-- indexer::continue -->

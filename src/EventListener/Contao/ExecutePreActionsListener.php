@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
-use Contao\BackendTemplate;
-use Contao\BackendUser;
 use Contao\Config;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Exception\ResponseException;
@@ -33,8 +31,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ExecutePreActionsListener
 {
     // Adapters
-    private Adapter $backendUserAdapter;
-
     private Adapter $configAdapter;
 
     private Adapter $dateAdapter;
@@ -51,7 +47,6 @@ class ExecutePreActionsListener
         private readonly RequestStack $requestStack,
     ) {
         // Adapters
-        $this->backendUserAdapter = $this->framework->getAdapter(BackendUser::class);
         $this->configAdapter = $this->framework->getAdapter(Config::class);
         $this->dateAdapter = $this->framework->getAdapter(Date::class);
         $this->memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
@@ -110,21 +105,6 @@ class ExecutePreActionsListener
         // editAllNavbarHandler in the Contao backend when using the overrideAll or
         // editAll mode
         if ('editAllNavbarHandler' === $strAction) {
-            if ('loadNavbar' === $request->request->get('subaction')) {
-                $json = [];
-                $json['navbar'] = '';
-                $json['status'] = 'error';
-                $json['subaction'] = $request->request->get('subaction');
-
-                if (null !== $this->backendUserAdapter->getInstance()) {
-                    $objTemplate = new BackendTemplate('be_edit_all_navbar_helper');
-                    $json['navbar'] = $objTemplate->parse();
-                    $json['status'] = 'success';
-                }
-                // Send json data to the browser
-                $this->json($json);
-            }
-
             if ('getSessionData' === $request->request->get('subaction')) {
                 $strTable = $request->query->get('table', '_default');
                 $session = $this->requestStack->getSession();

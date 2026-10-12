@@ -13,7 +13,12 @@
             <a href="{{ back }}" class="header_back" title="" accesskey="b">{{ 'MSC.backBTTitle'|trans }}</a>
         </div>
 
-        <div class="notify-event_participant_form">
+        {# The email input (cc) is turned into a token input by the Stimulus controller "sacevt--backend--text-input-tokenizer" #}
+        <div class="notify-event_participant_form"
+             data-controller="sacevt--backend--text-input-tokenizer"
+             data-sacevt--backend--text-input-tokenizer-input-value="#ctrl_recipientsCc"
+             data-sacevt--backend--text-input-tokenizer-suggestions-value="{{ user_role_emails|default([])|json_encode }}"
+             data-sacevt--backend--text-input-tokenizer-validator-value="email">
             {{ form|raw }}
         </div>
 
@@ -55,7 +60,7 @@
     <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
         ((callback) => 'loading' === document.readyState ? document.addEventListener('DOMContentLoaded', callback) : callback())((event) => { // Turbo-safe DOM ready (Contao 6)
 
-            const requestToken = '{{ request_token }}';
+            const requestToken = '{{ contao.request_token }}';
             const allowedExtensions = ['{{ allowed_extensions|join("','")|raw }}'];
             const maxFileSize = {{ max_filesize }};
             const generalAjaxErrorMessage = '{{ 'MSC.evt_epe_generalAjaxError'|trans }}';
@@ -381,21 +386,6 @@
         });
     </script>
 
-    {# Use the tokenizer and suggest script to handle email inputs #}
+    {# Styles of the token input (Stimulus controller "sacevt--backend--text-input-tokenizer") #}
     <link rel="stylesheet" href="{{ asset('text_input_tokenizer/css/style.css', 'markocupic_sac_event_tool') }}">
-    <script src="{{ asset('text_input_tokenizer/js/TextInputTokenizer.js', 'markocupic_sac_event_tool') }}"{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}></script>
-    <script{{ attrs().setIfExists('nonce', csp_nonce('script-src')) }}>
-        const suggestions = {{ user_role_emails|json_encode|raw }};
-
-        ((callback) => 'loading' === document.readyState ? document.addEventListener('DOMContentLoaded', callback) : callback())(() => { // Turbo-safe DOM ready (Contao 6)
-            const input = document.getElementById('ctrl_recipientsCc');
-
-            if (!input) return;
-
-            const tokenizer = new TextInputTokenizer(input, {
-                suggestions: suggestions || [],
-                validator: value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()), // Validate emails
-            });
-        });
-    </script>
 {% endblock %}

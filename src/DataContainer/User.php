@@ -26,7 +26,6 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Feature\BackendUserHomeDirectory\BackendUserHomeDirectory;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -44,7 +43,6 @@ readonly class User
         private ContaoFramework $framework,
         private Countries $countries,
         private BackendUserHomeDirectory $backendUserHomeDirectory,
-        private Packages $packages,
         private RequestStack $requestStack,
         private Security $security,
         private TranslatorInterface $translator,
@@ -69,14 +67,19 @@ readonly class User
         return array_combine(array_map('strtolower', array_keys($countries)), $countries);
     }
 
-    #[AsCallback(table: 'tl_user', target: 'config.onload', priority: 100)]
-    public function addBackendAssets(DataContainer $dc): void
+    /**
+     * Render the Stimulus controller for the member autocomplete next to the sacMemberId field.
+     *
+     * @see assets/controllers/backend/member_autocomplete_controller.js
+     */
+    #[AsCallback(table: 'tl_user', target: 'fields.sacMemberId.wizard', priority: 100)]
+    public function addMemberAutocomplete(DataContainer $dc): string
     {
-        $request = $this->requestStack->getCurrentRequest();
-
-        if ('user' === $request->query->get('do') && 'edit' === $request->query->get('act')) {
-            $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('js/backend_member_autocomplete.js', 'markocupic_sac_event_tool');
+        if ('user' !== $this->requestStack->getCurrentRequest()?->query->get('do')) {
+            return '';
         }
+
+        return '<span hidden data-controller="sacevt--backend--member-autocomplete"></span>';
     }
 
     #[AsCallback(table: 'tl_user', target: 'config.onload', priority: 100)]
