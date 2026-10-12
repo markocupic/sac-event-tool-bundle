@@ -14,15 +14,27 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Tests\Util;
 
+use Code4Nix\UriSigner\UriSigner;
+use Codefog\HasteBundle\UrlParser;
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\InsertTag\InsertTagParser;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\MemberModel;
 use Contao\System;
 use Contao\TestCase\ContaoTestCase;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
+use Markocupic\SacEventToolBundle\Avatar\Avatar;
+use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
 
 class CalendarEventsUtilDatabaseTest extends ContaoTestCase
 {
@@ -59,10 +71,7 @@ class CalendarEventsUtilDatabaseTest extends ContaoTestCase
 
     public function testGetEventStateReturnsCanceled(): void
     {
-        $util = $this->createUtil(
-            $this->mockConnection(['fetchOne' => 0]),
-            ['sacevt.event_registration.config.reg_start_time_offset' => 0],
-        );
+        $util = $this->createUtil($this->mockConnection(['fetchOne' => 0]));
 
         $event = $this->mockEvent($this->eventStateDefaults(['eventState' => EventState::STATE_CANCELED]));
 
@@ -71,10 +80,7 @@ class CalendarEventsUtilDatabaseTest extends ContaoTestCase
 
     public function testGetEventStateReturnsFinishedWhenStartDateIsInThePast(): void
     {
-        $util = $this->createUtil(
-            $this->mockConnection(['fetchOne' => 0]),
-            ['sacevt.event_registration.config.reg_start_time_offset' => 0],
-        );
+        $util = $this->createUtil($this->mockConnection(['fetchOne' => 0]));
 
         $event = $this->mockEvent($this->eventStateDefaults([
             'startDate' => time() - 86400,
@@ -86,10 +92,7 @@ class CalendarEventsUtilDatabaseTest extends ContaoTestCase
 
     public function testGetEventStateReturnsWaitingListWhenMaxMembersReached(): void
     {
-        $util = $this->createUtil(
-            $this->mockConnection(['fetchOne' => 5]),
-            ['sacevt.event_registration.config.reg_start_time_offset' => 0],
-        );
+        $util = $this->createUtil($this->mockConnection(['fetchOne' => 5]));
 
         $event = $this->mockEvent($this->eventStateDefaults([
             'startDate' => time() + 86400,
@@ -102,10 +105,7 @@ class CalendarEventsUtilDatabaseTest extends ContaoTestCase
 
     public function testGetEventStateReturnsOpenByDefault(): void
     {
-        $util = $this->createUtil(
-            $this->mockConnection(['fetchOne' => 0]),
-            ['sacevt.event_registration.config.reg_start_time_offset' => 0],
-        );
+        $util = $this->createUtil($this->mockConnection(['fetchOne' => 0]));
 
         $event = $this->mockEvent($this->eventStateDefaults([
             'startDate' => time() + 86400,
@@ -159,7 +159,7 @@ class CalendarEventsUtilDatabaseTest extends ContaoTestCase
             )
         ;
 
-        $util = $this->createUtil($connection, [], [UserModel::class => $userAdapter]);
+        $util = $this->createUtil($connection, [UserModel::class => $userAdapter]);
 
         $this->assertSame([10, 30], $util->getInstructorsAsArray($this->mockEvent(['id' => 1])));
     }
@@ -174,7 +174,7 @@ class CalendarEventsUtilDatabaseTest extends ContaoTestCase
             ->willReturn($this->mockUser(['id' => 5, 'lastname' => 'Muster', 'firstname' => 'Hans']))
         ;
 
-        $util = $this->createUtil($connection, [], [UserModel::class => $userAdapter]);
+        $util = $this->createUtil($connection, [UserModel::class => $userAdapter]);
 
         $this->assertSame('Muster Hans', $util->getMainInstructorName($this->mockEvent(['id' => 1])));
     }
@@ -182,7 +182,7 @@ class CalendarEventsUtilDatabaseTest extends ContaoTestCase
     public function testGetMainInstructorNameReturnsEmptyStringWhenNoInstructor(): void
     {
         $connection = $this->mockConnection(['fetchOne' => false]);
-        $util = $this->createUtil($connection, [], [UserModel::class => $this->mockAdapter(['findById'])]);
+        $util = $this->createUtil($connection, [UserModel::class => $this->mockAdapter(['findById'])]);
 
         $this->assertSame('', $util->getMainInstructorName($this->mockEvent(['id' => 1])));
     }
@@ -205,31 +205,14 @@ class CalendarEventsUtilDatabaseTest extends ContaoTestCase
     }
 
     /**
-     * @param array<string, mixed> $parameters
      * @param array<string, mixed> $adapters
      */
-    private function createUtil(Connection|null $connection = null, array $parameters = [], array $adapters = []): CalendarEventsUtil
+    private function createUtil(Connection|null $connection = null, array $adapters = []): CalendarEventsUtil
     {
-        $container = $this->createMock(ContainerInterface::class);
-        $container
-            ->method('get')
-            ->willReturnCallback(static fn (string $id) => 'database_connection' === $id ? $connection : null)
-        ;
-
-        $container
-            ->method('getParameter')
-            ->willReturnCallback(static fn (string $name) => $parameters[$name] ?? null)
-        ;
-
-        $system = $this->mockAdapter(['getContainer', 'loadLanguageFile']);
-        $system
-            ->method('getContainer')
-            ->willReturn($container)
-        ;
-
+        $system = $this->mockAdapter(['loadLanguageFile']);
         $framework = $this->mockContaoFramework(array_merge([System::class => $system], $adapters));
 
-        return new CalendarEventsUtil($framework);
+        return $this->createCalendarEventsUtil($framework, $connection);
     }
 
     /**
@@ -295,6 +278,36 @@ class CalendarEventsUtilDatabaseTest extends ContaoTestCase
                 'disableOnlineRegistration' => false,
             ],
             $overrides,
+        );
+    }
+
+    /**
+     * Creates a CalendarEventsUtil instance whose services are mocked.
+     */
+    private function createCalendarEventsUtil(
+        ContaoFramework $framework,
+        Connection|null $connection = null,
+    ): CalendarEventsUtil {
+        return new CalendarEventsUtil(
+            framework: $framework,
+            connection: $connection ?? $this->createMock(Connection::class),
+            contentUrlGenerator: $this->createMock(ContentUrlGenerator::class),
+            insertTagParser: $this->createMock(InsertTagParser::class),
+            twig: $this->createMock(Environment::class),
+            packages: $this->createMock(Packages::class),
+            router: $this->createMock(RouterInterface::class),
+            contaoCsrfTokenManager: $this->createMock(ContaoCsrfTokenManager::class),
+            requestStack: new RequestStack(),
+            security: $this->createMock(Security::class),
+            urlParser: $this->createMock(UrlParser::class),
+            uriSigner: new UriSigner('secret'),
+            avatar: $this->createMock(Avatar::class),
+            courseLevels: new CourseLevels([]),
+            projectDir: '/project',
+            eventCourseFallbackImage: 'files/fallback_image.svg',
+            eventGeoLink: 'https://map.geo.admin.ch/?E=%s&N=%s',
+            sacRoutePortalBaseLink: 'https://www.sac-cas.ch/de/huetten-und-touren/sac-tourenportal/',
+            regStartTimeOffset: 0,
         );
     }
 }

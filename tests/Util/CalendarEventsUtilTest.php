@@ -14,10 +14,24 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Tests\Util;
 
+use Code4Nix\UriSigner\UriSigner;
+use Codefog\HasteBundle\UrlParser;
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\InsertTag\InsertTagParser;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\TestCase\ContaoTestCase;
+use Doctrine\DBAL\Connection;
+use Markocupic\SacEventToolBundle\Avatar\Avatar;
+use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
 
 class CalendarEventsUtilTest extends ContaoTestCase
 {
@@ -203,7 +217,7 @@ class CalendarEventsUtilTest extends ContaoTestCase
 
     private function util(): CalendarEventsUtil
     {
-        return new CalendarEventsUtil($this->mockContaoFramework());
+        return $this->createCalendarEventsUtil($this->mockContaoFramework());
     }
 
     /**
@@ -212,5 +226,35 @@ class CalendarEventsUtilTest extends ContaoTestCase
     private function mockEvent(array $properties): CalendarEventsModel
     {
         return $this->mockClassWithProperties(CalendarEventsModel::class, $properties);
+    }
+
+    /**
+     * Creates a CalendarEventsUtil instance whose services are mocked.
+     */
+    private function createCalendarEventsUtil(
+        ContaoFramework $framework,
+        Connection|null $connection = null,
+    ): CalendarEventsUtil {
+        return new CalendarEventsUtil(
+            framework: $framework,
+            connection: $connection ?? $this->createMock(Connection::class),
+            contentUrlGenerator: $this->createMock(ContentUrlGenerator::class),
+            insertTagParser: $this->createMock(InsertTagParser::class),
+            twig: $this->createMock(Environment::class),
+            packages: $this->createMock(Packages::class),
+            router: $this->createMock(RouterInterface::class),
+            contaoCsrfTokenManager: $this->createMock(ContaoCsrfTokenManager::class),
+            requestStack: new RequestStack(),
+            security: $this->createMock(Security::class),
+            urlParser: $this->createMock(UrlParser::class),
+            uriSigner: new UriSigner('secret'),
+            avatar: $this->createMock(Avatar::class),
+            courseLevels: new CourseLevels([]),
+            projectDir: '/project',
+            eventCourseFallbackImage: 'files/fallback_image.svg',
+            eventGeoLink: 'https://map.geo.admin.ch/?E=%s&N=%s',
+            sacRoutePortalBaseLink: 'https://www.sac-cas.ch/de/huetten-und-touren/sac-tourenportal/',
+            regStartTimeOffset: 0,
+        );
     }
 }

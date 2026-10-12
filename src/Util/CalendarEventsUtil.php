@@ -24,8 +24,10 @@ use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\ContentModel;
 use Contao\Controller;
+use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\CoreBundle\Util\SymlinkUtil;
 use Contao\Date;
@@ -54,12 +56,16 @@ use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Markocupic\SacEventToolBundle\Model\TourTypeModel;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
 
 #[Autoconfigure(public: true)]
 class CalendarEventsUtil
@@ -87,8 +93,32 @@ class CalendarEventsUtil
         EventSubscriptionState::USER_HAS_UNSUBSCRIBED => ['unsubscribed-user', '%s stornierte Anmeldungen'],
     ];
 
-    public function __construct(private readonly ContaoFramework $framework)
-    {
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
+        private readonly InsertTagParser $insertTagParser,
+        private readonly Environment $twig,
+        private readonly Packages $packages,
+        private readonly RouterInterface $router,
+        private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
+        private readonly RequestStack $requestStack,
+        private readonly Security $security,
+        private readonly UrlParser $urlParser,
+        private readonly UriSigner $uriSigner,
+        private readonly Avatar $avatar,
+        private readonly CourseLevels $courseLevels,
+        #[Autowire(param: 'kernel.project_dir')]
+        private readonly string $projectDir,
+        #[Autowire(param: 'sacevt.event.course.fallback_image')]
+        private readonly string $eventCourseFallbackImage,
+        #[Autowire(param: 'sacevt.event.geo_link')]
+        private readonly string $eventGeoLink,
+        #[Autowire(param: 'sacevt.event.sac_route_portal_base_link')]
+        private readonly string $sacRoutePortalBaseLink,
+        #[Autowire(param: 'sacevt.event_registration.config.reg_start_time_offset')]
+        private readonly int $regStartTimeOffset,
+    ) {
     }
 
     /**
@@ -139,10 +169,7 @@ class CalendarEventsUtil
                 return StringUtil::revertInputEncoding($event->title);
 
             case 'eventUrl':
-                return $this->getContainer()
-                    ->get('contao.routing.content_url_generator')
-                    ->generate($event, [], UrlGeneratorInterface::ABSOLUTE_PATH)
-                ;
+                return $this->contentUrlGenerator->generate($event, [], UrlGeneratorInterface::ABSOLUTE_PATH);
 
             case 'tourTypesIds':
                 return implode('', StringUtil::deserialize($event->tourType, true));
@@ -251,13 +278,10 @@ class CalendarEventsUtil
                     return '';
                 }
 
-                return $this->getContainer()
-                    ->get('contao.insert_tag.parser')
-                    ->replace(\sprintf('{{picture::%s?size=%s}}', $this->getEventImagePath($event), $options['size']))
-                ;
+                return $this->insertTagParser->replace(\sprintf('{{picture::%s?size=%s}}', $this->getEventImagePath($event), $options['size']));
 
             case 'courseLevelName':
-                return $this->getContainer()->get(CourseLevels::class)->get($event->courseLevel);
+                return $this->courseLevels->get($event->courseLevel);
 
             case 'courseTypeLevel0Name':
                 return $this->getAdapter(CourseMainTypeModel::class)->findById($event->courseTypeLevel0)?->name ?? '';
@@ -338,7 +362,7 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $publicTransportJourneyId = $this->getDatabase()->fetchOne(
+        $publicTransportJourneyId = $this->connection->fetchOne(
             'SELECT id from tl_calendar_events_journey WHERE alias = ?',
             ['public-transport'],
             [Types::STRING],
@@ -362,14 +386,12 @@ class CalendarEventsUtil
             throw new \RuntimeException(\sprintf('The calendar of the event with ID %s does not exist.', $event->id));
         }
 
-        $avatarManager = $this->getContainer()->get(Avatar::class);
         $userPortraitPage = $this->getAdapter(PageModel::class)->findById($calendar->userPortraitJumpTo);
 
         if (null === $userPortraitPage) {
             throw new \Exception('Page model not found.');
         }
 
-        $contentUrlGenerator = $this->getContainer()->get('contao.routing.content_url_generator');
         $userModel = $this->getAdapter(UserModel::class);
         $items = [];
 
@@ -383,9 +405,9 @@ class CalendarEventsUtil
             $mainQualification = $this->getMainQualification($user);
 
             $instructor = $user->row();
-            $instructor['href'] = $contentUrlGenerator->generate($userPortraitPage).'?getUpcoming=1&username='.$user->username;
+            $instructor['href'] = $this->contentUrlGenerator->generate($userPortraitPage).'?getUpcoming=1&username='.$user->username;
             $instructor['has_link'] = true;
-            $instructor['avatar_path'] = $avatarManager->getAvatarResourcePath($user);
+            $instructor['avatar_path'] = $this->avatar->getAvatarResourcePath($user);
             $instructor['main_qualification'] = !empty($mainQualification) ? $mainQualification : '';
             $instructor['contact_options'] = [];
 
@@ -398,7 +420,7 @@ class CalendarEventsUtil
             $items[] = $instructor;
         }
 
-        return $this->getContainer()->get('twig')->render('@MarkocupicSacEventTool/Calendar/instructor_contact_boxes.html.twig', ['instructors' => $items]);
+        return $this->twig->render('@MarkocupicSacEventTool/Calendar/instructor_contact_boxes.html.twig', ['instructors' => $items]);
     }
 
     public function getEventState(CalendarEventsModel $event): string
@@ -451,12 +473,9 @@ class CalendarEventsUtil
 
         $eventState = $this->getEventState($event);
 
-        /** @var Packages $packages */
-        $packages = $this->getContainer()->get('assets.packages');
-
         return \sprintf(
             '<img src="%s" title="%s">',
-            $packages->getUrl("icons/event_states/$eventState.svg", 'markocupic_sac_event_tool'),
+            $this->packages->getUrl("icons/event_states/$eventState.svg", 'markocupic_sac_event_tool'),
             $GLOBALS['TL_LANG']['MSC']['calendar_events'][$eventState] ?? $eventState,
         );
     }
@@ -476,7 +495,7 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $userId = $this->getDatabase()->fetchOne(
+        $userId = $this->connection->fetchOne(
             'SELECT userId FROM tl_calendar_events_instructor WHERE pid = ? AND isMainInstructor = ?',
             [$event->id, 1],
             [Types::INTEGER, Types::INTEGER],
@@ -552,7 +571,7 @@ class CalendarEventsUtil
 
         $options = $this->resolveInstructorOptions($options);
 
-        $userIds = $this->getDatabase()->fetchFirstColumn(
+        $userIds = $this->connection->fetchFirstColumn(
             'SELECT userId FROM tl_calendar_events_instructor WHERE pid = ? ORDER BY isMainInstructor DESC',
             [$event->id],
             [Types::INTEGER],
@@ -651,16 +670,14 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $fallbackImage = $this->getContainer()->getParameter('sacevt.event.course.fallback_image');
-
         if (empty($event->singleSRC)) {
-            return $fallbackImage;
+            return $this->eventCourseFallbackImage;
         }
 
         $file = $this->getAdapter(FilesModel::class)->findByUuid($event->singleSRC);
 
-        if (null === $file || !is_file(Path::join($this->getProjectDir(), $file->path))) {
-            return $fallbackImage;
+        if (null === $file || !is_file(Path::join($this->projectDir, $file->path))) {
+            return $this->eventCourseFallbackImage;
         }
 
         return $file->path;
@@ -953,12 +970,12 @@ class CalendarEventsUtil
             }
         }
 
-        $href = $this->getContainer()->get('router')->generate('contao_backend', [
+        $href = $this->router->generate('contao_backend', [
             'do' => 'calendar',
             'table' => 'tl_calendar_events_member',
             'id' => $event->id,
-            'rt' => $this->getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(),
-            'ref' => $this->getContainer()->get('request_stack')->getCurrentRequest()->attributes->get('_contao_referer_id'),
+            'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
+            'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
         ]);
 
         $href = $this->getAdapter(StringUtil::class)->specialcharsUrl(StringUtil::ampersand($href));
@@ -1008,7 +1025,7 @@ class CalendarEventsUtil
         $eventDates = $this->getNonEmptyRepeats($event);
 
         // The other events the member is registered for and has not participated yet
-        $registrations = $this->getDatabase()->fetchAllAssociative(
+        $registrations = $this->connection->fetchAllAssociative(
             'SELECT * FROM tl_calendar_events_member WHERE eventId != ? AND contaoMemberId = ? AND stateOfSubscription = ? AND hasParticipated = ?',
             [$event->id, $member->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED, 0],
             [Types::INTEGER, Types::INTEGER, Types::STRING, Types::INTEGER],
@@ -1053,21 +1070,12 @@ class CalendarEventsUtil
             return '';
         }
 
-        /** @var UrlParser $urlParser */
-        $urlParser = $this->getContainer()->get(UrlParser::class);
-
-        /** @var UriSigner $uriSigner */
-        $uriSigner = $this->getContainer()->get('code4nix_uri_signer.uri_signer');
-
         $params = \sprintf('/%s', !empty($event->alias) ? $event->alias : $event->id);
 
-        /** @var ContentUrlGenerator $contentUrlGenerator */
-        $contentUrlGenerator = $this->getContainer()->get('contao.routing.content_url_generator');
-
-        $eventPreviewUrl = $urlParser->addQueryString('event_preview=true', $contentUrlGenerator->generate($previewPage, ['parameters' => $params], UrlGeneratorInterface::ABSOLUTE_URL));
+        $eventPreviewUrl = $this->urlParser->addQueryString('event_preview=true', $this->contentUrlGenerator->generate($previewPage, ['parameters' => $params], UrlGeneratorInterface::ABSOLUTE_URL));
         $eventPreviewUrl = $this->getAdapter(StringUtil::class)->specialcharsUrl(StringUtil::ampersand($eventPreviewUrl));
 
-        return $uriSigner->sign($eventPreviewUrl, 86400);
+        return $this->uriSigner->sign($eventPreviewUrl, 86400);
     }
 
     public function getTourProfileAsArray(CalendarEventsModel $event): array
@@ -1145,7 +1153,7 @@ class CalendarEventsUtil
 
             // The image insert tag url-decodes its parameters
             $logoInsertTag = \sprintf(str_replace('alt=%s', 'alt=%2$s', $insertTag), StringUtil::binToUuid($organizer->singleSRC), rawurlencode((string) $organizer->title));
-            $logo = $this->getContainer()->get('contao.insert_tag.parser')->replace($logoInsertTag);
+            $logo = $this->insertTagParser->replace($logoInsertTag);
 
             if ('' !== $logo) {
                 $logos[] = $logo;
@@ -1173,7 +1181,7 @@ class CalendarEventsUtil
                 throw new \RuntimeException(\sprintf('The logo of the event organizer "%s" (ID %s) does not exist in the file manager.', $organizer->title, $organizer->id));
             }
 
-            $path = Path::join($this->getProjectDir(), $file->path);
+            $path = Path::join($this->projectDir, $file->path);
 
             if (!is_file($path)) {
                 continue;
@@ -1189,12 +1197,11 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $projectDir = $this->getProjectDir();
         $folder = new Folder('system/qrcodes');
 
         // Symlink (target: "system/qrcodes", link: "public/system/qrcodes")
-        $relWebDir = Path::makeRelative(Path::join($projectDir, 'public'), $projectDir);
-        $this->getAdapter(SymlinkUtil::class)->symlink($folder->path, Path::join($relWebDir, $folder->path), $projectDir);
+        $relWebDir = Path::makeRelative(Path::join($this->projectDir, 'public'), $this->projectDir);
+        $this->getAdapter(SymlinkUtil::class)->symlink($folder->path, Path::join($relWebDir, $folder->path), $this->projectDir);
 
         $filepath = \sprintf($folder->path.'/eventQRcode_%s.png', $event->id);
 
@@ -1211,9 +1218,7 @@ class CalendarEventsUtil
 
         $qrOptions = new QROptions(array_merge($defaults, $options));
 
-        /** @var ContentUrlGenerator $contentUrlGenerator */
-        $contentUrlGenerator = $this->getContainer()->get('contao.routing.content_url_generator');
-        $url = $contentUrlGenerator->generate($event, [], $absoluteUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH);
+        $url = $this->contentUrlGenerator->generate($event, [], $absoluteUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH);
 
         // Generate the QR code and return the image path
         if ((new QRCode($qrOptions))->render($url, $filepath)) {
@@ -1263,7 +1268,7 @@ class CalendarEventsUtil
             return null;
         }
 
-        return \sprintf($this->getContainer()->getParameter('sacevt.event.geo_link'), $coords[0], $coords[1]);
+        return \sprintf($this->eventGeoLink, $coords[0], $coords[1]);
     }
 
     /**
@@ -1283,9 +1288,7 @@ class CalendarEventsUtil
             return null;
         }
 
-        $baseLink = $this->getContainer()->getParameter('sacevt.event.sac_route_portal_base_link');
-
-        if (!str_starts_with($portalLink, $baseLink) || $portalLink === $baseLink) {
+        if (!str_starts_with($portalLink, $this->sacRoutePortalBaseLink) || $portalLink === $this->sacRoutePortalBaseLink) {
             return null;
         }
 
@@ -1319,13 +1322,13 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $user = $this->getContainer()->get('security.helper')->getUser();
+        $user = $this->security->getUser();
 
         if (!$user instanceof FrontendUser) {
             return false;
         }
 
-        return false !== $this->getDatabase()->fetchOne(
+        return false !== $this->connection->fetchOne(
             'SELECT id FROM tl_favored_events WHERE eventId = ? AND memberId = ?',
             [$event->id, $user->id],
             [Types::INTEGER, Types::INTEGER],
@@ -1367,7 +1370,7 @@ class CalendarEventsUtil
 
     private function countAcceptedRegistrations(CalendarEventsModel $event): mixed
     {
-        return $this->getDatabase()->fetchOne(
+        return $this->connection->fetchOne(
             'SELECT COUNT(id) FROM tl_calendar_events_member WHERE eventId = ? AND stateOfSubscription = ?',
             [$event->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED],
             [Types::INTEGER, Types::STRING],
@@ -1379,7 +1382,7 @@ class CalendarEventsUtil
      */
     private function getRegistrationStartTime(CalendarEventsModel $event): mixed
     {
-        return $event->registrationStartDate + $this->getContainer()->getParameter('sacevt.event_registration.config.reg_start_time_offset');
+        return $event->registrationStartDate + $this->regStartTimeOffset;
     }
 
     /**
@@ -1419,21 +1422,6 @@ class CalendarEventsUtil
                 'title' => StringUtil::revertInputEncoding($category?->title),
             ],
         ];
-    }
-
-    private function getDatabase(): Connection
-    {
-        return $this->getContainer()->get('database_connection');
-    }
-
-    private function getProjectDir(): string
-    {
-        return $this->getContainer()->getParameter('kernel.project_dir');
-    }
-
-    private function getContainer(): ContainerInterface
-    {
-        return $this->getAdapter(System::class)->getContainer();
     }
 
     private function getAdapter(string $class): Adapter

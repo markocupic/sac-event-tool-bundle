@@ -14,13 +14,20 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Tests\Feature\EventReminder\Messenger\MessageHandler;
 
+use Code4Nix\UriSigner\UriSigner;
+use Codefog\HasteBundle\UrlParser;
 use Contao\CalendarEventsModel;
 use Contao\CalendarModel;
-use Contao\Date;
+use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\CoreBundle\Routing\ContentUrlGenerator;
+use Contao\Date;
 use Contao\System;
 use Contao\TestCase\ContaoTestCase;
 use Doctrine\DBAL\Connection;
+use Markocupic\SacEventToolBundle\Avatar\Avatar;
+use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Feature\EventReminder\Messenger\Message\SendEventReminderMessage;
 use Markocupic\SacEventToolBundle\Feature\EventReminder\Messenger\MessageHandler\SendEventReminderHandler;
 use Markocupic\SacEventToolBundle\Feature\EventReminder\Participant;
@@ -30,10 +37,15 @@ use Markocupic\SacEventToolBundle\Feature\EventReminder\RecipientResolver;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Terminal42\NotificationCenterBundle\NotificationCenter;
 use Terminal42\NotificationCenterBundle\Receipt\ReceiptCollection;
+use Twig\Environment;
 
 final class SendEventReminderHandlerTest extends ContaoTestCase
 {
@@ -375,7 +387,7 @@ final class SendEventReminderHandlerTest extends ContaoTestCase
         ;
 
         return new SendEventReminderHandler(
-            new CalendarEventsUtil($framework),
+            $this->createCalendarEventsUtil($framework),
             $this->connection,
             $framework,
             $contentUrlGenerator,
@@ -385,6 +397,36 @@ final class SendEventReminderHandlerTest extends ContaoTestCase
             $translator,
             'de',
             $this->logger,
+        );
+    }
+
+    /**
+     * Creates a CalendarEventsUtil instance whose services are mocked.
+     */
+    private function createCalendarEventsUtil(
+        ContaoFramework $framework,
+        Connection|null $connection = null,
+    ): CalendarEventsUtil {
+        return new CalendarEventsUtil(
+            framework: $framework,
+            connection: $connection ?? $this->createMock(Connection::class),
+            contentUrlGenerator: $this->createMock(ContentUrlGenerator::class),
+            insertTagParser: $this->createMock(InsertTagParser::class),
+            twig: $this->createMock(Environment::class),
+            packages: $this->createMock(Packages::class),
+            router: $this->createMock(RouterInterface::class),
+            contaoCsrfTokenManager: $this->createMock(ContaoCsrfTokenManager::class),
+            requestStack: new RequestStack(),
+            security: $this->createMock(Security::class),
+            urlParser: $this->createMock(UrlParser::class),
+            uriSigner: new UriSigner('secret'),
+            avatar: $this->createMock(Avatar::class),
+            courseLevels: new CourseLevels([]),
+            projectDir: '/project',
+            eventCourseFallbackImage: 'files/fallback_image.svg',
+            eventGeoLink: 'https://map.geo.admin.ch/?E=%s&N=%s',
+            sacRoutePortalBaseLink: 'https://www.sac-cas.ch/de/huetten-und-touren/sac-tourenportal/',
+            regStartTimeOffset: 0,
         );
     }
 }

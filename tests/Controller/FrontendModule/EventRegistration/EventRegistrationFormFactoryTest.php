@@ -14,16 +14,29 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Tests\Controller\FrontendModule\EventRegistration;
 
+use Code4Nix\UriSigner\UriSigner;
+use Codefog\HasteBundle\UrlParser;
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
+use Contao\CoreBundle\InsertTag\InsertTagParser;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\TestCase\ContaoTestCase;
+use Doctrine\DBAL\Connection;
+use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Config\CarSeatInfo;
+use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\TicketInfo;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistration\EventRegistrationFormFactory;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class EventRegistrationFormFactoryTest extends ContaoTestCase
 {
@@ -113,7 +126,7 @@ class EventRegistrationFormFactoryTest extends ContaoTestCase
 
         // Real methods (getStartTstamp(), getEventTimestamps(), ...), only the organizers are stubbed
         $calendarEventsUtil = $this->getMockBuilder(CalendarEventsUtil::class)
-            ->setConstructorArgs([$this->mockContaoFramework()])
+            ->setConstructorArgs($this->getCalendarEventsUtilConstructorArgs())
             ->onlyMethods(['getEventOrganizerModels'])
             ->getMock()
         ;
@@ -130,5 +143,35 @@ class EventRegistrationFormFactoryTest extends ContaoTestCase
             $this->createMock(TicketInfo::class),
             $this->createMock(TranslatorInterface::class),
         );
+    }
+
+    /**
+     * Constructor arguments of CalendarEventsUtil with mocked services.
+     *
+     * @return list<mixed>
+     */
+    private function getCalendarEventsUtilConstructorArgs(): array
+    {
+        return [
+            $this->mockContaoFramework(),
+            $this->createMock(Connection::class),
+            $this->createMock(ContentUrlGenerator::class),
+            $this->createMock(InsertTagParser::class),
+            $this->createMock(Environment::class),
+            $this->createMock(Packages::class),
+            $this->createMock(RouterInterface::class),
+            $this->createMock(ContaoCsrfTokenManager::class),
+            new RequestStack(),
+            $this->createMock(Security::class),
+            $this->createMock(UrlParser::class),
+            new UriSigner('secret'),
+            $this->createMock(Avatar::class),
+            new CourseLevels([]),
+            '/project',
+            'files/fallback_image.svg',
+            'https://map.geo.admin.ch/?E=%s&N=%s',
+            'https://www.sac-cas.ch/de/huetten-und-touren/sac-tourenportal/',
+            0,
+        ];
     }
 }
