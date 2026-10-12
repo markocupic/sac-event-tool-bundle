@@ -217,22 +217,25 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['preview'] = [
 	'href'       => 'action=preview', // use a button callback to generate the url
 	'attributes' => 'target="_blank" rel="noopener"',
 	'icon'       => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/presentation-screen-solid.svg', 'markocupic_sac_event_tool'),
-
+	'primary'    => true,
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] = [
-	'href' => 'table=tl_calendar_events_member',
-	'icon' => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/people-group-solid.svg', 'markocupic_sac_event_tool'),
+	'href'    => 'table=tl_calendar_events_member',
+	'icon'    => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/people-group-solid.svg', 'markocupic_sac_event_tool'),
+	'primary' => true,
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['downgradeEventReleaseLevel'] = [
-	'href' => 'act=edit&action=downgradeEventReleaseLevel', // use a button callback to generate the url
-	'icon' => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/square-arrow-down-solid.svg', 'markocupic_sac_event_tool'),
+	'href'    => 'act=edit&action=downgradeEventReleaseLevel', // use a button callback to generate the url
+	'icon'    => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/square-arrow-down-solid.svg', 'markocupic_sac_event_tool'),
+	'primary' => true,
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['upgradeEventReleaseLevel'] = [
-	'href' => 'act=edit&action=upgradeEventReleaseLevel', // use a button callback to generate the url
-	'icon' => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/square-arrow-up-solid.svg', 'markocupic_sac_event_tool'),
+	'href'    => 'act=edit&action=upgradeEventReleaseLevel', // use a button callback to generate the url
+	'icon'    => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/square-arrow-up-solid.svg', 'markocupic_sac_event_tool'),
+	'primary' => true,
 ];
 
 // Override DCA: tl_class

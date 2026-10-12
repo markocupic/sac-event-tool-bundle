@@ -55,16 +55,19 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 				'href'       => 'action=generateInvoicePdf&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
 				'icon'       => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/file-pdf-regular.svg', 'markocupic_sac_event_tool'),
 				'attributes' => 'data-action="contao--scroll-offset#store" onclick="if (!confirm(\'' . ($GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoicePdfConfirm'] ?? null) . '\')) return false"',
+				'primary'    => true,
 			],
 			'generateTourRapportPdf' => [
 				'href'       => 'action=generateTourRapportPdf&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
 				'icon'       => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/file-pdf-regular.svg', 'markocupic_sac_event_tool'),
 				'attributes' => 'data-action="contao--scroll-offset#store" onclick="if (!confirm(\'' . ($GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportPdfConfirm'] ?? null) . '\')) return false"',
+				'primary'    => true,
 			],
 			'sendRapport'            => [
 				'href'       => 'action=sendRapport',
 				'icon'       => System::getContainer()->get('assets.packages')->getUrl('icons/fontawesome/paper-plane-solid.svg', 'markocupic_sac_event_tool'),
 				'attributes' => 'data-action="contao--scroll-offset#store" onclick="if (!confirm(\'' . ($GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['submitRapportConfirm'] ?? null) . '\')) return false"',
+				'primary'    => true,
 			],
 		],
 	],
