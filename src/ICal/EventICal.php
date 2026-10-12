@@ -18,7 +18,7 @@ use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\InsertTag\InsertTagParser;
-use Contao\Events;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\StringUtil;
 use Eluceo\iCal\Domain\Entity\Calendar;
 use Eluceo\iCal\Domain\Entity\Event;
@@ -30,19 +30,18 @@ use Eluceo\iCal\Presentation\Factory\CalendarFactory;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EventICal
 {
-    private Adapter $events;
-
     private Adapter $stringUtil;
 
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly InsertTagParser $insertTagParser,
     ) {
-        $this->events = $this->framework->getAdapter(Events::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }
 
@@ -57,7 +56,7 @@ class EventICal
         $location = strip_tags($this->stringUtil->revertInputEncoding($location));
 
         // Get the url
-        $url = $this->events->generateEventUrl($objEvent, true);
+        $url = $this->contentUrlGenerator->generate($objEvent, [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $arrEvents = [];
         $arrEventTimestamps = $this->calendarEventsUtil->getEventTimestamps($objEvent);

@@ -10,5 +10,6 @@ services:
         arguments:
             - '@request_stack'
             - '@contao.framework'
+            - '@contao.routing.content_url_generator'
         tags:
             - { name: kernel.event_listener, event: contao.preview_url_convert, method: onPreviewUrlConvert }

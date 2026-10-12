@@ -17,8 +17,8 @@ namespace Markocupic\SacEventToolBundle\Feature\EventReminder\Messenger\MessageH
 use Contao\CalendarEventsModel;
 use Contao\CalendarModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\Date;
-use Contao\Events;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Feature\EventReminder\Messenger\Message\SendEventReminderMessage;
@@ -29,6 +29,8 @@ use Markocupic\SacEventToolBundle\Feature\EventReminder\RecipientResolver;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\UnicodeString;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Terminal42\NotificationCenterBundle\NotificationCenter;
@@ -51,6 +53,7 @@ class SendEventReminderHandler
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly NotificationCenter $notificationCenter,
         private readonly PersonProvider $personProvider,
         private readonly RecipientResolver $recipientResolver,
@@ -131,8 +134,6 @@ class SendEventReminderHandler
      */
     private function getTokens(CalendarEventsModel $event, CalendarModel $calendar, array $participants): array
     {
-        $eventsAdapter = $this->framework->getAdapter(Events::class);
-
         $instructors = $this->personProvider->getInstructors($event);
         $mainInstructor = $this->recipientResolver->getMainInstructor($instructors, $this->personProvider->getFlaggedMainInstructor($event));
         $coInstructors = $this->recipientResolver->getCoInstructors($instructors, $mainInstructor);
@@ -156,7 +157,7 @@ class SendEventReminderHandler
         $tokens['event_meeting_point'] = (string) $event->meetingPoint;
         $tokens['event_leistungen'] = (string) $event->leistungen;
         $tokens['event_deregistration_limit'] = $event->allowDeregistration ? (string) $event->deregistrationLimit : '';
-        $tokens['event_link_detail'] = $eventsAdapter->generateEventUrl($event, true);
+        $tokens['event_link_detail'] = $this->getEventUrl($event);
         $tokens['main_instructor_name'] = $mainInstructor?->name ?? '';
         $tokens['main_instructor_email'] = $mainInstructor?->email ?? '';
         $tokens['main_instructor_phone'] = $mainInstructor?->phone ?? '';
@@ -176,6 +177,24 @@ class SendEventReminderHandler
         $tokens['reminder_offset_days'] = $calendar->eventReminderOffset;
 
         return array_map(static fn ($item) => \is_string($item) ? StringUtil::revertInputEncoding($item) : $item, $tokens);
+    }
+
+    /**
+     * Send the reminder without the link instead of aborting it, e.g. if the
+     * calendar has no reader page.
+     */
+    private function getEventUrl(CalendarEventsModel $event): string
+    {
+        try {
+            return $this->contentUrlGenerator->generate($event, [], UrlGeneratorInterface::ABSOLUTE_URL);
+        } catch (RoutingExceptionInterface $e) {
+            $this->contaoErrorLogger?->error(
+                \sprintf('Event reminder for event ID %d: could not generate the event URL: %s', $event->id, $e->getMessage()),
+                ['exception' => $e],
+            );
+
+            return '';
+        }
     }
 
     private function camelToSnake(string $input): string

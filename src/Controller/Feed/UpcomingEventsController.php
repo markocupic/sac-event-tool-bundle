@@ -17,8 +17,8 @@ namespace Markocupic\SacEventToolBundle\Controller\Feed;
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\Environment;
-use Contao\Events;
 use Contao\StringUtil;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
@@ -30,11 +30,14 @@ use Markocupic\RssFeedGeneratorBundle\Item\Item;
 use Markocupic\RssFeedGeneratorBundle\Item\ItemGroup;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class UpcomingEventsController extends AbstractController
 {
@@ -42,8 +45,6 @@ class UpcomingEventsController extends AbstractController
     private const int MAX_LIMIT = 1000;
 
     private readonly Adapter $calendarEventsModel;
-
-    private readonly Adapter $events;
 
     private readonly Adapter $environment;
 
@@ -53,13 +54,14 @@ class UpcomingEventsController extends AbstractController
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly FeedFactory $feedFactory,
         private readonly LockFactory $lockFactory,
         private readonly string $sacevtLocale,
         private readonly string $projectDir,
+        private readonly LoggerInterface|null $contaoErrorLogger = null,
     ) {
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->events = $this->framework->getAdapter(Events::class);
         $this->environment = $this->framework->getAdapter(Environment::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }
@@ -179,14 +181,26 @@ class UpcomingEventsController extends AbstractController
                     $this->calendarEventsUtil->getInstructorNamesAsArray($eventsModel),
                 );
 
+                try {
+                    $eventUrl = $this->stringUtil->specialchars($this->contentUrlGenerator->generate($eventsModel, [], UrlGeneratorInterface::ABSOLUTE_URL));
+                } catch (RoutingExceptionInterface $e) {
+                    // Skip the event (e.g. the calendar has no reader page) instead of breaking the whole feed
+                    $this->contaoErrorLogger?->error(
+                        \sprintf('RSS feed "sac_cas_upcoming_events": could not generate the URL of event ID %d: %s', $eventsModel->id, $e->getMessage()),
+                        ['exception' => $e],
+                    );
+
+                    continue;
+                }
+
                 $rss->addChannelItemField(
                     new ItemGroup('item', [
                         new Item('title', strip_tags($this->stringUtil->stripInsertTags($event['title'])), ['cdata' => true]),
-                        new Item('link', $this->stringUtil->specialchars($this->events->generateEventUrl($eventsModel, true))),
+                        new Item('link', $eventUrl),
                         new Item('description', strip_tags(preg_replace('/[\n\r]+/', ' ', $event['teaser'])), ['cdata' => true]),
                         new Item('pubDate', date('r', (int) $eventsModel->startDate)),
                         new Item('author', implode(', ', $authorNames)),
-                        new Item('guid', $this->stringUtil->specialchars($this->events->generateEventUrl($eventsModel, true))),
+                        new Item('guid', $eventUrl),
                         new Item('tourdb:startdate', date('Y-m-d', (int) $eventsModel->startDate)),
                         new Item('tourdb:enddate', date('Y-m-d', (int) $eventsModel->endDate)),
                     ]),

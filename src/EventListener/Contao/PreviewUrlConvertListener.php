@@ -17,9 +17,10 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Event\PreviewUrlConvertEvent;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Events;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Adds the front end preview URL to the event.
@@ -29,6 +30,7 @@ class PreviewUrlConvertListener
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly ContaoFramework $framework,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
     ) {
     }
 
@@ -44,10 +46,7 @@ class PreviewUrlConvertListener
             return;
         }
 
-        /** @var Events $eventsAdapter */
-        $eventsAdapter = $this->framework->getAdapter(Events::class);
-
-        $event->setUrl($request->getSchemeAndHttpHost().'/'.$eventsAdapter->generateEventUrl($eventModel));
+        $event->setUrl($this->contentUrlGenerator->generate($eventModel, [], UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
     private function getEventModel(Request $request): CalendarEventsModel|null

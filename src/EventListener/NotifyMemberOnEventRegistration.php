@@ -17,7 +17,7 @@ namespace Markocupic\SacEventToolBundle\EventListener;
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Events;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\UserModel;
@@ -26,6 +26,7 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Terminal42\NotificationCenterBundle\NotificationCenter;
 use Terminal42\NotificationCenterBundle\Receipt\ReceiptCollection;
@@ -34,8 +35,6 @@ use Terminal42\NotificationCenterBundle\Receipt\ReceiptCollection;
 final class NotifyMemberOnEventRegistration
 {
     public const int PRIORITY = 10000;
-
-    private Adapter $eventsAdapter;
 
     private Adapter $userModelAdapter;
 
@@ -52,12 +51,12 @@ final class NotifyMemberOnEventRegistration
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly ContaoFramework $framework,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly NotificationCenter $notificationCenter,
         private readonly TranslatorInterface $translator,
         private readonly string $sacevtLocale,
         private readonly LoggerInterface|null $contaoErrorLogger,
     ) {
-        $this->eventsAdapter = $this->framework->getAdapter(Events::class);
         $this->userModelAdapter = $this->framework->getAdapter(UserModel::class);
     }
 
@@ -102,7 +101,7 @@ final class NotifyMemberOnEventRegistration
             'event_iban' => $this->eventModel->addIban ? $this->eventModel->iban : '',
             'event_ibanBeneficiary' => $this->eventModel->addIban ? $this->eventModel->ibanBeneficiary : '',
             'event_id' => $this->eventModel->id,
-            'event_link_detail' => $this->eventsAdapter->generateEventUrl($this->eventModel, true),
+            'event_link_detail' => $this->contentUrlGenerator->generate($this->eventModel, [], UrlGeneratorInterface::ABSOLUTE_URL),
             'event_title' => $this->eventModel->title,
             'instructor_email' => $delegatedInstructor['email'] ?? $instructor->email,
             'instructor_name' => $delegatedInstructor['name'] ?? $instructor->name,

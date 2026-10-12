@@ -25,9 +25,9 @@ use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\CoreBundle\Util\UrlUtil;
 use Contao\Email;
-use Contao\Events;
 use Contao\Input;
 use Contao\Message;
 use Contao\Model\Collection;
@@ -49,6 +49,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -81,8 +82,6 @@ class SendTourRapportNotificationController extends AbstractBackendController
 
     private Adapter $controller;
 
-    private Adapter $events;
-
     private Adapter $message;
 
     private Adapter $stringUtil;
@@ -93,6 +92,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
 
     public function __construct(
         private readonly ContaoCsrfTokenManager $csrfTokenManager,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly ContaoFramework $framework,
         #[Autowire(param: 'sacevt.mailer_transports.event_admin')]
         private readonly array $mailerTransport,
@@ -110,7 +110,6 @@ class SendTourRapportNotificationController extends AbstractBackendController
     ) {
         $this->config = $this->framework->getAdapter(Config::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
-        $this->events = $this->framework->getAdapter(Events::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->system = $this->framework->getAdapter(System::class);
@@ -498,7 +497,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
                     'renderEmailText' => true,
                     'event' => $calEvent,
                     'instructor' => $biller,
-                    'event_url' => $this->events->generateEventUrl($calEvent, true),
+                    'event_url' => $this->contentUrlGenerator->generate($calEvent, [], UrlGeneratorInterface::ABSOLUTE_URL),
                 ]);
 
                 $text = $this->stringUtil->revertInputEncoding($text);

@@ -19,8 +19,8 @@ use chillerlan\QRCode\QROptions;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\Dbafs;
-use Contao\Events;
 use Contao\FilesModel;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
@@ -32,6 +32,7 @@ use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class TourListGenerator extends AbstractController
 {
@@ -45,6 +46,7 @@ class TourListGenerator extends AbstractController
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly Connection $connection,
         private readonly ContaoFramework $framework,
+        private readonly ContentUrlGenerator $contentUrlGenerator,
         private readonly ConvertFile $convertFile,
         private readonly string $projectDir,
     ) {
@@ -262,7 +264,7 @@ class TourListGenerator extends AbstractController
         $options = new QROptions(array_merge($opt, $arrOptions));
 
         // Get event reader url
-        $url = Events::generateEventUrl($event, true);
+        $url = $this->contentUrlGenerator->generate($event, [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         // Generate QR code and return the image path
         if ((new QRCode($options))->render($url, $filepath)) {
