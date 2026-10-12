@@ -79,14 +79,6 @@ table#ctrl_eventDates thead {
   background: url(./../../../icons/sac-event-tool-backend-module-icon.svg) 3px 2px no-repeat
 }
 
-#tl_buttons .header_icon.download_event_registration_list, #tl_buttons .header_icon.global_op_icon_class, #tl_buttons .header_icon.send_email {
-  background-position: 0;
-  background-repeat: no-repeat;
-  background-size: 16px 16px;
-  margin-left: 15px;
-  padding: 3px 0 3px 21px
-}
-
 div.legend-box {
   column-gap: 16px;
   display: flex;

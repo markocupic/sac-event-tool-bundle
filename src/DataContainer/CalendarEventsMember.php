@@ -19,6 +19,7 @@ use Contao\BackendTemplate;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
+use Contao\CoreBundle\DataContainer\DataContainerGlobalOperationsBuilder;
 use Contao\CoreBundle\DataContainer\DataContainerOperation;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
@@ -609,35 +610,53 @@ class CalendarEventsMember
         return $template->parse();
     }
 
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'list.global_operations.backToEventSettings.button', priority: 100)]
-    public function showBackToEventSettingsButton(string|null $href, string $label, string $title, string $class, string $attributes, string $table): string
+    /**
+     * Register the button callbacks of the "backToEventSettings" and "sendEmail" global operations.
+     *
+     * Contao 5.6+ renders the global operations with the DataContainerGlobalOperationsBuilder
+     * and passes a DataContainerOperation object to the button callback (the legacy
+     * signature is deprecated and no longer works in Contao 6). Contao 5.3 only supports
+     * the legacy signature.
+     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
+    public function registerGlobalOperationButtonCallbacks(): void
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $modern = class_exists(DataContainerGlobalOperationsBuilder::class);
 
-        $href = $this->router->generate('contao_backend', [
-            'do' => 'calendar',
-            'table' => 'tl_calendar_events',
-            'id' => $request->query->get('id'),
-            'act' => 'edit',
-            'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
-            'ref' => $request->attributes->get('_contao_referer_id'),
-        ]);
-
-        return $this->renderGlobalOperation($href, $label, $title, $class, $attributes);
+        $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['backToEventSettings']['button_callback'] = [self::class, $modern ? 'backToEventSettingsButton' : 'legacyBackToEventSettingsButton'];
+        $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail']['button_callback'] = [self::class, $modern ? 'sendEmailButton' : 'legacySendEmailButton'];
     }
 
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'list.global_operations.sendEmail.button', priority: 100)]
-    public function generateSendEmailButton(string|null $href, string $label, string $title, string $class, string $attributes, string $table): string
+    /**
+     * Contao 5.6+.
+     */
+    public function backToEventSettingsButton(DataContainerOperation $operation): void
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $operation->setUrl($this->getBackToEventSettingsUrl());
+    }
 
-        $href = $this->router->generate(EventParticipantEmailController::class);
-        $href = $this->urlParser->addQueryString('eventId='.$request->query->get('id'), $href);
-        $href = $this->urlParser->addQueryString('rt='.$this->contaoCsrfTokenManager->getDefaultTokenValue(), $href);
-        $href = $this->urlParser->addQueryString('sid='.uniqid(), $href);
-        $href = $this->uriSigner->sign($href);
+    /**
+     * Contao 5.6+.
+     */
+    public function sendEmailButton(DataContainerOperation $operation): void
+    {
+        $operation->setUrl($this->getSendEmailUrl());
+    }
 
-        return $this->renderGlobalOperation($href, $label, $title, $class, $attributes);
+    /**
+     * Contao 5.3 (legacy button callback signature).
+     */
+    public function legacyBackToEventSettingsButton(string|null $href, string $label, string $title, string|null $class, string $attributes, string $table): string
+    {
+        return $this->renderGlobalOperation($this->getBackToEventSettingsUrl(), $label, $title, (string) $class, $attributes);
+    }
+
+    /**
+     * Contao 5.3 (legacy button callback signature).
+     */
+    public function legacySendEmailButton(string|null $href, string $label, string $title, string|null $class, string $attributes, string $table): string
+    {
+        return $this->renderGlobalOperation($this->getSendEmailUrl(), $label, $title, (string) $class, $attributes);
     }
 
     #[AsCallback(table: 'tl_calendar_events_member', target: 'edit.buttons', priority: 100)]
@@ -648,6 +667,35 @@ class CalendarEventsMember
         return $arrButtons;
     }
 
+    private function getBackToEventSettingsUrl(): string
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        return $this->router->generate('contao_backend', [
+            'do' => 'calendar',
+            'table' => 'tl_calendar_events',
+            'id' => $request->query->get('id'),
+            'act' => 'edit',
+            'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
+            'ref' => $request->attributes->get('_contao_referer_id'),
+        ]);
+    }
+
+    private function getSendEmailUrl(): string
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        $href = $this->router->generate(EventParticipantEmailController::class);
+        $href = $this->urlParser->addQueryString('eventId='.$request->query->get('id'), $href);
+        $href = $this->urlParser->addQueryString('rt='.$this->contaoCsrfTokenManager->getDefaultTokenValue(), $href);
+        $href = $this->urlParser->addQueryString('sid='.uniqid(), $href);
+
+        return $this->uriSigner->sign($href);
+    }
+
+    /**
+     * Contao 5.3 (legacy button callback signature).
+     */
     private function renderGlobalOperation(string $href, string $label, string $title, string $class, string $attributes): string
     {
         $href = $this->stringUtil->ampersand($href);
