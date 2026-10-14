@@ -41,6 +41,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * - makeFieldsReadonly(): the personal data of online registrations cannot be changed
  * - setGlobalOperations(): only shows the global operations the user is allowed to use
  * - editButton(), deleteButton(), toggleParticipationStateButton(): disable the operations the user is not allowed to use
+ *   (the participation can only be confirmed for accepted registrations and registrations on the waiting list)
  */
 class CalendarEventsMember
 {
@@ -283,29 +284,30 @@ class CalendarEventsMember
     }
 
     /**
-     * Show the participation state greyed out and without link, if the user does not administer
-     * the registrations of the event. The toggle itself is denied in checkPermission().
+     * Show the participation state greyed out and without link:
+     * - if the user does not administer the registrations of the event (the toggle itself is denied in checkPermission())
+     * - if the participation cannot be confirmed, because the registration is neither accepted nor on the waiting
+     *   list (see EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED). Removing a confirmed participation
+     *   stays possible. The server-side check is CalendarEventsMember::preventInvalidParticipationConfirmation().
+     *
+     * Contao calls only one button callback per operation, so both checks have to live in this callback.
      */
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'list.operations.toggleParticipationState.button', priority: 110)]
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'list.operations.toggleParticipationState.button', priority: 100)]
     public function toggleParticipationStateButton(DataContainerOperation $operation): void
     {
         $row = $operation->getRecord();
 
-        if ($this->security->isGranted('ROLE_ADMIN') || $this->canAdministerRegistrations($row['eventId'])) {
+        if (!$this->security->isGranted('ROLE_ADMIN') && !$this->canAdministerRegistrations($row['eventId'])) {
+            $this->disableParticipationStateButton($operation, (bool) $row['hasParticipated'], 'MSC.participationStateNoPermission');
+
             return;
         }
 
-        // Greyed out icon that still shows the current state
-        $icon = !empty($row['hasParticipated']) ? 'icons/fontawesome/square-check--disabled.svg' : 'icons/fontawesome/square-check_--disabled.svg';
-        $title = $this->translator->trans('MSC.participationStateNoPermission', [], 'contao_default');
+        $isConfirmationAllowed = \in_array($row['stateOfSubscription'] ?? '', EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED, true);
 
-        $operation->setHtml(
-            $this->image->getHtml(
-                $this->packages->getUrl($icon, 'markocupic_sac_event_tool'),
-                $title,
-                'title="'.$this->stringUtil->specialchars($title).'"',
-            ),
-        );
+        if (!$row['hasParticipated'] && !$isConfirmationAllowed) {
+            $this->disableParticipationStateButton($operation, false, 'MSC.participationConfirmationNotAllowed');
+        }
     }
 
     /**
@@ -384,6 +386,23 @@ class CalendarEventsMember
         $GLOBALS['TL_DCA'][self::TABLE]['config']['notDeletable'] = false;
 
         return true;
+    }
+
+    /**
+     * Greyed out icon without link that still shows the current state.
+     */
+    private function disableParticipationStateButton(DataContainerOperation $operation, bool $hasParticipated, string $titleKey): void
+    {
+        $icon = $hasParticipated ? 'icons/fontawesome/square-check--disabled.svg' : 'icons/fontawesome/square-check_--disabled.svg';
+        $title = $this->translator->trans($titleKey, [], 'contao_default');
+
+        $operation->setHtml(
+            $this->image->getHtml(
+                $this->packages->getUrl($icon, 'markocupic_sac_event_tool'),
+                $title,
+                'title="'.$this->stringUtil->specialchars($title).'"',
+            ),
+        );
     }
 
     private function canAdministerRegistrations(mixed $eventId): bool

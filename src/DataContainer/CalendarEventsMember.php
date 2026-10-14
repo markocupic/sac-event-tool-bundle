@@ -30,7 +30,6 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Routing\ContentUrlGenerator;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\DataContainer;
-use Contao\Image;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\StringUtil;
@@ -54,7 +53,6 @@ use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Asset\Packages;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\UriSigner;
@@ -85,8 +83,6 @@ class CalendarEventsMember
 
     private Adapter $controller;
 
-    private Adapter $image;
-
     private Adapter $member;
 
     private Adapter $message;
@@ -115,7 +111,6 @@ class CalendarEventsMember
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly EventRegistrationUtil $eventRegistrationUtil,
         private readonly NotificationCenter $notificationCenter,
-        private readonly Packages $packages,
         private readonly RequestStack $requestStack,
         private readonly RouterInterface $router,
         private readonly ScopeMatcher $scopeMatcher,
@@ -131,7 +126,6 @@ class CalendarEventsMember
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
-        $this->image = $this->framework->getAdapter(Image::class);
         $this->member = $this->framework->getAdapter(MemberModel::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
@@ -151,37 +145,6 @@ class CalendarEventsMember
         }
 
         return '<span hidden data-controller="sacevt--backend--member-autocomplete"></span>';
-    }
-
-    /**
-     * Participation can only be confirmed for accepted registrations and registrations on the waiting list.
-     * For all other registrations, the toggle icon is greyed out and has no link.
-     */
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'list.operations.toggleParticipationState.button', priority: 100)]
-    public function disableParticipationToggle(DataContainerOperation $operation): void
-    {
-        $registration = $operation->getRecord();
-
-        // Already greyed out because the user may not change the participation state (see AccessDecision\CalendarEventsMember)
-        if (null !== $operation->getHtml()) {
-            return;
-        }
-
-        if (\in_array($registration['stateOfSubscription'] ?? '', EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED, true)) {
-            return;
-        }
-
-        // Greyed out icon that still shows the current state
-        $icon = $registration['hasParticipated'] ? 'icons/fontawesome/square-check--disabled.svg' : 'icons/fontawesome/square-check_--disabled.svg';
-        $title = $this->translator->trans('MSC.participationConfirmationNotAllowed', [], 'contao_default');
-
-        $operation->setHtml(
-            $this->image->getHtml(
-                $this->packages->getUrl($icon, 'markocupic_sac_event_tool'),
-                $title,
-                'title="'.$this->stringUtil->specialchars($title).'"',
-            ),
-        );
     }
 
     /**
