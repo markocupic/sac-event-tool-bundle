@@ -21,14 +21,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Exports the entries of the abo survey (tl_abo_survey) as a CSV file (UTF-8 with BOM, ";").
- * The year and abo filter of the back end list view are applied, so the export contains
- * exactly the entries the user sees in the list.
- * First name and last name are taken from tl_member (joined by sacMemberId).
+ * Always all entries are exported (filters of the back end list view are not applied).
  */
 final readonly class AboSurveyCsvExport
 {
     public const array FIELDS = [
         'year',
+        'eventOrganizer',
+        'previousAboType',
         'aboType',
         'sacMemberId',
         'firstname',
@@ -37,6 +37,7 @@ final readonly class AboSurveyCsvExport
         'street',
         'postal',
         'city',
+        'notice',
         'dateAdded',
     ];
 
@@ -46,39 +47,26 @@ final readonly class AboSurveyCsvExport
     ) {
     }
 
-    public function generate(int|null $year = null, string|null $aboType = null): Response
+    public function generate(): Response
     {
         $csv = new CsvDownload();
         $csv->setOutputBOM(CsvDownload::BOM_UTF8);
         $csv->setHeadline($this->buildHeadline());
 
-        foreach ($this->fetchEntries($year, $aboType) as $entry) {
+        foreach ($this->fetchEntries() as $entry) {
             $csv->addRecord($this->buildRecord($entry));
         }
 
-        $filename = \sprintf('abo_umfrage_%s_%s.csv', $year ?? 'alle', date('Y-m-d'));
+        $filename = \sprintf('abo_umfrage_%s.csv', date('Y-m-d'));
 
         return $csv->createResponse($filename);
     }
 
-    private function fetchEntries(int|null $year, string|null $aboType): array
+    private function fetchEntries(): array
     {
-        $sql = 'SELECT s.*, m.firstname, m.lastname FROM '.AboSurveyRepository::TABLE.' s LEFT JOIN tl_member m ON m.sacMemberId = s.sacMemberId WHERE 1 = 1';
-        $params = [];
-
-        if (null !== $year) {
-            $sql .= ' AND s.year = ?';
-            $params[] = $year;
-        }
-
-        if (null !== $aboType) {
-            $sql .= ' AND s.aboType = ?';
-            $params[] = $aboType;
-        }
-
-        $sql .= ' ORDER BY s.year DESC, m.lastname, m.firstname, s.sacMemberId';
-
-        return $this->connection->fetchAllAssociative($sql, $params);
+        return $this->connection->fetchAllAssociative(
+            'SELECT * FROM '.AboSurveyRepository::TABLE.' ORDER BY year DESC, lastname, firstname, sacMemberId',
+        );
     }
 
     private function buildHeadline(): array
@@ -86,10 +74,7 @@ final readonly class AboSurveyCsvExport
         $headline = [];
 
         foreach (self::FIELDS as $field) {
-            $headline[] = match ($field) {
-                'firstname', 'lastname' => $this->translator->trans('tl_member.'.$field.'.0', [], 'contao_tl_member'),
-                default => $this->translator->trans('tl_abo_survey.'.$field.'.0', [], 'contao_tl_abo_survey'),
-            };
+            $headline[] = $this->translator->trans('tl_abo_survey.'.$field.'.0', [], 'contao_tl_abo_survey');
         }
 
         return $headline;
@@ -101,12 +86,22 @@ final readonly class AboSurveyCsvExport
 
         foreach (self::FIELDS as $field) {
             $record[] = match ($field) {
-                'aboType' => $this->translator->trans('tl_abo_survey.'.$entry['aboType'], [], 'contao_tl_abo_survey'),
+                'previousAboType', 'aboType' => empty($entry[$field]) ? '' : $this->translator->trans('tl_abo_survey.'.$entry[$field], [], 'contao_tl_abo_survey'),
                 'dateAdded' => empty($entry['dateAdded']) ? '' : date('d.m.Y H:i', (int) $entry['dateAdded']),
+                'notice' => $this->removeLineBreaks((string) ($entry['notice'] ?? '')),
                 default => (string) ($entry[$field] ?? ''),
             };
         }
 
         return $record;
+    }
+
+    /**
+     * One line per record: line breaks (\n, \r\n, \r) are replaced by a single space;
+     * several consecutive line breaks (incl. the spaces around them) become one space.
+     */
+    private function removeLineBreaks(string $text): string
+    {
+        return trim(preg_replace('/\h*(?:\R\h*)+/u', ' ', $text) ?? $text);
     }
 }

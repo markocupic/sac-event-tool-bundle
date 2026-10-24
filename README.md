@@ -96,7 +96,7 @@ Ausführliche Beschreibungen (Regeln, Datenmodell, Klassen, Tests) liegen unter 
 - [Rechte-Reset für Backend-User](docs/features/backend-user-permission-reset.md): setzt die persönlichen Rechte von Backend-Usern mit Gruppenrechten zurück, damit sie ihre Rechte nur über Gruppen erhalten.
 - [Mitgliederprofil löschen](docs/features/member-profile-deletion.md): löscht ein Mitglied samt Avatar-Ordner und anonymisiert seine Anmeldungen zu vergangenen Events; verweigert die Löschung, solange das Mitglied auf einer Buchungsliste steht.
 - [Bereinigung der Event-Anmeldungen](docs/features/event-registration-cleanup.md): löscht täglich die Anmeldungen zu gelöschten Events und anonymisiert die Anmeldungen gelöschter Mitglieder.
-- [Abo-Umfrage](docs/features/abo-survey.md): eingeloggte Mitglieder wählen in einem Zeitfenster ein Abo (White Risk oder SchweizMobil) für ein bestimmtes Jahr; die Eingaben sind im Backend-Modul «Abo-Umfrage» einsehbar.
+- [Abo-Umfrage](docs/features/abo-survey.md): eingeloggte Mitglieder geben in einem Zeitfenster ihr bisheriges und ihr neues Abo (Kein Abo, White Risk oder SchweizMobil) für ein bestimmtes Jahr an; die Eingaben sind im Backend-Modul «Abo-Umfrage» einsehbar.
 
 ## Einrichtung und Konfiguration
 

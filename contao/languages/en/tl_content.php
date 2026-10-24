@@ -45,11 +45,12 @@ $GLOBALS['TL_LANG']['tl_content']['aboSurveyExplanation'] = '<strong>Abo-Umfrage
 	. '<strong>Wer darf das Formular absenden?</strong><br>'
 	. 'Mitglieder mit SAC-Mitgliedernummer, zu der ein Backend-Benutzer existiert, und bei denen mindestens eines zutrifft:'
 	. '<ul style="list-style:disc;margin:4px 0 4px 20px">'
-	. '<li>Hauptleiterin oder Hauptleiter bei mindestens einer Tour oder einem Kurs im eingestellten Jahr mit Freigabestufe 3 oder höher</li>'
+	. '<li>Leiterin oder Leiter (Haupt- oder Co-Leitung) bei mindestens einer Tour oder einem Kurs im eingestellten Jahr mit Freigabestufe 3 oder höher</li>'
 	. '<li>Rolle mit «gehört zum Vorstand»</li>'
 	. '<li>Rolle unter «Zusätzlich berechtigte Rollen» ausgewählt</li>'
 	. '<li>Benutzer unter «Zusätzlich berechtigte Benutzer» ausgewählt</li>'
-	. '</ul>';
+	. '</ul>'
+	. '<strong>Bergführerinnen und Bergführer</strong> (Leiterqualifikation «Bergführer») sind immer ausgeschlossen, auch wenn sie eine der obigen Bedingungen erfüllen.';
 $GLOBALS['TL_LANG']['tl_content']['abo_survey_access_legend'] = 'Abo-Umfrage: Zusätzliche Berechtigungen';
 $GLOBALS['TL_LANG']['tl_content']['aboSurveyAllowedUserRoles'] = ['Zusätzlich berechtigte Rollen', 'Backend-Benutzer mit einer dieser Rollen dürfen das Formular ebenfalls absenden. Rollen mit «gehört zum Vorstand» sind immer berechtigt.'];
 $GLOBALS['TL_LANG']['tl_content']['aboSurveyAllowedUsers'] = ['Zusätzlich berechtigte Benutzer', 'Diese Backend-Benutzer dürfen das Formular ebenfalls absenden.'];

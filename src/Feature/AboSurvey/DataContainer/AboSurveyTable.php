@@ -18,15 +18,15 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Security\ContaoCorePermissions;
-use Markocupic\SacEventToolBundle\Feature\AboSurvey\AboSurveyAboType;
+use Contao\DataContainer;
 use Markocupic\SacEventToolBundle\Feature\AboSurvey\AboSurveyCsvExport;
 use Markocupic\SacEventToolBundle\Feature\AboSurvey\AboSurveyRepository;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Back end module "abo_survey": CSV export (global operation "exportCsv").
+ * Back end module "abo_survey": CSV export (global operation "exportCsv")
+ * and the options of the field "eventOrganizer".
  */
 class AboSurveyTable
 {
@@ -36,9 +36,27 @@ class AboSurveyTable
 
     public function __construct(
         private readonly AboSurveyCsvExport $aboSurveyCsvExport,
+        private readonly AboSurveyRepository $aboSurveyRepository,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
     ) {
+    }
+
+    /**
+     * The titles of tl_event_organizer. A stored title that no longer exists
+     * (group renamed or deleted) is kept as option, so it is not lost when saving.
+     */
+    #[AsCallback(table: AboSurveyRepository::TABLE, target: 'fields.eventOrganizer.options')]
+    public function getEventOrganizerOptions(DataContainer|null $dc = null): array
+    {
+        $titles = $this->aboSurveyRepository->findEventOrganizerTitles();
+        $current = (string) ($dc?->activeRecord?->eventOrganizer ?? '');
+
+        if ('' !== $current && !\in_array($current, $titles, true)) {
+            $titles[] = $current;
+        }
+
+        return array_combine($titles, $titles);
     }
 
     #[AsCallback(table: AboSurveyRepository::TABLE, target: 'config.onload')]
@@ -54,30 +72,7 @@ class AboSurveyTable
             throw new AccessDeniedException('Not enough permissions to export the abo survey.');
         }
 
-        $filter = $this->getListFilter($request);
-
-        throw new ResponseException($this->aboSurveyCsvExport->generate($filter['year'], $filter['aboType']));
-    }
-
-    /**
-     * The year and abo filter the user has set in the list view (panel "filter").
-     *
-     * @return array{year: int|null, aboType: string|null}
-     */
-    private function getListFilter(Request $request): array
-    {
-        $filter = [];
-
-        if ($request->hasSession()) {
-            $filter = $request->getSession()->getBag('contao_backend')->get('filter')[AboSurveyRepository::TABLE] ?? [];
-        }
-
-        $year = (int) ($filter['year'] ?? 0);
-        $aboType = (string) ($filter['aboType'] ?? '');
-
-        return [
-            'year' => $year > 0 ? $year : null,
-            'aboType' => \in_array($aboType, AboSurveyAboType::ALL, true) ? $aboType : null,
-        ];
+        // Always all entries, the filters of the list view are not applied
+        throw new ResponseException($this->aboSurveyCsvExport->generate());
     }
 }

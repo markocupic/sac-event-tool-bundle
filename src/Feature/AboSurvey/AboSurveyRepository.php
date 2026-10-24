@@ -40,20 +40,36 @@ final readonly class AboSurveyRepository
     }
 
     /**
-     * Creates the entry or updates the existing entry of the member for this year.
-     * The contact data is always taken from the member profile (tl_member).
+     * Titles of all groups (tl_event_organizer.title) in the order of the back end.
+     * The survey stores the title, not the id (tl_abo_survey.eventOrganizer).
+     *
+     * @return array<string>
      */
-    public function save(FrontendUser $user, int $year, string $aboType): void
+    public function findEventOrganizerTitles(): array
+    {
+        return $this->connection->fetchFirstColumn('SELECT title FROM tl_event_organizer ORDER BY sorting');
+    }
+
+    /**
+     * Creates the entry or updates the existing entry of the member for this year.
+     * The name and the contact data are always taken from the member profile (tl_member).
+     */
+    public function save(FrontendUser $user, int $year, string $eventOrganizer, string $previousAboType, string $aboType, string $notice = ''): void
     {
         $set = [
             'tstamp' => time(),
             'year' => $year,
+            'eventOrganizer' => $eventOrganizer,
+            'previousAboType' => $previousAboType,
             'aboType' => $aboType,
             'sacMemberId' => (int) $user->sacMemberId,
+            'firstname' => (string) $user->firstname,
+            'lastname' => (string) $user->lastname,
             'email' => (string) $user->email,
             'street' => (string) $user->street,
             'postal' => (string) $user->postal,
             'city' => (string) $user->city,
+            'notice' => $notice,
         ];
 
         $existing = $this->findOneBySacMemberIdAndYear((int) $user->sacMemberId, $year);

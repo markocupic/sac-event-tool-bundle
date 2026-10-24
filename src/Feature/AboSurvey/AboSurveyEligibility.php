@@ -18,16 +18,20 @@ use Contao\StringUtil;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Config\EventType;
+use Markocupic\SacEventToolBundle\Config\TourguideQualification;
 
 /**
  * Who may fill in the abo survey for a year:
  * - the member has a SAC member id (> 0) and
  * - there is an active back end user (tl_user: disable = 0, within start/stop) with the same sacMemberId and
+ * - this back end user is not a mountain guide (tl_user.leiterQualifikation contains
+ *   TourguideQualification::MOUNTAIN_GUIDE); this exclusion applies in any case and
+ *   takes precedence over all of the following and
  * - one of the following applies to this back end user:
  *   - he is selected in the content element (tl_content.aboSurveyAllowedUsers),
  *   - he has a role selected in the content element (tl_content.aboSurveyAllowedUserRoles),
  *   - he has a role that belongs to the executive board (tl_user_role.belongsToExecutiveBoard),
- *   - he is main instructor (tl_calendar_events_instructor.isMainInstructor) of at least one
+ *   - he is instructor (tl_calendar_events_instructor, main or co-instructor) of at least one
  *     tour or course that starts in the survey year and has release level 3 or higher
  *     (tl_event_release_level_policy.level >= 3).
  *
@@ -39,7 +43,9 @@ final readonly class AboSurveyEligibility
 
     public const string REASON_NO_BACKEND_USER = 'no_backend_user';
 
-    public const string REASON_NO_MAIN_INSTRUCTOR_EVENT = 'no_main_instructor_event';
+    public const string REASON_MOUNTAIN_GUIDE = 'mountain_guide';
+
+    public const string REASON_NO_INSTRUCTOR_EVENT = 'no_instructor_event';
 
     public const int MIN_RELEASE_LEVEL = 3;
 
@@ -71,12 +77,17 @@ final readonly class AboSurveyEligibility
         $now = time();
 
         $users = $this->connection->fetchAllAssociative(
-            "SELECT id, userRole FROM tl_user WHERE disable = ? AND sacMemberId = ? AND (start = '' OR start < ?) AND (stop = '' OR stop > ?)",
+            "SELECT id, userRole, leiterQualifikation FROM tl_user WHERE disable = ? AND sacMemberId = ? AND (start = '' OR start < ?) AND (stop = '' OR stop > ?)",
             [0, $sacMemberId, $now, $now],
         );
 
         if (empty($users)) {
             return self::REASON_NO_BACKEND_USER;
+        }
+
+        // Mountain guides may never fill in the survey
+        if ($this->isMountainGuide($users)) {
+            return self::REASON_MOUNTAIN_GUIDE;
         }
 
         $userIds = array_map(static fn (array $user): int => (int) $user['id'], $users);
@@ -98,11 +109,24 @@ final readonly class AboSurveyEligibility
             return null;
         }
 
-        if ($this->isMainInstructorOfReleasedEvent($userIds, $year)) {
+        if ($this->isInstructorOfReleasedEvent($userIds, $year)) {
             return null;
         }
 
-        return self::REASON_NO_MAIN_INSTRUCTOR_EVENT;
+        return self::REASON_NO_INSTRUCTOR_EVENT;
+    }
+
+    private function isMountainGuide(array $users): bool
+    {
+        foreach ($users as $user) {
+            $qualifications = array_map('intval', StringUtil::deserialize($user['leiterQualifikation'] ?? null, true));
+
+            if (\in_array(TourguideQualification::MOUNTAIN_GUIDE, $qualifications, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -136,13 +160,13 @@ final readonly class AboSurveyEligibility
         return false !== $roleId;
     }
 
-    private function isMainInstructorOfReleasedEvent(array $userIds, int $year): bool
+    private function isInstructorOfReleasedEvent(array $userIds, int $year): bool
     {
         $eventId = $this->connection->fetchOne(
             'SELECT e.id FROM tl_calendar_events e'
             .' INNER JOIN tl_calendar_events_instructor i ON i.pid = e.id'
             .' INNER JOIN tl_event_release_level_policy r ON r.id = e.eventReleaseLevel'
-            .' WHERE i.userId IN (:userIds) AND i.isMainInstructor = 1'
+            .' WHERE i.userId IN (:userIds)'
             .' AND e.eventType IN (:eventTypes) AND r.level >= :minLevel'
             .' AND e.startDate BETWEEN :start AND :end'
             .' LIMIT 1',

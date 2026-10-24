@@ -34,14 +34,24 @@
                 <dl class="row">
                     <dt class="col-sm-4">{{ 'MSC.abo_survey_label_year'|trans }}</dt>
                     <dd class="col-sm-8">{{ entry.year }}</dd>
+                    <dt class="col-sm-4">{{ 'MSC.abo_survey_label_event_organizer'|trans }}</dt>
+                    <dd class="col-sm-8">{{ entry.eventOrganizer|default('-') }}</dd>
+                    <dt class="col-sm-4">{{ 'MSC.abo_survey_label_previous_abo'|trans }}</dt>
+                    <dd class="col-sm-8">{{ entry_previous_abo_label|default('-') }}</dd>
                     <dt class="col-sm-4">{{ 'MSC.abo_survey_label_abo'|trans }}</dt>
                     <dd class="col-sm-8">{{ entry_abo_label }}</dd>
+                    <dt class="col-sm-4">{{ 'MSC.abo_survey_label_name'|trans }}</dt>
+                    <dd class="col-sm-8">{{ entry.firstname }} {{ entry.lastname }}</dd>
                     <dt class="col-sm-4">{{ 'MSC.abo_survey_label_sac_member_id'|trans }}</dt>
                     <dd class="col-sm-8">{{ entry.sacMemberId }}</dd>
                     <dt class="col-sm-4">{{ 'MSC.abo_survey_label_email'|trans }}</dt>
                     <dd class="col-sm-8">{{ entry.email }}</dd>
                     <dt class="col-sm-4">{{ 'MSC.abo_survey_label_address'|trans }}</dt>
                     <dd class="col-sm-8">{{ entry.street }}<br>{{ entry.postal }} {{ entry.city }}</dd>
+                    {% if entry.notice|default %}
+                        <dt class="col-sm-4">{{ 'MSC.abo_survey_label_notice'|trans }}</dt>
+                        <dd class="col-sm-8">{{ entry.notice|nl2br }}</dd>
+                    {% endif %}
                 </dl>
             </div>
         {% elseif ineligibility_reason %}
@@ -74,7 +84,20 @@
                 <div class="formbody">
                     <div class="row gy-4">
                         <div class="col-12">
-                            {{ form.getWidget('aboType').parse()|raw }}
+                            <label class="d-block mb-1 form-label fw-bold" for="ctrl_eventOrganizer">{{ form.getWidget('eventOrganizer').label }}</label>
+                            {{ form.getWidget('eventOrganizer').generateWithError()|raw }}
+                        </div>
+                        <div class="col-12">
+                            <label class="d-block mb-1 form-label fw-bold" for="ctrl_previousAboType">{{ form.getWidget('previousAboType').label }}</label>
+                            {{ form.getWidget('previousAboType').generateWithError()|raw }}
+                        </div>
+                        <div class="col-12">
+                            <label class="d-block mb-1 form-label fw-bold" for="ctrl_aboType">{{ form.getWidget('aboType').label }}</label>
+                            {{ form.getWidget('aboType').generateWithError()|raw }}
+                        </div>
+                        <div class="col-12">
+                            <label class="d-block mb-1 form-label fw-bold" for="ctrl_notice">{{ form.getWidget('notice').label }}</label>
+                            {{ form.getWidget('notice').generateWithError()|raw }}
                         </div>
                         <div class="col-12">
                             {{ form.getWidget('submit').generateWithError()|raw }}

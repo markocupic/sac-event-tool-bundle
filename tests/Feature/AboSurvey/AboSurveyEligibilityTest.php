@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Tests\Feature\AboSurvey;
 
 use Doctrine\DBAL\Connection;
+use Markocupic\SacEventToolBundle\Config\TourguideQualification;
 use Markocupic\SacEventToolBundle\Feature\AboSurvey\AboSurveyEligibility;
 use PHPUnit\Framework\TestCase;
 
@@ -47,7 +48,7 @@ final class AboSurveyEligibilityTest extends TestCase
             ->method('fetchAllAssociative')
             ->with(
                 $this->logicalAnd(
-                    $this->stringContains('FROM tl_user WHERE disable = ? AND sacMemberId = ?'),
+                    $this->stringContains('SELECT id, userRole, leiterQualifikation FROM tl_user WHERE disable = ? AND sacMemberId = ?'),
                     $this->stringContains("(start = '' OR start < ?) AND (stop = '' OR stop > ?)"),
                 ),
                 $this->callback(static fn (array $params): bool => 4 === \count($params) && 0 === $params[0] && 123456 === $params[1] && \is_int($params[2]) && $params[2] === $params[3]),
@@ -63,6 +64,42 @@ final class AboSurveyEligibilityTest extends TestCase
         $eligibility = new AboSurveyEligibility($connection);
 
         $this->assertSame(AboSurveyEligibility::REASON_NO_BACKEND_USER, $eligibility->check(123456, 2027, [5], [42]));
+    }
+
+    public function testMountainGuideIsNeverEligible(): void
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection
+            ->method('fetchAllAssociative')
+            ->willReturn([
+                ['id' => '42', 'userRole' => serialize(['5']), 'leiterQualifikation' => serialize(['1', (string) TourguideQualification::MOUNTAIN_GUIDE])],
+            ])
+        ;
+
+        $connection
+            ->expects($this->never())
+            ->method('fetchOne')
+        ;
+
+        $eligibility = new AboSurveyEligibility($connection);
+
+        // Even if the user and his role are explicitly allowed
+        $this->assertSame(AboSurveyEligibility::REASON_MOUNTAIN_GUIDE, $eligibility->check(123456, 2027, ['5'], ['42']));
+    }
+
+    public function testOtherQualificationsDoNotExclude(): void
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection
+            ->method('fetchAllAssociative')
+            ->willReturn([
+                ['id' => '42', 'userRole' => null, 'leiterQualifikation' => serialize([(string) TourguideQualification::TOURGUIDE_SAC])],
+            ])
+        ;
+
+        $eligibility = new AboSurveyEligibility($connection);
+
+        $this->assertNull($eligibility->check(123456, 2027, [], ['42']));
     }
 
     public function testExplicitlyAllowedUserIsEligible(): void
@@ -124,7 +161,7 @@ final class AboSurveyEligibilityTest extends TestCase
         $this->assertNull($eligibility->check(123456, 2027, ['9'], ['7']));
     }
 
-    public function testUserWithoutRolesAndWithoutReleasedMainInstructorEventIsNotEligible(): void
+    public function testUserWithoutRolesAndWithoutReleasedInstructorEventIsNotEligible(): void
     {
         $connection = $this->createMock(Connection::class);
         $connection
@@ -132,17 +169,17 @@ final class AboSurveyEligibilityTest extends TestCase
             ->willReturn([['id' => '42', 'userRole' => null]])
         ;
 
-        // No role: only the main instructor query is executed
+        // No role: only the instructor query is executed
         $connection
             ->expects($this->once())
             ->method('fetchOne')
-            ->with($this->stringContains('i.isMainInstructor = 1'))
+            ->with($this->stringContains('INNER JOIN tl_calendar_events_instructor i'))
             ->willReturn(false)
         ;
 
         $eligibility = new AboSurveyEligibility($connection);
 
-        $this->assertSame(AboSurveyEligibility::REASON_NO_MAIN_INSTRUCTOR_EVENT, $eligibility->check(123456, 2027));
+        $this->assertSame(AboSurveyEligibility::REASON_NO_INSTRUCTOR_EVENT, $eligibility->check(123456, 2027));
     }
 
     public function testUserWithRolesButWithoutAnyQualificationIsNotEligible(): void
@@ -161,18 +198,18 @@ final class AboSurveyEligibilityTest extends TestCase
 
         $eligibility = new AboSurveyEligibility($connection);
 
-        $this->assertSame(AboSurveyEligibility::REASON_NO_MAIN_INSTRUCTOR_EVENT, $eligibility->check(123456, 2027, ['5'], ['7']));
+        $this->assertSame(AboSurveyEligibility::REASON_NO_INSTRUCTOR_EVENT, $eligibility->check(123456, 2027, ['5'], ['7']));
     }
 
-    public function testMainInstructorOfReleasedEventIsEligible(): void
+    public function testInstructorOfReleasedEventIsEligible(): void
     {
         $connection = $this->createMock(Connection::class);
         $connection
             ->method('fetchAllAssociative')
             ->willReturn([
-            ['id' => '42', 'userRole' => null],
-            ['id' => '43', 'userRole' => ''],
-        ])
+                ['id' => '42', 'userRole' => null],
+                ['id' => '43', 'userRole' => ''],
+            ])
         ;
 
         $connection
@@ -180,7 +217,8 @@ final class AboSurveyEligibilityTest extends TestCase
             ->method('fetchOne')
             ->with(
                 $this->logicalAnd(
-                    $this->stringContains('i.isMainInstructor = 1'),
+                    $this->stringContains('WHERE i.userId IN (:userIds)'),
+                    $this->logicalNot($this->stringContains('isMainInstructor')),
                     $this->stringContains('r.level >= :minLevel'),
                     $this->stringContains('e.eventType IN (:eventTypes)'),
                     $this->stringContains('e.startDate BETWEEN :start AND :end'),

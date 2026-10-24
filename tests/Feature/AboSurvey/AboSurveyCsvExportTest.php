@@ -31,6 +31,8 @@ final class AboSurveyCsvExportTest extends TestCase
             ->willReturn([
                 [
                     'year' => 2027,
+                    'eventOrganizer' => 'Skitouren',
+                    'previousAboType' => AboSurveyAboType::NO_ABO,
                     'aboType' => AboSurveyAboType::WHITE_RISK,
                     'sacMemberId' => 123456,
                     'firstname' => 'Hans',
@@ -39,6 +41,7 @@ final class AboSurveyCsvExportTest extends TestCase
                     'street' => 'Bergweg 1',
                     'postal' => '6000',
                     'city' => 'Luzern',
+                    'notice' => "Gerne wieder.\r\n\r\n\nBitte frühzeitig \n  informieren.\n",
                     'dateAdded' => mktime(14, 30, 0, 11, 2, 2026),
                 ],
             ])
@@ -51,44 +54,23 @@ final class AboSurveyCsvExportTest extends TestCase
         $lines = explode("\r\n", trim(substr($content, 3)));
 
         $this->assertCount(2, $lines);
-        $this->assertSame('label:year;label:aboType;label:sacMemberId;label:firstname;label:lastname;label:email;label:street;label:postal;label:city;label:dateAdded', $lines[0]);
-        $this->assertSame('2027;"White Risk";123456;Hans;Muster;hans@example.com;"Bergweg 1";6000;Luzern;"02.11.2026 14:30"', $lines[1]);
+        $this->assertSame('label:year;label:eventOrganizer;label:previousAboType;label:aboType;label:sacMemberId;label:firstname;label:lastname;label:email;label:street;label:postal;label:city;label:notice;label:dateAdded', $lines[0]);
+        $this->assertSame('2027;Skitouren;"Kein Abo";"White Risk";123456;Hans;Muster;hans@example.com;"Bergweg 1";6000;Luzern;"Gerne wieder. Bitte frühzeitig informieren.";"02.11.2026 14:30"', $lines[1]);
     }
 
-    public function testAppliesTheFilter(): void
+    public function testAlwaysExportsAllEntries(): void
     {
         $connection = $this->createMock(Connection::class);
         $connection
             ->expects($this->once())
             ->method('fetchAllAssociative')
-            ->with(
-                $this->logicalAnd(
-                    $this->stringContains('s.year = ?'),
-                    $this->stringContains('s.aboType = ?'),
-                ),
-                [2027, AboSurveyAboType::SCHWEIZ_MOBIL],
-            )
-            ->willReturn([])
-        ;
-
-        $response = $this->createExport($connection)->generate(2027, AboSurveyAboType::SCHWEIZ_MOBIL);
-
-        $this->assertStringContainsString('abo_umfrage_2027_', (string) $response->headers->get('Content-Disposition'));
-    }
-
-    public function testWithoutFilterAllEntriesAreExported(): void
-    {
-        $connection = $this->createMock(Connection::class);
-        $connection
-            ->expects($this->once())
-            ->method('fetchAllAssociative')
-            ->with($this->logicalNot($this->stringContains('s.year = ?')), [])
+            ->with($this->logicalNot($this->stringContains('WHERE')))
             ->willReturn([])
         ;
 
         $response = $this->createExport($connection)->generate();
 
-        $this->assertStringContainsString('abo_umfrage_alle_', (string) $response->headers->get('Content-Disposition'));
+        $this->assertStringContainsString(\sprintf('abo_umfrage_%s.csv', date('Y-m-d')), (string) $response->headers->get('Content-Disposition'));
     }
 
     private function createExport(Connection $connection): AboSurveyCsvExport
@@ -98,6 +80,7 @@ final class AboSurveyCsvExportTest extends TestCase
             ->method('trans')
             ->willReturnCallback(
                 static fn (string $id): string => match ($id) {
+                    'tl_abo_survey.'.AboSurveyAboType::NO_ABO => 'Kein Abo',
                     'tl_abo_survey.'.AboSurveyAboType::WHITE_RISK => 'White Risk',
                     'tl_abo_survey.'.AboSurveyAboType::SCHWEIZ_MOBIL => 'SchweizMobil',
                     default => 'label:'.explode('.', $id)[1],

@@ -23,7 +23,7 @@ use Markocupic\SacEventToolBundle\Feature\AboSurvey\DataContainer\AboSurveyTable
  * One row per member and year (unique index sacMemberId,year).
  * Entries are created in the frontend only; in the back end module "abo_survey"
  * they can be listed, edited, deleted and exported as CSV (global operation "exportCsv",
- * see Feature\AboSurvey\DataContainer\AboSurveyTable). The export applies the year and abo filter of the list.
+ * see Feature\AboSurvey\DataContainer\AboSurveyTable). The export always contains all entries.
  *
  * See docs/features/abo-survey.md
  */
@@ -50,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_abo_survey'] = [
 			'panelLayout' => 'filter;sort,search,limit',
 		],
 		'label'             => [
-			'fields'      => ['year', 'aboType', 'sacMemberId', 'email', 'street', 'postal', 'city', 'dateAdded'],
+			'fields'      => ['year', 'previousAboType', 'aboType', 'sacMemberId', 'lastname', 'firstname', 'email', 'street', 'postal', 'city', 'eventOrganizer', 'dateAdded'],
 			'showColumns' => true,
 		],
 		'global_operations' => [
@@ -69,16 +69,16 @@ $GLOBALS['TL_DCA']['tl_abo_survey'] = [
 		],
 	],
 	'palettes' => [
-		'default' => '{abo_legend},year,aboType;{member_legend},sacMemberId,email;{address_legend},street,postal,city;{meta_legend},dateAdded',
+		'default' => '{abo_legend},year,eventOrganizer,previousAboType,aboType;{member_legend},sacMemberId,firstname,lastname,email;{address_legend},street,postal,city;{notice_legend},notice;{meta_legend},dateAdded',
 	],
 	'fields'   => [
-		'id'          => [
+		'id'              => [
 			'sql' => 'int(10) unsigned NOT NULL auto_increment',
 		],
-		'tstamp'      => [
+		'tstamp'          => [
 			'sql' => 'int(10) unsigned NOT NULL default 0',
 		],
-		'dateAdded'   => [
+		'dateAdded'       => [
 			'sorting'   => true,
 			'flag'      => DataContainer::SORT_DAY_DESC,
 			'inputType' => 'text',
@@ -86,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_abo_survey'] = [
 			'sql'       => 'int(10) unsigned NOT NULL default 0',
 		],
 		// Year the survey is for, e.g. 2027 (tl_content.aboSurveyYear)
-		'year'        => [
+		'year'            => [
 			'filter'    => true,
 			'sorting'   => true,
 			'flag'      => DataContainer::SORT_DESC,
@@ -94,7 +94,17 @@ $GLOBALS['TL_DCA']['tl_abo_survey'] = [
 			'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'minlength' => 4, 'maxlength' => 4, 'tl_class' => 'w50'],
 			'sql'       => 'smallint(5) unsigned NOT NULL default 0',
 		],
-		'aboType'     => [
+		// Group membership: tl_event_organizer.title (the title, not the id, is stored)
+		// Options: see Feature\AboSurvey\DataContainer\AboSurveyTable
+		'eventOrganizer'  => [
+			'search'    => true,
+			'filter'    => true,
+			'sorting'   => true,
+			'inputType' => 'select',
+			'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
+			'sql'       => "varchar(255) NOT NULL default ''",
+		],
+		'previousAboType' => [
 			'filter'    => true,
 			'sorting'   => true,
 			'inputType' => 'select',
@@ -103,39 +113,69 @@ $GLOBALS['TL_DCA']['tl_abo_survey'] = [
 			'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
 			'sql'       => "varchar(32) NOT NULL default ''",
 		],
-		'sacMemberId' => [
+		'aboType'         => [
+			'filter'    => true,
+			'sorting'   => true,
+			'inputType' => 'select',
+			'options'   => AboSurveyAboType::ALL,
+			'reference' => &$GLOBALS['TL_LANG']['tl_abo_survey'],
+			'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
+			'sql'       => "varchar(32) NOT NULL default ''",
+		],
+		'sacMemberId'     => [
 			'search'    => true,
 			'sorting'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 7, 'tl_class' => 'w50'],
 			'sql'       => 'int(10) unsigned NOT NULL default 0',
 		],
-		'email'       => [
+		'firstname'       => [
+			'search'    => true,
+			'sorting'   => true,
+			'inputType' => 'text',
+			'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
+			'sql'       => "varchar(255) NOT NULL default ''",
+		],
+		'lastname'        => [
+			'search'    => true,
+			'sorting'   => true,
+			'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
+			'inputType' => 'text',
+			'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
+			'sql'       => "varchar(255) NOT NULL default ''",
+		],
+		'email'           => [
 			'search'    => true,
 			'sorting'   => true,
 			'inputType' => 'text',
 			'eval'      => ['rgxp' => 'email', 'maxlength' => 255, 'decodeEntities' => true, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
-		'street'      => [
+		'street'          => [
 			'search'    => true,
 			'inputType' => 'text',
 			'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
-		'postal'      => [
+		'postal'          => [
 			'search'    => true,
 			'sorting'   => true,
 			'inputType' => 'text',
 			'eval'      => ['maxlength' => 32, 'tl_class' => 'w50'],
 			'sql'       => "varchar(32) NOT NULL default ''",
 		],
-		'city'        => [
+		'city'            => [
 			'search'    => true,
 			'sorting'   => true,
 			'inputType' => 'text',
 			'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
+		],
+		'notice'          => [
+			'search'    => true,
+			'inputType' => 'textarea',
+			'eval'      => ['maxlength' => 2000, 'decodeEntities' => true, 'tl_class' => 'clr'],
+			'sql'       => 'text NULL',
 		],
 	],
 ];

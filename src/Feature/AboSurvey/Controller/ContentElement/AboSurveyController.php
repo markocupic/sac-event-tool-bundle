@@ -40,7 +40,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * set in the content element. The form is open between aboSurveyStartDate and aboSurveyEndDate.
  * The survey can be submitted only once per year; afterwards the member sees his entry and
  * the date of the submission instead of the form. Guests do not see the element at all.
- * Only main instructors of a released tour or course in the survey year may fill in the form
+ * Only instructors of a released tour or course in the survey year may fill in the form
  * (see AboSurveyEligibility); everybody else gets a message with the reason.
  *
  * See docs/features/abo-survey.md
@@ -81,6 +81,7 @@ class AboSurveyController extends AbstractContentElementController
         $template->set('state', $state);
         $template->set('entry', $entry);
         $template->set('entry_abo_label', null === $entry ? null : $this->getAboTypeLabel($entry['aboType']));
+        $template->set('entry_previous_abo_label', empty($entry['previousAboType']) ? null : $this->getAboTypeLabel($entry['previousAboType']));
         $template->set('notification_key', self::NOTIFICATION_KEY);
         $template->set('form', null);
         $template->set('ineligibility_reason', null);
@@ -123,23 +124,49 @@ class AboSurveyController extends AbstractContentElementController
             $options[$aboType] = $this->getAboTypeLabel($aboType);
         }
 
+        $eventOrganizers = $this->aboSurveyRepository->findEventOrganizerTitles();
+
+        $form->addFormField('eventOrganizer', [
+            'label' => $this->translator->trans('MSC.abo_survey_event_organizer', [], 'contao_default'),
+            'inputType' => 'select',
+            'options' => array_combine($eventOrganizers, $eventOrganizers),
+            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'class' => 'form-select'],
+        ]);
+
+        $form->addFormField('previousAboType', [
+            'label' => $this->translator->trans('MSC.abo_survey_previous_abo_type', [], 'contao_default'),
+            'inputType' => 'select',
+            'options' => $options,
+            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'class' => 'form-select'],
+        ]);
+
         $form->addFormField('aboType', [
             'label' => $this->translator->trans('MSC.abo_survey_abo_type', [], 'contao_default'),
-            'inputType' => 'radio',
+            'inputType' => 'select',
             'options' => $options,
-            'eval' => ['mandatory' => true],
+            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'class' => 'form-select'],
+        ]);
+
+        $form->addFormField('notice', [
+            'label' => $this->translator->trans('MSC.abo_survey_notice', [], 'contao_default'),
+            'inputType' => 'textarea',
+            'eval' => ['mandatory' => false, 'maxlength' => 2000, 'decodeEntities' => true, 'rows' => 4, 'class' => 'form-control'],
         ]);
 
         $form->addFormField('submit', [
             'label' => $this->translator->trans('MSC.abo_survey_submit', [], 'contao_default'),
             'inputType' => 'submit',
+            'eval' => ['class' => 'btn btn-primary'],
         ]);
 
         if ($form->validate()) {
+            $eventOrganizer = (string) $form->fetch('eventOrganizer');
+            $previousAboType = (string) $form->fetch('previousAboType');
             $aboType = (string) $form->fetch('aboType');
+            $notice = trim((string) $form->fetch('notice'));
 
-            if (\in_array($aboType, AboSurveyAboType::ALL, true)) {
-                $this->aboSurveyRepository->save($user, $year, $aboType);
+            if (\in_array($eventOrganizer, $eventOrganizers, true) && \in_array($previousAboType, AboSurveyAboType::ALL, true) && \in_array($aboType, AboSurveyAboType::ALL, true)) {
+                $this->aboSurveyRepository->save($user, $year, $eventOrganizer, $previousAboType, $aboType, $notice);
 
                 new DefaultFrontendUserNotification(
                     $user,
@@ -151,11 +178,12 @@ class AboSurveyController extends AbstractContentElementController
 
                 $this->contaoGeneralLogger?->info(
                     \sprintf(
-                        'Frontend user %s %s (SAC member id %d) has chosen the abo "%s" for %d in the abo survey.',
+                        'Frontend user %s %s (SAC member id %d) has chosen the abo "%s" (previous abo "%s") for %d in the abo survey.',
                         $user->firstname,
                         $user->lastname,
                         $user->sacMemberId,
                         $aboType,
+                        $previousAboType,
                         $year,
                     ),
                     ['contao' => new ContaoContext(__METHOD__, Log::ABO_SURVEY_SUBMIT)],

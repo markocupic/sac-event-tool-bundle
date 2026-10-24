@@ -15,16 +15,20 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Feature\AboSurvey;
 
 /**
- * The abos a member can choose in the abo survey (tl_abo_survey.aboType).
+ * The abos a member can choose in the abo survey
+ * (tl_abo_survey.aboType and tl_abo_survey.previousAboType).
  * The labels are in contao/languages/<lang>/tl_abo_survey.php.
  */
 final class AboSurveyAboType
 {
+    public const string NO_ABO = 'noAbo';
+
     public const string WHITE_RISK = 'whiteRisk';
 
     public const string SCHWEIZ_MOBIL = 'schweizMobil';
 
     public const array ALL = [
+        self::NO_ABO,
         self::WHITE_RISK,
         self::SCHWEIZ_MOBIL,
     ];

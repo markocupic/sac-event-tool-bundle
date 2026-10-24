@@ -5,7 +5,7 @@ Ort: `src/Feature/AboSurvey/` (Namespace `Markocupic\SacEventToolBundle\Feature\
 
 ## Ziel
 
-Eingeloggte Mitglieder entscheiden sich im Frontend für ein Abo (White Risk oder SchweizMobil) für ein bestimmtes Jahr. Die Eingaben werden in `tl_abo_survey` gespeichert und können im Backend eingesehen, bearbeitet und gelöscht werden.
+Eingeloggte Mitglieder geben im Frontend an, welches Abo sie bisher hatten, und entscheiden sich für ein Abo für ein bestimmtes Jahr (jeweils «Kein Abo», «White Risk» oder «SchweizMobil»). Die Eingaben werden in `tl_abo_survey` gespeichert und können im Backend eingesehen, bearbeitet und gelöscht werden.
 
 ## Fachliche Regeln
 
@@ -13,16 +13,18 @@ Eingeloggte Mitglieder entscheiden sich im Frontend für ein Abo (White Risk ode
 - Teilnehmen dürfen nur Mitglieder, die alle Bedingungen erfüllen (`AboSurveyEligibility`):
   1. `tl_member.sacMemberId` > 0,
   2. es gibt einen aktiven Backend-Benutzer (`tl_user`: `disable = 0` und innerhalb von `start`/`stop`) mit derselben `sacMemberId`,
-  3. für diesen Backend-Benutzer trifft mindestens eines zu:
+  3. dieser Backend-Benutzer ist kein Bergführer (`tl_user.leiterQualifikation` enthält nicht `TourguideQualification::MOUNTAIN_GUIDE`). Bergführer sind immer ausgeschlossen, auch wenn sie unter 4. ausgewählt sind oder zum Vorstand gehören,
+  4. für diesen Backend-Benutzer trifft mindestens eines zu:
      - er ist im Inhaltselement unter «Zusätzlich berechtigte Benutzer» ausgewählt (`aboSurveyAllowedUsers`),
      - er hat eine Rolle (`tl_user.userRole`), die im Inhaltselement unter «Zusätzlich berechtigte Rollen» ausgewählt ist (`aboSurveyAllowedUserRoles`),
      - er hat eine Rolle, die zum Vorstand gehört (`tl_user_role.belongsToExecutiveBoard`),
-     - er ist Hauptleiter (`tl_calendar_events_instructor.isMainInstructor`) bei mindestens einer Tour oder einem Kurs (`eventType` `tour` oder `course`), der im eingestellten Jahr beginnt (`startDate` 1.1. 00:00 bis 31.12. 23:59:59) und mindestens Freigabestufe 3 hat (`tl_event_release_level_policy.level >= 3`).
+     - er ist als Leiter (Haupt- oder Co-Leiter, `tl_calendar_events_instructor`) bei mindestens einer Tour oder einem Kurs (`eventType` `tour` oder `course`), der im eingestellten Jahr beginnt (`startDate` 1.1. 00:00 bis 31.12. 23:59:59) und mindestens Freigabestufe 3 hat (`tl_event_release_level_policy.level >= 3`).
 
   Ist eine Bedingung nicht erfüllt, sieht das Mitglied statt des Formulars eine Meldung mit dem Grund (die erste nicht erfüllte Bedingung). Wer die Umfrage bereits abgegeben hat, sieht weiterhin seine Eingaben, auch wenn er die Bedingungen inzwischen nicht mehr erfüllt.
 - Das Formular ist vom Startdatum (00:00 Uhr) bis zum Enddatum (23:59:59 Uhr) aktiv. Vorher erscheint ein Hinweis mit dem Startdatum, danach ein Hinweis, dass die Umfrage abgeschlossen ist.
-- Pro Mitglied (`sacMemberId`) und Jahr gibt es höchstens einen Eintrag (Unique-Index). Die Umfrage kann nur einmal abgegeben werden: Danach sieht das Mitglied statt des Formulars seine Eingaben (Jahr, Abo, Mitglieder-Nr., E-Mail, Adresse) und den Hinweis, dass es die Umfrage bereits am `dateAdded` (dd.mm.YYYY) ausgefüllt hat. Direkt nach dem Absenden erscheint statt dieses Hinweises einmalig die Erfolgsmeldung; der Hinweis erscheint erst, wenn das Mitglied die Seite später wieder aufruft. Das gilt auch nach Ablauf des Zeitfensters. Korrekturen sind nur im Backend möglich.
-- E-Mail und Adresse werden beim Speichern aus dem Mitgliederprofil (`tl_member`) übernommen und sind im Formular nicht editierbar.
+- Pro Mitglied (`sacMemberId`) und Jahr gibt es höchstens einen Eintrag (Unique-Index). Die Umfrage kann nur einmal abgegeben werden: Danach sieht das Mitglied statt des Formulars seine Eingaben (Jahr, Gruppe, bisheriges Abo, Abo, Name, Mitglieder-Nr., E-Mail, Adresse, Kommentar falls vorhanden) und den Hinweis, dass es die Umfrage bereits am `dateAdded` (dd.mm.YYYY) ausgefüllt hat. Direkt nach dem Absenden erscheint statt dieses Hinweises einmalig die Erfolgsmeldung; der Hinweis erscheint erst, wenn das Mitglied die Seite später wieder aufruft. Das gilt auch nach Ablauf des Zeitfensters. Korrekturen sind nur im Backend möglich.
+- Vorname, Nachname, E-Mail und Adresse werden beim Speichern aus dem Mitgliederprofil (`tl_member`) übernommen und sind im Formular nicht editierbar.
+- Das Formular enthält das Pflicht-Auswahlfeld «Gruppenzugehörigkeit» (`eventOrganizer`, Optionen: alle `tl_event_organizer` in der Backend-Sortierung; gespeichert wird `tl_event_organizer.title`, nicht die ID), die zwei Pflicht-Auswahlfelder (Select) «Bisheriges Abo» (`previousAboType`) und «Abo» (`aboType`) mit den Optionen «Kein Abo», «White Risk» und «SchweizMobil» (`AboSurveyAboType`) sowie ein optionales Kommentarfeld (`notice`, Textarea, max. 2000 Zeichen).
 - Jede Abgabe wird im Contao-Log protokolliert (`Log::ABO_SURVEY_SUBMIT`).
 
 ## Konfiguration
@@ -38,11 +40,11 @@ Inhaltselement «Abo-Umfrage» (`abo_survey`, Kategorie «SAC Pilatus Inhalts-El
 | `aboSurveyAllowedUserRoles` | Zusätzlich berechtigte Rollen (`tl_user_role`, Chosen-Mehrfachauswahl) |
 | `aboSurveyAllowedUsers` | Zusätzlich berechtigte Backend-Benutzer (`tl_user`, Chosen-Mehrfachauswahl) |
 
-Backend-Modul «Abo-Umfrage» (`abo_survey`) in der Backend-Menü-Kategorie «SAC-Pilatus Umfragen» (`sac_pilatus_surveys`): Liste mit Filter nach Jahr und Abo, Suche, Bearbeiten und Löschen. Neue Einträge entstehen nur über das Frontend.
+Backend-Modul «Abo-Umfrage» (`abo_survey`) in der Backend-Menü-Kategorie «SAC-Pilatus Umfragen» (`sac_pilatus_surveys`): Liste mit Filter nach Jahr, Gruppe, bisherigem Abo und Abo, Suche, Bearbeiten und Löschen. Neue Einträge entstehen nur über das Frontend.
 
 ### CSV-Export
 
-Die globale Operation «CSV-Export» lädt die Einträge als CSV-Datei herunter (UTF-8 mit BOM, Trennzeichen `;`, öffnet sich direkt in Excel). Ist in der Liste ein Filter nach Jahr und/oder Abo gesetzt, enthält der Export nur diese Einträge, sonst alle. Vorname und Nachname werden über die `sacMemberId` aus `tl_member` ergänzt (leer, wenn das Mitglied nicht mehr existiert). Spalten: Jahr, Abo, SAC-Mitgliedernummer, Vorname, Nachname, E-Mail, Strasse, PLZ, Ort, Eingereicht am. Dateiname: `abo_umfrage_<jahr|alle>_<datum>.csv`. Für den Export braucht der Benutzer Zugriff auf das Backend-Modul.
+Die globale Operation «CSV-Export» lädt die Einträge als CSV-Datei herunter (UTF-8 mit BOM, Trennzeichen `;`, öffnet sich direkt in Excel). Der Export enthält immer alle Einträge (alle Jahre); die Filter der Liste werden nicht berücksichtigt. Spalten: Jahr, Gruppenzugehörigkeit, Bisheriges Abo, Abo, SAC-Mitgliedernummer, Vorname, Nachname, E-Mail, Strasse, PLZ, Ort, Kommentar, Eingereicht am. Dateiname: `abo_umfrage_<datum>.csv`. Für den Export braucht der Benutzer Zugriff auf das Backend-Modul.
 
 ## Datenmodell `tl_abo_survey`
 
@@ -51,9 +53,13 @@ Die globale Operation «CSV-Export» lädt die Einträge als CSV-Datei herunter 
 | `id`, `tstamp` | Standardfelder |
 | `dateAdded` | Zeitpunkt der ersten Abgabe |
 | `year` | Jahr der Umfrage |
-| `aboType` | `whiteRisk` oder `schweizMobil` (`AboSurveyAboType`) |
+| `eventOrganizer` | Gruppenzugehörigkeit: `tl_event_organizer.title` (Titel, nicht ID; wird ein Titel später geändert, bleibt der gespeicherte Wert erhalten) |
+| `previousAboType` | Bisheriges Abo: `noAbo`, `whiteRisk` oder `schweizMobil` (`AboSurveyAboType`) |
+| `aboType` | Gewähltes Abo: `noAbo`, `whiteRisk` oder `schweizMobil` (`AboSurveyAboType`) |
 | `sacMemberId` | SAC-Mitgliedernummer |
+| `firstname`, `lastname` | Name aus `tl_member` |
 | `email`, `street`, `postal`, `city` | Kontaktdaten aus `tl_member` |
+| `notice` | Kommentar des Mitglieds (optional, max. 2000 Zeichen) |
 
 ## Klassen und Dateien
 
@@ -64,7 +70,7 @@ Die globale Operation «CSV-Export» lädt die Einträge als CSV-Datei herunter 
 - `AboSurveyAboType.php`: verfügbare Abos
 - `AboSurveyCsvExport.php`: erzeugt die CSV-Datei
 - `DataContainer/AboSurveyContent.php`: HTML-Erklärung (`aboSurveyExplanation`) und Optionen der Felder `aboSurveyAllowedUserRoles` und `aboSurveyAllowedUsers`
-- `DataContainer/AboSurveyTable.php`: onload-Callback, der die Export-Aktion (`action=exportAboSurveyCsv`) abfängt und den Listen-Filter aus der Backend-Session liest
+- `DataContainer/AboSurveyTable.php`: Optionen des Felds `eventOrganizer` und onload-Callback, der die Export-Aktion (`action=exportAboSurveyCsv`) abfängt und den Export auslöst
 - `contao/dca/tl_abo_survey.php`, Felder in `contao/dca/tl_content.php`
 - Template `contao/templates/twig/content_element/abo_survey.html.twig`
 - Sprachdateien `contao/languages/{de,en}/tl_abo_survey.php`, Texte in `default.php` (`MSC.abo_survey_*`)
@@ -72,5 +78,5 @@ Die globale Operation «CSV-Export» lädt die Einträge als CSV-Datei herunter 
 ## Tests
 
 - `AboSurveyPeriodTest`: Grenzen des Zeitfensters (Start 00:00, Ende 23:59:59)
-- `AboSurveyEligibilityTest`: die Ablehnungsgründe sowie die Berechtigung über Benutzer, Rolle, Vorstand und Hauptleitung
-- `AboSurveyCsvExportTest`: Inhalt der CSV-Datei und Anwendung des Filters
+- `AboSurveyEligibilityTest`: die Ablehnungsgründe (inkl. Bergführer) sowie die Berechtigung über Benutzer, Rolle, Vorstand und Leitung
+- `AboSurveyCsvExportTest`: Inhalt der CSV-Datei, immer alle Einträge
