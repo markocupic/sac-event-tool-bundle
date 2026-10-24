@@ -34,3 +34,22 @@ $GLOBALS['TL_LANG']['tl_content']['eventUnsubscribePage'] = ['Seite mit dem Even
 // References
 $GLOBALS['TL_LANG']['tl_content']['selectUserRoles'] = 'Anhand Benutzer-Rollen';
 $GLOBALS['TL_LANG']['tl_content']['selectUsers'] = 'Anhand Benutzer-Auswahl';
+
+// Abo survey
+$GLOBALS['TL_LANG']['tl_content']['abo_survey_legend'] = 'Abo-Umfrage';
+$GLOBALS['TL_LANG']['tl_content']['aboSurveyYear'] = ['Jahr', 'Für welches Jahr gelten die Eingaben? z.B. 2027'];
+$GLOBALS['TL_LANG']['tl_content']['aboSurveyStartDate'] = ['Formular aktiv ab', 'Ab diesem Datum (00:00 Uhr) ist das Formular aktiv.'];
+$GLOBALS['TL_LANG']['tl_content']['aboSurveyEndDate'] = ['Formular aktiv bis', 'Bis zu diesem Datum (23:59 Uhr) ist das Formular aktiv.'];
+$GLOBALS['TL_LANG']['tl_content']['aboSurveyExplanation'] = '<strong>Abo-Umfrage (White Risk / SchweizMobil)</strong><br>'
+	. 'Eingeloggte Mitglieder wählen ein Abo für das eingestellte Jahr. Das Formular ist vom Startdatum (00:00 Uhr) bis zum Enddatum (23:59 Uhr) aktiv.<br><br>'
+	. '<strong>Wer darf das Formular absenden?</strong><br>'
+	. 'Mitglieder mit SAC-Mitgliedernummer, zu der ein Backend-Benutzer existiert, und bei denen mindestens eines zutrifft:'
+	. '<ul style="list-style:disc;margin:4px 0 4px 20px">'
+	. '<li>Hauptleiterin oder Hauptleiter bei mindestens einer Tour oder einem Kurs im eingestellten Jahr mit Freigabestufe 3 oder höher</li>'
+	. '<li>Rolle mit «gehört zum Vorstand»</li>'
+	. '<li>Rolle unter «Zusätzlich berechtigte Rollen» ausgewählt</li>'
+	. '<li>Benutzer unter «Zusätzlich berechtigte Benutzer» ausgewählt</li>'
+	. '</ul>';
+$GLOBALS['TL_LANG']['tl_content']['abo_survey_access_legend'] = 'Abo-Umfrage: Zusätzliche Berechtigungen';
+$GLOBALS['TL_LANG']['tl_content']['aboSurveyAllowedUserRoles'] = ['Zusätzlich berechtigte Rollen', 'Backend-Benutzer mit einer dieser Rollen dürfen das Formular ebenfalls absenden. Rollen mit «gehört zum Vorstand» sind immer berechtigt.'];
+$GLOBALS['TL_LANG']['tl_content']['aboSurveyAllowedUsers'] = ['Zusätzlich berechtigte Benutzer', 'Diese Backend-Benutzer dürfen das Formular ebenfalls absenden.'];

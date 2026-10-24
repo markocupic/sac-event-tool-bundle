@@ -79,6 +79,11 @@ table#ctrl_eventDates thead {
   background: url(./../../../icons/sac-event-tool-backend-module-icon.svg) 3px 2px no-repeat
 }
 
+// Back end menu category "SAC-Pilatus Umfragen" (Lucide icon "clipboard-list")
+#tl_navigation .group-sac_pilatus_surveys {
+  background: url(./../../../icons/lucide/clipboard-list.svg) 3px 2px no-repeat
+}
+
 div.legend-box {
   column-gap: 16px;
   display: flex;

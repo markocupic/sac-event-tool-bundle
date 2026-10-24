@@ -21,6 +21,7 @@ use Markocupic\SacEventToolBundle\Controller\ContentElement\SwisstopoEventMapCon
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\MemberDashboardMyEventRegistrationsController;
+use Markocupic\SacEventToolBundle\Feature\AboSurvey\Controller\ContentElement\AboSurveyController;
 
 // Palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes'][PurgeEventFavoritesLinkController::TYPE] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},cssID,space;{invisible_legend:hide},invisible,start,stop';
@@ -32,6 +33,7 @@ $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentButtonGroupController
 $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentWrapperDivController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][SwisstopoEventMapController::TYPE] = 'name,type,headline;{swisstopo_map_legend},swisstopoCenter,swisstopoZoom;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][MemberDashboardMyEventRegistrationsController::TYPE] = '{title_legend},name,type;{member_dashboard_my_events_legend},eventUnsubscribePage;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_content']['palettes'][AboSurveyController::TYPE] = '{type_legend},name,type,headline;{abo_survey_legend},aboSurveyYear,aboSurveyStartDate,aboSurveyEndDate;{abo_survey_access_legend},aboSurveyExplanation,aboSurveyAllowedUserRoles,aboSurveyAllowedUsers;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID,space;{invisible_legend:hide},invisible,start,stop';
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
 	'exclude'    => true,
@@ -133,4 +135,46 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['eventUnsubscribePage'] = [
 	'eval'       => ['fieldType' => 'radio', 'mandatory' => true],
 	'sql'        => 'int(10) unsigned NOT NULL default 0',
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
+];
+
+// Abo survey (see docs/features/abo-survey.md)
+$GLOBALS['TL_DCA']['tl_content']['fields']['aboSurveyYear'] = [
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'minlength' => 4, 'maxlength' => 4, 'tl_class' => 'w33 clr'],
+	'sql'       => 'smallint(5) unsigned NOT NULL default 0',
+];
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['aboSurveyStartDate'] = [
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
+	'sql'       => 'int(10) unsigned NOT NULL default 0',
+];
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['aboSurveyEndDate'] = [
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
+	'sql'       => 'int(10) unsigned NOT NULL default 0',
+];
+
+// HTML explanation (no database column), rendered in Feature\AboSurvey\DataContainer\AboSurveyContent
+$GLOBALS['TL_DCA']['tl_content']['fields']['aboSurveyExplanation'] = [
+	'exclude' => true,
+];
+
+// Options: see Feature\AboSurvey\DataContainer\AboSurveyContent
+$GLOBALS['TL_DCA']['tl_content']['fields']['aboSurveyAllowedUserRoles'] = [
+	'exclude'   => true,
+	'inputType' => 'select',
+	'eval'      => ['chosen' => true, 'multiple' => true, 'tl_class' => 'clr'],
+	'sql'       => 'blob NULL',
+];
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['aboSurveyAllowedUsers'] = [
+	'exclude'   => true,
+	'inputType' => 'select',
+	'eval'      => ['chosen' => true, 'multiple' => true, 'tl_class' => 'clr'],
+	'sql'       => 'blob NULL',
 ];

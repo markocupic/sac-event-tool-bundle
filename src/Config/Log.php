@@ -131,4 +131,9 @@ class Log
      * of a participant has been denied.
      */
     public const string PARTICIPANT_EVENT_HISTORY_ACCESS_DENIED = 'PARTICIPANT_EVENT_HISTORY_ACCESS_DENIED';
+
+    /**
+     * ABO_SURVEY: Log type when a member has submitted the abo survey.
+     */
+    public const string ABO_SURVEY_SUBMIT = 'ABO_SURVEY_SUBMIT';
 }

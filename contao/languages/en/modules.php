@@ -52,6 +52,8 @@ $GLOBALS['TL_LANG']['MOD'][SacBackendUserRolesExportController::BACKEND_MODULE_T
 $GLOBALS['TL_LANG']['MOD'][EventStatsController::BACKEND_MODULE_TYPE] = ['SAC Pilatus Event Statistiken', 'SAC Pilatus Event Statistiken ansehen.'];
 $GLOBALS['TL_LANG']['MOD']['event_feedback'] = ['Event Feedback', 'Abgegebene Event-Auswertungen der Teilnehmenden.'];
 $GLOBALS['TL_LANG']['MOD']['event_feedback_reminder'] = ['Event Feedback Reminder', 'Geplante Aufforderungen an die Teilnehmenden, die Event-Auswertung auszufüllen.'];
+$GLOBALS['TL_LANG']['MOD']['sac_pilatus_surveys'] = ['SAC-Pilatus Umfragen'];
+$GLOBALS['TL_LANG']['MOD']['abo_survey'] = ['Abo-Umfrage', 'Eingaben der Mitglieder zur Abo-Umfrage (White Risk / SchweizMobil).'];
 
 // Contao legacy frontend modules
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'] = ['Event Reader Vorschau'];

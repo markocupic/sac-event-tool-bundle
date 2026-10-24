@@ -1,0 +1,87 @@
+{% trans_default_domain 'contao_default' %}
+{% extends "@Contao/content_element/_base.html.twig" %}
+
+{% block content %}
+    <div class="abo-survey">
+        <p class="abo-survey__intro">
+            {{ 'MSC.abo_survey_intro'|trans([year]) }}
+        </p>
+
+        {# Notification after the form has been submitted (only shown once, right after the redirect) #}
+        {% set just_submitted = has_frontend_user_notifications(notification_key) %}
+        {% if just_submitted %}
+            {% for message in get_frontend_user_notifications(notification_key, true) %}
+                <div class="my-4 d-flex">
+                    {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-success', add_icon: true, icon_class: 'fa-solid fa-circle-check', text: message.messageText} %}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if entry %}
+            {# The member has already submitted the survey: show his entry instead of the form #}
+            <div class="abo-survey__entry">
+                {% set content %}
+                    <p class="m-0">{{ 'MSC.abo_survey_already_submitted'|trans([entry.dateAdded|date('d.m.Y')]) }}</p>
+                {% endset %}
+                {# Not right after the submit: the success message is shown instead #}
+                {% if not just_submitted %}
+                    <div class="my-4 d-flex">
+                        {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-lighter', add_icon: true, icon_class: 'fa-solid fa-info-circle', text: content} %}
+                    </div>
+                {% endif %}
+
+                <p><strong>{{ 'MSC.abo_survey_your_entries'|trans }}</strong></p>
+                <dl class="row">
+                    <dt class="col-sm-4">{{ 'MSC.abo_survey_label_year'|trans }}</dt>
+                    <dd class="col-sm-8">{{ entry.year }}</dd>
+                    <dt class="col-sm-4">{{ 'MSC.abo_survey_label_abo'|trans }}</dt>
+                    <dd class="col-sm-8">{{ entry_abo_label }}</dd>
+                    <dt class="col-sm-4">{{ 'MSC.abo_survey_label_sac_member_id'|trans }}</dt>
+                    <dd class="col-sm-8">{{ entry.sacMemberId }}</dd>
+                    <dt class="col-sm-4">{{ 'MSC.abo_survey_label_email'|trans }}</dt>
+                    <dd class="col-sm-8">{{ entry.email }}</dd>
+                    <dt class="col-sm-4">{{ 'MSC.abo_survey_label_address'|trans }}</dt>
+                    <dd class="col-sm-8">{{ entry.street }}<br>{{ entry.postal }} {{ entry.city }}</dd>
+                </dl>
+            </div>
+        {% elseif ineligibility_reason %}
+            {# The member may not fill in the survey: show the reason #}
+            {% set content %}
+                <p class="m-0">{{ ('MSC.abo_survey_ineligible_' ~ ineligibility_reason)|trans([year]) }}</p>
+            {% endset %}
+            <div class="my-4 d-flex abo-survey__ineligible">
+                {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-lighter', add_icon: true, icon_class: 'fa-solid fa-circle-exclamation', text: content, headline_text: 'MSC.abo_survey_ineligible_headline'|trans} %}
+            </div>
+        {% elseif 'not_started' == state %}
+            <p class="abo-survey__info">{{ 'MSC.abo_survey_not_started'|trans([start_date|date('d.m.Y')]) }}</p>
+        {% elseif 'closed' == state %}
+            <p class="abo-survey__info">{{ 'MSC.abo_survey_closed'|trans([end_date|date('d.m.Y')]) }}</p>
+        {% elseif form %}
+            <p class="abo-survey__period">{{ 'MSC.abo_survey_open_until'|trans([end_date|date('d.m.Y')]) }}</p>
+
+            <div class="abo-survey__address mb-4">
+                <strong>{{ 'MSC.abo_survey_address'|trans }}</strong><br>
+                {{ user.firstname }} {{ user.lastname }}<br>
+                {{ user.street }}<br>
+                {{ user.postal }} {{ user.city }}<br>
+                {{ user.email }}<br>
+                <small class="text-muted">{{ 'MSC.abo_survey_address_hint'|trans }}</small>
+            </div>
+
+            <form action="{{ form.getAction() }}" enctype="{{ form.getEnctype() }}" method="{{ form.getHttpMethod() }}">
+                {{ form.getWidget('FORM_SUBMIT').generateWithError()|raw }}
+                {{ form.getWidget('REQUEST_TOKEN').generateWithError()|raw }}
+                <div class="formbody">
+                    <div class="row gy-4">
+                        <div class="col-12">
+                            {{ form.getWidget('aboType').parse()|raw }}
+                        </div>
+                        <div class="col-12">
+                            {{ form.getWidget('submit').generateWithError()|raw }}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -231,10 +231,8 @@ class CalendarEventsUtilTest extends ContaoTestCase
     /**
      * Creates a CalendarEventsUtil instance whose services are mocked.
      */
-    private function createCalendarEventsUtil(
-        ContaoFramework $framework,
-        Connection|null $connection = null,
-    ): CalendarEventsUtil {
+    private function createCalendarEventsUtil(ContaoFramework $framework, Connection|null $connection = null,): CalendarEventsUtil
+    {
         return new CalendarEventsUtil(
             framework: $framework,
             connection: $connection ?? $this->createMock(Connection::class),

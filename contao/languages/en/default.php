@@ -25,6 +25,7 @@ use Markocupic\SacEventToolBundle\Controller\ContentElement\SwisstopoEventMapCon
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\MemberDashboardMyEventRegistrationsController;
+use Markocupic\SacEventToolBundle\Feature\AboSurvey\Controller\ContentElement\AboSurveyController;
 
 // Content elements
 $GLOBALS['TL_LANG']['CTE']['sac_event_tool_content_elements'] = ['SAC Pilatus Inhalts-Elemente'];
@@ -36,6 +37,7 @@ $GLOBALS['TL_LANG']['CTE'][NestedFragmentButtonGroupController::TYPE] = ['Nested
 $GLOBALS['TL_LANG']['CTE'][NestedFragmentWrapperDivController::TYPE] = ['Nested Fragment - Wrapper DIV-Element'];
 $GLOBALS['TL_LANG']['CTE'][SwisstopoEventMapController::TYPE] = ['Swisstopo-Event-Karte (Kartensuche)'];
 $GLOBALS['TL_LANG']['CTE'][MemberDashboardMyEventRegistrationsController::TYPE] = ['SAC Mitgliederkonto Dashboard - Meine Event Buchungen'];
+$GLOBALS['TL_LANG']['CTE'][AboSurveyController::TYPE] = ['Abo-Umfrage (White Risk / SchweizMobil)', 'Mitglieder wählen ein Abo für das eingestellte Jahr. Nur für eingeloggte Mitglieder sichtbar.'];
 
 // Override defaults
 $request = System::getContainer()->get('request_stack')->getCurrentRequest();
@@ -366,3 +368,26 @@ $GLOBALS['TL_LANG']['MSC']['sacEvFb']['salutationMale'] = 'Lieber';
 $GLOBALS['TL_LANG']['MSC']['sacEvFb']['salutationFemale'] = 'Liebe';
 $GLOBALS['TL_LANG']['MSC']['sacEvFb']['formAlreadyFilledOutMsg'] = '%s %s{{br}}Wir haben von dir bereits ein Feedback zum Event "%s" erhalten. Besten Dank dafür. {{br}}{{br}}Wir wünschen dir weiterhin unvergessliche und unfallfreie Touren und hoffentlich bis bald{{br}}{{br}}SAC Touren- und Kursadministration';
 $GLOBALS['TL_LANG']['MSC']['sacEvFb']['checkoutMsg'] = '%s %s{{br}}Besten Dank für dein Feedback. Deine Rückmeldung hilft uns, unsere Angebote stetig zu verbessern und diese den Bedürfnissen der Teilnehmer anzupassen.{{br}}{{br}}Weiterhin unvergessliche und unfallfreie Touren und hoffentlich bis bald{{br}}{{br}}SAC Touren- und Kursadministration';
+
+// Abo survey (content element abo_survey)
+$GLOBALS['TL_LANG']['MSC']['abo_survey_intro'] = 'Als Mitglied des Vorstandes oder als aktive Touren-/Kursleiter:in wird dir ein Jahresabo für "Schweiz-Mobil" oder "White-Risk" geschenkt. Wähle hier dein Abo für das Jahr %s aus.';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_abo_type'] = 'Für welches Abo entscheidest du dich?';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_submit'] = 'Auswahl speichern';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_address'] = 'Deine Angaben';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_address_hint'] = 'Die Adresse wird aus deinem Mitgliederprofil übernommen. Änderungen nimmst du im SAC/CAS-Portal vor.';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_already_submitted'] = 'Du hast die Umfrage bereits am %s ausgefüllt.';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_your_entries'] = 'Deine Eingaben';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_label_year'] = 'Jahr';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_label_abo'] = 'Abo';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_label_sac_member_id'] = 'Mitglieder-Nr.';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_label_email'] = 'E-Mail';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_label_address'] = 'Adresse';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_open_until'] = 'Du kannst deine Auswahl bis am %s abgeben.';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_ineligible_headline'] = 'Kein Zugriff auf die Umfrage';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_ineligible_no_sac_member_id'] = 'Deinem Mitgliederkonto ist keine SAC-Mitgliedernummer zugeordnet. Deshalb kannst du an dieser Umfrage nicht teilnehmen.';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_ineligible_no_backend_user'] = 'Die Umfrage richtet sich an Leiterinnen und Leiter. Zu deiner Mitgliedernummer gibt es kein Leiter-Konto im Event-Tool. Deshalb kannst du an dieser Umfrage nicht teilnehmen.';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_ineligible_no_main_instructor_event'] = 'Die Umfrage richtet sich an Vorstandsmitglieder sowie an Leiterinnen und Leiter, die im Jahr %s als Hauptleiterin oder Hauptleiter mindestens eine Tour oder einen Kurs mit Freigabestufe 3 oder höher leiten. Du erfüllst keine dieser Bedingungen. Deshalb kannst du an dieser Umfrage nicht teilnehmen.';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_not_started'] = 'Die Umfrage startet am %s.';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_closed'] = 'Die Umfrage ist seit dem %s abgeschlossen.';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_saved_title'] = 'Mitteilung';
+$GLOBALS['TL_LANG']['MSC']['abo_survey_saved_text'] = 'Vielen Dank! Deine Auswahl «%s» für das Jahr %s wurde gespeichert.';

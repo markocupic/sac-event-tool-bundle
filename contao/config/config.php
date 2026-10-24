@@ -123,6 +123,14 @@ $GLOBALS['BE_MOD']['sac_be_modules']['calendar']['showEventFeedbacks'] = [EventF
 $GLOBALS['BE_MOD']['sac_be_modules']['calendar']['showEventFeedbacksAsPdf'] = [EventFeedbackBackendController::class, 'getEventFeedbackAsPdfAction'];
 
 /*
+ * Back end menu category "SAC-Pilatus Umfragen"
+ * Abo survey (see docs/features/abo-survey.md)
+ */
+$GLOBALS['BE_MOD']['sac_pilatus_surveys']['abo_survey'] = [
+	'tables' => ['tl_abo_survey'],
+];
+
+/*
  * Register the models
  */
 $GLOBALS['TL_MODELS'][CalendarContainerModel::getTable()] = CalendarContainerModel::class;
