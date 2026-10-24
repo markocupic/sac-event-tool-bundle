@@ -4,7 +4,7 @@
   "swisstopo_event_map.js": "/bundles/markocupicsaceventtool/swisstopo_event_map.01670117.js",
   "member_dashboard_my_event_registrations.js": "/bundles/markocupicsaceventtool/member_dashboard_my_event_registrations.23f9efd8.js",
   "js/avatar_uploader.js": "/bundles/markocupicsaceventtool/js/avatar_uploader.34c669c6.js",
-  "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.58500290.css",
+  "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.2bed1223.css",
   "images/events/course/booklet/fallback.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/fallback.jpg",
   "images/events/course/booklet/toc.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/toc.jpg",
   "images/event_feedback/background_2.jpg": "/bundles/markocupicsaceventtool/images/event_feedback/background_2.jpg",
@@ -96,6 +96,7 @@
   "icons/event_states/event_status_1.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_1.svg",
   "icons/event_states/event_status_3.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_3.svg",
   "icons/event_states/event_status_5.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_5.svg",
+  "images/message-square-heart.svg": "/bundles/markocupicsaceventtool/images/message-square-heart.4978ad8f.svg",
   "images/clipboard-list.svg": "/bundles/markocupicsaceventtool/images/clipboard-list.7da1e290.svg",
   "icons/my_events_dashboard/more--dark.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more--dark.svg",
   "icons/my_events_dashboard/more.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more.svg",
@@ -105,5 +106,5 @@
   "swisstopo_event_map.01670117.js.map": "/bundles/markocupicsaceventtool/swisstopo_event_map.01670117.js.map",
   "member_dashboard_my_event_registrations.23f9efd8.js.map": "/bundles/markocupicsaceventtool/member_dashboard_my_event_registrations.23f9efd8.js.map",
   "avatar_uploader.34c669c6.js.map": "/bundles/markocupicsaceventtool/js/avatar_uploader.34c669c6.js.map",
-  "be_stylesheet.58500290.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.58500290.css.map"
+  "be_stylesheet.2bed1223.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.2bed1223.css.map"
 }

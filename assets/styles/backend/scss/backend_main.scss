@@ -84,6 +84,11 @@ table#ctrl_eventDates thead {
   background: url(./../../../icons/lucide/clipboard-list.svg) 3px 2px no-repeat
 }
 
+// Back end menu category "Event Feedback" (Lucide icon "message-square-heart")
+#tl_navigation .group-event_feedback {
+  background: url(./../../../icons/lucide/message-square-heart.svg) 3px 2px no-repeat
+}
+
 div.legend-box {
   column-gap: 16px;
   display: flex;
