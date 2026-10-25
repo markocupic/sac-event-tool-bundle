@@ -33,7 +33,7 @@ $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentButtonGroupController
 $GLOBALS['TL_DCA']['tl_content']['palettes'][NestedFragmentWrapperDivController::TYPE] = 'name,type,headline;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][SwisstopoEventMapController::TYPE] = 'name,type,headline;{swisstopo_map_legend},swisstopoCenter,swisstopoZoom;{template_legend},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes'][MemberDashboardMyEventRegistrationsController::TYPE] = '{title_legend},name,type;{member_dashboard_my_events_legend},eventUnsubscribePage;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
-$GLOBALS['TL_DCA']['tl_content']['palettes'][AboSurveyController::TYPE] = '{type_legend},name,type,headline;{abo_survey_legend},aboSurveyYear,aboSurveyStartDate,aboSurveyEndDate;{abo_survey_access_legend},aboSurveyExplanation,aboSurveyAllowedUserRoles,aboSurveyAllowedUsers;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes'][AboSurveyController::TYPE] = '{type_legend},name,type,headline;{abo_survey_legend},aboSurveyYear,aboSurveyStartDate,aboSurveyEndDate,aboSurveyEventPeriodStart,aboSurveyEventPeriodEnd;{abo_survey_access_legend},aboSurveyExplanation,aboSurveyAllowedUserRoles,aboSurveyAllowedUsers;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID,space;{invisible_legend:hide},invisible,start,stop';
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
 	'exclude'    => true,
@@ -156,6 +156,23 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['aboSurveyEndDate'] = [
 	'exclude'   => true,
 	'inputType' => 'text',
 	'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w33 wizard'],
+	'sql'       => 'int(10) unsigned NOT NULL default 0',
+];
+
+// Events (tl_calendar_events.startDate) must lie within this period (00:00 of the start date until 23:59:59 of the end date)
+// to be taken into account (see AboSurveyEligibility).
+// Independent of the year, so that e.g. tours of the 2027 programme starting in December 2026 can be included.
+$GLOBALS['TL_DCA']['tl_content']['fields']['aboSurveyEventPeriodStart'] = [
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 clr wizard'],
+	'sql'       => 'int(10) unsigned NOT NULL default 0',
+];
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['aboSurveyEventPeriodEnd'] = [
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
 	'sql'       => 'int(10) unsigned NOT NULL default 0',
 ];
 

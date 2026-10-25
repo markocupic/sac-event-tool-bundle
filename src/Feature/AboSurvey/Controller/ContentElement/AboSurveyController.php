@@ -40,7 +40,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * set in the content element. The form is open between aboSurveyStartDate and aboSurveyEndDate.
  * The survey can be submitted only once per year; afterwards the member sees his entry and
  * the date of the submission instead of the form. Guests do not see the element at all.
- * Only instructors of a released tour or course in the survey year may fill in the form
+ * Only instructors of a released tour or course within the event period may fill in the form
  * (see AboSurveyEligibility); everybody else gets a message with the reason.
  *
  * See docs/features/abo-survey.md
@@ -78,6 +78,12 @@ class AboSurveyController extends AbstractContentElementController
         $template->set('year', $year);
         $template->set('start_date', (int) $model->aboSurveyStartDate);
         $template->set('end_date', (int) $model->aboSurveyEndDate);
+        // Event period: from 00:00 of the start date until 23:59:59 of the end date (rgxp date)
+        $eventPeriodStart = AboSurveyPeriod::getStartOfDay((int) $model->aboSurveyEventPeriodStart);
+        $eventPeriodEnd = AboSurveyPeriod::getEndOfDay((int) $model->aboSurveyEventPeriodEnd);
+
+        $template->set('event_period_start', $eventPeriodStart);
+        $template->set('event_period_end', $eventPeriodEnd);
         $template->set('state', $state);
         $template->set('entry', $entry);
         $template->set('entry_abo_label', null === $entry ? null : $this->getAboTypeLabel($entry['aboType']));
@@ -93,7 +99,8 @@ class AboSurveyController extends AbstractContentElementController
 
         $ineligibilityReason = $this->aboSurveyEligibility->check(
             (int) $user->sacMemberId,
-            $year,
+            $eventPeriodStart,
+            $eventPeriodEnd,
             StringUtil::deserialize($model->aboSurveyAllowedUserRoles, true),
             StringUtil::deserialize($model->aboSurveyAllowedUsers, true),
         );

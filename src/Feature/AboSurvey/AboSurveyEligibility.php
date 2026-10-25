@@ -32,7 +32,8 @@ use Markocupic\SacEventToolBundle\Config\TourguideQualification;
  *   - he has a role selected in the content element (tl_content.aboSurveyAllowedUserRoles),
  *   - he has a role that belongs to the executive board (tl_user_role.belongsToExecutiveBoard),
  *   - he is instructor (tl_calendar_events_instructor, main or co-instructor) of at least one
- *     tour or course that starts in the survey year and has release level 3 or higher
+ *     tour or course that starts within the event period (tl_content.aboSurveyEventPeriodStart
+ *     until tl_content.aboSurveyEventPeriodEnd) and has release level 3 or higher
  *     (tl_event_release_level_policy.level >= 3).
  *
  * check() returns null if the member is eligible, otherwise the reason (one of the REASON_* constants).
@@ -59,15 +60,17 @@ final readonly class AboSurveyEligibility
     }
 
     /**
-     * Checks whether the member may fill in the abo survey for the given year.
+     * Checks whether the member may fill in the abo survey.
      *
+     * @param int               $eventPeriodStart   events must start at or after this timestamp
+     * @param int               $eventPeriodEnd     events must start at or before this timestamp
      * @param array<int|string> $allowedUserRoleIds tl_user_role.id selected in the content element
      * @param array<int|string> $allowedUserIds     tl_user.id selected in the content element
      *
      * @return string|null null if the member has access to the form, otherwise the reason
      *                     why he has no access (one of the REASON_* constants)
      */
-    public function check(int $sacMemberId, int $year, array $allowedUserRoleIds = [], array $allowedUserIds = []): string|null
+    public function check(int $sacMemberId, int $eventPeriodStart, int $eventPeriodEnd, array $allowedUserRoleIds = [], array $allowedUserIds = []): string|null
     {
         if ($sacMemberId < 1) {
             return self::REASON_NO_SAC_MEMBER_ID;
@@ -109,7 +112,7 @@ final readonly class AboSurveyEligibility
             return null;
         }
 
-        if ($this->isInstructorOfReleasedEvent($userIds, $year)) {
+        if ($this->isInstructorOfReleasedEvent($userIds, $eventPeriodStart, $eventPeriodEnd)) {
             return null;
         }
 
@@ -160,7 +163,7 @@ final readonly class AboSurveyEligibility
         return false !== $roleId;
     }
 
-    private function isInstructorOfReleasedEvent(array $userIds, int $year): bool
+    private function isInstructorOfReleasedEvent(array $userIds, int $eventPeriodStart, int $eventPeriodEnd): bool
     {
         $eventId = $this->connection->fetchOne(
             'SELECT e.id FROM tl_calendar_events e'
@@ -174,8 +177,8 @@ final readonly class AboSurveyEligibility
                 'userIds' => $userIds,
                 'eventTypes' => self::EVENT_TYPES,
                 'minLevel' => self::MIN_RELEASE_LEVEL,
-                'start' => mktime(0, 0, 0, 1, 1, $year),
-                'end' => mktime(23, 59, 59, 12, 31, $year),
+                'start' => $eventPeriodStart,
+                'end' => $eventPeriodEnd,
             ],
             [
                 'userIds' => ArrayParameterType::INTEGER,

@@ -36,8 +36,8 @@ final class AboSurveyEligibilityTest extends TestCase
 
         $eligibility = new AboSurveyEligibility($connection);
 
-        $this->assertSame(AboSurveyEligibility::REASON_NO_SAC_MEMBER_ID, $eligibility->check(0, 2027));
-        $this->assertSame(AboSurveyEligibility::REASON_NO_SAC_MEMBER_ID, $eligibility->check(-1, 2027, [1], [1]));
+        $this->assertSame(AboSurveyEligibility::REASON_NO_SAC_MEMBER_ID, $eligibility->check(0, self::periodStart(), self::periodEnd()));
+        $this->assertSame(AboSurveyEligibility::REASON_NO_SAC_MEMBER_ID, $eligibility->check(-1, self::periodStart(), self::periodEnd(), [1], [1]));
     }
 
     public function testMemberWithoutBackendUserIsNotEligible(): void
@@ -63,7 +63,7 @@ final class AboSurveyEligibilityTest extends TestCase
 
         $eligibility = new AboSurveyEligibility($connection);
 
-        $this->assertSame(AboSurveyEligibility::REASON_NO_BACKEND_USER, $eligibility->check(123456, 2027, [5], [42]));
+        $this->assertSame(AboSurveyEligibility::REASON_NO_BACKEND_USER, $eligibility->check(123456, self::periodStart(), self::periodEnd(), [5], [42]));
     }
 
     public function testMountainGuideIsNeverEligible(): void
@@ -84,7 +84,7 @@ final class AboSurveyEligibilityTest extends TestCase
         $eligibility = new AboSurveyEligibility($connection);
 
         // Even if the user and his role are explicitly allowed
-        $this->assertSame(AboSurveyEligibility::REASON_MOUNTAIN_GUIDE, $eligibility->check(123456, 2027, ['5'], ['42']));
+        $this->assertSame(AboSurveyEligibility::REASON_MOUNTAIN_GUIDE, $eligibility->check(123456, self::periodStart(), self::periodEnd(), ['5'], ['42']));
     }
 
     public function testOtherQualificationsDoNotExclude(): void
@@ -99,7 +99,7 @@ final class AboSurveyEligibilityTest extends TestCase
 
         $eligibility = new AboSurveyEligibility($connection);
 
-        $this->assertNull($eligibility->check(123456, 2027, [], ['42']));
+        $this->assertNull($eligibility->check(123456, self::periodStart(), self::periodEnd(), [], ['42']));
     }
 
     public function testExplicitlyAllowedUserIsEligible(): void
@@ -117,7 +117,7 @@ final class AboSurveyEligibilityTest extends TestCase
 
         $eligibility = new AboSurveyEligibility($connection);
 
-        $this->assertNull($eligibility->check(123456, 2027, [], ['7', '42']));
+        $this->assertNull($eligibility->check(123456, self::periodStart(), self::periodEnd(), [], ['7', '42']));
     }
 
     public function testUserWithAllowedRoleIsEligible(): void
@@ -135,7 +135,7 @@ final class AboSurveyEligibilityTest extends TestCase
 
         $eligibility = new AboSurveyEligibility($connection);
 
-        $this->assertNull($eligibility->check(123456, 2027, ['5'], []));
+        $this->assertNull($eligibility->check(123456, self::periodStart(), self::periodEnd(), ['5'], []));
     }
 
     public function testUserWithExecutiveBoardRoleIsEligible(): void
@@ -158,7 +158,7 @@ final class AboSurveyEligibilityTest extends TestCase
 
         $eligibility = new AboSurveyEligibility($connection);
 
-        $this->assertNull($eligibility->check(123456, 2027, ['9'], ['7']));
+        $this->assertNull($eligibility->check(123456, self::periodStart(), self::periodEnd(), ['9'], ['7']));
     }
 
     public function testUserWithoutRolesAndWithoutReleasedInstructorEventIsNotEligible(): void
@@ -179,7 +179,7 @@ final class AboSurveyEligibilityTest extends TestCase
 
         $eligibility = new AboSurveyEligibility($connection);
 
-        $this->assertSame(AboSurveyEligibility::REASON_NO_INSTRUCTOR_EVENT, $eligibility->check(123456, 2027));
+        $this->assertSame(AboSurveyEligibility::REASON_NO_INSTRUCTOR_EVENT, $eligibility->check(123456, self::periodStart(), self::periodEnd()));
     }
 
     public function testUserWithRolesButWithoutAnyQualificationIsNotEligible(): void
@@ -198,7 +198,7 @@ final class AboSurveyEligibilityTest extends TestCase
 
         $eligibility = new AboSurveyEligibility($connection);
 
-        $this->assertSame(AboSurveyEligibility::REASON_NO_INSTRUCTOR_EVENT, $eligibility->check(123456, 2027, ['5'], ['7']));
+        $this->assertSame(AboSurveyEligibility::REASON_NO_INSTRUCTOR_EVENT, $eligibility->check(123456, self::periodStart(), self::periodEnd(), ['5'], ['7']));
     }
 
     public function testInstructorOfReleasedEventIsEligible(): void
@@ -227,8 +227,8 @@ final class AboSurveyEligibilityTest extends TestCase
                     static fn (array $params): bool => [42, 43] === $params['userIds']
                         && ['tour', 'course'] === $params['eventTypes']
                         && 3 === $params['minLevel']
-                        && mktime(0, 0, 0, 1, 1, 2027) === $params['start']
-                        && mktime(23, 59, 59, 12, 31, 2027) === $params['end'],
+                        && self::periodStart() === $params['start']
+                        && self::periodEnd() === $params['end'],
                 ),
             )
             ->willReturn(1001)
@@ -236,6 +236,19 @@ final class AboSurveyEligibilityTest extends TestCase
 
         $eligibility = new AboSurveyEligibility($connection);
 
-        $this->assertNull($eligibility->check(123456, 2027));
+        $this->assertNull($eligibility->check(123456, self::periodStart(), self::periodEnd()));
+    }
+
+    /**
+     * Event period of the 2027 programme incl. December 2026.
+     */
+    private static function periodStart(): int
+    {
+        return mktime(0, 0, 0, 12, 1, 2026);
+    }
+
+    private static function periodEnd(): int
+    {
+        return mktime(23, 59, 59, 12, 31, 2027);
     }
 }

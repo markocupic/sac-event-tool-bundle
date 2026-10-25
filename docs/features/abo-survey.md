@@ -10,6 +10,7 @@ Eingeloggte Mitglieder geben im Frontend an, welches Abo sie bisher hatten, und 
 ## Fachliche Regeln
 
 - Das Inhaltselement ist nur für eingeloggte Frontend-User sichtbar; Gäste sehen nichts.
+- Für die Berechtigung als Leiter zählt der Zeitraum (`aboSurveyEventPeriodStart` bis `aboSurveyEventPeriodEnd`), nicht das Jahr. So können z.B. Touren des Jahresprogramms 2027, die bereits im Dezember 2026 beginnen, berücksichtigt werden.
 - Teilnehmen dürfen nur Mitglieder, die alle Bedingungen erfüllen (`AboSurveyEligibility`):
   1. `tl_member.sacMemberId` > 0,
   2. es gibt einen aktiven Backend-Benutzer (`tl_user`: `disable = 0` und innerhalb von `start`/`stop`) mit derselben `sacMemberId`,
@@ -18,7 +19,7 @@ Eingeloggte Mitglieder geben im Frontend an, welches Abo sie bisher hatten, und 
      - er ist im Inhaltselement unter «Zusätzlich berechtigte Benutzer» ausgewählt (`aboSurveyAllowedUsers`),
      - er hat eine Rolle (`tl_user.userRole`), die im Inhaltselement unter «Zusätzlich berechtigte Rollen» ausgewählt ist (`aboSurveyAllowedUserRoles`),
      - er hat eine Rolle, die zum Vorstand gehört (`tl_user_role.belongsToExecutiveBoard`),
-     - er ist als Leiter (Haupt- oder Co-Leiter, `tl_calendar_events_instructor`) bei mindestens einer Tour oder einem Kurs (`eventType` `tour` oder `course`), der im eingestellten Jahr beginnt (`startDate` 1.1. 00:00 bis 31.12. 23:59:59) und mindestens Freigabestufe 3 hat (`tl_event_release_level_policy.level >= 3`).
+     - er ist als Leiter (Haupt- oder Co-Leiter, `tl_calendar_events_instructor`) bei mindestens einer Tour oder einem Kurs (`eventType` `tour` oder `course`), der im eingestellten Zeitraum beginnt (`startDate` zwischen `aboSurveyEventPeriodStart` und `aboSurveyEventPeriodEnd`) und mindestens Freigabestufe 3 hat (`tl_event_release_level_policy.level >= 3`).
 
   Ist eine Bedingung nicht erfüllt, sieht das Mitglied statt des Formulars eine Meldung mit dem Grund (die erste nicht erfüllte Bedingung). Wer die Umfrage bereits abgegeben hat, sieht weiterhin seine Eingaben, auch wenn er die Bedingungen inzwischen nicht mehr erfüllt.
 - Das Formular ist vom Startdatum (00:00 Uhr) bis zum Enddatum (23:59:59 Uhr) aktiv. Vorher erscheint ein Hinweis mit dem Startdatum, danach ein Hinweis, dass die Umfrage abgeschlossen ist.
@@ -34,9 +35,11 @@ Inhaltselement «Abo-Umfrage» (`abo_survey`, Kategorie «SAC Pilatus Inhalts-El
 | Feld | Bedeutung |
 |---|---|
 | `aboSurveyExplanation` | Nur Anzeige: HTML-Erklärung oben in der Bearbeitungsansicht (ohne Datenbankspalte, Text in `tl_content.php` der Sprachdateien) |
-| `aboSurveyYear` | Jahr, für das die Eingaben gelten (z.B. 2027) |
+| `aboSurveyYear` | Jahr, für das die Eingaben gelten (z.B. 2027); wird mit den Einträgen gespeichert, ist aber für die Berechtigung nicht massgebend |
 | `aboSurveyStartDate` | Formular aktiv ab (Datum) |
 | `aboSurveyEndDate` | Formular aktiv bis (Datum) |
+| `aboSurveyEventPeriodStart` | Zeitraum Start (Datum): Touren und Kurse, die ab diesem Datum (00:00 Uhr) beginnen, berechtigen zur Teilnahme |
+| `aboSurveyEventPeriodEnd` | Zeitraum Ende (Datum): Touren und Kurse, die bis zu diesem Datum (23:59:59 Uhr) beginnen, berechtigen zur Teilnahme |
 | `aboSurveyAllowedUserRoles` | Zusätzlich berechtigte Rollen (`tl_user_role`, Chosen-Mehrfachauswahl) |
 | `aboSurveyAllowedUsers` | Zusätzlich berechtigte Backend-Benutzer (`tl_user`, Chosen-Mehrfachauswahl) |
 

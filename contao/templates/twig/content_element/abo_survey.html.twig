@@ -57,7 +57,7 @@
         {% elseif ineligibility_reason %}
             {# The member may not fill in the survey: show the reason #}
             {% set content %}
-                <p class="m-0">{{ ('MSC.abo_survey_ineligible_' ~ ineligibility_reason)|trans([year]) }}</p>
+                <p class="m-0">{{ ('MSC.abo_survey_ineligible_' ~ ineligibility_reason)|trans([event_period_start|date('d.m.Y'), event_period_end|date('d.m.Y')]) }}</p>
             {% endset %}
             <div class="my-4 d-flex abo-survey__ineligible">
                 {% include '@Contao_MarkocupicSacEventToolBundle/component/_alert_default.html.twig'|default with {wrapper_class: 'alert-lighter', add_icon: true, icon_class: 'fa-solid fa-circle-exclamation', text: content, headline_text: 'MSC.abo_survey_ineligible_headline'|trans} %}
