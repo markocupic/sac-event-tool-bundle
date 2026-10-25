@@ -419,13 +419,18 @@ class CalendarEventsMember
     #[AsCallback(table: 'tl_calendar_events_member', target: 'config.oncreate', priority: 100)]
     public function oncreateCallback(string $strTable, int $insertId, array $arrFields, DataContainer $dc): void
     {
-        if (!$dc->id) {
+        // The event id is passed as pid (ptable tl_calendar_events); older URLs pass it as id
+        $request = $this->requestStack->getCurrentRequest();
+        $eventId = (int) ($arrFields['pid'] ?? 0) ?: (int) $request?->query->get('pid') ?: (int) $request?->query->get('id');
+
+        if ($eventId < 1) {
             return;
         }
 
         $set = [
             'uuid' => Uuid::uuid4()->toString(),
-            'eventId' => $this->requestStack->getCurrentRequest()->query->get('id'),
+            'pid' => $eventId,
+            'eventId' => $eventId,
             'dateAdded' => time(),
         ];
 

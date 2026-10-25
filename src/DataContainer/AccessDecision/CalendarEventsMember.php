@@ -315,7 +315,11 @@ class CalendarEventsMember
      */
     private function allowCreate(DataContainer $dc): bool
     {
-        if (!$this->canAdministerRegistrations($dc->id)) {
+        // The event id is passed as pid (ptable tl_calendar_events); older URLs pass it as id
+        $request = $this->requestStack->getCurrentRequest();
+        $eventId = (int) $request?->query->get('pid') ?: (int) $dc->id;
+
+        if (!$this->canAdministerRegistrations($eventId)) {
             return false;
         }
 

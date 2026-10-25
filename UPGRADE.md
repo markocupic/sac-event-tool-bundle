@@ -1,5 +1,19 @@
 # Upgrade
 
+## Anmeldungen: Eltern-Tabelle `tl_calendar_events` (`ptable`/`pid`)
+
+`tl_calendar_events_member` hat neu die Eltern-Tabelle `tl_calendar_events` (`ptable`) und das Feld `pid`, das immer
+denselben Wert wie `eventId` hat. Contao 5.7 berechnet den Zurück-Link, die Weiterleitung nach «Speichern und
+schliessen» und die Breadcrumb aus `ptable`/`pid`. Ohne `pid` landete man nach dem Bearbeiten einer Anmeldung auf der
+Liste aller Anmeldungen statt auf der Teilnehmerliste des Events.
+
+- Die Migration `EventRegistrationPidMigration` füllt `pid` mit `eventId` (nachdem `contao:migrate` die Spalte angelegt hat).
+- Neue Anmeldungen (online und im Backend) bekommen `pid` und `eventId` gesetzt.
+- `eventId` bleibt bestehen und wird weiterhin überall verwendet.
+- `tl_calendar_events_member` steht bewusst **nicht** in `tl_calendar_events.ctable`: Sonst würden beim Kopieren eines
+  Events auch dessen Anmeldungen kopiert.
+- Eigener Code, der Anmeldungen direkt in die Datenbank schreibt, muss neu auch `pid` setzen.
+
 ## SAC-Mitgliedernummer eindeutig in `tl_member` und `tl_user`
 
 `tl_member.sacMemberId` und `tl_user.sacMemberId` haben neu einen Unique-Index. Ein Unique-Index erlaubt `NULL`

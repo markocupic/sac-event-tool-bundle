@@ -140,6 +140,8 @@ class EventRegistrationCreator
         $data['contaoMemberId'] = $memberModel->id;
         $data['eventName'] = $eventModel->title;
         $data['eventId'] = $eventModel->id;
+        // Parent record (ptable tl_calendar_events), same value as eventId
+        $data['pid'] = $eventModel->id;
         $data['dateAdded'] = $now;
         $data['tstamp'] = $now;
         $data['uuid'] = $this->generateUuid();
