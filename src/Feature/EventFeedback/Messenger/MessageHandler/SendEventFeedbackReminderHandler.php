@@ -86,7 +86,7 @@ readonly class SendEventFeedbackReminderHandler
             return;
         }
 
-        $event = $this->framework->getAdapter(CalendarEventsModel::class)->findById($registration->eventId);
+        $event = $this->framework->getAdapter(CalendarEventsModel::class)->findById($registration->pid);
 
         if (null === $event) {
             return;

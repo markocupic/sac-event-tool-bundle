@@ -166,7 +166,7 @@ class EventStatsQuery
         foreach ($years as $year) {
             $qb = $this->createEventQuery($year, self::ADVERTISED_RELEASE_LEVELS, self::TOURS_AND_COURSES)
                 ->select('COUNT(m.id)')
-                ->innerJoin('t', 'tl_calendar_events_member', 'm', 'm.eventId = t.id')
+                ->innerJoin('t', 'tl_calendar_events_member', 'm', 'm.pid = t.id')
             ;
 
             if (null !== $stateOfSubscription) {
@@ -194,7 +194,7 @@ class EventStatsQuery
         foreach ($years as $year) {
             $participants = $this->createEventQuery($year, self::PUBLISHED_RELEASE_LEVELS, self::TOURS_AND_COURSES)
                 ->select('m.gender, m.dateOfBirth')
-                ->innerJoin('t', 'tl_calendar_events_member', 'm', 'm.eventId = t.id')
+                ->innerJoin('t', 'tl_calendar_events_member', 'm', 'm.pid = t.id')
                 ->andWhere('m.hasParticipated = 1')
                 ->fetchAllAssociative()
             ;

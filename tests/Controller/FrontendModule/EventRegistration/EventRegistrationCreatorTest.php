@@ -78,7 +78,6 @@ class EventRegistrationCreatorTest extends ContaoTestCase
         $this->assertSame(123456, $data['sacMemberId']);
         $this->assertSame('Hallo', $data['notes']);
         $this->assertSame(5, $data['contaoMemberId']);
-        $this->assertSame(1, $data['eventId']);
         $this->assertSame(1, $data['pid']);
         $this->assertSame('Testevent', $data['eventName']);
         $this->assertSame(self::NOW, $data['dateAdded']);

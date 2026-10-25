@@ -96,7 +96,7 @@ class PersonProvider
         $qb
             ->select('firstname', 'lastname', 'email')
             ->from('tl_calendar_events_member')
-            ->where('eventId = :eventId')
+            ->where('pid = :eventId')
             ->andWhere('stateOfSubscription = :state')
             ->andWhere('email != :emptyEmail')
             ->orderBy('lastname')

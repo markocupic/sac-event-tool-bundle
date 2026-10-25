@@ -207,7 +207,7 @@ class CalendarEventsMember
             return;
         }
 
-        $hasRegistrations = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$eventId], [Types::INTEGER]);
+        $hasRegistrations = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE pid = ?', [$eventId], [Types::INTEGER]);
 
         if (!$hasRegistrations) {
             unset($GLOBALS['TL_DCA'][self::TABLE]['list']['global_operations']['sendEmail']);
@@ -303,10 +303,10 @@ class CalendarEventsMember
         // Temporarily apply the changes to the registration model
         $registration->mergeRow($updatedFields);
 
-        $event = $this->calendarEvents->findById($registration->eventId);
+        $event = $this->calendarEvents->findById($registration->pid);
 
         if (null === $event) {
-            throw new \Exception(\sprintf('The event ID %d that is associated with the registration does not exist.', $registration->eventId));
+            throw new \Exception(\sprintf('The event ID %d that is associated with the registration does not exist.', $registration->pid));
         }
 
         if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED !== $registration->stateOfSubscription) {
@@ -430,7 +430,6 @@ class CalendarEventsMember
         $set = [
             'uuid' => Uuid::uuid4()->toString(),
             'pid' => $eventId,
-            'eventId' => $eventId,
             'dateAdded' => time(),
         ];
 
@@ -470,7 +469,7 @@ class CalendarEventsMember
         $dc->activeRecord->contaoMemberId = (int) $contaoMemberId;
 
         // Event title
-        $event = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events WHERE id = ?', [$dc->activeRecord->eventId], [Types::INTEGER]);
+        $event = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events WHERE id = ?', [$dc->activeRecord->pid], [Types::INTEGER]);
 
         if ($event) {
             $set['eventName'] = $event['title'];
@@ -546,7 +545,7 @@ class CalendarEventsMember
             return '';
         }
 
-        $event = $this->calendarEvents->findById($registration->eventId);
+        $event = $this->calendarEvents->findById($registration->pid);
 
         if (null === $event) {
             return '';
@@ -678,11 +677,11 @@ class CalendarEventsMember
      */
     private function notifyMemberOnSubscriptionStateChange(array $registration): void
     {
-        $calendarEvent = $this->calendarEvents->findById($registration['eventId']);
+        $calendarEvent = $this->calendarEvents->findById($registration['pid']);
 
         // The registration has already been saved, so do not throw an exception.
         if (null === $calendarEvent) {
-            $this->logFailedNotification($registration, new \RuntimeException(\sprintf('The event with ID %d does not exist.', $registration['eventId'])));
+            $this->logFailedNotification($registration, new \RuntimeException(\sprintf('The event with ID %d does not exist.', $registration['pid'])));
             $this->message->addError($this->translator->trans('ERR.participantCouldNotBeNotifiedAboutTheRegistrationStatusChange', [$registration['firstname'], $registration['lastname']], 'contao_default'));
 
             return;
@@ -752,7 +751,7 @@ class CalendarEventsMember
     private function writeParticipationStateChangeToContaoSystemLog(array $registration): void
     {
         // The registration has already been saved, so do not throw an exception
-        $calendarEvent = $this->calendarEvents->findById($registration['eventId']);
+        $calendarEvent = $this->calendarEvents->findById($registration['pid']);
 
         if ($registration['hasParticipated']) {
             $logText = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "unconfirmed" to "confirmed".';
@@ -763,7 +762,7 @@ class CalendarEventsMember
         }
 
         $this->contaoGeneralLogger?->info(
-            \sprintf($logText, $registration['firstname'], $registration['lastname'], $registration['sacMemberId'] ?? '0', $calendarEvent?->title ?? 'unknown event', $registration['eventId']),
+            \sprintf($logText, $registration['firstname'], $registration['lastname'], $registration['sacMemberId'] ?? '0', $calendarEvent?->title ?? 'unknown event', $registration['pid']),
             ['contao' => new ContaoContext(__METHOD__, $context)],
         );
     }

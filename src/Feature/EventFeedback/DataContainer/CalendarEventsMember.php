@@ -38,7 +38,7 @@ readonly class CalendarEventsMember
     public function onParticipationChange(mixed $value, DataContainer $dc): mixed
     {
         $registration = CalendarEventsMemberModel::findById($dc->id);
-        $event = null !== $registration ? CalendarEventsModel::findById($registration->eventId) : null;
+        $event = null !== $registration ? CalendarEventsModel::findById($registration->pid) : null;
 
         if (null === $event || true !== $this->eventFeedbackHelper->eventHasValidFeedbackConfiguration($event)) {
             return $value;

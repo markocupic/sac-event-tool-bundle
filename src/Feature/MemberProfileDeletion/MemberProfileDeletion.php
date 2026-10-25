@@ -155,7 +155,7 @@ class MemberProfileDeletion
         return $this->findRegistrationIds(
             $memberId,
             $sacMemberId,
-            'r.anonymized = 0 AND EXISTS (SELECT 1 FROM tl_calendar_events AS e WHERE e.id = r.eventId)',
+            'r.anonymized = 0 AND EXISTS (SELECT 1 FROM tl_calendar_events AS e WHERE e.id = r.pid)',
         );
     }
 
@@ -169,7 +169,7 @@ class MemberProfileDeletion
         return $this->findRegistrationIds(
             $memberId,
             $sacMemberId,
-            'NOT EXISTS (SELECT 1 FROM tl_calendar_events AS e WHERE e.id = r.eventId)',
+            'NOT EXISTS (SELECT 1 FROM tl_calendar_events AS e WHERE e.id = r.pid)',
         );
     }
 

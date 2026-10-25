@@ -127,7 +127,7 @@ class ParticipantEventHistoryController extends AbstractBackendController
             $name,
             $sacMemberId,
             $registrationId,
-            (int) $registration->eventId,
+            (int) $registration->pid,
         ));
 
         $years = ParticipantEventHistoryQuery::HISTORY_YEARS;
@@ -143,7 +143,7 @@ class ParticipantEventHistoryController extends AbstractBackendController
             'back_url' => $this->router->generate('contao_backend', [
                 'do' => 'calendar',
                 'table' => 'tl_calendar_events_member',
-                'id' => (int) $registration->eventId,
+                'id' => (int) $registration->pid,
             ]),
         ]);
     }

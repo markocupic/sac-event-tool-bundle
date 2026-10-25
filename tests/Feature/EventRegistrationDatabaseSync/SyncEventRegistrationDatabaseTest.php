@@ -96,7 +96,7 @@ final class SyncEventRegistrationDatabaseTest extends ContaoTestCase
         $sync = $this->createSync([
             $this->row(['id' => 1, 'member_id' => 7]),
             $this->row(['id' => 2, 'member_id' => 7, 'member_lastname' => 'Neu']),
-            $this->row(['id' => 3, 'member_id' => 8, 'eventId' => self::PAST_EVENT, 'member_foodHabits' => 'vegan']),
+            $this->row(['id' => 3, 'member_id' => 8, 'pid' => self::PAST_EVENT, 'member_foodHabits' => 'vegan']),
         ]);
 
         $log = $sync->run();
@@ -228,7 +228,7 @@ final class SyncEventRegistrationDatabaseTest extends ContaoTestCase
             'foodHabits' => '',
         ];
 
-        $row = ['id' => '1', 'eventId' => (string) self::UPCOMING_EVENT, 'member_id' => '7'];
+        $row = ['id' => '1', 'pid' => (string) self::UPCOMING_EVENT, 'member_id' => '7'];
 
         foreach ($data as $field => $value) {
             $row[$field] = $value;

@@ -123,7 +123,7 @@ class MemberDashboardMyEventRegistrationsController extends AbstractContentEleme
         return $qb
             ->select('e.id AS eventId', 'm.id AS regId')
             ->from('tl_calendar_events_member', 'm')
-            ->innerJoin('m', 'tl_calendar_events', 'e', 'e.id = m.eventId')
+            ->innerJoin('m', 'tl_calendar_events', 'e', 'e.id = m.pid')
             ->where('m.sacMemberId = :sacMemberId')
             ->andWhere('e.published = 1')
             ->andWhere('e.endDate >= :endDate')
@@ -147,7 +147,7 @@ class MemberDashboardMyEventRegistrationsController extends AbstractContentEleme
         $rows = $qb
             ->select('e.id AS eventId', 'm.id AS regId')
             ->from('tl_calendar_events_member', 'm')
-            ->innerJoin('m', 'tl_calendar_events', 'e', 'e.id = m.eventId')
+            ->innerJoin('m', 'tl_calendar_events', 'e', 'e.id = m.pid')
             ->where('m.sacMemberId = :sacMemberId')
             ->andWhere('e.published = 1')
             ->andWhere('e.endDate < :endDate')

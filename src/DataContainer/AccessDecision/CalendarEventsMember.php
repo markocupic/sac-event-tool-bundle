@@ -263,7 +263,7 @@ class CalendarEventsMember
     {
         $row = $operation->getRecord();
 
-        if (!$this->security->isGranted('ROLE_ADMIN') && !$this->canAdministerRegistrations($row['eventId'])) {
+        if (!$this->security->isGranted('ROLE_ADMIN') && !$this->canAdministerRegistrations($row['pid'])) {
             $operation->disable();
         }
     }
@@ -276,7 +276,7 @@ class CalendarEventsMember
     {
         $row = $operation->getRecord();
 
-        $isAllowed = $this->security->isGranted('ROLE_ADMIN') || ($this->canAdministerRegistrations($row['eventId']) && BookingType::MANUALLY === ($row['bookingType'] ?? null));
+        $isAllowed = $this->security->isGranted('ROLE_ADMIN') || ($this->canAdministerRegistrations($row['pid']) && BookingType::MANUALLY === ($row['bookingType'] ?? null));
 
         if (!$isAllowed) {
             $operation->disable();
@@ -297,7 +297,7 @@ class CalendarEventsMember
     {
         $row = $operation->getRecord();
 
-        if (!$this->security->isGranted('ROLE_ADMIN') && !$this->canAdministerRegistrations($row['eventId'])) {
+        if (!$this->security->isGranted('ROLE_ADMIN') && !$this->canAdministerRegistrations($row['pid'])) {
             $this->disableParticipationStateButton($operation, (bool) $row['hasParticipated'], 'MSC.participationStateNoPermission');
 
             return;
@@ -333,7 +333,7 @@ class CalendarEventsMember
     {
         $registration = $dc->getCurrentRecord();
 
-        if (null === $registration || !$this->canAdministerRegistrations($registration['eventId'])) {
+        if (null === $registration || !$this->canAdministerRegistrations($registration['pid'])) {
             return false;
         }
 
@@ -363,7 +363,7 @@ class CalendarEventsMember
 
         $isConfirmationAllowed = $registration['hasParticipated'] || \in_array($registration['stateOfSubscription'] ?? '', EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED, true);
 
-        if (!$isConfirmationAllowed || !$this->canAdministerRegistrations($registration['eventId'])) {
+        if (!$isConfirmationAllowed || !$this->canAdministerRegistrations($registration['pid'])) {
             return false;
         }
 
@@ -379,7 +379,7 @@ class CalendarEventsMember
     {
         $registration = $dc->getCurrentRecord();
 
-        if (null === $registration || !$this->canAdministerRegistrations($registration['eventId'])) {
+        if (null === $registration || !$this->canAdministerRegistrations($registration['pid'])) {
             return false;
         }
 

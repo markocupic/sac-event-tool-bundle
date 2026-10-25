@@ -143,7 +143,7 @@ final class SendEventFeedbackReminderHandlerTest extends ContaoTestCase
         $registration = $this->mockClassWithProperties(CalendarEventsMemberModel::class, [
             'id' => 12,
             'uuid' => 'abc-123',
-            'eventId' => 10,
+            'pid' => 10,
             'firstname' => 'Heidi',
             'lastname' => 'Muster',
             'email' => 'heidi@example.org',

@@ -56,7 +56,7 @@ class EventRegistrationUtil
             return '';
         }
 
-        $event = $this->framework->getAdapter(CalendarEventsModel::class)->findById($registrationModel->eventId);
+        $event = $this->framework->getAdapter(CalendarEventsModel::class)->findById($registrationModel->pid);
 
         if (null === $year) {
             if (null === $event || null === $event->startDate) {

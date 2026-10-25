@@ -52,7 +52,7 @@ class CalendarEventsMemberModel extends Model
         $database = System::getContainer()->get('database_connection');
 
         $eventReg = $database->fetchOne(
-            'SELECT * FROM '.static::$strTable.' WHERE eventId = ? AND sacMemberId = ?',
+            'SELECT * FROM '.static::$strTable.' WHERE pid = ? AND sacMemberId = ?',
             [
                 $eventId,
                 $objMember->sacMemberId,
@@ -81,7 +81,7 @@ class CalendarEventsMemberModel extends Model
         $database = System::getContainer()->get('database_connection');
 
         $id = $database->fetchOne(
-            'SELECT id FROM tl_calendar_events_member WHERE sacMemberId = ? AND eventId = ?',
+            'SELECT id FROM tl_calendar_events_member WHERE sacMemberId = ? AND pid = ?',
             [
                 $objMember->sacMemberId,
                 $eventModel->id,
@@ -135,7 +135,7 @@ class CalendarEventsMemberModel extends Model
         $eventIDS = [];
 
         if ($hasSacMemberId) {
-            $sql = 'SELECT eventId FROM tl_calendar_events_member WHERE sacMemberId = ?';
+            $sql = 'SELECT pid FROM tl_calendar_events_member WHERE sacMemberId = ?';
 
             if ($options['blnShowEventsWithParticipationOnly']) {
                 $sql .= ' AND hasParticipated = 1';
@@ -201,7 +201,7 @@ class CalendarEventsMemberModel extends Model
 
             foreach ($qb->fetchAllAssociative() as $arrEvent) {
                 $rowReg = $database->fetchAssociative(
-                    'SELECT * FROM tl_calendar_events_member WHERE sacMemberId = ? AND eventId = ?',
+                    'SELECT * FROM tl_calendar_events_member WHERE sacMemberId = ? AND pid = ?',
                     [
                         $objMember->sacMemberId,
                         $arrEvent['id'],
@@ -280,7 +280,7 @@ class CalendarEventsMemberModel extends Model
             $database = System::getContainer()->get('database_connection');
 
             $regCount = $database->fetchOne(
-                'SELECT COUNT(id) FROM tl_calendar_events_member WHERE id != ? AND eventId = ? AND stateOfSubscription = ?',
+                'SELECT COUNT(id) FROM tl_calendar_events_member WHERE id != ? AND pid = ? AND stateOfSubscription = ?',
                 [
                     $objMember->id,
                     $objEvent->id,

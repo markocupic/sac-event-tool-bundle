@@ -176,7 +176,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     $courseId = '';
                     $eventTitle = $registration->eventName;
 
-                    $calendarEvent = $registration->getRelated('eventId');
+                    $calendarEvent = $registration->getRelated('pid');
 
                     if (null !== $calendarEvent) {
                         $startDate = $dateAdapter->parse('Y', $calendarEvent->startDate);
@@ -220,7 +220,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     $phpWord->replace('lastname', htmlspecialchars(html_entity_decode((string) $member->lastname)));
                     $phpWord->replace('memberId', $member->sacMemberId);
                     $phpWord->replace('eventYear', $startDate);
-                    $phpWord->replace('eventId', htmlspecialchars(html_entity_decode((string) $registration->eventId)));
+                    $phpWord->replace('eventId', htmlspecialchars(html_entity_decode((string) $registration->pid)));
                     $phpWord->replace('eventName', $eventTitle);
                     $phpWord->replace('regId', $registration->id);
                     $phpWord->replace('courseId', $courseId);

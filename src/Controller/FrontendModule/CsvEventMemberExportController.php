@@ -134,7 +134,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                 }
             }
 
-            $members = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events_member WHERE eventId = ? ORDER BY lastname', [$event['id']]);
+            $members = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events_member WHERE pid = ? ORDER BY lastname', [$event['id']]);
 
             foreach ($members as $member) {
                 $records[] = $this->buildRecord($fields, $member);
@@ -209,7 +209,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
                 break;
             case 'organizers':
-                $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
+                $objEvent = $calendarEventsModel->findById($arrEventMember['pid']);
 
                 if (null !== $objEvent) {
                     $arrOrganizer = $this->calendarEventsUtil->getEventOrganizersAsArray($objEvent, 'title');
@@ -221,7 +221,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
                 break;
             case 'startDate':
-                $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
+                $objEvent = $calendarEventsModel->findById($arrEventMember['pid']);
 
                 if (null !== $objEvent) {
                     $value = $date->parse('Y-m-d', $objEvent->startDate);
@@ -229,7 +229,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
                 break;
             case 'endDate':
-                $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
+                $objEvent = $calendarEventsModel->findById($arrEventMember['pid']);
 
                 if (null !== $objEvent) {
                     $value = $date->parse('Y-m-d', $objEvent->endDate);
@@ -239,7 +239,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
             case 'executionState':
             case 'eventState':
                 $this->getContaoAdapter(Controller::class)->loadLanguageFile('tl_calendar_events');
-                $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
+                $objEvent = $calendarEventsModel->findById($arrEventMember['pid']);
 
                 if (null !== $objEvent) {
                     $value = $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] ?? $objEvent->$field;
@@ -247,7 +247,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
                 break;
             case 'mainInstructor':
-                $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
+                $objEvent = $calendarEventsModel->findById($arrEventMember['pid']);
 
                 if (null !== $objEvent) {
                     $value = $this->calendarEventsUtil->getMainInstructorName($objEvent);
@@ -255,7 +255,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
                 break;
             case 'mountainguide':
-                $objEvent = $calendarEventsModel->findById($arrEventMember['eventId']);
+                $objEvent = $calendarEventsModel->findById($arrEventMember['pid']);
 
                 if (null !== $objEvent) {
                     $value = $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][$objEvent->$field];

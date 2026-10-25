@@ -139,8 +139,7 @@ class EventRegistrationCreator
 
         $data['contaoMemberId'] = $memberModel->id;
         $data['eventName'] = $eventModel->title;
-        $data['eventId'] = $eventModel->id;
-        // Parent record (ptable tl_calendar_events), same value as eventId
+        // Parent record (ptable tl_calendar_events)
         $data['pid'] = $eventModel->id;
         $data['dateAdded'] = $now;
         $data['tstamp'] = $now;
@@ -149,7 +148,7 @@ class EventRegistrationCreator
         $data['bookingType'] = BookingType::ONLINE_FORM;
         $data['sectionId'] = $memberModel->sectionId;
         // tl_member.sacMemberId is NULL if the member has no SAC member id; the registration stores 0
-        $data['sacMemberId'] = (int) $memberModel->sacMemberId;
+        $data['sacMemberId'] = (int) ($data['sacMemberId'] ?? 0);
 
         return $data;
     }

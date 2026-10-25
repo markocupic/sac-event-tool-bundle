@@ -138,7 +138,7 @@ class EventDeregistrationController extends AbstractFrontendModuleController
             \sprintf(
                 'User with SAC-Member-ID %d has unsubscribed himself from event with ID: %d ("%s")',
                 $registration->sacMemberId,
-                $registration->eventId,
+                $registration->pid,
                 $registration->eventName,
             ),
             ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)],
@@ -165,7 +165,7 @@ class EventDeregistrationController extends AbstractFrontendModuleController
         $regId = (int) $request->query->get('regId');
 
         $registration = CalendarEventsMemberModel::findById($regId);
-        $calendarEvent = CalendarEventsModel::findById($registration?->eventId);
+        $calendarEvent = CalendarEventsModel::findById($registration?->pid);
         $user = MemberModel::findById($this->user->id);
 
         $template->set('user', $user->row());
@@ -262,7 +262,7 @@ class EventDeregistrationController extends AbstractFrontendModuleController
             throw new EventDeregistrationException('User just has successfully unsubscribed from event.', 'info', 'MSC.evt_dereg_success', [$this->user->firstname, $deregSuccessToken['event']['title']]);
         }
 
-        $calendarEvent = $registration?->getRelated('eventId');
+        $calendarEvent = $registration?->getRelated('pid');
 
         if (null === $registration) {
             throw new EventDeregistrationException(\sprintf('Could not find a registration with ID %d.', $regId), 'error', 'MSC.evt_dereg_regNotFound', [$this->user->firstname, $regId]);
@@ -339,7 +339,7 @@ class EventDeregistrationController extends AbstractFrontendModuleController
             $shouldDelete = true;
         }
 
-        $calendarEvent = $registration->getRelated('eventId');
+        $calendarEvent = $registration->getRelated('pid');
 
         // Unregister from the event
         $registration->stateOfSubscription = EventSubscriptionState::USER_HAS_UNSUBSCRIBED;
@@ -375,7 +375,7 @@ class EventDeregistrationController extends AbstractFrontendModuleController
             \sprintf(
                 'User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s").%s',
                 $registration->sacMemberId,
-                $registration->eventId,
+                $registration->pid,
                 $registration->eventName,
                 $event->shouldDelete() ? ' The data record was deleted.' : '',
             ),

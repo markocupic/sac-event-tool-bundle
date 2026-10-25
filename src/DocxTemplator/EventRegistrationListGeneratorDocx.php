@@ -63,7 +63,7 @@ class EventRegistrationListGeneratorDocx
     {
         $objEventMember = $this->calendarEventsMemberModelAdapter->findBy(
             [
-                'tl_calendar_events_member.eventId = ?',
+                'tl_calendar_events_member.pid = ?',
                 'tl_calendar_events_member.stateOfSubscription = ?',
             ],
             [

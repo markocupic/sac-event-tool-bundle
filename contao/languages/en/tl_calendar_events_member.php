@@ -47,7 +47,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['deregistration_legend'] = 'Eve
 
 // Fields
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['uuid'] = ['Registrierungs-UUID', 'Geben Sie hier die Registrierungs-UUID ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['eventId'] = ['Event-ID', 'Geben Sie hier die Event-ID ein.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['pid'] = ['Event-ID', 'ID des Events, zu dem die Anmeldung gehört.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['hasParticipated'] = ['Hat am Event teilgenommen', 'Geben Sie hier abschliessend an, ob der Teilnehmer auch tatsächlich am Event teilgenommen hat. (Erst nach Eventende einstellen!)'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['stateOfSubscription'] = ['Anmeldestatus', 'Geben Sie hier den Anmeldestatus ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['dateAdded'] = ['Anmeldedatum', 'Geben Sie hier das Anmeldedatum ein.'];

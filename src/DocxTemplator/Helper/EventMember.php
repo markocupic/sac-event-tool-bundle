@@ -232,7 +232,7 @@ readonly class EventMember
                 // Only participants of the event and a subscription state
                 // that allows confirming the participation (accepted or waiting list, see EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED)
                 // and hasParticipated = 1 are allowed.
-                'tl_calendar_events_member.eventId=?',
+                'tl_calendar_events_member.pid=?',
                 'tl_calendar_events_member.hasParticipated=?',
                 'tl_calendar_events_member.stateOfSubscription IN ('.implode(',', array_fill(0, \count($allowedStates), '?')).')',
             ],

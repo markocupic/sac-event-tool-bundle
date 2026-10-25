@@ -85,7 +85,7 @@ class EventRegistrationCleanupCommand extends Command
         $io->table(self::HEADERS, array_map(
             static fn (array $registration): array => [
                 $registration['id'],
-                $registration['eventId'],
+                $registration['pid'],
                 StringUtil::revertInputEncoding((string) $registration['eventName']),
                 trim($registration['firstname'].' '.$registration['lastname']),
                 $registration['sacMemberId'],

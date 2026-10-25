@@ -144,7 +144,7 @@ class EventRegistrationListGeneratorCsv
     private function fetchRegistrations(int $eventId): array
     {
         return $this->connection->fetchAllAssociative(
-            'SELECT * FROM tl_calendar_events_member WHERE eventId = ? ORDER BY lastname, firstname',
+            'SELECT * FROM tl_calendar_events_member WHERE pid = ? ORDER BY lastname, firstname',
             [$eventId],
         );
     }

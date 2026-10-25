@@ -259,7 +259,7 @@ class MyEventsDashboardController
         $operation = [];
         $operation['icon_class'] = 'fa-solid fa-fw fa-at';
 
-        $regId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$event->id]);
+        $regId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE pid = ?', [$event->id]);
 
         if ($regId) {
             $url = System::getContainer()->get('router')->generate(EventParticipantEmailController::class);

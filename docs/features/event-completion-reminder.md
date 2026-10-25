@@ -40,7 +40,7 @@ Gerechnet wird in ganzen Kalendertagen, die Zeitumstellung hat keinen Einfluss. 
 
 Bei `generalEvent` wird nur die Teilnahmebestätigung verlangt: Das Backend bietet den Tourrapport-Button (Teilnehmerliste, Event-Dashboard, «Meine Events») nur bei Touren an.
 
-Für die Teilnahme-Aufgabe zählen nur Anmeldungen in `tl_calendar_events_member` mit `eventId = event.id` und dem Status `subscription-accepted` **oder** `subscription-on-waiting-list` (`EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED`):
+Für die Teilnahme-Aufgabe zählen nur Anmeldungen in `tl_calendar_events_member` mit `pid = event.id` und dem Status `subscription-accepted` **oder** `subscription-on-waiting-list` (`EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED`):
 - Die Aufgabe existiert nur, wenn es mindestens eine solche Anmeldung gibt.
 - Die Aufgabe ist erledigt, sobald mindestens eine dieser Anmeldungen `hasParticipated = 1` hat.
 - Auch ein Event, das nur Wartelisten-Anmeldungen hat, löst eine Erinnerung aus, solange keine dieser Anmeldungen `hasParticipated = 1` hat.

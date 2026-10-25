@@ -99,7 +99,7 @@ readonly class EventFeedbackBackendController
 
         $template->replace('date', date('d.m.Y'));
         $template->replace('count_fb', (string) $summary->countFeedbacks());
-        $template->replace('count_reg', (string) CalendarEventsMemberModel::countBy(['hasParticipated = ?', 'eventId = ?'], ['1', $event->id]));
+        $template->replace('count_reg', (string) CalendarEventsMemberModel::countBy(['hasParticipated = ?', 'pid = ?'], ['1', $event->id]));
 
         foreach ($summary->getChoiceFields() as $field) {
             $text = '';

@@ -253,7 +253,7 @@ readonly class Event
         $carTaxes = 0;
 
         if ($objEventInvoice->countCars > 0 && $objEventInvoice->carTaxesKm > 0) {
-            $resEventMember = $this->connection->fetchOne('SELECT * FROM tl_calendar_events_member WHERE eventId = ? AND hasParticipated = ?', [$objEvent->id, 1], [Types::INTEGER, Types::INTEGER]);
+            $resEventMember = $this->connection->fetchOne('SELECT * FROM tl_calendar_events_member WHERE pid = ? AND hasParticipated = ?', [$objEvent->id, 1], [Types::INTEGER, Types::INTEGER]);
 
             if (false !== $resEventMember) {
                 // ((CHF 0.60 x AnzKm + Park-/Strassen-/Tunnelgebühren) x AnzAutos) : AnzPersonen

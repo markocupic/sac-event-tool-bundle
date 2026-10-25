@@ -84,7 +84,7 @@ class EventReminderCron
                 ->andWhere('EXISTS (
 					SELECT 1
 					FROM tl_calendar_events_member m
-					WHERE m.eventId = e.id
+					WHERE m.pid = e.id
 					  AND m.stateOfSubscription = :state
 				)')
                 ->setParameter('pid', $calendar['id'])

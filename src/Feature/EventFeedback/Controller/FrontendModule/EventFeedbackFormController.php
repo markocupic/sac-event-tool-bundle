@@ -87,7 +87,7 @@ class EventFeedbackFormController extends AbstractFrontendModuleController
             return $this->warning($template, 'invalidUuidForLoggedInUser');
         }
 
-        $event = CalendarEventsModel::findById($registration->eventId);
+        $event = CalendarEventsModel::findById($registration->pid);
 
         if (null === $event) {
             return $this->warning($template, 'eventMatchingUuidNotFound');

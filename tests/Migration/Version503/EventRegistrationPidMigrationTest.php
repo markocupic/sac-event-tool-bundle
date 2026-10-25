@@ -46,9 +46,20 @@ final class EventRegistrationPidMigrationTest extends TestCase
         $this->assertFalse((new EventRegistrationPidMigration($connection))->shouldRun());
     }
 
-    public function testDoesNotRunWithoutPidColumn(): void
+    public function testRunsWithoutPidColumn(): void
     {
         $connection = $this->createConnection(['eventid']);
+        $connection
+            ->expects($this->never())
+            ->method('fetchOne')
+        ;
+
+        $this->assertTrue((new EventRegistrationPidMigration($connection))->shouldRun());
+    }
+
+    public function testDoesNotRunWhenEventIdHasBeenDropped(): void
+    {
+        $connection = $this->createConnection(['pid']);
         $connection
             ->expects($this->never())
             ->method('fetchOne')
@@ -76,6 +87,35 @@ final class EventRegistrationPidMigrationTest extends TestCase
 
         $this->assertTrue($result->isSuccessful());
         $this->assertStringContainsString('5 registration(s)', $result->getMessage());
+    }
+
+    public function testAddsThePidColumnBeforeCopying(): void
+    {
+        $connection = $this->createConnection(['eventid']);
+
+        $statements = [];
+
+        $connection
+            ->method('executeStatement')
+            ->willReturnCallback(
+                static function (string $sql) use (&$statements): int {
+                    $statements[] = $sql;
+
+                    return 3;
+                },
+            )
+        ;
+
+        $result = (new EventRegistrationPidMigration($connection))->run();
+
+        $this->assertTrue($result->isSuccessful());
+        $this->assertSame(
+            [
+                'ALTER TABLE tl_calendar_events_member ADD pid INT UNSIGNED DEFAULT 0 NOT NULL',
+                'UPDATE tl_calendar_events_member SET pid = eventId WHERE pid <> eventId',
+            ],
+            $statements,
+        );
     }
 
     /**

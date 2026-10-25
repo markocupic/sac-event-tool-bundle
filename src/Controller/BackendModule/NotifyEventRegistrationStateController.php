@@ -146,7 +146,7 @@ class NotifyEventRegistrationStateController
             $this->controller->redirect($this->getErrorUri());
         }
 
-        $this->event = $this->calendarEvents->findById($this->registration->eventId);
+        $this->event = $this->calendarEvents->findById($this->registration->pid);
 
         if (null === $this->event) {
             $this->message->addError('Es wurde kein zur Registrierung gehörender Event gefunden.');

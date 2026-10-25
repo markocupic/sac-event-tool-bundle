@@ -26,9 +26,9 @@ System::loadLanguageFile('tl_member');
 $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 	'config'      => [
 		'dataContainer'    => DC_Table::class,
-		// Parent table (pid = eventId), required by Contao 5.7 for the back link, the
-		// "save and close" redirect and the breadcrumb (DcaUrlAnalyzer). Do NOT add this
-		// table to tl_calendar_events.ctable: copying an event would copy its registrations.
+		// Parent table: pid is the event (tl_calendar_events.id). Contao 5.7 builds the back link,
+		// the "save and close" redirect and the breadcrumb from ptable/pid (DcaUrlAnalyzer).
+		// Do NOT add this table to tl_calendar_events.ctable: copying an event would copy its registrations.
 		'ptable'           => 'tl_calendar_events',
 		'ctable'           => [
 			'tl_event_feedback_reminder',
@@ -39,7 +39,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'keys' => [
 				'id'            => 'primary',
 				'pid'           => 'index',
-				'email,eventId' => 'index',
+				'email,pid'     => 'index',
 				'sacMemberId'   => 'index',
 			],
 		],
@@ -50,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'fields'      => ['stateOfSubscription', 'dateAdded', 'lastname', 'firstname'],
 			'flag'        => DataContainer::SORT_INITIAL_LETTER_ASC,
 			'panelLayout' => 'filter;sort,search',
-			'filter'      => [['eventId=?', Input::get('id')]],
+			'filter'      => [['pid=?', Input::get('id')]],
 		],
 		'label'             => [
 			// The field J+S/Jugend does not exist and is only used to show the age group of the member
@@ -167,15 +167,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 			'eval'       => ['readonly' => true],
 		],
-		// Same value as eventId (see ptable). Set when the registration is created and
-		// filled for existing registrations by the EventRegistrationPidMigration.
+		// The event (tl_calendar_events.id), see ptable. Replaces the former column eventId
+		// (see EventRegistrationPidMigration).
 		'pid'                                   => [
-			'foreignKey' => 'tl_calendar_events.title',
-			'sql'        => "int(10) unsigned NOT NULL default 0",
-			'relation'   => ['type' => 'belongsTo', 'load' => 'lazy'],
-		],
-		'eventId'                               => [
-			'exclude'    => true,
 			'foreignKey' => 'tl_calendar_events.title',
 			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],

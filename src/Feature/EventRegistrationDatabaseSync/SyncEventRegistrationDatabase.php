@@ -199,7 +199,7 @@ class SyncEventRegistrationDatabase
                 ++$this->syncLog['processed_registrations'];
                 $memberIds[(int) $row['member_id']] = true;
 
-                $set = $this->getChangedFields($row, isset($upcomingEventIds[(int) $row['eventId']]));
+                $set = $this->getChangedFields($row, isset($upcomingEventIds[(int) $row['pid']]));
 
                 if ([] === $set) {
                     continue;
@@ -237,7 +237,7 @@ class SyncEventRegistrationDatabase
     {
         $fields = [...self::FIELDS_ALWAYS, self::FIELD_SAC_MEMBER_ID, ...self::FIELDS_IF_NOT_EMPTY, ...self::FIELDS_UPCOMING_EVENTS_ONLY];
 
-        $columns = ['r.id', 'r.eventId', 'm.id AS member_id'];
+        $columns = ['r.id', 'r.pid', 'm.id AS member_id'];
 
         foreach ($fields as $field) {
             $columns[] = 'r.'.$field;

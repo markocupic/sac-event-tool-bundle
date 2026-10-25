@@ -46,7 +46,7 @@ class EventFeedbackRemindersCommand extends Command
             'SELECT r.executionDate, r.expiration, m.firstname, m.lastname, m.sacMemberId, e.id AS eventId, e.title
             FROM tl_event_feedback_reminder r
             LEFT JOIN tl_calendar_events_member m ON m.id = r.pid
-            LEFT JOIN tl_calendar_events e ON e.id = m.eventId
+            LEFT JOIN tl_calendar_events e ON e.id = m.pid
             WHERE r.dispatched = 0 AND r.expiration > ?
             ORDER BY r.executionDate, r.id',
             [time()],

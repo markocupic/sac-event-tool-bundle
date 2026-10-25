@@ -11,7 +11,7 @@ Räumt die Event-Anmeldungen (`tl_calendar_events_member`) einmal täglich auf: 
 
 ### 1. Anmeldungen zu gelöschten Events löschen
 
-Ausgewählt werden alle Anmeldungen (`findRegistrationsOfDeletedEvents()`), die gespeichert sind (`tstamp > 0`) und deren Event (`eventId`) nicht mehr in `tl_calendar_events` existiert, **mit oder ohne SAC-Nummer**.
+Ausgewählt werden alle Anmeldungen (`findRegistrationsOfDeletedEvents()`), die gespeichert sind (`tstamp > 0`) und deren Event (`pid`) nicht mehr in `tl_calendar_events` existiert, **mit oder ohne SAC-Nummer**.
 
 Grund: Wird ein Event gelöscht, gehören auch seine Anmeldungen weg. Die Tour-History im Mitglieder-Dashboard zeigt Anmeldungen zu gelöschten Events ohnehin nicht mehr an (`CalendarEventsMemberModel::findEventsByMemberId()` lädt die Events aus `tl_calendar_events`).
 

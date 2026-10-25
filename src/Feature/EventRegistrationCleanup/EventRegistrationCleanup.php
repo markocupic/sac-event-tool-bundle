@@ -27,7 +27,7 @@ use Markocupic\SacEventToolBundle\Feature\MemberProfileDeletion\EventRegistratio
  */
 class EventRegistrationCleanup
 {
-    private const string COLUMNS = 'r.id, r.eventId, r.eventName, r.firstname, r.lastname, r.sacMemberId, r.contaoMemberId';
+    private const string COLUMNS = 'r.id, r.pid, r.eventName, r.firstname, r.lastname, r.sacMemberId, r.contaoMemberId';
 
     public function __construct(
         private readonly Connection $connection,
@@ -80,7 +80,7 @@ class EventRegistrationCleanup
                 AND (r.contaoMemberId > 0 OR r.sacMemberId > 0)
                 AND NOT EXISTS (SELECT 1 FROM tl_member AS m WHERE m.id = r.contaoMemberId)
                 AND NOT (r.sacMemberId > 0 AND EXISTS (SELECT 1 FROM tl_member AS m WHERE m.sacMemberId = r.sacMemberId))
-                AND EXISTS (SELECT 1 FROM tl_calendar_events AS e WHERE e.id = r.eventId)
+                AND EXISTS (SELECT 1 FROM tl_calendar_events AS e WHERE e.id = r.pid)
             ORDER BY r.id',
         );
     }
@@ -96,7 +96,7 @@ class EventRegistrationCleanup
             'SELECT '.self::COLUMNS.'
             FROM tl_calendar_events_member AS r
             WHERE r.tstamp > 0
-                AND NOT EXISTS (SELECT 1 FROM tl_calendar_events AS e WHERE e.id = r.eventId)
+                AND NOT EXISTS (SELECT 1 FROM tl_calendar_events AS e WHERE e.id = r.pid)
             ORDER BY r.id',
         );
     }

@@ -62,7 +62,7 @@ class ParticipantEventHistoryQuery
         $qb
             ->select('DISTINCT e.id', 'e.startDate')
             ->from('tl_calendar_events', 'e')
-            ->innerJoin('e', 'tl_calendar_events_member', 'm', 'm.eventId = e.id')
+            ->innerJoin('e', 'tl_calendar_events_member', 'm', 'm.pid = e.id')
             ->where('m.sacMemberId = :sacMemberId')
             ->andWhere('m.hasParticipated = 1')
             ->andWhere('e.published = 1')

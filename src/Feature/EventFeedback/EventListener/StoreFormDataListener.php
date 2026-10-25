@@ -71,7 +71,7 @@ readonly class StoreFormDataListener
 
         $data['form'] = $form->id;
         $data['uuid'] = $registration->uuid;
-        $data['pid'] = $registration->eventId;
+        $data['pid'] = $registration->pid;
         $data['dateAdded'] = time();
         $data['tstamp'] = time();
 

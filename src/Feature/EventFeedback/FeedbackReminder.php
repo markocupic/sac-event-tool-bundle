@@ -107,7 +107,7 @@ class FeedbackReminder
             'SELECT r.id, r.executionDate, c.onlineFeedbackConfiguration AS configuration
             FROM '.self::TABLE.' r
             LEFT JOIN tl_calendar_events_member m ON m.id = r.pid
-            LEFT JOIN tl_calendar_events e ON e.id = m.eventId
+            LEFT JOIN tl_calendar_events e ON e.id = m.pid
             LEFT JOIN tl_calendar c ON c.id = e.pid
             WHERE r.dispatched = 0 AND r.expiration > ? AND r.executionDate <= ?
             ORDER BY r.executionDate, r.id

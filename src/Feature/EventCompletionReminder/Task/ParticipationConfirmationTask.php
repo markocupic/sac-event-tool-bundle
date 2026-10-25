@@ -61,7 +61,7 @@ class ParticipationConfirmationTask implements PostEventTaskInterface
         $row = $this->connection->fetchAssociative(
             'SELECT COUNT(id) AS registrations, COALESCE(SUM(hasParticipated = 1), 0) AS confirmed
             FROM tl_calendar_events_member
-            WHERE eventId = ? AND stateOfSubscription IN (?)',
+            WHERE pid = ? AND stateOfSubscription IN (?)',
             [(int) $event->id, EventSubscriptionState::PARTICIPATION_CONFIRMATION_ALLOWED],
             [ParameterType::INTEGER, ArrayParameterType::STRING],
         );

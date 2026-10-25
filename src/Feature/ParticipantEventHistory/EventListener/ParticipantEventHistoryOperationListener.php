@@ -87,7 +87,7 @@ class ParticipantEventHistoryOperationListener
             return $this->translator->trans('MSC.participantEventHistoryNoSacMemberId', [], 'contao_default');
         }
 
-        $event = $this->calendarEventsModel->findById((int) $registration['eventId']);
+        $event = $this->calendarEventsModel->findById((int) $registration['pid']);
 
         // The user has the permission, but the access period has expired
         if (null !== $event && $this->security->isGranted(CalendarEventsVoter::CAN_VIEW_PARTICIPANT_EVENT_HISTORY, (int) $event->id)) {

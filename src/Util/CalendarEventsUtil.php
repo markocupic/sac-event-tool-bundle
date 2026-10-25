@@ -956,7 +956,7 @@ class CalendarEventsUtil
     {
         $this->framework->initialize();
 
-        $registrations = $this->getAdapter(CalendarEventsMemberModel::class)->findByEventId($event->id);
+        $registrations = $this->getAdapter(CalendarEventsMemberModel::class)->findByPid($event->id);
 
         if (null === $registrations) {
             return '';
@@ -1026,7 +1026,7 @@ class CalendarEventsUtil
 
         // The other events the member is registered for and has not participated yet
         $registrations = $this->connection->fetchAllAssociative(
-            'SELECT * FROM tl_calendar_events_member WHERE eventId != ? AND contaoMemberId = ? AND stateOfSubscription = ? AND hasParticipated = ?',
+            'SELECT * FROM tl_calendar_events_member WHERE pid != ? AND contaoMemberId = ? AND stateOfSubscription = ? AND hasParticipated = ?',
             [$event->id, $member->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED, 0],
             [Types::INTEGER, Types::INTEGER, Types::STRING, Types::INTEGER],
         );
@@ -1034,7 +1034,7 @@ class CalendarEventsUtil
         $calendarEventsModel = $this->getAdapter(CalendarEventsModel::class);
 
         foreach ($registrations as $registration) {
-            $otherEvent = $calendarEventsModel->findById($registration['eventId']);
+            $otherEvent = $calendarEventsModel->findById($registration['pid']);
 
             if (null === $otherEvent) {
                 continue;
@@ -1371,7 +1371,7 @@ class CalendarEventsUtil
     private function countAcceptedRegistrations(CalendarEventsModel $event): mixed
     {
         return $this->connection->fetchOne(
-            'SELECT COUNT(id) FROM tl_calendar_events_member WHERE eventId = ? AND stateOfSubscription = ?',
+            'SELECT COUNT(id) FROM tl_calendar_events_member WHERE pid = ? AND stateOfSubscription = ?',
             [$event->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED],
             [Types::INTEGER, Types::STRING],
         );

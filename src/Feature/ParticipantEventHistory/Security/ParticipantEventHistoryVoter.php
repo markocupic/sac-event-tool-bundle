@@ -73,7 +73,7 @@ class ParticipantEventHistoryVoter extends Voter
             return true;
         }
 
-        $event = $this->calendarEventsModel->findById((int) $registration->eventId);
+        $event = $this->calendarEventsModel->findById((int) $registration->pid);
 
         if (null === $event) {
             return false;

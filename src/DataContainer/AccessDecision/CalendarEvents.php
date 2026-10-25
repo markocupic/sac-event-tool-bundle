@@ -526,7 +526,7 @@ class CalendarEvents
 
     private function hasRegistrations(int|string|null $eventId): bool
     {
-        return (bool) $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$eventId]);
+        return (bool) $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE pid = ?', [$eventId]);
     }
 
     /**

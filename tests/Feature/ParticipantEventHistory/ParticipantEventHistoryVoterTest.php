@@ -91,7 +91,7 @@ final class ParticipantEventHistoryVoterTest extends ContaoTestCase
 
         $registration = $this->mockClassWithProperties(CalendarEventsMemberModel::class, [
             'id' => 1,
-            'eventId' => 5,
+            'pid' => 5,
             'sacMemberId' => $sacMemberId,
         ]);
 

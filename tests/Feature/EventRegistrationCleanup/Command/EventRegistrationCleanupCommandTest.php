@@ -30,7 +30,7 @@ final class EventRegistrationCleanupCommandTest extends ContaoTestCase
             ->method('run')
             ->with(true)
             ->willReturn([
-                'anonymized' => [['id' => '1', 'eventId' => '10', 'eventName' => 'Skitour &#40;Pilatus&#41;', 'firstname' => 'Anna', 'lastname' => 'Muster', 'sacMemberId' => '123456', 'contaoMemberId' => '0']],
+                'anonymized' => [['id' => '1', 'pid' => '10', 'eventName' => 'Skitour &#40;Pilatus&#41;', 'firstname' => 'Anna', 'lastname' => 'Muster', 'sacMemberId' => '123456', 'contaoMemberId' => '0']],
                 'deleted' => [],
             ])
         ;

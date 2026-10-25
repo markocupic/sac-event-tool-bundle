@@ -165,7 +165,7 @@ class PendingRegistrationProvider
         return $this->connection->fetchAllAssociative(
             "SELECT firstname, lastname, gender, sacMemberId, dateAdded
             FROM tl_calendar_events_member
-            WHERE eventId = ? AND stateOfSubscription = ? AND dateAdded <= ?
+            WHERE pid = ? AND stateOfSubscription = ? AND dateAdded <= ?
                 AND firstname != '' AND lastname != '' AND gender != '' AND street != '' AND postal != '' AND city != ''
             ORDER BY dateAdded, id",
             [$eventId, EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED, $now],

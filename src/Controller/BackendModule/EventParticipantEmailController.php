@@ -540,7 +540,7 @@ class EventParticipantEmailController extends AbstractBackendController
         // Get the event participants
         $stmt = $this->connection
             ->executeQuery(
-                'SELECT * FROM tl_calendar_events_member WHERE eventId = ? ORDER BY stateOfSubscription, firstname',
+                'SELECT * FROM tl_calendar_events_member WHERE pid = ? ORDER BY stateOfSubscription, firstname',
                 [
                     $this->event->id,
                 ],

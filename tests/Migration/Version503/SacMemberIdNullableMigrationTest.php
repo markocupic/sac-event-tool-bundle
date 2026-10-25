@@ -33,7 +33,10 @@ final class SacMemberIdNullableMigrationTest extends TestCase
     public function testRunsWhileTheColumnStillContainsZero(): void
     {
         $connection = $this->createConnection(notNull: false);
-        $connection->method('fetchOne')->willReturn(42);
+        $connection
+            ->method('fetchOne')
+            ->willReturn(42)
+        ;
 
         $this->assertTrue((new SacMemberIdNullableMigration($connection))->shouldRun());
     }
@@ -41,7 +44,10 @@ final class SacMemberIdNullableMigrationTest extends TestCase
     public function testDoesNotRunWhenNullableAndWithoutZero(): void
     {
         $connection = $this->createConnection(notNull: false);
-        $connection->method('fetchOne')->willReturn(false);
+        $connection
+            ->method('fetchOne')
+            ->willReturn(false)
+        ;
 
         $this->assertFalse((new SacMemberIdNullableMigration($connection))->shouldRun());
     }
@@ -54,7 +60,10 @@ final class SacMemberIdNullableMigrationTest extends TestCase
     public function testConvertsBothTablesAndReplacesZeroByNull(): void
     {
         $connection = $this->createConnection(notNull: true);
-        $connection->method('fetchAllAssociative')->willReturn([]);
+        $connection
+            ->method('fetchAllAssociative')
+            ->willReturn([])
+        ;
 
         $statements = [];
 
@@ -86,7 +95,11 @@ final class SacMemberIdNullableMigrationTest extends TestCase
     public function testListsDuplicatesAndFails(): void
     {
         $connection = $this->createConnection(notNull: true);
-        $connection->method('executeStatement')->willReturn(0);
+        $connection
+            ->method('executeStatement')
+            ->willReturn(0)
+        ;
+
         $connection
             ->method('fetchAllAssociative')
             ->with($this->stringContains('HAVING COUNT(id) > 1'))
