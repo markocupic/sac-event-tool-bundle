@@ -47,6 +47,15 @@ class BackendAssetsSubscriber implements EventSubscriberInterface
             // Stimulus
             $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('stimulus_backend.js', 'markocupic_sac_event_tool');
 
+            // MultiColumnWizard (menatwork/contao-multicolumnwizard-bundle): the bundle adds its assets
+            // in the "initializeSystem" hook. Under Contao 5.7 these entries can get lost (TL_JAVASCRIPT
+            // and TL_CSS are backed up at the end of kernel.request by the LegacyGlobalsBackupListener and
+            // restored later), which results in "MultiColumnWizard is not defined". This listener runs
+            // between routing and the backup, so the assets are always there. Same keys as the bundle,
+            // therefore nothing is loaded twice.
+            $GLOBALS['TL_JAVASCRIPT']['multicolumnwizard'] = 'bundles/multicolumnwizard/js/multicolumnwizard_be.js';
+            $GLOBALS['TL_CSS']['multicolumnwizard'] = 'bundles/multicolumnwizard/css/multicolumnwizard.css';
+
             // Field selection helper (Stimulus controller "sacevt--backend--edit-all-navbar-helper")
             // on the field selection page of the "editAll" and "overrideAll" mode.
             // TL_MOOTOOLS is rendered inside <body> (Contao 5.3, 5.7 and 6), so Turbo
