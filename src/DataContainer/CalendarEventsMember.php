@@ -656,6 +656,7 @@ class CalendarEventsMember
         $href = $this->urlParser->addQueryString('eventId='.$request->query->get('id'), $href);
         $href = $this->urlParser->addQueryString('rt='.$this->contaoCsrfTokenManager->getDefaultTokenValue(), $href);
         $href = $this->urlParser->addQueryString('sid='.uniqid(), $href);
+        $href = $this->urlParser->addQueryString('back='.rawurlencode($request->getRequestUri()), $href);
 
         return $this->uriSigner->sign($href);
     }

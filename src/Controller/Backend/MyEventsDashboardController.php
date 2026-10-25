@@ -267,6 +267,7 @@ class MyEventsDashboardController
             $url = $this->urlParser->addQueryString('eventId='.$event->id, $url);
             $url = $this->urlParser->addQueryString('rt='.$this->contaoCsrfTokenManager->getDefaultTokenValue(), $url);
             $url = $this->urlParser->addQueryString('sid='.uniqid(), $url);
+            $url = $this->urlParser->addQueryString('back='.rawurlencode($this->requestStack->getCurrentRequest()->getRequestUri()), $url);
 
             $operation['href'] = $this->uriSigner->sign($url);
             $operation['link_attributes'] = [

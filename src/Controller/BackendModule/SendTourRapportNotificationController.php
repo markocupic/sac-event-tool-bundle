@@ -124,7 +124,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
         // Will throw an exception if the CSRF token is invalid
         $this->checkIsCsrfTokenValid($rt);
 
-        $this->setRefererIfNotSet($this->system->getReferer());
+        $this->setRefererIfNotSet($this->getRefererFromRequest());
 
         // Will redirect back to the referer page if the signed URL is invalid
         $this->checkIsSignedUrlValid($request);
@@ -560,6 +560,23 @@ class SendTourRapportNotificationController extends AbstractBackendController
         $form->getWidget('text')->value = $bag['text'];
     }
 
+    /**
+     * The calling page passes its URL in the "back" query parameter. Since Contao 5.7,
+     * System::getReferer() no longer knows the previous page of a custom backend route
+     * and would return the backend start page.
+     */
+    private function getRefererFromRequest(): string
+    {
+        $back = (string) $this->requestStack->getCurrentRequest()->query->get('back', '');
+
+        // Only accept relative URLs of the same host
+        if (str_starts_with($back, '/') && !str_starts_with($back, '//') && !str_contains($back, '\\')) {
+            return $back;
+        }
+
+        return $this->system->getReferer();
+    }
+
     private function setRefererIfNotSet(string $strUri): void
     {
         $arrBag = $this->getSessionBag();
@@ -580,7 +597,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
 
         if (!isset($bagAll[$this->sid])) {
             $bagAll[$this->sid] = [
-                'referer' => $this->system->getReferer(),
+                'referer' => $this->getRefererFromRequest(),
                 'attachments' => [],
                 'recipients' => [],
                 'subject' => '',

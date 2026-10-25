@@ -34,6 +34,10 @@ Contao 5.6 deprecated und funktioniert in Contao 6 nicht mehr.
 
 - [ ] `Cache\CacheTagInvalidator`: Weiche `contao.cache.entity_tags` (5.3) / `contao.cache.tag_manager` entfernen. In Contao 5.7 prüfen, welcher Service vorhanden ist.
 - [ ] Tests: `@dataProvider`-Annotationen entfernen, nur noch `#[DataProvider]` (PHPUnit 12). Weiche PHPUnit 9/12 in der CI entfernen.
+- [ ] `key=noref` aus dem `href` der globalen Operationen entfernen (samt Kommentar). Es verhinderte nur, dass der `StoreRefererListener` die Download-URL als Referer speichert. Diesen Listener gibt es ab Contao 5.7 nicht mehr; der Zurück-Link kommt aus dem `DcaUrlAnalyzer`.
+  - `contao/dca/tl_abo_survey.php` (`AboSurveyTable::ACTION_EXPORT_CSV`)
+  - `contao/dca/tl_calendar_events_instructor_invoice.php` (`generateInvoicePdf`, `generateTourRapportPdf`)
+  - `contao/dca/tl_calendar_events_member.php` (`downloadEventRegistrationListCsv`, `downloadEventRegistrationListDocx`)
 - [ ] Alle Bundles nach weiteren Weichen durchsuchen: `class_exists`, `method_exists`, `interface_exists`, `version_compare`, `ContaoCoreBundle::getVersion`, `InstalledVersions`.
 - [ ] `composer.json`: Symfony-Komponenten auf `^7.4 || ^8.0` setzen. CI-Matrix und `UPGRADE.md` anpassen.
 

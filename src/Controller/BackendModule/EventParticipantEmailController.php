@@ -514,6 +514,23 @@ class EventParticipantEmailController extends AbstractBackendController
         return $bag['referer'];
     }
 
+    /**
+     * The calling page passes its URL in the "back" query parameter. Since Contao 5.7,
+     * System::getReferer() no longer knows the previous page of a custom backend route
+     * and would return the backend start page.
+     */
+    private function getRefererFromRequest(): string
+    {
+        $back = (string) $this->requestStack->getCurrentRequest()->query->get('back', '');
+
+        // Only accept relative URLs of the same host
+        if (str_starts_with($back, '/') && !str_starts_with($back, '//') && !str_contains($back, '\\')) {
+            return $back;
+        }
+
+        return System::getReferer();
+    }
+
     private function getRegistrations(): array
     {
         $options = [];
@@ -582,7 +599,7 @@ class EventParticipantEmailController extends AbstractBackendController
 
         if (!isset($bagAll[$this->sid])) {
             $bagAll[$this->sid] = [
-                'referer' => System::getReferer(),
+                'referer' => $this->getRefererFromRequest(),
                 'attachments' => [],
                 'recipients' => [],
                 'subject' => '',

@@ -1,6 +1,18 @@
 {% trans_default_domain "contao_default" %}
 {% extends "@Contao/be_main" %}
 
+{#
+    Disable Turbo for this page (Contao 5.7+): the inline scripts and the Vue app would run again
+    on Turbo visits and on snapshots restored from the Turbo cache (browser back/forward), e.g.
+    the "select all/unselect all" links were inserted twice. Turbo now does a full page load
+    and does not cache the page.
+#}
+{% block meta %}
+    {{ parent() }}
+    <meta name="turbo-visit-control" content="reload">
+    <meta name="turbo-cache-control" content="no-cache">
+{% endblock %}
+
 {% block error %}
     {% if error|default %}
         {{ error|raw }}
@@ -8,9 +20,9 @@
 {% endblock %}
 
 {% block main_content %}
-    <div id="eventParticipantEmail">
+    <div id="eventParticipantEmail" data-turbo="false">{# Submit the forms without Turbo #}
         <div id="tl_buttons">
-            <a href="{{ back }}" class="header_back" title="" accesskey="b">{{ 'MSC.backBTTitle'|trans }}</a>
+            <a href="{{ back }}" class="header_back" title="{{ 'MSC.backBTTitle'|trans }}" accesskey="b">{{ 'MSC.backBT'|trans }}</a>
         </div>
 
         {# The email input (cc) is turned into a token input by the Stimulus controller "sacevt--backend--text-input-tokenizer" #}

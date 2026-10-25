@@ -242,6 +242,7 @@ readonly class CalendarEventsInstructorInvoice
             'rapport_id' => $operation->getRecord()['id'],
             'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
             'sid' => uniqid(),
+            'back' => $this->requestStack->getCurrentRequest()->getRequestUri(),
         ]));
 
         $operation->setUrl($this->framework->getAdapter(StringUtil::class)->specialcharsUrl($url));
