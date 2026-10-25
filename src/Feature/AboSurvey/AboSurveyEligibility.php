@@ -17,13 +17,15 @@ namespace Markocupic\SacEventToolBundle\Feature\AboSurvey;
 use Contao\StringUtil;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Config\TourguideQualification;
 
 /**
  * Who may fill in the abo survey for a year:
  * - the member has a SAC member id (> 0) and
- * - there is an active back end user (tl_user: disable = 0, within start/stop) with the same sacMemberId and
+ * - there is an active back end user (tl_user: disable = 0, within start/stop) with the same sacMemberId
+ *   (tl_user.sacMemberId is unique) and
  * - this back end user is not a mountain guide (tl_user.leiterQualifikation contains
  *   TourguideQualification::MOUNTAIN_GUIDE); this exclusion applies in any case and
  *   takes precedence over all of the following and
@@ -76,31 +78,32 @@ final readonly class AboSurveyEligibility
             return self::REASON_NO_SAC_MEMBER_ID;
         }
 
-        // Active back end users only: not disabled and within the start/stop period
+        // Active back end user only: not disabled and within the start/stop period.
+        // tl_user.sacMemberId is unique, so there is at most one back end user per SAC member id.
         $now = time();
 
-        $users = $this->connection->fetchAllAssociative(
+        $user = $this->connection->fetchAssociative(
             "SELECT id, userRole, leiterQualifikation FROM tl_user WHERE disable = ? AND sacMemberId = ? AND (start = '' OR start < ?) AND (stop = '' OR stop > ?)",
             [0, $sacMemberId, $now, $now],
         );
 
-        if (empty($users)) {
+        if (false === $user) {
             return self::REASON_NO_BACKEND_USER;
         }
 
         // Mountain guides may never fill in the survey
-        if ($this->isMountainGuide($users)) {
+        if ($this->isMountainGuide($user)) {
             return self::REASON_MOUNTAIN_GUIDE;
         }
 
-        $userIds = array_map(static fn (array $user): int => (int) $user['id'], $users);
+        $userId = (int) $user['id'];
 
         // Explicitly allowed back end users
-        if (array_intersect($userIds, array_map('intval', $allowedUserIds))) {
+        if (\in_array($userId, array_map('intval', $allowedUserIds), true)) {
             return null;
         }
 
-        $userRoleIds = $this->getUserRoleIds($users);
+        $userRoleIds = $this->getUserRoleIds($user);
 
         // Explicitly allowed roles
         if (array_intersect($userRoleIds, array_map('intval', $allowedUserRoleIds))) {
@@ -112,38 +115,31 @@ final readonly class AboSurveyEligibility
             return null;
         }
 
-        if ($this->isInstructorOfReleasedEvent($userIds, $eventPeriodStart, $eventPeriodEnd)) {
+        if ($this->isInstructorOfReleasedEvent($userId, $eventPeriodStart, $eventPeriodEnd)) {
             return null;
         }
 
         return self::REASON_NO_INSTRUCTOR_EVENT;
     }
 
-    private function isMountainGuide(array $users): bool
+    /**
+     * @param array<string, mixed> $user
+     */
+    private function isMountainGuide(array $user): bool
     {
-        foreach ($users as $user) {
-            $qualifications = array_map('intval', StringUtil::deserialize($user['leiterQualifikation'] ?? null, true));
+        $qualifications = array_map('intval', StringUtil::deserialize($user['leiterQualifikation'] ?? null, true));
 
-            if (\in_array(TourguideQualification::MOUNTAIN_GUIDE, $qualifications, true)) {
-                return true;
-            }
-        }
-
-        return false;
+        return \in_array(TourguideQualification::MOUNTAIN_GUIDE, $qualifications, true);
     }
 
     /**
+     * @param array<string, mixed> $user
+     *
      * @return array<int>
      */
-    private function getUserRoleIds(array $users): array
+    private function getUserRoleIds(array $user): array
     {
-        $roleIds = [];
-
-        foreach ($users as $user) {
-            foreach (StringUtil::deserialize($user['userRole'] ?? null, true) as $roleId) {
-                $roleIds[] = (int) $roleId;
-            }
-        }
+        $roleIds = array_map('intval', StringUtil::deserialize($user['userRole'] ?? null, true));
 
         return array_values(array_unique(array_filter($roleIds)));
     }
@@ -163,25 +159,25 @@ final readonly class AboSurveyEligibility
         return false !== $roleId;
     }
 
-    private function isInstructorOfReleasedEvent(array $userIds, int $eventPeriodStart, int $eventPeriodEnd): bool
+    private function isInstructorOfReleasedEvent(int $userId, int $eventPeriodStart, int $eventPeriodEnd): bool
     {
         $eventId = $this->connection->fetchOne(
             'SELECT e.id FROM tl_calendar_events e'
             .' INNER JOIN tl_calendar_events_instructor i ON i.pid = e.id'
             .' INNER JOIN tl_event_release_level_policy r ON r.id = e.eventReleaseLevel'
-            .' WHERE i.userId IN (:userIds)'
+            .' WHERE i.userId = :userId'
             .' AND e.eventType IN (:eventTypes) AND r.level >= :minLevel'
             .' AND e.startDate BETWEEN :start AND :end'
             .' LIMIT 1',
             [
-                'userIds' => $userIds,
+                'userId' => $userId,
                 'eventTypes' => self::EVENT_TYPES,
                 'minLevel' => self::MIN_RELEASE_LEVEL,
                 'start' => $eventPeriodStart,
                 'end' => $eventPeriodEnd,
             ],
             [
-                'userIds' => ArrayParameterType::INTEGER,
+                'userId' => Types::INTEGER,
                 'eventTypes' => ArrayParameterType::STRING,
             ],
         );

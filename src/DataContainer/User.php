@@ -183,4 +183,23 @@ readonly class User
     {
         return $this->connection->fetchAllKeyValue('SELECT id, title FROM tl_user_role ORDER BY sorting');
     }
+
+    /**
+     * NULL (no SAC member id) is displayed as 0 in the back end.
+     */
+    #[AsCallback(table: 'tl_user', target: 'fields.sacMemberId.load', priority: 100)]
+    public function loadSacMemberId(mixed $value): int
+    {
+        return (int) $value;
+    }
+
+    /**
+     * 0 or empty is stored as NULL: the column has a unique index, which allows NULL
+     * several times, but not 0 (see SacMemberIdNullableMigration).
+     */
+    #[AsCallback(table: 'tl_user', target: 'fields.sacMemberId.save', priority: 100)]
+    public function saveSacMemberId(mixed $value): int|null
+    {
+        return (int) $value > 0 ? (int) $value : null;
+    }
 }

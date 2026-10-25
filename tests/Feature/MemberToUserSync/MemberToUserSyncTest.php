@@ -75,7 +75,7 @@ final class MemberToUserSyncTest extends TestCase
         $this->assertFalse($log['with_error']);
 
         $this->assertSame(['tl_user', ['city' => 'Kriens'], ['id' => 2]], $this->updates[0]);
-        $this->assertSame(0, $this->updates[1][1]['sacMemberId']);
+        $this->assertNull($this->updates[1][1]['sacMemberId']);
         $this->assertSame(['id' => 3], $this->updates[1][2]);
         $this->assertCount(2, $log['log']);
     }

@@ -1,5 +1,24 @@
 # Upgrade
 
+## SAC-Mitgliedernummer eindeutig in `tl_member` und `tl_user`
+
+`tl_member.sacMemberId` und `tl_user.sacMemberId` haben neu einen Unique-Index. Ein Unique-Index erlaubt `NULL`
+mehrfach, aber nicht `0`. «Keine Mitgliedernummer» wird deshalb neu als `NULL` statt `0` gespeichert.
+
+- Die Migration `SacMemberIdNullableMigration` macht beide Spalten NULL-fähig und ersetzt `0` durch `NULL`.
+  Danach legt `contao:migrate` den Unique-Index an.
+- Gibt es bereits doppelte Mitgliedernummern, listet die Migration sie auf (Tabelle, Nummer, IDs). Diese müssen von
+  Hand bereinigt werden, sonst kann der Unique-Index nicht angelegt werden. Prüfen vor dem Update:
+
+  ```sql
+  SELECT sacMemberId, COUNT(*) FROM tl_member WHERE sacMemberId > 0 GROUP BY sacMemberId HAVING COUNT(*) > 1;
+  SELECT sacMemberId, COUNT(*) FROM tl_user WHERE sacMemberId > 0 GROUP BY sacMemberId HAVING COUNT(*) > 1;
+  ```
+
+- Im Backend wird «keine Mitgliedernummer» weiterhin als `0` angezeigt und eingegeben; gespeichert wird `NULL`.
+- Eigener Code, der auf `sacMemberId = 0` prüft oder `0` schreibt, muss auf `IS NULL` / `> 0` bzw. `NULL`
+  umgestellt werden. Abfragen mit `> 0` funktionieren unverändert.
+
 ## Contao 6 Support
 
 Mit dieser Version läuft das Event-Tool unter Contao 5.3 und ist für Contao 6 vorbereitet. Getestet wird mit Contao 5.3

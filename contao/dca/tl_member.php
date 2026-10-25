@@ -42,7 +42,8 @@ $GLOBALS['TL_DCA']['tl_member']['subpalettes']['hasLeadClimbingEducation'] = 'da
 $GLOBALS['TL_DCA']['tl_member']['list']['sorting']['fields'] = ['lastname ASC'];
 
 // Add tl_member.sacMemberId to index
-$GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index';
+// Unique: "no SAC member id" is stored as NULL (allowed several times), see SacMemberIdNullableMigration
+$GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'unique';
 
 // More fields...
 $GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = [
@@ -73,7 +74,8 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = [
     'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
     'inputType' => 'text',
     'eval'      => ['doNotCopy' => true, 'mandatory' => true, 'maxlength' => 255, 'readonly' => true, 'rgxp' => 'natural', 'tl_class' => 'w50'],
-    'sql'       => "int(10) unsigned NOT NULL default 0",
+    // NULL = no SAC member id (0 is converted to NULL, see DataContainer\Member)
+    'sql'       => 'int(10) unsigned NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['hasLeadClimbingEducation'] = [

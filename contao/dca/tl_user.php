@@ -18,8 +18,8 @@ use Contao\System;
 use Markocupic\SacEventToolBundle\Config\BackendUserRescissionCause;
 use Markocupic\SacEventToolBundle\Config\TourguideQualification;
 
-// Add tl_user.sacMemberId to index
-$GLOBALS['TL_DCA']['tl_user']['config']['sql']['keys']['sacMemberId'] = 'index';
+// Unique: "no SAC member id" is stored as NULL (allowed several times), see SacMemberIdNullableMigration
+$GLOBALS['TL_DCA']['tl_user']['config']['sql']['keys']['sacMemberId'] = 'unique';
 
 // ***** Manipulate palette default ******
 
@@ -193,7 +193,8 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['sacMemberId'] = [
 	'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
 	'inputType' => 'text',
 	'eval'      => ['doNotCopy' => true, 'mandatory' => true, 'maxlength' => 255, 'rgxp' => 'sacMemberIdIsUniqueOrZero', 'tl_class' => 'clr'],
-	'sql'       => "int(10) unsigned NOT NULL default 0",
+	// NULL = no SAC member id (0 is converted to NULL, see DataContainer\User)
+	'sql'       => 'int(10) unsigned NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['sectionId'] = [

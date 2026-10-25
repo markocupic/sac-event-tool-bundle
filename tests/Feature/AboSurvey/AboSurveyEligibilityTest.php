@@ -26,7 +26,7 @@ final class AboSurveyEligibilityTest extends TestCase
         $connection = $this->createMock(Connection::class);
         $connection
             ->expects($this->never())
-            ->method('fetchAllAssociative')
+            ->method('fetchAssociative')
         ;
 
         $connection
@@ -45,7 +45,7 @@ final class AboSurveyEligibilityTest extends TestCase
         $connection = $this->createMock(Connection::class);
         $connection
             ->expects($this->once())
-            ->method('fetchAllAssociative')
+            ->method('fetchAssociative')
             ->with(
                 $this->logicalAnd(
                     $this->stringContains('SELECT id, userRole, leiterQualifikation FROM tl_user WHERE disable = ? AND sacMemberId = ?'),
@@ -53,7 +53,7 @@ final class AboSurveyEligibilityTest extends TestCase
                 ),
                 $this->callback(static fn (array $params): bool => 4 === \count($params) && 0 === $params[0] && 123456 === $params[1] && \is_int($params[2]) && $params[2] === $params[3]),
             )
-            ->willReturn([])
+            ->willReturn(false)
         ;
 
         $connection
@@ -70,10 +70,8 @@ final class AboSurveyEligibilityTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $connection
-            ->method('fetchAllAssociative')
-            ->willReturn([
-                ['id' => '42', 'userRole' => serialize(['5']), 'leiterQualifikation' => serialize(['1', (string) TourguideQualification::MOUNTAIN_GUIDE])],
-            ])
+            ->method('fetchAssociative')
+            ->willReturn(['id' => '42', 'userRole' => serialize(['5']), 'leiterQualifikation' => serialize(['1', (string) TourguideQualification::MOUNTAIN_GUIDE])])
         ;
 
         $connection
@@ -91,10 +89,8 @@ final class AboSurveyEligibilityTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $connection
-            ->method('fetchAllAssociative')
-            ->willReturn([
-                ['id' => '42', 'userRole' => null, 'leiterQualifikation' => serialize([(string) TourguideQualification::TOURGUIDE_SAC])],
-            ])
+            ->method('fetchAssociative')
+            ->willReturn(['id' => '42', 'userRole' => null, 'leiterQualifikation' => serialize([(string) TourguideQualification::TOURGUIDE_SAC])])
         ;
 
         $eligibility = new AboSurveyEligibility($connection);
@@ -106,8 +102,8 @@ final class AboSurveyEligibilityTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $connection
-            ->method('fetchAllAssociative')
-            ->willReturn([['id' => '42', 'userRole' => null]])
+            ->method('fetchAssociative')
+            ->willReturn(['id' => '42', 'userRole' => null])
         ;
 
         $connection
@@ -124,8 +120,8 @@ final class AboSurveyEligibilityTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $connection
-            ->method('fetchAllAssociative')
-            ->willReturn([['id' => '42', 'userRole' => serialize(['3', '5'])]])
+            ->method('fetchAssociative')
+            ->willReturn(['id' => '42', 'userRole' => serialize(['3', '5'])])
         ;
 
         $connection
@@ -142,8 +138,8 @@ final class AboSurveyEligibilityTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $connection
-            ->method('fetchAllAssociative')
-            ->willReturn([['id' => '42', 'userRole' => serialize(['3', '5'])]])
+            ->method('fetchAssociative')
+            ->willReturn(['id' => '42', 'userRole' => serialize(['3', '5'])])
         ;
 
         $connection
@@ -165,8 +161,8 @@ final class AboSurveyEligibilityTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $connection
-            ->method('fetchAllAssociative')
-            ->willReturn([['id' => '42', 'userRole' => null]])
+            ->method('fetchAssociative')
+            ->willReturn(['id' => '42', 'userRole' => null])
         ;
 
         // No role: only the instructor query is executed
@@ -186,8 +182,8 @@ final class AboSurveyEligibilityTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $connection
-            ->method('fetchAllAssociative')
-            ->willReturn([['id' => '42', 'userRole' => serialize(['3'])]])
+            ->method('fetchAssociative')
+            ->willReturn(['id' => '42', 'userRole' => serialize(['3'])])
         ;
 
         $connection
@@ -205,11 +201,8 @@ final class AboSurveyEligibilityTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $connection
-            ->method('fetchAllAssociative')
-            ->willReturn([
-                ['id' => '42', 'userRole' => null],
-                ['id' => '43', 'userRole' => ''],
-            ])
+            ->method('fetchAssociative')
+            ->willReturn(['id' => '42', 'userRole' => null])
         ;
 
         $connection
@@ -217,14 +210,14 @@ final class AboSurveyEligibilityTest extends TestCase
             ->method('fetchOne')
             ->with(
                 $this->logicalAnd(
-                    $this->stringContains('WHERE i.userId IN (:userIds)'),
+                    $this->stringContains('WHERE i.userId = :userId'),
                     $this->logicalNot($this->stringContains('isMainInstructor')),
                     $this->stringContains('r.level >= :minLevel'),
                     $this->stringContains('e.eventType IN (:eventTypes)'),
                     $this->stringContains('e.startDate BETWEEN :start AND :end'),
                 ),
                 $this->callback(
-                    static fn (array $params): bool => [42, 43] === $params['userIds']
+                    static fn (array $params): bool => 42 === $params['userId']
                         && ['tour', 'course'] === $params['eventTypes']
                         && 3 === $params['minLevel']
                         && self::periodStart() === $params['start']

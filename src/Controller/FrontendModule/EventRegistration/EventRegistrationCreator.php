@@ -146,6 +146,8 @@ class EventRegistrationCreator
         $data['stateOfSubscription'] = $this->resolveSubscriptionState($eventModel);
         $data['bookingType'] = BookingType::ONLINE_FORM;
         $data['sectionId'] = $memberModel->sectionId;
+        // tl_member.sacMemberId is NULL if the member has no SAC member id; the registration stores 0
+        $data['sacMemberId'] = (int) $memberModel->sacMemberId;
 
         return $data;
     }

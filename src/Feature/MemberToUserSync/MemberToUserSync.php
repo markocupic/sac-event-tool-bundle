@@ -170,12 +170,13 @@ class MemberToUserSync
      */
     private function disableUser(array $row): void
     {
-        $this->connection->update('tl_user', ['sacMemberId' => 0, 'tstamp' => time()], ['id' => (int) $row['id']]);
+        // NULL = no SAC member id (unique index, see SacMemberIdNullableMigration)
+        $this->connection->update('tl_user', ['sacMemberId' => null, 'tstamp' => time()], ['id' => (int) $row['id']]);
 
         ++$this->syncLog['disabled'];
 
         $message = \sprintf(
-            'Updated "%s". Set tl_user.sacMemberId to "0" after syncing tl_member with tl_user. "%s" no longer seems to be a club member.',
+            'Updated "%s". Set tl_user.sacMemberId to NULL after syncing tl_member with tl_user. "%s" no longer seems to be a club member.',
             $row['name'],
             $row['name'],
         );

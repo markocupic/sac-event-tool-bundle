@@ -163,9 +163,14 @@ readonly class AddCustomRegexpListener
             return true;
         }
 
-        $count = $this->connection->fetchOne('SELECT COUNT(id) FROM tl_user WHERE sacMemberId = ?', [$input], [Types::INTEGER]);
+        // Another user (not the current record) with the same SAC member id
+        $count = (int) $this->connection->fetchOne(
+            'SELECT COUNT(id) FROM tl_user WHERE sacMemberId = ? AND id <> ?',
+            [(int) $input, (int) $widget->currentRecord],
+            [Types::INTEGER, Types::INTEGER],
+        );
 
-        if ($count > 1) {
+        if ($count > 0) {
             $widget->addError($this->translator->trans('ERR.userWithThisSACMemberIdAlreadyExists', [$input], 'contao_default'));
         }
 

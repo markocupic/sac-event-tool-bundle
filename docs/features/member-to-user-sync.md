@@ -12,11 +12,11 @@ Zusammen mit dem [Mitglieder-Sync](member-database-sync.md) ergibt sich die Kett
 ## Regeln (`MemberToUserSync::run()`)
 
 - Geprüft werden alle Backend-User mit `sacMemberId > 0`. User und Mitgliederdaten werden in **einer** Abfrage gelesen (`tl_user LEFT JOIN tl_member` über `sacMemberId`) und zeilenweise verarbeitet (`iterateAssociative()`).
-- Gibt es mehrere Mitglieder mit derselben `sacMemberId`, zählt das mit der tiefsten ID.
+- `tl_member.sacMemberId` und `tl_user.sacMemberId` sind eindeutig (Unique-Index). «Keine Mitgliedernummer» wird als `NULL` gespeichert.
 - **Mitglied gefunden** (`tl_member.sacMemberId` gleich): Folgende Felder werden übernommen: `firstname`, `lastname`, `name` («Nachname Vorname»), `sectionId`, `dateOfBirth`, `email`, `street`, `postal`, `city`, `country`, `gender`, `phone`, `mobile`.
   - Hat das Mitglied keine E-Mail-Adresse, bekommt der User den Platzhalter `invalid_<username>_<sacMemberId>@noemail.ch`.
   - Geschrieben werden nur die Felder, die sich tatsächlich unterscheiden (`getChangedFields()`). Ist alles gleich, gibt es kein UPDATE und keinen Log-Eintrag.
-- **Kein Mitglied gefunden** (ausgetreten): `tl_user.sacMemberId` wird auf `0` gesetzt. Der User selbst wird nicht deaktiviert oder gelöscht.
+- **Kein Mitglied gefunden** (ausgetreten): `tl_user.sacMemberId` wird auf `NULL` gesetzt. Der User selbst wird nicht deaktiviert oder gelöscht.
 - Alles läuft in **einer** Transaktion. Bei einem Fehler wird zurückgerollt, der Fehler steht im Protokoll (`with_error`, `exception`).
 - Jede Änderung und die Zusammenfassung landen im Contao-Log (`Config\Log::MEMBER_WITH_USER_SYNC_SUCCESS`).
 
@@ -27,7 +27,7 @@ Zusammen mit dem [Mitglieder-Sync](member-database-sync.md) ergibt sich die Kett
     'log' => list<string>,   // eine Zeile pro geändertem User
     'processed' => int,
     'updates' => int,
-    'disabled' => int,       // User, bei denen sacMemberId auf 0 gesetzt wurde
+    'disabled' => int,       // User, bei denen sacMemberId auf NULL gesetzt wurde
     'duration' => float,     // Sekunden
     'with_error' => bool,
     'exception' => string,
