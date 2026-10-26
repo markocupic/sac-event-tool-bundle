@@ -23,6 +23,8 @@ $GLOBALS['TL_DCA']['tl_calendar_container'] = [
 		'switchToEdit'     => true,
 		'enableVersioning' => true,
 		'markAsCopy'       => 'title',
+		// Contao 5.7: non-admins only see the calendar containers enabled in tl_user(_group).calendar_containers
+		'userRoot'         => 'calendar_containers',
 		'sql'              => [
 			'keys' => [
 				'id' => 'primary',

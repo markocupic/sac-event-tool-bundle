@@ -38,6 +38,7 @@ Contao 5.6 deprecated und funktioniert in Contao 6 nicht mehr.
   - `contao/dca/tl_abo_survey.php` (`AboSurveyTable::ACTION_EXPORT_CSV`)
   - `contao/dca/tl_calendar_events_instructor_invoice.php` (`generateInvoicePdf`, `generateTourRapportPdf`)
   - `contao/dca/tl_calendar_events_member.php` (`downloadEventRegistrationListCsv`, `downloadEventRegistrationListDocx`)
+- [ ] `DataContainer\CalendarContainer::filterRecordsContao53()` (`config.onload`) entfernen – ab Contao 5.7 filtert der Core-`UserRootListener` die Liste über `userRoot` im DCA.
 - [ ] Alle Bundles nach weiteren Weichen durchsuchen: `class_exists`, `method_exists`, `interface_exists`, `version_compare`, `ContaoCoreBundle::getVersion`, `InstalledVersions`.
 - [ ] `composer.json`: Symfony-Komponenten auf `^7.4 || ^8.0` setzen. CI-Matrix und `UPGRADE.md` anpassen.
 
@@ -57,6 +58,30 @@ Contao 5.6 deprecated und funktioniert in Contao 6 nicht mehr.
 - [ ] Eigene Backend-Skripte (heute zusätzlich mit `turbo:load` initialisiert) durch die Core-Stimulus-Controller `toggle-sender`/`toggle-receiver` und `check-all` oder eigene Stimulus-Controller ersetzen.
 - [ ] Eigene Datensatz-Darstellung (`child_record_callback`, HTML aus `label_callback`) in die Twig-Templates der DC_Table-Ansichten (`listView`, `parentView`, `treeView`) verschieben (siehe auch Punkt zu `child_record_callback` unten).
 - [ ] **contao-theme-sac-pilatus**: Module für Login, Passwort ändern, Konto schliessen und Zwei-Faktor durch die neuen Inhaltselemente ersetzen, Theme-Templates und Styles anpassen.
+
+### Zugriffslogik auf DataContainer-Voter umstellen
+
+Kein Muss für Contao 5.7 (die heutige Lösung läuft weiterhin), aber der vorgesehene Weg. Die Klassen in
+`src/DataContainer/AccessDecision/` (`CalendarEvents`, `CalendarEventsMember`) werten heute selbst `act`, `mode`
+und `field` aus dem Request aus, werfen `AccessDeniedException` und schalten Buttons einzeln ab. Ein DC-Voter
+(`contao_dc.<table>` mit `Create`-/`Read`-/`Update`-/`DeleteAction`) greift dagegen überall, wo `DC_Table` selbst
+prüft (inkl. «Mehrere bearbeiten», Ausschneiden, Toggle, Versionen, Clipboard, Prefetch/Turbo), und der
+`DefaultOperationsListener` deaktiviert die Standard-Buttons automatisch.
+
+- [ ] **`tl_calendar_events_member`** (grösster Gewinn): neuen DC-Voter erstellen (z. B. `CalendarEventsMemberAccessVoter`
+  auf Basis von `CAN_ADMINISTER_EVENT_REGISTRATIONS`), danach `checkPermission()` (Request-Auswertung) sowie die
+  Button-Callbacks `editButton()` und `deleteButton()` in `AccessDecision\CalendarEventsMember` entfernen.
+- [ ] **`tl_calendar_events`**: Regeln aus `AccessDecision\CalendarEvents` (`setPermissions()`, Prüfungen für
+  delete/cut/toggle/editAll) in den bestehenden `CalendarEventsAccessVoter` verschieben (`CAN_WRITE_EVENT`,
+  `CAN_DELETE_EVENT`, `CAN_CUT_EVENT`), danach `deleteIcon()`, `cutIcon()` und `copyIcon()` entfernen.
+- [ ] Bleibt als Callback: Feldlogik (readonly-Felder, Freigabestufe hoch/runter) und eigene Operationen
+  (`upgradeEventReleaseLevel`, `downgradeEventReleaseLevel`, `preview`, `toggleParticipationState`) – diese
+  fragen dann nur noch den DC-Voter.
+- [ ] Zusammen mit dem Punkt «DCA-Berechtigungen (contao/contao#9012)» oben angehen; Tests unter `tests/Security/Voter/`.
+- [x] `tl_calendar`: Core-Voter `contao_calendar.security.calendar_access_voter` durch den eigenen `CalendarAccessVoter`
+  ersetzt (Contao 5.7 verweigerte `ReadAction` ohne ID → Jahrescontainer liessen sich nicht öffnen).
+- [x] `tl_calendar_container`: `userRoot` = `calendar_containers` (Liste nur freigeschaltete Container) und
+  `ReadAction` im `CalendarContainerAccessVoter` prüft die Freischaltung.
 
 ### Weitere Prüfungen für Contao 6 (noch nicht erfasst)
 

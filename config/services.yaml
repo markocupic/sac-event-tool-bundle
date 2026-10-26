@@ -44,7 +44,7 @@ services:
 
     Markocupic\SacEventToolBundle\:
         resource: ../src/
-        exclude: ../src/{ContaoManager,Session,Event,DependencyInjection,Model}
+        exclude: ../src/{ContaoManager,Session,Event,DependencyInjection,Model,Security/Voter/CalendarAccessVoter.php}
 
     # Contao 5.3 (EntityCacheTags) and Contao 6 (CacheTagManager), see CacheTagManagerPass
     Markocupic\SacEventToolBundle\Cache\CacheTagInvalidator:
@@ -68,9 +68,12 @@ services:
         tags:
             - { name: security.voter, priority: 10 }
 
-    Markocupic\SacEventToolBundle\Security\Voter\CalendarAccessVoter:
-        tags:
-            - { name: security.voter, priority: 10 }
+    # Replaces the Contao core voter for tl_calendar. The core voter denies reading tl_calendar
+    # without an ID as of Contao 5.7 (e.g. the "children" operation of tl_calendar_container).
+    contao_calendar.security.calendar_access_voter:
+        class: Markocupic\SacEventToolBundle\Security\Voter\CalendarAccessVoter
+        arguments:
+            - '@security.access.decision_manager'
 
     Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsAccessVoter:
         tags:

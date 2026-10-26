@@ -14,16 +14,51 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Contao\BackendUser;
 use Contao\CoreBundle\DataContainer\DataContainerOperation;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\EventListener\DataContainer\UserRootListener;
 use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\CoreBundle\Security\DataContainer\CreateAction;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 readonly class CalendarContainer
 {
-    public function __construct(private AuthorizationCheckerInterface $authorizationChecker)
+    public function __construct(
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private Security $security,
+    ) {
+    }
+
+    /**
+     * Contao 5.3: Only list the calendar containers enabled for the user
+     * (tl_user(_group).calendar_containers). Otherwise, DC_Table denies reading
+     * the containers the user has no access to and the whole list fails.
+     *
+     * As of Contao 5.7, the core UserRootListener does this (see "userRoot" in
+     * the DCA). Remove this callback when dropping support for Contao 5.3.
+     */
+    #[AsCallback(table: 'tl_calendar_container', target: 'config.onload')]
+    public function filterRecordsContao53(): void
     {
+        if (class_exists(UserRootListener::class)) {
+            return;
+        }
+
+        $user = $this->security->getUser();
+
+        if (!$user instanceof BackendUser || $this->security->isGranted('ROLE_ADMIN')) {
+            return;
+        }
+
+        $root = array_filter((array) $user->calendar_containers, is_numeric(...));
+
+        if ([] === $root) {
+            $root = [0];
+        }
+
+        $GLOBALS['TL_DCA']['tl_calendar_container']['list']['sorting']['root'] = array_map(intval(...), array_values($root));
     }
 
     /**

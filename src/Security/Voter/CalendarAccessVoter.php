@@ -26,6 +26,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 
 /**
+ * Replaces the Contao core voter "contao_calendar.security.calendar_access_voter"
+ * (see config/services.yaml), because tl_calendar has the parent table tl_calendar_container.
+ *
  * @internal
  */
 class CalendarAccessVoter extends AbstractDataContainerVoter
@@ -52,9 +55,13 @@ class CalendarAccessVoter extends AbstractDataContainerVoter
 
         return match (true) {
             $action instanceof CreateAction => $this->accessDecisionManager->decide($token, [ContaoCalendarPermissions::USER_CAN_CREATE_CALENDARS]),
-            $action instanceof ReadAction => true,
-            $action instanceof UpdateAction => $this->accessDecisionManager->decide($token, [ContaoCalendarPermissions::USER_CAN_EDIT_CALENDAR], $action->getCurrentId()),
-            $action instanceof DeleteAction => $this->accessDecisionManager->decide($token, [ContaoCalendarPermissions::USER_CAN_EDIT_CALENDAR], $action->getCurrentId())
+            // Without an ID (e.g. the "children" operation of tl_calendar_container), access to any
+            // calendar is sufficient. Do not cast null to 0 like the Contao 5.7 core voter does.
+            $action instanceof ReadAction => null === $action->getCurrentId()
+                ? $this->accessDecisionManager->decide($token, [ContaoCalendarPermissions::USER_CAN_EDIT_CALENDAR])
+                : $this->accessDecisionManager->decide($token, [ContaoCalendarPermissions::USER_CAN_EDIT_CALENDAR], (int) $action->getCurrentId()),
+            $action instanceof UpdateAction => $this->accessDecisionManager->decide($token, [ContaoCalendarPermissions::USER_CAN_EDIT_CALENDAR], (int) $action->getCurrentId()),
+            $action instanceof DeleteAction => $this->accessDecisionManager->decide($token, [ContaoCalendarPermissions::USER_CAN_EDIT_CALENDAR], (int) $action->getCurrentId())
                 && $this->accessDecisionManager->decide($token, [ContaoCalendarPermissions::USER_CAN_DELETE_CALENDARS]),
         };
     }

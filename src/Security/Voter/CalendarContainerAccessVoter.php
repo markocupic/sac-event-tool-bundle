@@ -46,9 +46,12 @@ class CalendarContainerAccessVoter extends AbstractDataContainerVoter
 
         return match (true) {
             $action instanceof CreateAction => $this->accessDecisionManager->decide($token, [SacEventToolPermissions::USER_CAN_CREATE_CALENDAR_CONTAINERS]),
-            $action instanceof ReadAction => true,
-            $action instanceof UpdateAction => $this->accessDecisionManager->decide($token, [SacEventToolPermissions::USER_CAN_EDIT_CALENDAR_CONTAINERS], $action->getCurrentId()),
-            $action instanceof DeleteAction => $this->accessDecisionManager->decide($token, [SacEventToolPermissions::USER_CAN_EDIT_CALENDAR_CONTAINERS], $action->getCurrentId())
+            // Without an ID, access to any calendar container is sufficient
+            $action instanceof ReadAction => null === $action->getCurrentId()
+                ? $this->accessDecisionManager->decide($token, [SacEventToolPermissions::USER_CAN_EDIT_CALENDAR_CONTAINERS])
+                : $this->accessDecisionManager->decide($token, [SacEventToolPermissions::USER_CAN_EDIT_CALENDAR_CONTAINERS], (int) $action->getCurrentId()),
+            $action instanceof UpdateAction => $this->accessDecisionManager->decide($token, [SacEventToolPermissions::USER_CAN_EDIT_CALENDAR_CONTAINERS], (int) $action->getCurrentId()),
+            $action instanceof DeleteAction => $this->accessDecisionManager->decide($token, [SacEventToolPermissions::USER_CAN_EDIT_CALENDAR_CONTAINERS], (int) $action->getCurrentId())
                 && $this->accessDecisionManager->decide($token, [SacEventToolPermissions::USER_CAN_DELETE_CALENDAR_CONTAINERS]),
         };
     }
