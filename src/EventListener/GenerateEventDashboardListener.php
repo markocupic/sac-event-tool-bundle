@@ -41,9 +41,8 @@ readonly class GenerateEventDashboardListener
         EventOperationsBuilder::OPERATION_PRINT_REPORT,
     ];
 
-    public function __construct(
-        private EventOperationsBuilder $eventOperationsBuilder,
-    ) {
+    public function __construct(private EventOperationsBuilder $eventOperationsBuilder)
+    {
     }
 
     public function __invoke(GenerateEventDashboardEvent $event): void

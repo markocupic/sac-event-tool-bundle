@@ -65,7 +65,7 @@ final class BackendEventSearchOperationsListenerTest extends ContaoTestCase
 
         $listener = new BackendEventSearchOperationsListener($this->mockFramework($calendarEvent), $builder, $twig);
 
-        $event = new BuildSearchHitOperationsEvent(5, ['id' => 5, 'title' => 'Piz Palü'], 'sac_calendar');
+        $event = $this->createSearchEvent(5, ['id' => 5, 'title' => 'Piz Palü'], 'sac_calendar');
         $listener($event);
 
         $this->assertSame('<div class="sacevt-op-menu-item"></div>', $event->getOperationsHtml());
@@ -86,7 +86,7 @@ final class BackendEventSearchOperationsListenerTest extends ContaoTestCase
 
         $listener = new BackendEventSearchOperationsListener($this->mockFramework(null), $builder, $this->createMock(Environment::class));
 
-        $event = new BuildSearchHitOperationsEvent(999, ['id' => 999], 'calendar');
+        $event = $this->createSearchEvent(999, ['id' => 999], 'calendar');
         $listener($event);
 
         $this->assertNull($event->getOperationsHtml());
@@ -102,6 +102,17 @@ final class BackendEventSearchOperationsListenerTest extends ContaoTestCase
 
         $listener = new BackendEventSearchOperationsListener($this->mockFramework(null), $builder, $this->createMock(Environment::class));
         $listener(new \stdClass());
+    }
+
+    /**
+     * The event search is an optional dependency (see "suggest" in composer.json), so
+     * PHPStan does not know the event class. setUp() skips the tests without it.
+     *
+     * @param array<string, mixed> $document
+     */
+    private function createSearchEvent(int $eventId, array $document, string $backendModule): BuildSearchHitOperationsEvent // @phpstan-ignore class.notFound
+    {
+        return new BuildSearchHitOperationsEvent($eventId, $document, $backendModule); // @phpstan-ignore class.notFound
     }
 
     private function mockFramework(CalendarEventsModel|null $calendarEvent): mixed

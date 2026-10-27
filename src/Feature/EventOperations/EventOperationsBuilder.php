@@ -267,19 +267,8 @@ class EventOperationsBuilder
      * @param \Closure(): string    $href           Only called if the operation is enabled
      * @param array<string, string> $linkAttributes
      */
-    private function createOperation(
-        string $name,
-        EventOperationState $state,
-        string $label,
-        string $title,
-        string $iconClass,
-        \Closure $href,
-        string|null $notAvailableTitle = null,
-        bool $primary = false,
-        string|null $iconModifier = null,
-        string|null $accessKey = null,
-        array $linkAttributes = ['data-turbo' => 'false'],
-    ): EventOperation {
+    private function createOperation(string $name, EventOperationState $state, string $label, string $title, string $iconClass, \Closure $href, string|null $notAvailableTitle = null, bool $primary = false, string|null $iconModifier = null, string|null $accessKey = null, array $linkAttributes = ['data-turbo' => 'false'],): EventOperation
+    {
         $label = $this->trans($label);
 
         $title = match ($state) {

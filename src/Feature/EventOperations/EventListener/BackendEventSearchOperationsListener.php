@@ -41,6 +41,12 @@ readonly class BackendEventSearchOperationsListener
 
     public function __invoke(object $event): void
     {
+        // The event search is an optional dependency. The class name must be a string,
+        // so that PHPStan recognizes the check (see "discovering symbols" in the docs).
+        if (!class_exists('Markocupic\ContaoBackendEventSearch\Event\BuildSearchHitOperationsEvent')) {
+            return;
+        }
+
         if (!$event instanceof BuildSearchHitOperationsEvent) {
             return;
         }
