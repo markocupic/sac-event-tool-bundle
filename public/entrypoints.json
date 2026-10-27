@@ -12,7 +12,7 @@
     },
     "swisstopo_event_map": {
       "js": [
-        "/bundles/markocupicsaceventtool/swisstopo_event_map.5a30e820.js"
+        "/bundles/markocupicsaceventtool/swisstopo_event_map.5210f98d.js"
       ]
     },
     "member_dashboard_my_event_registrations": {
@@ -27,7 +27,7 @@
     },
     "css/be_stylesheet": {
       "css": [
-        "/bundles/markocupicsaceventtool/css/be_stylesheet.bde1f299.css"
+        "/bundles/markocupicsaceventtool/css/be_stylesheet.03ec23b1.css"
       ]
     }
   }

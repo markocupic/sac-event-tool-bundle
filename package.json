@@ -15,29 +15,32 @@
         "@hotwired/turbo": "^8.0.0",
         "@symfony/stimulus-bridge": "^4.0.1",
         "choices.js": "^11.1.0",
-        "vue": "^3.5",
         "ol": "9.2.4",
-        "proj4": "2.11.0"
+        "proj4": "^2.22.0",
+        "vue": "^3.5"
     },
     "devDependencies": {
-        "bootstrap": "^5.3",
-        "@babel/preset-env": "^7.0",
+        "@babel/core": "^8.0.9",
+        "@babel/preset-env": "^8.0.7",
         "@hotwired/stimulus": "^3.2.2",
         "@hotwired/stimulus-webpack-helpers": "^1.0.1",
-        "@symfony/webpack-encore": "^5.0",
+        "@symfony/webpack-encore": "^7.2.0",
         "autoprefixer": "^10.2",
+        "babel-plugin-polyfill-corejs3": "^1.0.0",
+        "bootstrap": "^5.3",
         "core-js": "^3.15",
-        "ts-loader": "^9.5.2",
-        "typescript": "^5.8.3",
         "css-loader": "^7.1.2",
+        "cssnano": "^9.9.0",
         "file-loader": "^6.0",
+        "postcss": "^8.5.32",
         "postcss-loader": "^8.1.1",
         "sass": "^1.87.0",
-        "sass-loader": "^16.0.5",
-        "style-loader": "^4.0.0"
-    },
-    "overrides": {
-        "webpack": "~5.111.1"
+        "sass-loader": "^17.1.0",
+        "style-loader": "^4.0.0",
+        "ts-loader": "^9.5.2",
+        "typescript": "^5.8.3",
+        "webpack": "^5.112.2",
+        "webpack-cli": "^6.0.1"
     },
     "browserslist": [
         "defaults"
