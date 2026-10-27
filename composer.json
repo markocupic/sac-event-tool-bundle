@@ -54,6 +54,9 @@
         "contao/test-case": "^5.3 || ^6.0",
         "phpunit/phpunit": "^9.5 || ^12.4"
     },
+    "suggest": {
+        "markocupic/contao-backend-event-search": "Event search on the back end start page; shows the event operations of the Event-Tool in the search results"
+    },
     "autoload": {
         "psr-4": {
             "Markocupic\\SacEventToolBundle\\": "src/"

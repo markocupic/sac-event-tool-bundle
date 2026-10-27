@@ -11,10 +11,12 @@
 import {Controller} from '@hotwired/stimulus';
 
 /**
- * Operations dropdown of the "My events" dashboard (small screens).
+ * Operations dropdown of an event (small screens), see the template
+ * Backend/EventOperations/operations_menu.html.twig. Used by the "My events"
+ * dashboard and the back end event search.
  *
  * To avoid overflow-hidden issues, the menu is cloned into the ".dropdown-portal"
- * of the dashboard item when it is opened. The clone is removed again when the
+ * of the surrounding ".sacevt-op-menu-item" when it is opened. The clone is removed again when the
  * menu is closed, before Turbo caches the page, when the page is restored from
  * the browser's back/forward cache and when the controller disconnects.
  */
@@ -27,7 +29,7 @@ export default class extends Controller {
         // Keep references: the targets are not reliably available in disconnect()
         this.toggleEl = this.toggleTarget;
         this.menuEl = this.menuTarget;
-        this.portal = this.element.closest('.my-events-dashb--item')?.querySelector('.dropdown-portal') ?? null;
+        this.portal = this.element.closest('.sacevt-op-menu-item')?.querySelector('.dropdown-portal') ?? null;
 
         this.onToggleClick = this.toggle.bind(this);
         this.onDocumentClick = this.#onDocumentClick.bind(this);
@@ -79,7 +81,7 @@ export default class extends Controller {
             return;
         }
 
-        // Close the menus of the other dashboard items
+        // Close the other open operation menus
         this.dispatch('open', {target: document, detail: {controller: this}});
 
         const rect = this.toggleEl.getBoundingClientRect();

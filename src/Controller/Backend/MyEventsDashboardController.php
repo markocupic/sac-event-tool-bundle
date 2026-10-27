@@ -18,24 +18,19 @@ use Codefog\HasteBundle\UrlParser;
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Config;
-use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
-use Contao\System;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
-use Markocupic\SacEventToolBundle\Config\EventType;
-use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmailController;
+use Markocupic\SacEventToolBundle\Feature\EventOperations\EventOperation;
+use Markocupic\SacEventToolBundle\Feature\EventOperations\EventOperationsBuilder;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\UriSigner;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment as Twig;
 
 class MyEventsDashboardController
@@ -49,14 +44,11 @@ class MyEventsDashboardController
     public function __construct(
         private readonly CalendarEventsUtil $calendarEventsUtil,
         private readonly Connection $connection,
-        private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
         private readonly ContaoFramework $framework,
+        private readonly EventOperationsBuilder $eventOperationsBuilder,
         private readonly RequestStack $requestStack,
-        private readonly RouterInterface $router,
         private readonly Security $security,
-        private readonly TranslatorInterface $translator,
         private readonly Twig $twig,
-        private readonly UriSigner $uriSigner,
         private readonly UrlParser $urlParser,
     ) {
         $this->calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
@@ -96,18 +88,6 @@ class MyEventsDashboardController
         ]);
 
         return new Response($html);
-    }
-
-    public function getOperationData(CalendarEventsModel $event): array
-    {
-        return [
-            'be-dashb-op--event-preview' => $this->getEventPreviewOperation($event),
-            'be-dashb-op--event-listing' => $this->getEventListingOperation($event),
-            'be-dashb-op--event-registration-list' => $this->getEventRegistrationListOperation($event),
-            'be-dashb-op--send-email' => $this->getSendEmailOperation($event),
-            'be-dashb-op--create-or-edit-report' => $this->getCreateOrEditReportOperation($event),
-            'be-dashb-op--print-report' => $this->getPrintReportOperation($event),
-        ];
     }
 
     /**
@@ -162,15 +142,12 @@ class MyEventsDashboardController
             $title = $this->stringUtilAdapter->restoreBasicEntities($title);
             $title = empty($title) ? 'Neuer Event' : $title;
 
+            $operations = $this->eventOperationsBuilder->build($eventModel);
+            $editOperation = $operations[EventOperationsBuilder::OPERATION_EDIT_EVENT];
+
             $event = [];
-            $event['href_event'] = $this->router->generate('contao_backend', [
-                'do' => 'calendar',
-                'table' => 'tl_calendar_events',
-                'id' => $eventModel->id,
-                'act' => 'edit',
-                'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
-                'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-            ]);
+            $event['href_event'] = $editOperation->href;
+            $event['title_event'] = $editOperation->title;
 
             $event['row_class'] = $rowClass;
             $event['badge'] = $this->calendarEventsUtil->getSubscriptionStateBadges($eventModel);
@@ -180,8 +157,8 @@ class MyEventsDashboardController
             $event['release_level'] = $this->calendarEventsUtil->getEventReleaseLevelAsString($eventModel);
             $event['has_filled_in_tour_report'] = $eventModel->filledInEventReportForm;
 
-            // Get operations
-            $event['operations'] = $this->getOperationData($eventModel);
+            // Get operations (without "edit-event", see href_event)
+            $event['operations'] = $this->toDashboardOperations($operations);
 
             $events[] = $event;
         }
@@ -189,162 +166,22 @@ class MyEventsDashboardController
         return $events;
     }
 
-    private function getEventPreviewOperation(CalendarEventsModel $event): array
-    {
-        $operation = [];
-        $operation['icon_class'] = 'fa-solid fa-fw fa-presentation-screen';
-
-        $operation['href'] = $this->calendarEventsUtil->generateEventPreviewUrl($event);
-        $operation['title'] = $this->translator->trans('MSC.bhs_dashb_livePreview', [], 'contao_default');
-        $operation['link_attributes'] = [
-            'data-turbo' => 'false',
-            'rel' => 'noopener',
-            'target' => '_blank',
-        ];
-        $operation['label'] = 'Vorschau';
-        $operation['primary'] = false;
-
-        return $operation;
-    }
-
-    private function getEventListingOperation(CalendarEventsModel $event): array
-    {
-        $operation = [];
-        $operation['icon_class'] = 'fa-solid fa-fw fa-list-tree';
-
-        $operation['href'] = $this->router->generate('contao_backend', [
-            'do' => 'calendar',
-            'table' => 'tl_calendar_events',
-            'id' => $event->pid,
-            'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
-            'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-        ]);
-        $operation['title'] = $this->translator->trans('MSC.bhs_dashb_eventListing', [], 'contao_default');
-        $operation['link_attributes'] = [
-            'data-turbo' => 'false',
-        ];
-        $operation['label'] = 'Event Liste';
-        $operation['primary'] = false;
-
-        return $operation;
-    }
-
-    private function getEventRegistrationListOperation(CalendarEventsModel $event): array
-    {
-        $operation = [];
-        $operation['icon_class'] = 'fa-solid fa-fw fa-people-group';
-
-        $operation['href'] = $this->router->generate('contao_backend', [
-            'do' => 'calendar',
-            'table' => 'tl_calendar_events_member',
-            'id' => $event->id,
-            'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
-            'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-        ]);
-        $operation['title'] = $this->translator->trans('MSC.bhs_dashb_registrationList', [], 'contao_default');
-        $operation['link_attributes'] = [
-            'data-turbo' => 'false',
-        ];
-        $operation['label'] = 'Anmeldungen';
-        $operation['primary'] = false;
-
-        return $operation;
-    }
-
     /**
-     * @throws Exception
+     * Maps the operations to the keys used in the template ("be-dashb-op--<name>").
+     *
+     * @param array<string, EventOperation> $operations
+     *
+     * @return array<string, array<string, mixed>>
      */
-    private function getSendEmailOperation(CalendarEventsModel $event): array
+    private function toDashboardOperations(array $operations): array
     {
-        $operation = [];
-        $operation['icon_class'] = 'fa-solid fa-fw fa-at';
+        $dashboardOperations = [];
 
-        $regId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE pid = ?', [$event->id]);
-
-        if ($regId) {
-            $url = System::getContainer()->get('router')->generate(EventParticipantEmailController::class);
-
-            $url = $this->urlParser->addQueryString('eventId='.$event->id, $url);
-            $url = $this->urlParser->addQueryString('rt='.$this->contaoCsrfTokenManager->getDefaultTokenValue(), $url);
-            $url = $this->urlParser->addQueryString('sid='.uniqid(), $url);
-            $url = $this->urlParser->addQueryString('back='.rawurlencode($this->requestStack->getCurrentRequest()->getRequestUri()), $url);
-
-            $operation['href'] = $this->uriSigner->sign($url);
-            $operation['link_attributes'] = [
-                'data-turbo' => 'false',
-            ];
+        foreach (EventOperationsBuilder::MENU_OPERATIONS as $name) {
+            $dashboardOperations['be-dashb-op--'.$name] = $operations[$name]->toArray();
         }
 
-        $operation['title'] = !empty($operation['href']) ? $this->translator->trans('MSC.bhs_dashb_sendEmail', [], 'contao_default') : $this->translator->trans('MSC.bhs_dashb_sendEmailDisabled', [], 'contao_default');
-        $operation['label'] = 'E-Mails senden';
-        $operation['primary'] = true;
-
-        return $operation;
-    }
-
-    private function getCreateOrEditReportOperation(CalendarEventsModel $event): array
-    {
-        $operation = [];
-        $class = 'fa-solid fa-fw fa-comment-pen';
-
-        if (EventType::TOUR === $event->eventType || EventType::LAST_MINUTE_TOUR === $event->eventType) {
-            $operation['icon_class'] = $class.($event->filledInEventReportForm ? ' filter-green' : ' filter-red');
-
-            $operation['href'] = $this->router->generate('contao_backend', [
-                'do' => 'calendar',
-                'table' => 'tl_calendar_events',
-                'act' => 'edit',
-                'call' => 'writeTourReport',
-                'id' => $event->id,
-                'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
-                'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-            ]);
-            $operation['link_attributes'] = [
-                'data-turbo' => 'false',
-            ];
-        } else {
-            $operation['icon_class'] = $class.' filter-brightened';
-        }
-
-        if (!empty($operation['href'])) {
-            if ($event->filledInEventReportForm) {
-                $operation['title'] = $this->translator->trans('MSC.bhs_dashb_editReport', [], 'contao_default');
-            } else {
-                $operation['title'] = $this->translator->trans('MSC.bhs_dashb_createReport', [], 'contao_default');
-            }
-        } else {
-            $operation['title'] = $this->translator->trans('MSC.bhs_dashb_createReportDisabled', [], 'contao_default');
-        }
-
-        $operation['label'] = $event->filledInEventReportForm ? 'Tourrapport bearbeiten' : 'Tour-Rapport erfassen';
-        $operation['primary'] = true;
-
-        return $operation;
-    }
-
-    private function getPrintReportOperation(CalendarEventsModel $event): array
-    {
-        $operation = [];
-        $operation['icon_class'] = 'fa-solid fa-fw fa-print';
-
-        if (EventType::TOUR === $event->eventType || EventType::LAST_MINUTE_TOUR === $event->eventType) {
-            $operation['href'] = $this->router->generate('contao_backend', [
-                'do' => 'calendar',
-                'table' => 'tl_calendar_events_instructor_invoice',
-                'id' => $event->id,
-                'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
-                'ref' => $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id'),
-            ]);
-            $operation['link_attributes'] = [
-                'data-turbo' => 'false',
-            ];
-        }
-
-        $operation['title'] = !empty($operation['href']) ? $this->translator->trans('MSC.bhs_dashb_printReport', [], 'contao_default') : $this->translator->trans('MSC.bhs_dashb_printReportDisabled', [], 'contao_default');
-        $operation['label'] = 'Rapporte drucken & einreichen';
-        $operation['primary'] = false;
-
-        return $operation;
+        return $dashboardOperations;
     }
 
     private function getAllowedCalendarContainerIds(): array

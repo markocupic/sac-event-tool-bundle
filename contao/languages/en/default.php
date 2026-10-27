@@ -176,6 +176,17 @@ $GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorialsText'] = 'Die Seite "<a 
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_noUpcomingEventsDetected'] = 'In nächster Zeit stehen bei Ihnen keine Events an, wo Sie eine Leitungsfunktion ausüben.';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_noPastEventsDetected'] = 'Es wurden keine Events gefunden, bei denen Sie in letzter Zeit eine Leitungsfunktion ausgeübt haben.';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_loadMorePastEventsBtnLbl'] = 'Lade weitere Events';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_livePreviewDisabled'] = 'Event Vorschau nicht verfügbar (keine Vorschauseite beim Eventtyp)';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_opDenied'] = '%s: keine Berechtigung';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_opNotAvailable'] = '%s: nicht verfügbar';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_opLabel_editEvent'] = 'Event';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_opLabel_eventListing'] = 'Eventliste';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_opLabel_livePreview'] = 'Vorschau';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_opLabel_registrationList'] = 'Teilnehmerliste';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_opLabel_sendEmail'] = 'E-Mail versenden';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_opLabel_createReport'] = 'Tourrapport erfassen';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_opLabel_editReport'] = 'Tourrapport bearbeiten';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_opLabel_printReport'] = 'Tourrapport und Vergütungsformular drucken und einreichen';
 
 // Event registration frontend module
 $GLOBALS['TL_LANG']['ERR']['evt_reg_unknownError'] = 'Es ist ein unerwarteter Fehler aufgetreten. Bitte benachrichtige den Administrator dieser Webseite, sollte der Fehler erneut auftreten.';

@@ -1,0 +1,155 @@
+// Operations of an event (Feature\EventOperations\EventOperationsBuilder).
+// Not scoped to a page: the classes are used by the "my events" dashboard,
+// the button navbar in the event form and by other bundles, e.g. the back
+// end event search (markocupic/contao-backend-event-search).
+
+$sacevt-op-color: #1a6b99;
+$sacevt-op-color-disabled: #6f7685;
+$sacevt-op-color-green: #589b0f;
+$sacevt-op-color-red: #d80128;
+$sacevt-op-breakpoint: 576px;
+
+.sacevt-op-icon {
+  color: $sacevt-op-color !important;
+}
+
+.sacevt-op-icon--green {
+  color: $sacevt-op-color-green !important;
+}
+
+.sacevt-op-icon--red {
+  color: $sacevt-op-color-red !important;
+}
+
+// Denied or not available
+.sacevt-op-icon--disabled {
+  color: $sacevt-op-color-disabled !important;
+  cursor: not-allowed;
+}
+
+// Button navbar in the event form: operations the user is not allowed to execute
+.event-dashboard .tl_submit.sacevt-op--disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+
+// Dropdown menu of the operations (template Backend/EventOperations/operations_menu.html.twig).
+// Small screens: the primary operations as icons and a toggle button for the dropdown.
+// Larger screens: all operations as icons, no toggle button.
+// ".sacevt-op-menu-item" is the element that contains the menu and its ".dropdown-portal".
+.sacevt-op-menu-item {
+  // Reset the browser styles of the lists (in the dashboard, Contao resets them for .tl_listing)
+  ul.primary-operations, ul.dropdown-menu--dropdown {
+    margin: 0;
+    list-style: none;
+  }
+
+  ul.primary-operations {
+    padding: 0;
+  }
+
+  .dropdown-menu {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-menu--toggle {
+    padding: 0 .375rem;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: gray;
+  }
+
+  // The images of the toggle button (.color-scheme--light/--dark) are switched by the Contao core
+
+  @media (min-width: $sacevt-op-breakpoint) {
+    .dropdown-menu--toggle {
+      display: none;
+    }
+  }
+
+  .dropdown-menu--title {
+    border-bottom: 1px solid var(--border);
+    @media (min-width: $sacevt-op-breakpoint) {
+      display: none;
+    }
+  }
+
+  ul.dropdown-menu--dropdown {
+    position: absolute;
+    width: 220px;
+    @media (min-width: $sacevt-op-breakpoint) {
+      width: auto;
+    }
+    padding: 0.5rem;
+    background-color: var(--content-bg);
+    border: 1px solid var(--content-border);
+    z-index: 10;
+    display: none;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    column-gap: .25rem;
+  }
+
+  ul.dropdown-menu--dropdown.show {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+    @media (min-width: $sacevt-op-breakpoint) {
+      row-gap: 0;
+      flex-direction: row;
+    }
+  }
+
+  ul.dropdown-menu--dropdown a:hover * {
+    color: var(--contao) !important;
+  }
+
+  @media (min-width: $sacevt-op-breakpoint) {
+    ul.primary-operations, .dropdown-portal {
+      display: none;
+    }
+
+    ul.dropdown-menu--dropdown {
+      display: flex;
+      flex-direction: row;
+      column-gap: .25rem;
+      row-gap: 0;
+      min-width: initial;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      position: initial;
+      background-color: transparent;
+      z-index: initial;
+    }
+
+    ul.dropdown-menu--dropdown.show {
+      display: flex;
+    }
+  }
+
+  li.dropdown-menu--item * {
+    text-decoration: none;
+    text-align: left;
+    line-height: 1.25;
+  }
+
+  @media (min-width: $sacevt-op-breakpoint) {
+    li.dropdown-menu--item {
+      display: block;
+      color: var(--text);
+      text-decoration: none;
+      text-align: left;
+      line-height: 1;
+    }
+  }
+
+  @media (min-width: $sacevt-op-breakpoint) {
+    .dropdown-menu--item-label {
+      display: none;
+    }
+  }
+}

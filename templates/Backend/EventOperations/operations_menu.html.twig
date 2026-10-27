@@ -1,0 +1,75 @@
+{% trans_default_domain 'contao_default' %}
+{#
+    Operations of an event: the primary operations as icons and all operations in a
+    dropdown menu (small screens, Stimulus controller "sacevt--backend--operation-dropdown-menu").
+    Used by the "my events" dashboard and the back end event search.
+
+    Variables:
+    - operations:  array of EventOperation::toArray(), keyed by a CSS class (e.g. "be-dashb-op--print-report")
+    - menu_title:  title of the dropdown menu, e.g. the event title
+    - with_portal: adds the wrapper ".sacevt-op-menu-item" with the ".dropdown-portal" for the opened menu.
+                   Set it to false, if the surrounding element provides them (it must not hide the overflow).
+#}
+{% if with_portal|default(false) %}
+<div class="sacevt-op-menu-item">
+    <div class="dropdown-portal">{# The opened dropdown is placed here to prevent overflow-hidden issues. #}</div>
+{% endif %}
+    <div class="sacevt-op-menu --d-flex --flex-row --column-gap-1 --align-items-start">
+        <ul class="primary-operations --d-flex --flex-row --column-gap-1">
+            {% for op_name,op in operations %}
+                {% if op.primary|default %}
+                    <li{{ attrs().addClass([op_name, 'is-primary-op']) }}>
+                        {% if op.href|default %}
+                            {% set attributes = attrs()
+                                .set('href', op.href)
+                                .addClass('--d-flex')
+                                .set('title', op.title)
+                                .mergeWith(op.link_attributes|default({})) %}
+                            <a{{ attributes }}>
+                                <i{{ attrs().addClass(op.icon_class) }}></i>
+                            </a>
+                        {% else %}
+                            <span class="--d-flex">
+                            <i{{ attrs().addClass(op.icon_class).set('title', op.title) }}></i>
+                        </span>
+                        {% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        {# Wrap the operation links in a dropdown #}
+        <div data-controller="sacevt--backend--operation-dropdown-menu" class="dropdown-menu">
+            <button data-sacevt--backend--operation-dropdown-menu-target="toggle" title="Operationen anzeigen" class="dropdown-menu--toggle" type="button" aria-expanded="false">
+                <img src="{{ asset('icons/my_events_dashboard/more.svg', 'markocupic_sac_event_tool') }}" width="16" height="16" alt="Operationen für Event anzeigen" class="color-scheme--light">
+                <img src="{{ asset('icons/my_events_dashboard/more--dark.svg', 'markocupic_sac_event_tool') }}" width="16" height="16" alt="Operationen für Event anzeigen" class="color-scheme--dark">
+            </button>
+            <ul data-sacevt--backend--operation-dropdown-menu-target="menu" class="dropdown-menu--dropdown">
+                <div class="dropdown-menu--title --overflow-hidden ">
+                    <h6 class="--text-nowrap --mt-0 --mb-0 --pb-2 --lh-150">{{ menu_title }}</h6>
+                </div>
+
+                {% for op_name,op in operations %}
+                    <li{{ attrs().addClass([op_name, 'dropdown-menu--item', op.primary|default ? 'is-primary-op' : '']) }}>
+                        {% if op.href|default %}
+                            {% set attributes = attrs()
+                                .set('href', op.href)
+                                .set('class', 'dropdown-menu--item-link --d-flex --flex-row --flex-nowrap --column-gap-2 --text-nowrap')
+                                .set('title', op.title)
+                                .mergeWith(op.link_attributes|default({})) %}
+                            <a{{ attributes }}>
+                                <i{{ attrs().addClass(op.icon_class) }}></i><span class="dropdown-menu--item-label">{{ op.label }}</span>
+                            </a>
+                        {% else %}
+                            <div class="dropdown-menu--item --d-flex --flex-row --flex-nowrap --column-gap-2 --text-nowrap">
+                                <i{{ attrs().addClass(op.icon_class).set('title', op.title) }}></i><span class="dropdown-menu--item-label --text-gray">{{ op.label }}</span>
+                            </div>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {# End dropdown #}
+    </div>
+{% if with_portal|default(false) %}
+</div>
+{% endif %}

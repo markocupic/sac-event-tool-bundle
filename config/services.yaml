@@ -44,7 +44,7 @@ services:
 
     Markocupic\SacEventToolBundle\:
         resource: ../src/
-        exclude: ../src/{ContaoManager,Session,Event,DependencyInjection,Model,Security/Voter/CalendarAccessVoter.php}
+        exclude: ../src/{ContaoManager,Session,Event,DependencyInjection,Model,Security/Voter/CalendarAccessVoter.php,Feature/EventOperations/EventOperation.php,Feature/EventOperations/EventOperationState.php}
 
     # Contao 5.3 (EntityCacheTags) and Contao 6 (CacheTagManager), see CacheTagManagerPass
     Markocupic\SacEventToolBundle\Cache\CacheTagInvalidator:
