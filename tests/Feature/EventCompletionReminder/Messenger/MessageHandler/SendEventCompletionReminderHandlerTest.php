@@ -156,7 +156,7 @@ final class SendEventCompletionReminderHandlerTest extends ContaoTestCase
                         $this->assertArrayNotHasKey('lookback_days', $tokens);
                         $this->assertSame('<html-list>', $tokens['task_list_html']);
                         $this->assertSame('text-list', $tokens['task_list_text']);
-                        $this->assertSame('https://example.org/contao', $tokens['link_my_events_dashboard']);
+                        $this->assertSame('https://example.org/contao', $tokens['link_backend_welcome_screen']);
 
                         return true;
                     },

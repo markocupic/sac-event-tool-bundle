@@ -35,8 +35,8 @@ Encore
       to: 'icons/maintenance/[path][name].[ext]',
     })
     .copyFiles({
-      from: './assets/icons/my_events_dashboard',
-      to: 'icons/my_events_dashboard/[path][name].[ext]',
+      from: './assets/icons/welcome_screen_dashboard',
+      to: 'icons/welcome_screen_dashboard/[path][name].[ext]',
     })
     .copyFiles({
       from: './assets/icons/subscription-states',

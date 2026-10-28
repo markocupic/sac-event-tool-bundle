@@ -176,7 +176,7 @@ $GLOBALS['TL_LANG']['nc_tokens'][$type]['interval_days'] = 'Intervall in Tagen z
 
 // Notification
 $GLOBALS['TL_LANG']['nc_tokens'][$type]['reminder_count'] = 'Die wievielte Erinnerung für diesen Empfänger und Kalender (1 = erste Erinnerung).';
-$GLOBALS['TL_LANG']['nc_tokens'][$type]['link_my_events_dashboard'] = 'Absoluter Link ins Backend (Startseite mit dem Dashboard "Meine Events").';
+$GLOBALS['TL_LANG']['nc_tokens'][$type]['link_backend_welcome_screen'] = 'Absoluter Link ins Backend (Startseite mit dem Dashboard "Meine Events").';
 
 /*
  * Event registration reminder

@@ -223,7 +223,7 @@ Der Mailversand selbst läuft getrennt im Messenger-Worker und ist nicht enthalt
 - Zähler: `open_task_count`, `event_count`
 - Einstellungen: `first_offset_days`, `interval_days`
 - Versand: `reminder_count`
-- Links: `link_my_events_dashboard`
+- Links: `link_backend_welcome_screen`
 
 ## Templates
 
@@ -246,7 +246,7 @@ Absage-Hinweis bei Kursen und allgemeinen Events:
 - Texte: `MSC.instructor_post_event_task_cancel_hint`, `MSC.instructor_post_event_task_cancel_hint_link` («Zum Event»).
 - Damit der Leiter den Status setzen kann, braucht er Schreibrecht auf das Event in der aktuellen Freigabestufe (Recht `can_write_event` in den Rechte-Regeln der Freigabestufe).
 
-URL-Erzeugung wie im `MyEventsDashboardController`. Der Cron läuft per CLI, daher muss der Router-Kontext konfiguriert sein: entweder `framework.router.default_uri` (z. B. `https://www.sac-pilatus.ch`) oder `router.request_context.host`/`scheme` in `parameters.yaml`.
+URL-Erzeugung wie im `WelcomeScreenDashboardController`. Der Cron läuft per CLI, daher muss der Router-Kontext konfiguriert sein: entweder `framework.router.default_uri` (z. B. `https://www.sac-pilatus.ch`) oder `router.request_context.host`/`scheme` in `parameters.yaml`.
 
 HTML-Mail im Worker: Das Notification Center wandelt im HTML relative URLs mit `Environment::get('base')` um. Ohne Request (Cron, Messenger-Worker) ergibt das `http://:/` und der Versand scheitert («Unable to parse URI»). Im HTML-Text der Notification deshalb keine relativen Links verwenden. TinyMCE kürzt Links auf die eigene Domain ab, interne Seiten darum als Insert-Tag verlinken: `{{link_url::<id>::absolute|urlattr}}`.
 

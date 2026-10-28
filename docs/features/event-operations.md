@@ -7,7 +7,7 @@ Ort: `src/Feature/EventOperations/` (Namespace `Markocupic\SacEventToolBundle\Fe
 
 Die Operationen eines Events (bearbeiten, Eventliste, Vorschau, Teilnehmerliste, E-Mail, Tourrapport, Rapporte drucken) werden an einer Stelle erzeugt und für den angemeldeten Backend-Benutzer geprüft. So zeigen alle Stellen im Backend dieselben Operationen mit denselben Icons, Farben und Berechtigungen:
 
-- Dashboard «Ihre nächsten Events» / «Ihre vergangenen Events» auf der Backend-Startseite (`Controller\Backend\MyEventsDashboardController`)
+- Dashboard «Ihre nächsten Events» / «Ihre vergangenen Events» auf der Backend-Startseite (`Controller\Backend\WelcomeScreenDashboardController`)
 - Button-Leiste im Event-Formular (`EventListener\GenerateEventDashboardListener`)
 - Treffer der Event-Suche auf der Backend-Startseite (`markocupic/contao-backend-event-search`, optional), siehe unten
 

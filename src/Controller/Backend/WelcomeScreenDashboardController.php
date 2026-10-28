@@ -33,7 +33,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment as Twig;
 
-class MyEventsDashboardController
+class WelcomeScreenDashboardController
 {
     private Adapter $calendarEventsModelAdapter;
 
@@ -79,7 +79,7 @@ class MyEventsDashboardController
             $this->prepareEventsForView($pastEvents, 'past-event'),
         );
 
-        $html = $this->twig->render('@MarkocupicSacEventTool/Backend/MyEventsDashboard/my_events_dashboard.html.twig', [
+        $html = $this->twig->render('@MarkocupicSacEventTool/Backend/WelcomeScreenDashboard/welcome_screen_dashboard.html.twig', [
             'events' => $events,
             'has_upcoming_events' => !empty($upcomingEvents),
             'has_past_events' => !empty($pastEvents),

@@ -4,7 +4,7 @@
   "swisstopo_event_map.js": "/bundles/markocupicsaceventtool/swisstopo_event_map.5210f98d.js",
   "member_dashboard_my_event_registrations.js": "/bundles/markocupicsaceventtool/member_dashboard_my_event_registrations.23f9efd8.js",
   "js/avatar_uploader.js": "/bundles/markocupicsaceventtool/js/avatar_uploader.c7ebb8e9.js",
-  "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.03ec23b1.css",
+  "css/be_stylesheet.css": "/bundles/markocupicsaceventtool/css/be_stylesheet.57f16a39.css",
   "images/events/course/booklet/fallback.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/fallback.jpg",
   "images/events/course/booklet/toc.jpg": "/bundles/markocupicsaceventtool/images/events/course/booklet/toc.jpg",
   "images/event_feedback/background_2.jpg": "/bundles/markocupicsaceventtool/images/event_feedback/background_2.jpg",
@@ -98,13 +98,13 @@
   "icons/event_states/event_status_5.svg": "/bundles/markocupicsaceventtool/icons/event_states/event_status_5.svg",
   "images/message-square-heart.svg": "/bundles/markocupicsaceventtool/images/message-square-heart.4978ad8f.svg",
   "images/clipboard-list.svg": "/bundles/markocupicsaceventtool/images/clipboard-list.7da1e290.svg",
-  "icons/my_events_dashboard/more--dark.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more--dark.svg",
-  "icons/my_events_dashboard/more.svg": "/bundles/markocupicsaceventtool/icons/my_events_dashboard/more.svg",
+  "icons/welcome_screen_dashboard/more--dark.svg": "/bundles/markocupicsaceventtool/icons/welcome_screen_dashboard/more--dark.svg",
+  "icons/welcome_screen_dashboard/more.svg": "/bundles/markocupicsaceventtool/icons/welcome_screen_dashboard/more.svg",
   "../assets/ts/avatar_uploader.d.ts": "/bundles/markocupicsaceventtool/../assets/ts/avatar_uploader.d.ts",
   "stimulus_backend.e025cba0.js.map": "/bundles/markocupicsaceventtool/stimulus_backend.e025cba0.js.map",
   "stimulus_frontend.e7a19ae7.js.map": "/bundles/markocupicsaceventtool/stimulus_frontend.e7a19ae7.js.map",
   "swisstopo_event_map.5210f98d.js.map": "/bundles/markocupicsaceventtool/swisstopo_event_map.5210f98d.js.map",
   "member_dashboard_my_event_registrations.23f9efd8.js.map": "/bundles/markocupicsaceventtool/member_dashboard_my_event_registrations.23f9efd8.js.map",
   "avatar_uploader.c7ebb8e9.js.map": "/bundles/markocupicsaceventtool/js/avatar_uploader.c7ebb8e9.js.map",
-  "be_stylesheet.03ec23b1.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.03ec23b1.css.map"
+  "be_stylesheet.57f16a39.css.map": "/bundles/markocupicsaceventtool/css/be_stylesheet.57f16a39.css.map"
 }

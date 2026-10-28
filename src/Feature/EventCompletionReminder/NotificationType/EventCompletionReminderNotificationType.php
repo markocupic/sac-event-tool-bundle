@@ -81,7 +81,7 @@ class EventCompletionReminderNotificationType implements NotificationTypeInterfa
                 'first_offset_days',
                 'interval_days',
                 'reminder_count',
-                'link_my_events_dashboard',
+                'link_backend_welcome_screen',
             ],
         ];
     }

@@ -1,6 +1,6 @@
 {% trans_default_domain 'contao_default' %}
-<div id="tl_my_events_dashboard">
-    <div id="tl_my_events_dashboard_inner">
+<div id="tl_welcome_screen_dashboard">
+    <div id="tl_welcome_screen_dashboard_inner">
         <h2><i class="fa-solid fa-mountain-sun"></i> {{ 'MSC.bhs_dashb_sacEvents'|trans }}</h2>
         <ul class="tl_listing --display-flex --flex-column">
             {% set col_span = 10 %}
@@ -27,22 +27,22 @@
                         {% endif %}
                     {% endif %}
                 {% else %}
-                    <li class="my-events-dashb--item sacevt-op-menu-item --d-flex --flex-row --flex-nowrap --row-gap-1 --align-items-start hover-div">
+                    <li class="welcome-screen-dashboard--item sacevt-op-menu-item --d-flex --flex-row --flex-nowrap --row-gap-1 --align-items-start hover-div">
                         <div class="dropdown-portal">{# To prevent overflow-hidden issues we will place the operation navigation dropdown here. #}</div>
                         <ul class="--d-flex --flex-row --flex-nowrap --flex-grow-1 --overflow-hidden">
                             {# Column 1: Contains the event subscription badges. #}
-                            <li class="my-events-dashb--badge-col --flex-shrink-0 --text-align-left --align-items-start">
+                            <li class="welcome-screen-dashboard--badge-col --flex-shrink-0 --text-align-left --align-items-start">
                                 <div class="--d-flex --flex-row --flex-wrap --row-gap-2 --column-gap-2">
                                     {{ event.badge|raw }}
                                 </div>
                             </li>
                             {# Column 2: Contains the event date, the event state icon, the event title and the FS info. #}
-                            <li class="my-events-dashb--title-col --position-relative --flex-grow-1 --text-align-left --align-items-start --overflow-hidden">
-                                <div class="my-events-dashb--title-col--inner --w-100 --column-gap-2 --d-flex">
-                                    <div class="my-events-dashb--title-col--date --flex-shrink-0">
+                            <li class="welcome-screen-dashboard--title-col --position-relative --flex-grow-1 --text-align-left --align-items-start --overflow-hidden">
+                                <div class="welcome-screen-dashboard--title-col--inner --w-100 --column-gap-2 --d-flex">
+                                    <div class="welcome-screen-dashboard--title-col--date --flex-shrink-0">
                                         {{ event.date }}
                                     </div>
-                                    <div class="my-events-dashb--title-col--icon-and-title --d-flex --flex-row --column-gap-1">
+                                    <div class="welcome-screen-dashboard--title-col--icon-and-title --d-flex --flex-row --column-gap-1">
                                         {{ event.state_icon|raw }}
                                         {% if event.href_event %}
                                             <a href="{{ event.href_event }}" class="--text-underline" title="{{ event.title_event }}"><strong>{{ event.title }}</strong></a>
@@ -51,7 +51,7 @@
                                         {% endif %}
                                     </div>
                                     {% if event.release_level is not empty %}
-                                        <div class="my-events-dashb--title-col--fs --flex-shrink-0 --me-2">
+                                        <div class="welcome-screen-dashboard--title-col--fs --flex-shrink-0 --me-2">
                                             {% if event['operations']['be-dashb-op--event-listing']['href'] %}
                                                 <a href="{{ event['operations']['be-dashb-op--event-listing']['href'] }}" class="--text-underline" title="{{ 'MSC.bhs_dashb_editReleaseLevel'|trans }}"><small>({{ event.release_level }})</small></a>
                                             {% else %}
@@ -62,7 +62,7 @@
                                 </div>
                             </li>
                             {# Column 3: Contains the operation icons and the dropdown navigation (small screens), see EventOperations/operations_menu.html.twig. #}
-                            <li class="my-events-dashb--operation-col --d-flex --flex-shrink-0 --vertical-align-top">
+                            <li class="welcome-screen-dashboard--operation-col --d-flex --flex-shrink-0 --vertical-align-top">
                                 {% include '@MarkocupicSacEventTool/Backend/EventOperations/operations_menu.html.twig' with {operations: event.operations, menu_title: event.title, with_portal: false} only %}
                             </li>
                         </ul>

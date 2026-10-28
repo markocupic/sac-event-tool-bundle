@@ -1,11 +1,11 @@
 $responsive-breakpoint: 576px;
 
-#tl_my_events_dashboard {
+#tl_welcome_screen_dashboard {
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
   padding: 0 15px 4px;
 
-  #tl_my_events_dashboard_inner {
+  #tl_welcome_screen_dashboard_inner {
     width: 100%;
 
     h2 {
@@ -26,7 +26,7 @@ $responsive-breakpoint: 576px;
     // The colors of the operation icons are defined in _event_operations.scss
 
     // The first column contains the event subscription badges
-    & li.my-events-dashb--badge-col {
+    & li.welcome-screen-dashboard--badge-col {
       width: 50px;
 
       @media (min-width: $responsive-breakpoint) {
@@ -52,7 +52,7 @@ $responsive-breakpoint: 576px;
     }
 
     // The second column contains the date, the event title and the FS info
-    & li.my-events-dashb--title-col {
+    & li.welcome-screen-dashboard--title-col {
       & a, & i {
         line-height: 1.2;
         @media (max-width: $responsive-breakpoint) {
@@ -75,7 +75,7 @@ $responsive-breakpoint: 576px;
         }
       }
 
-      & > div.my-events-dashb--title-col--inner {
+      & > div.welcome-screen-dashboard--title-col--inner {
         display: flex;
         flex-direction: column;
         row-gap: .5rem;
@@ -84,11 +84,11 @@ $responsive-breakpoint: 576px;
           flex-wrap: nowrap;
         }
 
-        & > div.my-events-dashb--title-col--date {
+        & > div.welcome-screen-dashboard--title-col--date {
           min-width: 65px;
         }
 
-        & .my-events-dashb--title-col--icon-and-title > a, & .my-events-dashb--title-col--icon-and-title {
+        & .welcome-screen-dashboard--title-col--icon-and-title > a, & .welcome-screen-dashboard--title-col--icon-and-title {
           box-sizing: border-box;
           line-height: normal;
           min-height: 18px;

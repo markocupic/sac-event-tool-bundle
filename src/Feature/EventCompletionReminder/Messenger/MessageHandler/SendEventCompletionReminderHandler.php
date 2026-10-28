@@ -180,7 +180,7 @@ readonly class SendEventCompletionReminderHandler
             'first_offset_days' => (int) $calendar->eventCompletionReminderFirstOffset,
             'interval_days' => (int) $calendar->eventCompletionReminderInterval,
             'reminder_count' => $reminderCount,
-            'link_my_events_dashboard' => $this->router->generate('contao_backend', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            'link_backend_welcome_screen' => $this->router->generate('contao_backend', [], UrlGeneratorInterface::ABSOLUTE_URL),
         ];
     }
 
