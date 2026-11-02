@@ -589,9 +589,16 @@ class CalendarEventsMember
     public function registerGlobalOperationButtonCallbacks(): void
     {
         $modern = class_exists(DataContainerGlobalOperationsBuilder::class);
+        $globalOperations = &$GLOBALS['TL_DCA'][self::TABLE]['list']['global_operations'];
 
-        $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['backToEventSettings']['button_callback'] = [self::class, $modern ? 'backToEventSettingsButton' : 'legacyBackToEventSettingsButton'];
-        $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail']['button_callback'] = [self::class, $modern ? 'sendEmailButton' : 'legacySendEmailButton'];
+        // Do not recreate operations that have been removed by another onload callback
+        if (isset($globalOperations['backToEventSettings'])) {
+            $globalOperations['backToEventSettings']['button_callback'] = [self::class, $modern ? 'backToEventSettingsButton' : 'legacyBackToEventSettingsButton'];
+        }
+
+        if (isset($globalOperations['sendEmail'])) {
+            $globalOperations['sendEmail']['button_callback'] = [self::class, $modern ? 'sendEmailButton' : 'legacySendEmailButton'];
+        }
     }
 
     /**
