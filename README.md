@@ -92,6 +92,8 @@ Ausführliche Beschreibungen (Regeln, Datenmodell, Klassen, Tests) liegen unter 
 - [Mitglieder-Sync mit dem Zentralverband](docs/features/member-database-sync.md): übernimmt täglich die Mitgliederdaten aus der Mitgliederdatenbank des SAC Zentralverbands in `tl_member`.
 - [Mitgliederdaten in die Backend-User übernehmen](docs/features/member-to-user-sync.md): überträgt täglich die Personendaten aus `tl_member` in die Backend-User (`tl_user`) mit SAC-Mitgliedernummer.
 - [Mitgliederdaten in die Event-Anmeldungen übernehmen](docs/features/event-registration-database-sync.md): überträgt täglich die aktuellen Personendaten aus `tl_member` in die Anmeldungen (`tl_calendar_events_member`).
+- [Downloads von Events nur für Mitglieder](docs/features/event-enclosure-protection.md): sperrt den Download von Event-Anhängen (`?file=`) für nicht eingeloggte Besucher.
+- [Tour als PDF](docs/features/event-pdf-export.md): zeigt eine veröffentlichte Tour als PDF im Design «Wegweiser» an (Button auf der Detailseite); erzeugt mit Typst und pro Event zwischengespeichert.
 - [Kursprogramm als PDF](docs/features/workshop-booklet.md): erzeugt das Kursprogramm eines Jahres oder einen einzelnen Kurs als PDF zum Herunterladen (nur für eingeloggte Mitglieder).
 - [Home-Verzeichnis für Backend-User](docs/features/backend-user-home-directory.md): legt für jeden Backend-User ein persönliches Verzeichnis mit Filemount an und archiviert die Verzeichnisse gelöschter User.
 - [Rechte-Reset für Backend-User](docs/features/backend-user-permission-reset.md): setzt die persönlichen Rechte von Backend-Usern mit Gruppenrechten zurück, damit sie ihre Rechte nur über Gruppen erhalten.
