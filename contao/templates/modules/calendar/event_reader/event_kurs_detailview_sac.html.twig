@@ -8,7 +8,7 @@
 <!-- indexer::continue -->
 
 <div class="event event-detailview layout_full block{{ get_event_data(model, 'class') }}">
-    <h1 class="content-headline mt-3">{{ get_event_data(model, 'title') }}</h1>
+    <h1 class="content-headline mt-0 mt-md-3">{{ get_event_data(model, 'title') }}</h1>
 
     {# begin first row #}
     <div class="row gx-3">
@@ -46,16 +46,16 @@
                 <!-- indexer::stop -->
                 <div class="organizers event-detail event-info-box icon-box-small">
                     <h5>Organisierende Gruppe</h5>
-                    <div class="organizer-logo mb-2">
+                    <div class="event-detail event-info-box organizer-logo mt-2 mb-1">
                         {% set logos = get_event_data(model, 'eventOrganizerLogos') %}
-                        <ul class="row g-1 list-unstyled">
+                        <ul class="row mb-0 g-1 list-unstyled">
                             {% for logo in logos %}
                                 <li class="col-auto">{{ logo|raw }}</li>
                             {% endfor %}
                         </ul>
                     </div>
                     {% if not get_event_data(model, 'eventOrganizers') is empty %}
-                        <p>{{ get_event_data(model, 'eventOrganizers')|raw }}</p>
+                        <p><small>{{ get_event_data(model, 'eventOrganizers')|raw }}</small></p>
                     {% else %}
                         <p>Keine Gruppe ausgewählt</p>
                     {% endif %}
