@@ -128,6 +128,17 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
+                        // See docs/features/workshop-booklet.md
+                        ->arrayNode('workshop_booklet')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->integerNode('cache_ttl')
+                                    ->info('Seconds a generated course programme is reused (0 = generate it on every download).')
+                                    ->min(0)
+                                    ->defaultValue(3600)
+                                ->end()
+                            ->end()
+                        ->end()
                         // See docs/features/event-pdf-export.md
                         ->arrayNode('event_pdf_export')
                             ->addDefaultsIfNotSet()

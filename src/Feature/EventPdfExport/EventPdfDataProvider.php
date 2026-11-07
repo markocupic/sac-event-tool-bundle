@@ -46,12 +46,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class EventPdfDataProvider
 {
     /**
-     * Event types that can be exported (they use the tour detail template).
+     * Event types that can be exported. Courses have their own variant (red, course fields).
      */
     public const array EVENT_TYPES = [
         EventType::TOUR,
         EventType::LAST_MINUTE_TOUR,
         EventType::GENERAL_EVENT,
+        EventType::COURSE,
     ];
 
     /**
@@ -122,9 +123,10 @@ class EventPdfDataProvider
 
         $util = $this->calendarEventsUtil;
         $isTour = self::isTour($event);
+        $isCourse = self::isCourse($event);
         $tourProfile = $isTour ? StringUtil::deserialize($event->tourProfile, true) : [];
 
-        $kicker = $util->getTourTypesAsArray($event, 'title');
+        $kicker = $isCourse ? ['Kurs'] : $util->getTourTypesAsArray($event, 'title');
 
         if (EventType::LAST_MINUTE_TOUR === $event->eventType) {
             array_unshift($kicker, 'Spontantour');
@@ -132,9 +134,25 @@ class EventPdfDataProvider
 
         $kicker[] = $util->getEventDuration($event);
 
+        // Courses show their course number (like on the detail page), if there is one
+        $courseId = $isCourse ? $this->plain($util->getEventData($event, 'courseId')) : '';
+
         return [
+            // "course" (red, course fields) or "tour" (blue)
+            'variant' => $isCourse ? 'course' : 'tour',
             'sectionName' => $this->sectionName,
-            'eventNumber' => (string) $util->getEventData($event, 'eventId'),
+            'numberLabel' => '' !== $courseId ? 'Kurs-Nr.' : 'Nr.',
+            'eventNumber' => '' !== $courseId ? $courseId : (string) $util->getEventData($event, 'eventId'),
+            'dateLabel' => $isCourse ? 'Kursdaten' : 'Datum',
+            'courseType' => $isCourse ? $this->getCourseType($event) : '',
+            'courseLevel' => $isCourse ? $this->plain($util->getEventData($event, 'courseLevelName')) : '',
+            'instructorsTitle' => $isCourse ? 'Kursleitung' : 'Leitung',
+            // Below the QR code in the registration box
+            'onlineLabel' => match (true) {
+                $isCourse => 'Zum Kurs online',
+                $isTour => 'Zur Tour online',
+                default => 'Zum Event online',
+            },
             'title' => $this->plain($event->title),
             'kicker' => array_values(array_filter(array_map($this->plain(...), $kicker))),
             'teaser' => $this->plain($event->teaser),
@@ -158,6 +176,11 @@ class EventPdfDataProvider
             'registration' => $this->getRegistration($event, $forMembers),
             'url' => $this->contentUrlGenerator->generate($event, [], UrlGeneratorInterface::ABSOLUTE_URL),
         ];
+    }
+
+    public static function isCourse(CalendarEventsModel $event): bool
+    {
+        return EventType::COURSE === $event->eventType;
     }
 
     public static function isTour(CalendarEventsModel $event): bool
@@ -428,6 +451,17 @@ class EventPdfDataProvider
     }
 
     /**
+     * "Kursart" like on the course detail page, e.g. "Ausbildung Hochtouren: Grundkurs".
+     */
+    private function getCourseType(CalendarEventsModel $event): string
+    {
+        $level0 = $this->plain($this->calendarEventsUtil->getEventData($event, 'courseTypeLevel0Name'));
+        $level1 = $this->plain($this->calendarEventsUtil->getEventData($event, 'courseTypeLevel1Name'));
+
+        return '' !== $level0 && '' !== $level1 ? $level0.': '.$level1 : '';
+    }
+
+    /**
      * The own avatar of the user (not a default avatar). The modification time is part of
      * the data, so a new photo leads to a new PDF.
      *
@@ -469,9 +503,13 @@ class EventPdfDataProvider
         $price[] = $this->plain($event->leistungen);
 
         $isTour = self::isTour($event);
+        $isCourse = self::isCourse($event);
 
-        // Tours: "Route/Details" and "Profil", general events: "Details" (like on the detail page)
+        // Tours: "Route/Details" and "Profil", general events: "Details", courses: "Kursinhalte" and
+        // "Kursziele" (like on the detail pages)
         $sections = [
+            'Kursinhalte' => $isCourse ? $this->plain($event->issues) : '',
+            'Kursziele' => $isCourse ? $this->plain($event->terms) : '',
             'Route/Details' => $isTour ? $this->plain($event->tourDetailText) : '',
             'Details' => EventType::GENERAL_EVENT === $event->eventType ? $this->plain($event->generalEventDetailText) : '',
             'Profil' => $isTour ? implode("\n", array_map($this->plain(...), $this->calendarEventsUtil->getTourProfileAsArray($event))) : '',
@@ -516,6 +554,11 @@ class EventPdfDataProvider
 
         if (null !== $geoLink) {
             $links[] = ['title' => 'Karte auf map.geo.admin.ch', 'url' => str_replace('/embed.html', '/index.html', $geoLink)];
+        }
+
+        // The course detail page has no further links
+        if (self::isCourse($event)) {
+            return $links;
         }
 
         $routePortal = $this->calendarEventsUtil->getSacRoutePortalLink($event);

@@ -117,6 +117,7 @@ class MarkocupicSacEventToolExtension extends Extension implements PrependExtens
         $container->setParameter($rootKey.'.feature.event_feedback.configs', $config['feature']['event_feedback']['configs']);
         $container->setParameter($rootKey.'.feature.event_registration_reminder.disable', $config['feature']['event_registration_reminder']['disable']);
         $container->setParameter($rootKey.'.feature.event_registration_reminder.cron_schedule', $config['feature']['event_registration_reminder']['cron_schedule']);
+        $container->setParameter($rootKey.'.feature.workshop_booklet.cache_ttl', $config['feature']['workshop_booklet']['cache_ttl']);
         $container->setParameter($rootKey.'.feature.event_pdf_export.typst_binary', $config['feature']['event_pdf_export']['typst_binary']);
         $container->setParameter($rootKey.'.feature.event_pdf_export.logo', $config['feature']['event_pdf_export']['logo']);
         $container->setParameter($rootKey.'.feature.event_pdf_export.cache', $config['feature']['event_pdf_export']['cache']);

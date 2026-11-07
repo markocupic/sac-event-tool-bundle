@@ -240,19 +240,10 @@
                                         <i class="fa-regular fa-calendar-plus"></i>&nbsp;iCal
                                     </a>
                                 </div>
-                                {# Display the download details as PDF button for the current event #}
-                                {% if has_logged_in_frontend_user() %}
-                                    {# Do not allow the download for not logged in users #}
-                                    {% set attributes = attrs()
-                                        .set('href', path('sac_event_tool_download_print_workshop_details_as_pdf', {'eventId': get_event_data(model, 'id')})) %}
-                                {% else %}
-                                    {% set attributes = attrs()
-                                        .set('data-sac-login-toggle', 'modal')
-                                        .set('data-sac-login-target', 'same-site') %}
-                                {% endif %}
+                                {# Display the PDF download button for the current course (see docs/features/event-pdf-export.md) #}
                                 <div class="d-inline me-2 mt-3 mb-3">
-                                    <a{{ attributes }} title="Details drucken" class="btn btn-block btn-outline-primary text-nowrap">
-                                        <i class="fa-regular fa-print"></i>&nbsp;Detailinfos
+                                    <a href="{{ path('sac_event_tool_download_event_pdf', {'eventId': get_event_data(model, 'id')}) }}" target="_blank" rel="noopener" title="Kurs als PDF anzeigen" class="btn btn-block btn-outline-primary text-nowrap">
+                                        <i class="fa-regular fa-file-pdf"></i>&nbsp;PDF
                                     </a>
                                 </div>
                             </nav>

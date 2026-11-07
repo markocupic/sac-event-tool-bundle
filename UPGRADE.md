@@ -77,7 +77,9 @@ nach Twig portieren. Die `.html5`-Versionen werden nicht mehr ausgeliefert.
 
 Hinweise zu einzelnen Templates:
 
-- **`tcpdf_template_sac_kurse`** (Kursbroschüre): Die Textfelder (Teaser, Kursziele, Kursinhalte, Voraussetzungen,
+- **`tcpdf_template_sac_kurse`** (Kursbroschüre): Inzwischen entfernt. Das Kursheft wird mit Typst erzeugt
+  (`src/Feature/EventPdfExport/typst/course_booklet.typ`, siehe `docs/features/workshop-booklet.md`); ein eigenes
+  `tcpdf_template_sac_kurse` im Projekt wird nicht mehr verwendet und kann gelöscht werden. Bis dahin galt: Die Textfelder (Teaser, Kursziele, Kursinhalte, Voraussetzungen,
   Kursort, Leistungen, Anmeldung, Material, Treffpunkt, Weiteres) werden nicht mehr in PHP mit `nl2br()` aufbereitet,
   sondern als reiner Text übergeben. Zeilenumbrüche werden im Template mit `|nl2br` umgewandelt.
 - **`mod_jahresprogramm_export`**: Die Abschnitte sind in Blöcke unterteilt (`courses`, `tours`,

@@ -50,7 +50,7 @@ Contao 5.6 deprecated und funktioniert in Contao 6 nicht mehr.
 
 ### Neue Möglichkeiten ab Contao 5.7
 
-- [ ] Exporte als Hintergrund-Jobs (Jobs-Framework, ab 5.7 mit Messenger): Jahresprogramm, Pilatus-Export, CSV-Exporte, Kursbroschüre (`tcpdf_template_sac_kurse`). Fortschritt in der Job-Ansicht, Dateien als Job-Anhänge (seit 5.7 mehrere möglich).
+- [ ] Exporte als Hintergrund-Jobs (Jobs-Framework, ab 5.7 mit Messenger): Jahresprogramm, Pilatus-Export, CSV-Exporte, Kursheft (`WorkshopBookletGenerator`, Typst). Fortschritt in der Job-Ansicht, Dateien als Job-Anhänge (seit 5.7 mehrere möglich).
 - [ ] Backend-Suche (Loupe, DCA-Option `$config['backendSearch']`) für Events (`tl_calendar_events`), Anmeldungen (`tl_calendar_events_member`) und Tourenberichte (sac-event-blog-bundle). Berechtigungen beachten.
 - [ ] DCA-Berechtigungen (contao/contao#9012) prüfen: Können sie Teile der eigenen Zugriffslogik (`DataContainer\AccessDecision`, Voter) ersetzen? Nur übernehmen, wenn das Verhalten gleich bleibt.
 - [ ] Virtuelle Felder mit JSON-Speicher (contao/contao#8838) prüfen: Selten abgefragte Felder von `tl_calendar_events`/`tl_calendar_events_member` (nie gefiltert, sortiert oder durchsucht) in eine JSON-Spalte verschieben. Braucht eine Datenmigration.

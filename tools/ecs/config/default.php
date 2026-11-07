@@ -28,7 +28,6 @@ return ECSConfig::configure()
 		\SlevomatCodingStandard\Sniffs\Variables\UnusedVariableSniff::class => [
 			//'core-bundle/tests/Session/Attribute/ArrayAttributeBagTest.php',
 			'*/Controller/Cloudconvert/Sandbox/WebhookController.php',
-			'*/Pdf/WorkshopTCPDF.php',
 		],
 		__DIR__ . '/../../src/Controller/Cloudconvert/Sandbox/WebhookController.php',
 

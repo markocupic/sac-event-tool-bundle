@@ -44,7 +44,6 @@
         "symfony/stopwatch": "*",
         "symfony/string": "^6.4 || ^7.0 || ^8.0",
         "symfony/webpack-encore-bundle": "^v2.0",
-        "tecnickcom/tcpdf": "^6.4",
         "terminal42/notification_center": "^2.0",
         "mvo/contao-group-widget": "^1.6",
         "rbdwllr/reallysimplejwt": "^4.0",

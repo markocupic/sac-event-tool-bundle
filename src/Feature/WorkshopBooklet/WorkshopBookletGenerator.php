@@ -15,55 +15,56 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Feature\WorkshopBooklet;
 
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
-use Contao\FrontendTemplate;
-use Contao\StringUtil;
-use Contao\System;
-use Contao\UserModel;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
-use Markocupic\SacEventToolBundle\Config\CourseLevels;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
-use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
-use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
-use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
+use Markocupic\SacEventToolBundle\Feature\EventPdfExport\EventPdfGenerator;
 use Markocupic\SacEventToolBundle\Util\CalendarEventsUtil;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Generates the course programme ("Kursprogramm") as a PDF booklet: all published courses of a year
- * with cover and table of contents, or a single course without cover and table of contents.
+ * with cover and table of contents, or a single course.
+ *
+ * The PDF is created with Typst in the design "Wegweiser" (EventPdfGenerator::generateBooklet(),
+ * template src/Feature/EventPdfExport/typst/course_booklet.typ). A single course is the same PDF
+ * as the "PDF" button on the course detail page (EventPdfGenerator::generate()).
+ *
+ * The course programme is reused for sacevt.feature.workshop_booklet.cache_ttl seconds (default one
+ * hour), so the server does not compile it again for every download. A lock makes sure that
+ * simultaneous downloads do not compile it several times.
  *
  * See docs/features/workshop-booklet.md
  */
 class WorkshopBookletGenerator
 {
-    private WorkshopTCPDF|null $pdf;
-
-    private int|null $year;
+    private int $year;
 
     private int|null $eventId = null;
 
     private bool $download = false;
 
-    private bool $printSingleEvent = false;
-
     public function __construct(
-        private readonly CalendarEventsUtil $calendarEventsUtil,
-        private readonly CourseLevels $courseLevels,
-        private readonly BinaryFileDownload $binaryFileDownload,
-        private readonly Connection $connection,
         private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
+        private readonly CalendarEventsUtil $calendarEventsUtil,
+        private readonly EventPdfGenerator $eventPdfGenerator,
+        private readonly BinaryFileDownload $binaryFileDownload,
         private readonly string $projectDir,
         private readonly string $sacevtEventCourseBookletFilenamePattern,
         private readonly string $sacevtTempDir,
+        #[Autowire('%sacevt.event.course.booklet_cover_image%')]
+        private readonly string $coverImage,
+        #[Autowire('%sacevt.feature.workshop_booklet.cache_ttl%')]
+        private readonly int $cacheTtl,
     ) {
-        $this->framework->initialize(true);
-
         // Set defaults
         $this->year = (int) date('Y');
     }
@@ -78,6 +79,7 @@ class WorkshopBookletGenerator
         if (!checkdate(1, 1, $year)) {
             throw new \Exception(\sprintf('%s is not a valid year number. Please use a valid year number f.ex. "2020" as first parameter.', Date::parse('Y', strtotime((string) $year))));
         }
+
         $this->year = $year;
 
         return $this;
@@ -90,7 +92,9 @@ class WorkshopBookletGenerator
      */
     public function setEventId(int $eventId): self
     {
-        if (null === CalendarEventsModel::findById($eventId)) {
+        $this->framework->initialize();
+
+        if (null === $this->framework->getAdapter(CalendarEventsModel::class)->findById($eventId)) {
             throw new \Exception('Please use a valid event id as first parameter.');
         }
 
@@ -109,269 +113,126 @@ class WorkshopBookletGenerator
         return $this;
     }
 
-    /**
-     * @throws Exception
-     */
     public function generate(): BinaryFileResponse
     {
-        $addToc = true;
-        $addCover = true;
+        $this->framework->initialize();
 
-        // Print single event
-        if (null !== CalendarEventsModel::findById($this->eventId)) {
-            $this->printSingleEvent = true;
-            $addToc = false;
-            $addCover = false;
-        }
-
-        // The fonts are part of this feature
-        $fontDirectory = __DIR__.'/fonts/opensans';
-
-        // Create new PDF document Extend TCPDF for special footer and header handling
-        $this->pdf = new WorkshopTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-        \TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-Light.ttf', 'TrueTypeUnicode', '', 96);
-        \TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-Bold.ttf', 'TrueTypeUnicode', '', 96);
-        \TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-LightItalic.ttf', 'TrueTypeUnicode', '', 96);
-
-        // $this->pdf->setPrintHeader(false);
-        $this->pdf->setPrintFooter(false);
-
-        // Set margins
-        $this->pdf->SetMargins(20, 20, 20);
-        $this->pdf->SetHeaderMargin(0);
-
-        // Set auto page breaks false
-        $this->pdf->SetAutoPageBreak(false);
-
-        if ($addCover) {
-            // Cover (first page)
-            $this->pdf->type = 'cover';
-            $this->pdf->AddPage('P', 'A4');
-
-            $this->pdf->SetY(60);
-            $this->pdf->SetFont('opensans', 'B', 30);
-            $this->pdf->SetTextColor(255, 255, 255);
-            $this->pdf->MultiCell(0, 0, 'SAC Sektion Pilatus', 0, 'R', 0, 1, '', '', true);
-
-            $this->pdf->SetY(120);
-            $this->pdf->SetFont('opensans', 'B', 45);
-            $this->pdf->SetTextColor(255, 255, 255);
-            $this->pdf->MultiCell(0, 0, 'Kursprogramm '.$this->year, 0, 'R', 0, 1, '', '', true);
-
-            $this->pdf->Ln();
-            $this->pdf->SetY(270);
-            $this->pdf->SetFont('opensanslight', '', 8);
-            $this->pdf->SetTextColor(0, 0, 0);
-            $this->pdf->MultiCell(0, 0, 'Ausgabe vom '.Date::parse('d.m.Y H:i', time()), 0, 'R', 0, 1, '', '', true);
-        }
-
-        // Event items
-        $this->pdf->SetFont('opensanslight', '', 12);
-        $this->pdf->SetTextColor(0, 0, 0);
-
-        if ($this->eventId) {
-            $stmt = $this->connection->executeQuery('SELECT * FROM tl_calendar_events WHERE id = ? AND published = ?', [$this->eventId, 1]);
-        } else {
-            $year = $this->year;
-            $start = (new \DateTime($year.'-01-01'))->getTimestamp();
-            $stop = (new \DateTime($year + 1 .'-01-01'))->getTimestamp();
-
-            $stmt = $this->connection->executeQuery(
-                'SELECT * FROM tl_calendar_events WHERE eventType = ? AND startTime >= ? AND endTime < ? AND published = ? ORDER BY courseTypeLevel0, title, startDate',
-                [EventType::COURSE, $start, $stop, '1'],
-            );
-        }
-
-        while (false !== ($row = $stmt->fetchAssociative())) {
-            // Create a page for each event
-            $this->pdf->type = 'eventPage';
-            $this->pdf->objEvent = CalendarEventsModel::findById($row['id']);
-            $this->pdf->AddPage('P', 'A4');
-            $html = $this->generateHtmlContent();
-            $this->pdf->writeHTML($html);
-        }
-
-        if ($addToc) {
-            $this->pdf->type = 'TOC';
-            $this->pdf->addTOCPage('P', 'A4', 20);
-
-            // Write the TOC title
-            $this->pdf->SetFont('opensanslight', 'B', 16);
-            $this->pdf->SetTextColor(100, 0, 0);
-            $this->pdf->MultiCell(0, 0, 'Inhaltsverzeichnis', 0, 'L', 0, 1, '', '', true);
-            $this->pdf->SetTextColor(0, 0, 0);
-            $this->pdf->Ln();
-
-            $this->pdf->SetFont('opensanslight', '', 11);
-
-            // Add a simple Table Of Content at first page (check the example n. 59 for the
-            // HTML version)
-            $this->pdf->addTOC(2, 'opensanslight', '.', 'INDEX', 'B', [255, 255, 255]);
-
-            // end of TOC page
-            $this->pdf->endTOCPage();
+        // Single course: the same PDF as the "PDF" button on the course detail page
+        if (null !== $this->eventId) {
+            return $this->generateSingleCourse($this->eventId);
         }
 
         // Kursprogramm_%s.pdf
         $filename = \sprintf($this->sacevtEventCourseBookletFilenamePattern, $this->year);
-        $path = $this->projectDir.'/'.$this->sacevtTempDir.'/'.$filename;
+        $path = Path::join($this->projectDir, $this->sacevtTempDir, $filename);
+
+        $this->generateBookletIfOutdated($path);
 
         if (false === $this->download) {
-            $this->pdf->Output($path, 'F');
-
             throw new ResponseException(new Response(''));
         }
 
-        if ($this->printSingleEvent) {
-            $eventAlias = CalendarEventsModel::findById($this->eventId)->alias;
-            $path = \dirname($path).'/'.$eventAlias.'.pdf';
-
-            $this->pdf->setTitle(basename($path));
-
-            // Save as file
-            $this->pdf->Output($path, 'F');
-
-            // Send file to the browser
-            return $this->binaryFileDownload->sendFileToBrowser($path, basename($path), false, false);
-        }
-
-        $this->pdf->setTitle(basename($path));
-
-        // Save as file
-        $this->pdf->Output($path, 'F');
-
-        // Send file to the browser
-        return $this->binaryFileDownload->sendFileToBrowser($path, basename($path), false, true);
+        // Send file to the browser. The file stays for the next downloads (cache).
+        return $this->binaryFileDownload->sendFileToBrowser($path, basename($path), false, 0 === $this->cacheTtl);
     }
 
-    public function getDateString(int $eventId): string
+    /**
+     * Compiles the course programme, unless it is younger than the cache TTL. The lock makes
+     * simultaneous requests wait for the first one and then use its file.
+     */
+    private function generateBookletIfOutdated(string $path): void
     {
-        $objEvent = CalendarEventsModel::findById($eventId);
-        $strDates = '';
+        if ($this->isFresh($path)) {
+            return;
+        }
 
-        if (null !== $objEvent) {
-            $arr = $this->calendarEventsUtil->getEventTimestamps($objEvent);
+        if (!is_dir(\dirname($path))) {
+            mkdir(\dirname($path), 0777, true);
+        }
 
-            if (!empty($arr)) {
-                $arrValue = [];
+        $lock = fopen($path.'.lock', 'c');
 
-                foreach ($arr as $k => $v) {
-                    if ($k === \count($arr) - 1) {
-                        $arrValue[] = 'und '.Date::parse('d.m.Y', $v);
-                    } else {
-                        $arrValue[] = Date::parse('d.m.', $v);
-                    }
-                }
-                $strDates = implode(', ', $arrValue);
-                $strDates = str_replace(', und ', ' und ', $strDates);
+        if (false === $lock) {
+            throw new \RuntimeException(\sprintf('Could not create the lock file "%s.lock".', $path));
+        }
+
+        try {
+            flock($lock, LOCK_EX);
+
+            // Another request may have compiled it while we were waiting for the lock
+            if ($this->isFresh($path)) {
+                return;
             }
-        }
 
-        return $strDates;
+            $this->eventPdfGenerator->generateBooklet(
+                \sprintf('Kursprogramm %s', $this->year),
+                $this->getCourses(),
+                $path,
+                Path::makeAbsolute($this->coverImage, $this->projectDir),
+            );
+        } finally {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+        }
     }
 
-    private function generateHtmlContent(): string
+    private function isFresh(string $path): bool
     {
-        System::loadLanguageFile('tl_calendar_events');
-        $objEvent = CalendarEventsModel::findById($this->pdf->objEvent->id);
-        $this->pdf->Bookmark(html_entity_decode($objEvent->title), 0, 0, '', 'I', [0, 0, 0]);
+        clearstatcache(true, $path);
 
-        // Create template object (line breaks are converted in the Twig template)
-        $objPartial = new FrontendTemplate('tcpdf_template_sac_kurse');
+        return $this->cacheTtl > 0 && is_file($path) && filemtime($path) > time() - $this->cacheTtl;
+    }
 
-        // Title
-        $objPartial->title = $objEvent->title;
+    private function generateSingleCourse(int $eventId): BinaryFileResponse
+    {
+        $event = $this->framework->getAdapter(CalendarEventsModel::class)->findById($eventId);
 
-        // Dates
-        $objPartial->date = $this->getDateString((int) $objEvent->id);
+        if (null === $event || !$event->published) {
+            throw new PageNotFoundException('Page not found!');
+        }
 
-        // Duration
-        $objPartial->durationInfo = $objEvent->durationInfo;
+        // The course programme is only for logged-in members: with contact data and downloads
+        $path = $this->eventPdfGenerator->generate($event, true);
 
-        // Course type
-        $objPartial->courseTypeLevel0 = CourseMainTypeModel::findById($objEvent->courseTypeLevel0)->name;
-        $objPartial->courseTypeLevel1 = CourseSubTypeModel::findById($objEvent->courseTypeLevel1)->name;
-
-        // Course level
-        $objPartial->courseLevel = $this->courseLevels->get($objEvent->courseLevel);
-
-        // Organizers
-        $arrItems = array_map(
-            static function ($item) {
-                $objOrganizer = EventOrganizerModel::findById($item);
-
-                if (null !== $objOrganizer) {
-                    $item = $objOrganizer->title;
-                }
-
-                return $item;
-            },
-            StringUtil::deserialize($objEvent->organizers, true),
+        return $this->binaryFileDownload->sendFileToBrowser(
+            $path,
+            $this->eventPdfGenerator->getFilename($event),
+            false,
+            !$this->eventPdfGenerator->isCacheEnabled(),
         );
-        $objPartial->organizers = implode(', ', $arrItems);
+    }
 
-        // Teaser text
-        $objPartial->teaser = (string) $objEvent->teaser;
+    /**
+     * Published courses of the year, sorted by course type, title and start date. The group in
+     * the table of contents is the course type (e.g. "Ausbildung Hochtouren").
+     *
+     * @return list<array{event: CalendarEventsModel, group: string}>
+     */
+    private function getCourses(): array
+    {
+        $start = (new \DateTime($this->year.'-01-01'))->getTimestamp();
+        $stop = (new \DateTime($this->year + 1 .'-01-01'))->getTimestamp();
 
-        // Event terms
-        $objPartial->terms = (string) $objEvent->terms;
-
-        // Event Issues
-        $objPartial->issues = (string) $objEvent->issues;
-
-        // Requirements
-        $objPartial->requirements = (string) $objEvent->requirements;
-
-        // Event location
-        $objPartial->location = (string) $objEvent->location;
-
-        // Instructors
-        $arrInstructors = $this->calendarEventsUtil->getInstructorsAsArray($objEvent);
-        $calendarEventsUtil = $this->calendarEventsUtil;
-        $arrItems = array_map(
-            static function ($userId) use ($calendarEventsUtil) {
-                $objUser = UserModel::findById($userId);
-
-                if (null !== $objUser) {
-                    $strQuali = '' !== $calendarEventsUtil->getMainQualification($objUser) ? ' ('.$calendarEventsUtil->getMainQualification($objUser).')' : '';
-
-                    return $objUser->name.$strQuali;
-                }
-
-                return '';
-            },
-            $arrInstructors,
+        $ids = $this->connection->fetchFirstColumn(
+            'SELECT id FROM tl_calendar_events WHERE eventType = ? AND startTime >= ? AND endTime < ? AND published = ? ORDER BY courseTypeLevel0, title, startDate',
+            [EventType::COURSE, $start, $stop, '1'],
         );
 
-        // Instructors
-        $objPartial->instructor = implode(', ', $arrItems);
+        $courses = [];
 
-        // Services/Leistungen
-        $objPartial->leistungen = (string) $objEvent->leistungen;
+        foreach ($ids as $id) {
+            $event = $this->framework->getAdapter(CalendarEventsModel::class)->findById($id);
 
-        // Sign in
-        $objPartial->bookingDetails = str_replace('(at)', '@', (string) $objEvent->bookingDetails);
+            if (null === $event) {
+                continue;
+            }
 
-        // Equipment
-        $objPartial->equipment = (string) $objEvent->equipment;
+            $courses[] = [
+                'event' => $event,
+                'group' => html_entity_decode(strip_tags((string) $this->calendarEventsUtil->getEventData($event, 'courseTypeLevel0Name')), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            ];
+        }
 
-        // Meeting point
-        $objPartial->meetingPoint = (string) $objEvent->meetingPoint;
-
-        // Miscellaneous
-        $objPartial->miscellaneous = (string) $objEvent->miscellaneous;
-
-        // Styles
-        $objPartial->titleStyle = "color:#000000; font-family: 'opensansbold'; font-size: 20px";
-        $objPartial->rowStyleA = 'background-color: #ffffff';
-        $objPartial->rowStyleB = 'background-color: #ffffff';
-
-        $objPartial->cellStyleA = "font-family: 'opensansbold';  width:40mm; font-weight:bold; font-size: 9px";
-        $objPartial->cellStyleB = "font-family: 'opensanslight'; width:130mm; font-size: 9px";
-
-        // Teaser
-        $objPartial->cellStyleC = "color: #000000; font-family: 'opensansbold'; font-size: 9px";
-
-        return $objPartial->parse();
+        return $courses;
     }
 }
