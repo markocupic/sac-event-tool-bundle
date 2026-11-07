@@ -979,15 +979,15 @@ class CalendarEventsUtil
         ]);
 
         $href = $this->getAdapter(StringUtil::class)->specialcharsUrl(StringUtil::ampersand($href));
-        $badges = '';
+        $badges = [];
 
         foreach (self::SUBSCRIPTION_STATE_BADGES as $state => [$cssClass, $title]) {
             if ($counts[$state] > 0) {
-                $badges .= \sprintf('<span class="subscription-badge %s" data-title="%s" role="button" onclick="window.location.href=\'%s\'">%s</span>', $cssClass, \sprintf($title, $counts[$state]), $href, $counts[$state]);
+                $badges[] = \sprintf('<span class="subscription-badge %s" data-title="%s" role="button" onclick="window.location.href=\'%s\'">%s</span>', $cssClass, \sprintf($title, $counts[$state]), $href, $counts[$state]);
             }
         }
 
-        return $badges;
+        return empty($badges) ? '' : '<div class="subscription-badge-container">'.implode('', $badges).'</div>';
     }
 
     public function getEventOrganizerModels(CalendarEventsModel $event): array

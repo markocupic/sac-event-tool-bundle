@@ -196,14 +196,23 @@ div.tl_header_tour_rapport table td {
   padding: 10px
 }
 
+.subscription-badge-container {
+  margin-left: 20px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .subscription-badge {
   background-color: #4e4e4e;
   border-radius: 5px;
   cursor: pointer;
   font-size: x-small;
+  line-height: 1;
   font-weight: 700;
-  margin-left: 20px;
-  padding: 4px 8px
+  padding: 6px 0;
+  min-width: 22px;
+  text-align: center;
 }
 
 .subscription-badge.not-confirmed {
