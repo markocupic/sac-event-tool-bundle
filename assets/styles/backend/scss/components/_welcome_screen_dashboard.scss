@@ -34,20 +34,11 @@ $responsive-breakpoint: 576px;
       }
 
       @media (min-width: 768px) {
-        width: 180px;
+        width: 140px;
       }
 
-      & .subscription-badge {
-        margin: 0 !important;
-        @media (max-width: $responsive-breakpoint) {
-          padding: 2px 5px;
-        }
-
-        @media (max-width: $responsive-breakpoint) {
-          & * {
-            font-size: 11px !important;
-          }
-        }
+      .subscription-badge-container {
+        margin-left: 0;
       }
     }
 
