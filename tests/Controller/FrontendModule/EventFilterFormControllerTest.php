@@ -21,7 +21,6 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventFilterFormContr
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventFilterFormControllerTest extends TestCase
 {
@@ -35,7 +34,6 @@ class EventFilterFormControllerTest extends TestCase
         $this->controller = new EventFilterFormController(
             $this->createMock(ContaoFramework::class),
             $this->createMock(ContentUrlGenerator::class),
-            $this->createMock(TranslatorInterface::class),
             $this->urlParserMock,
             'en',
         );

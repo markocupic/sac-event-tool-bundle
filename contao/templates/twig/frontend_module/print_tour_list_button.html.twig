@@ -72,6 +72,14 @@
                         return params.toString();
                     },
                     initDownload: function (button) {
+                        // The url is read from the data-url attribute on click, so the listener must be added only once
+                        // (the list is fetched several times, e.g. "load more" or a changed filter)
+                        if (button.dataset.downloadInitialized) {
+                            return;
+                        }
+
+                        button.dataset.downloadInitialized = '1';
+
                         button.addEventListener("click", async (e) => {
                             // Prevent multiple form submits
                             button.setAttribute('disabled', '');

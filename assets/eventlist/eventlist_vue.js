@@ -39,6 +39,8 @@ if (typeof VueEventList !== 'function') {
                     'offset': '0',
                 },
                 'fields': [],
+                // The module only lists the favored events of the logged-in member
+                'showFavoredEventsOnly': false,
             };
 
             // Merge options and defaults
@@ -47,6 +49,9 @@ if (typeof VueEventList !== 'function') {
             if (null === params.csrfToken) {
                 console.error('No CSRF token has been set.');
             }
+
+            // Used to cancel a pending request, e.g. if the user changes the filter
+            let abortController = null;
 
             const {createApp} = Vue
 
@@ -76,6 +81,8 @@ if (typeof VueEventList !== 'function') {
                         blnAllEventsLoaded: false,
                         // The last (fetch) request url
                         lastRequestUrl: '',
+                        // The filter has changed: replace the displayed rows as soon as the new rows have been loaded
+                        blnReplaceRows: false,
                         // Flag to prevent loading from indexedDB after back-forward-cache restore
                         blnLoadedFromCache: false,
                     };
@@ -92,6 +99,25 @@ if (typeof VueEventList !== 'function') {
                         }
                     });
 
+                    // Reload the list without page reload if the user changes the event filter
+                    document.addEventListener('sacevt::event_filter.change', (event) => {
+                        // Tell the filter form that the event has been handled (no page reload needed)
+                        event.preventDefault();
+                        self.applyFilter(event.detail.params);
+                    });
+
+                    // Show the loading spinner while the filter is waiting for the user to stop typing
+                    document.addEventListener('sacevt::event_filter.pending', () => {
+                        self.blnIsBusy = true;
+                    });
+
+                    // The filter has not changed: hide the loading spinner if no request is running
+                    document.addEventListener('sacevt::event_filter.unchanged', () => {
+                        if (null === abortController) {
+                            self.blnIsBusy = false;
+                        }
+                    });
+
                     self.prepareRequest();
                 },
 
@@ -103,6 +129,37 @@ if (typeof VueEventList !== 'function') {
                             self.blnIsBusy = true;
                             self.fetchItems();
                         }
+                    },
+
+                    // Apply the filter params (URLSearchParams) of the event filter form and reload the list
+                    applyFilter: function applyFilter(filterParams) {
+                        const self = this;
+
+                        // Multi selects are transmitted like this: organizers[]=5&organizers[]=7
+                        for (const key of ['organizers', 'tourType', 'courseType']) {
+                            self.apiParams[key] = [...filterParams.getAll(key + '[]'), ...filterParams.getAll(key)]
+                                .map((value) => parseInt(value))
+                                .filter((value) => value > 0);
+                        }
+
+                        for (const key of ['suitableForBeginners', 'publicTransportEvent', 'favoredEvent', 'getUpcoming', 'dateStart', 'dateEnd', 'textSearch', 'eventId', 'courseId']) {
+                            const values = filterParams.getAll(key).filter((value) => value !== '');
+                            self.apiParams[key] = values.length ? values[values.length - 1] : '';
+                        }
+
+                        if (params.showFavoredEventsOnly) {
+                            self.apiParams.favoredEvent = '1';
+                        }
+
+                        // Reset the list, but keep displaying the current rows until the new rows have been loaded
+                        self.loadedItems = 0;
+                        self.blnAllEventsLoaded = false;
+                        self.blnReplaceRows = true;
+                        self.blnIsBusy = true;
+
+                        self.fetchItems().catch(() => {
+                            // The error has already been logged
+                        });
                     },
 
                     favorEvent: async function favorEvent(index) {
@@ -194,9 +251,17 @@ if (typeof VueEventList !== 'function') {
 
                         document.dispatchEvent(event);
 
+                        // Cancel a pending request (its result would belong to the old filter)
+                        if (abortController) {
+                            abortController.abort();
+                        }
+
+                        abortController = new AbortController();
+
                         try {
                             // Fetch
                             const response = await fetch(url, {
+                                signal: abortController.signal,
                                 headers: {
                                     'x-requested-with': 'XMLHttpRequest'
                                 }
@@ -208,7 +273,15 @@ if (typeof VueEventList !== 'function') {
 
                             const json = await response.json();
 
+                            abortController = null;
                             self.blnIsBusy = false;
+
+                            // Replace the rows of the previous filter
+                            if (self.blnReplaceRows) {
+                                self.rows = [];
+                                self.arrEventIds = [];
+                                self.blnReplaceRows = false;
+                            }
 
                             // Process loaded records
                             let i = 0;
@@ -262,6 +335,13 @@ if (typeof VueEventList !== 'function') {
                             return json;
 
                         } catch (err) {
+                            // The request has been replaced by a newer one
+                            if (err.name === 'AbortError') {
+                                return;
+                            }
+
+                            abortController = null;
+                            self.blnIsBusy = false;
                             console.error('Fetch error:', err);
                             throw err;
                         }

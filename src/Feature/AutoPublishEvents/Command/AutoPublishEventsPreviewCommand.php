@@ -16,9 +16,6 @@ namespace Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\Command;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\CalendarRunner;
-use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\Candidate;
-use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\PublishResult;
-use Markocupic\SacEventToolBundle\Feature\AutoPublishEvents\SkippedEvent;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,7 +27,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * and shows which events would be promoted and published on the due date, based on the current state
  * of the events. Changes nothing.
  *
- * Publishing itself is done by the cron only (AutoPublishEventsCron).
+ * Publishing is done by the cron (AutoPublishEventsCron) or manually with
+ * sacevt:auto-publish-events:run (AutoPublishEventsRunCommand).
  *
  * Usage:
  *   php vendor/bin/contao-console sacevt:auto-publish-events:preview
@@ -67,66 +65,11 @@ class AutoPublishEventsPreviewCommand extends Command
         }
 
         foreach ($calendarIds as $calendarId) {
-            $this->printResult($io, $this->calendarRunner->run($calendarId, true));
+            PublishResultPrinter::print($io, $this->calendarRunner->run($calendarId, true));
         }
 
         $io->note('Massgebend ist der Stand der Events am Stichtag. Events, die bis dahin noch hoch- oder herabgestuft werden, sind in dieser Vorschau nicht berücksichtigt.');
 
         return Command::SUCCESS;
-    }
-
-    private function printResult(SymfonyStyle $io, PublishResult $result): void
-    {
-        $io->section(\sprintf('Kalender ID %d "%s"', $result->calendarId, $result->calendarTitle));
-
-        $date = date('d.m.Y H:i', $result->dueDate);
-
-        if ([] === $result->getPublished()) {
-            $io->text(\sprintf('Am %s wird kein Event hochgestuft.', $date));
-        }
-
-        // A calendar can contain events with different release level systems: one list per level change
-        foreach ($this->groupByLevelChange($result->getPublished()) as [$fromLevel, $toLevel, $candidates]) {
-            $io->text(\sprintf('Am %s werden folgende Events von FS %d auf FS %d hochgestuft und veröffentlicht:', $date, $fromLevel, $toLevel));
-            $io->listing(array_map(
-                static fn (Candidate $candidate): string => \sprintf('Event ID %d %s', $candidate->eventId, $candidate->title),
-                $candidates,
-            ));
-        }
-
-        if ([] !== $result->getSkipped()) {
-            $io->text('Folgende Events werden nicht hochgestuft:');
-            $io->listing(array_map(
-                static fn (SkippedEvent $skippedEvent): string => \sprintf('Event ID %d %s: %s', $skippedEvent->eventId, $skippedEvent->title, self::describeReason($skippedEvent)),
-                $result->getSkipped(),
-            ));
-        }
-    }
-
-    /**
-     * @param list<Candidate> $candidates
-     *
-     * @return list<array{0: int, 1: int, 2: list<Candidate>}>
-     */
-    private function groupByLevelChange(array $candidates): array
-    {
-        $groups = [];
-
-        foreach ($candidates as $candidate) {
-            $key = $candidate->currentLevel->level.'-'.$candidate->targetLevel->level;
-            $groups[$key] ??= [$candidate->currentLevel->level, $candidate->targetLevel->level, []];
-            $groups[$key][2][] = $candidate;
-        }
-
-        return array_values($groups);
-    }
-
-    private static function describeReason(SkippedEvent $skippedEvent): string
-    {
-        return match ($skippedEvent->reason) {
-            SkippedEvent::REASON_INVALID_RELEASE_LEVEL => 'Die Freigabestufe gehört nicht zum Freigabestufen-System des Event-Typs.',
-            SkippedEvent::REASON_OUTSIDE_VALID_TIME_PERIOD => 'Das Startdatum liegt ausserhalb der Kalender-Zeitspanne.',
-            default => CalendarRunner::describeReason($skippedEvent),
-        };
     }
 }

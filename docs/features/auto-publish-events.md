@@ -64,7 +64,7 @@ Die Einstellung «Hochstufen auf höchste FS ab Datum ermöglichen» erlaubt es 
 
 ### Einmalig pro Stichtag
 
-Der Lauf erfolgt einmal am Stichtag. Danach stufen die Verantwortlichen wieder manuell hoch. Wird das Datum geändert, läuft es erneut.
+Der Lauf erfolgt einmal am Stichtag. Danach stufen die Verantwortlichen wieder manuell hoch. Wird das Datum geändert, läuft es erneut. Mit `sacevt:auto-publish-events:run` lässt sich der Lauf auch manuell auslösen, siehe «Command (sofort veröffentlichen)».
 
 ## Benennung
 
@@ -100,6 +100,8 @@ Keine eigene Tabelle. Protokoll nur über das Contao-System-Log.
 src/Feature/AutoPublishEvents/
 ├── Cron/AutoPublishEventsCron.php            # alle 15 Min.: fällige Kalender laufen lassen, Zusammenfassung ins Cron-Log
 ├── Command/AutoPublishEventsPreviewCommand.php  # sacevt:auto-publish-events:preview (nur Anzeige)
+├── Command/AutoPublishEventsRunCommand.php   # sacevt:auto-publish-events:run (sofort veröffentlichen, mit Vorschau und Rückfrage)
+├── Command/PublishResultPrinter.php          # gemeinsame Konsolen-Ausgabe eines PublishResult (Vorschau und Lauf)
 ├── DataContainer/Calendar.php                # input_field_callback: Status des letzten Laufs
 ├── CalendarRunner.php                        # fällige Kalender finden, Lauf für einen Kalender, Log, als ausgeführt markieren
 ├── CandidateProvider.php                     # Events eines Kalenders auf der zweithöchsten Stufe (inkl. Prüfung Zeitraum)
@@ -115,7 +117,7 @@ Ausserhalb des Feature-Ordners:
 - `src/EventReleaseLevel/ReleaseLevel.php`: Wertobjekt für eine Stufe (`id`, `level`, `title`)
 
 - `CandidateProvider` lädt die Stufen pro Eventtyp nur einmal pro Lauf.
-- `EventPublisher` ist die einzige Klasse, die Events schreibt. Cron und Vorschau laufen beide über `CalendarRunner`, die Vorschau als Dry Run.
+- `EventPublisher` ist die einzige Klasse, die Events schreibt. Cron, Vorschau und Run-Command laufen alle über `CalendarRunner`, die Vorschau als Dry Run.
 
 ### Command (Vorschau)
 
@@ -137,7 +139,25 @@ Kalender ID 12 "Kurse 2027"
  * Event ID 14 Titlis: Das Startdatum liegt ausserhalb der Kalender-Zeitspanne.
 ```
 
-Die Vorschau zeigt den aktuellen Stand der Events, massgebend ist der Stand am Stichtag. Sie ändert nichts, schreibt nichts ins Log und markiert keinen Lauf als ausgeführt (`CalendarRunner::run($id, dryRun: true)`). Veröffentlicht wird ausschliesslich durch den Cron.
+Die Vorschau zeigt den aktuellen Stand der Events, massgebend ist der Stand am Stichtag. Sie ändert nichts, schreibt nichts ins Log und markiert keinen Lauf als ausgeführt (`CalendarRunner::run($id, dryRun: true)`). Veröffentlicht wird durch den Cron oder manuell mit dem Run-Command.
+
+### Command (sofort veröffentlichen)
+
+```
+php vendor/bin/contao-console sacevt:auto-publish-events:run
+php vendor/bin/contao-console sacevt:auto-publish-events:run --calendar=12
+php vendor/bin/contao-console sacevt:auto-publish-events:run --calendar=12 --no-interaction
+```
+
+Führt den Lauf sofort aus, statt auf den nächsten Cron-Lauf zu warten. Es wird derselbe Code verwendet wie im Cron (`CalendarRunner::run()`): gleiche Regeln, gleiche Versionen, Cache-Tags und Einträge im Contao-System-Log, und der Lauf wird als ausgeführt markiert.
+
+- **Ohne Option:** alle fälligen Kalender, also genau die, die auch der Cron ausführen würde (`CalendarRunner::findDueCalendarIds()`).
+- **`--calendar=<ID>` (`-c`):** nur dieser Kalender, **auch vor dem Stichtag**. Voraussetzung (`CalendarRunner::isPending()`): Funktion aktiviert, Stichtag gesetzt und für diesen Stichtag noch kein Lauf. Sonst bricht der Command mit Fehler ab. Für einen erneuten Lauf muss der Stichtag im Backend geändert werden.
+- **Achtung bei einem Lauf vor dem Stichtag:** Er gilt als Lauf für diesen Stichtag (`autoPublishEventsExecutedForDate = Stichtag`). Der Cron führt den Kalender am Stichtag deshalb nicht mehr aus. Events, die erst danach auf die zweithöchste Stufe kommen, müssen manuell hochgestuft werden. Der Command weist mit einem Hinweis darauf hin.
+- **Ablauf:** Zuerst wird für jeden Kalender die Vorschau angezeigt (Dry Run), dann folgt die Rückfrage «Sollen diese Events jetzt hochgestuft und veröffentlicht werden?» (Standard: nein). Mit `--no-interaction` entfällt die Rückfrage, z. B. für Skripte. Danach wird das Ergebnis pro Kalender ausgegeben (veröffentlichte und übersprungene Events mit Grund).
+- **Fehler:** Ein Fehler in einem Kalender stoppt die anderen nicht (wie im Cron). Dieser Kalender wird nicht als ausgeführt markiert. Bei Fehlern endet der Command mit Exit-Code 1 (`FAILURE`), bei ungültiger Option `--calendar` mit 2 (`INVALID`).
+
+Die Konsolen-Ausgabe von Vorschau und Lauf kommt aus `Command\PublishResultPrinter`: In der Vorschau steht «werden … hochgestuft», nach dem Lauf «wurden … hochgestuft».
 
 ## Ablauf Cron
 
@@ -151,7 +171,8 @@ Die Vorschau zeigt den aktuellen Stand der Events, massgebend ist der Stand am S
 - `tests/EventReleaseLevel/EventReleaseLevelPolicyUtilTest`: `getLevelsByEventType()`, Mapping der Stufen, Eventtyp ohne System
 - `CandidateProviderTest`: zweithöchste Stufe, andere Stufen ignoriert (auch höchste Stufe unveröffentlicht), Stufen mit Lücken (1, 2, 5), System mit 2 Stufen (Anfangsstufe wird veröffentlicht), System mit 1 Stufe, ungültige Stufe, Kalender mit gemischten Systemen, Stufen nur einmal pro Eventtyp geladen, Zeitraum `validTimePeriod*` (Grenzen, ausgeschaltet), Abfrage ohne Filter auf `eventState`/`endDate`
 - `EventPublisherTest`: Stufe, `published`, Version, Cache-Tags; Event in der Zwischenzeit geändert
-- `CalendarRunnerTest`: fällige Kalender, Lauf wird markiert (auch ohne Kandidaten), Vorschau (Dry Run) ändert nichts, anstehende Kalender (`findUpcomingCalendarIds()`), geänderter Event, Fehler in einem Event, Log der übersprungenen Events, unbekannter Kalender
+- `CalendarRunnerTest`: fällige Kalender, `isPending()` (Stichtag darf in der Zukunft liegen), Lauf wird markiert (auch ohne Kandidaten), Vorschau (Dry Run) ändert nichts, anstehende Kalender (`findUpcomingCalendarIds()`), geänderter Event, Fehler in einem Event, Log der übersprungenen Events, unbekannter Kalender
 - `Cron\AutoPublishEventsCronTest`: alle fälligen Kalender, Fehler in einem Kalender stoppt die anderen nicht
 - `Command\AutoPublishEventsPreviewCommandTest`: Ausgabe pro Kalender (gruppiert nach Stufenwechsel, übersprungene Events), kein anstehender Kalender
+- `Command\AutoPublishEventsRunCommandTest`: kein fälliger Kalender, alle fälligen Kalender ohne Rückfrage (zuerst Vorschau, dann Lauf), Abbruch bei «nein», Lauf bei «ja», `--calendar` vor dem Stichtag (Hinweis), Kalender nicht ausführbar, ungültige Option, Fehler in einem Kalender stoppt die anderen nicht
 - `DataContainer\CalendarTest`: drei Status-Texte

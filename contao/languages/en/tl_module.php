@@ -20,6 +20,7 @@ $GLOBALS['TL_LANG']['tl_module']['member_dashboard_event_type_filter_legend'] = 
 $GLOBALS['TL_LANG']['tl_module']['applyCalFilter'] = ['Kalender Filter anwenden', 'Wenn der Filter deaktiviert bleibt, werden alle Kalender berücksichtigt.'];
 $GLOBALS['TL_LANG']['tl_module']['showFavoredEventsOnly'] = ['Nur Events von Merkliste anzeigen', 'Macht dann Sinn, wenn die Liste nur eingeloggten Mitgliedern angezeigt wird.'];
 $GLOBALS['TL_LANG']['tl_module']['eventFilterBoardFields'] = ['Eventfilter-Felder', 'Legen Sie hier die Felder fest, die im Filter angezeigt werden sollen.'];
+$GLOBALS['TL_LANG']['tl_module']['eventFilterAutoApply'] = ['Filter automatisch anwenden', 'Die Event-Liste wird bei jeder Änderung am Filter ohne Seiten-Reload neu geladen. Ist die Option deaktiviert, wird ein Button «Filter anwenden» angezeigt.'];
 $GLOBALS['TL_LANG']['tl_module']['eventListLimitPerRequest'] = ['Anzahl Events pro Request', 'Legen Sie die Anzahl zu ladende Events pro Request fest. 0 für alle.'];
 $GLOBALS['TL_LANG']['tl_module']['eventListPartialTpl'] = ['Event Auflistungs-Kindtemplate', 'Wählen SIe das Kindtemplate (Partialtemplate) aus.'];
 $GLOBALS['TL_LANG']['tl_module']['eventRegCheckoutLinkLabel'] = ['Buttonbeschriftung für "ZUR EVENTANMELDUNG"', 'Hier können Sie die Button Beschriftung eingeben.'];

@@ -27,7 +27,6 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsFrontendModule(EventFilterFormController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_event_filter_form')]
 class EventFilterFormController extends AbstractFrontendModuleController
@@ -43,7 +42,6 @@ class EventFilterFormController extends AbstractFrontendModuleController
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly ContentUrlGenerator $contentUrlGenerator,
-        private readonly TranslatorInterface $translator,
         private readonly UrlParser $urlParser,
         private readonly string $sacevtLocale,
     ) {
@@ -62,7 +60,9 @@ class EventFilterFormController extends AbstractFrontendModuleController
 
         $url = $this->sanitizeUrl($request);
 
-        if ($this->urlFixCount) {
+        // Do not redirect XHR requests (e.g. adding an event to the favorites in the event
+        // list), because the URL is updated by the event filter without page reload.
+        if ($this->urlFixCount && !$request->isXmlHttpRequest()) {
             $controllerAdapter->redirect($url);
         }
 
@@ -70,6 +70,9 @@ class EventFilterFormController extends AbstractFrontendModuleController
 
         $template->set('fields', $arrAllowedFields);
         $template->set('form', $this->generateForm($request, $arrAllowedFields));
+
+        // Apply the filter on change (without page reload) or show a submit button
+        $template->set('auto_apply', (bool) $model->eventFilterAutoApply);
 
         // Datepicker config
         $template->set('sacevt_locale', $this->sacevtLocale);
@@ -113,12 +116,6 @@ class EventFilterFormController extends AbstractFrontendModuleController
                 return true;
             },
         );
-
-        // Let's add  a submit button
-        $objForm->addFormField('submit', [
-            'label' => $this->translator->trans('tl_event_filter_form.submitBtn', [], 'contao_default'),
-            'inputType' => 'submit',
-        ]);
 
         // Set form field value from $_GET
         if (!empty($arrAllowedFields)) {

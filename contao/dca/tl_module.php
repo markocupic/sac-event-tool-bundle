@@ -37,7 +37,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventPreviewReader
 // Add palettes (Contao 5 ready)
 $GLOBALS['TL_DCA']['tl_module']['palettes'][CsvEventMemberExportController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][CsvUserExportController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes'][EventFilterFormController::TYPE] = '{title_legend},name,headline,type;{config_legend},eventFilterBoardFields;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes'][EventFilterFormController::TYPE] = '{title_legend},name,headline,type;{config_legend},eventFilterBoardFields,eventFilterAutoApply;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][EventListController::TYPE] = '{title_legend},name,headline,type;{config_legend},applyCalFilter,eventType,showFavoredEventsOnly,cal_readerModule,eventListLimitPerRequest;{template_legend:hide},eventListPartialTpl;{image_legend:hide},imgSize;{protected_legend:hide},protected;{expert_legend:hide},cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][EventRegistrationCheckoutLinkController::TYPE] = '{title_legend},name,headline,type;{jumpTo_legend},eventRegCheckoutLinkPage,eventRegCheckoutLinkLabel;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][EventRegistrationController::TYPE] = '{title_legend},name,headline,type;{eventRegloginModule_legend},eventRegLoginModule;{notification_legend},receiptEventRegistrationNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID';
@@ -130,6 +130,12 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['print_export_allowedEventTypes'] = [
 	'options'   => EventType::ALL,
 	'eval'      => ['chosen' => true, 'mandatory' => false, 'multiple' => true, 'tl_class' => 'clr'],
 	'sql'       => 'blob NULL',
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterAutoApply'] = [
+	'inputType' => 'checkbox',
+	'eval'      => ['tl_class' => 'm12 clr'],
+	'sql'       => ['type' => 'boolean', 'default' => true],
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterBoardFields'] = [

@@ -89,6 +89,32 @@ final class CalendarRunnerTest extends TestCase
         $this->assertSame([12, 4], $runner->findUpcomingCalendarIds($now));
     }
 
+    public function testIsPendingChecksTheCalendarAndTheRunForTheDueDate(): void
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection
+            ->expects($this->exactly(2))
+            ->method('fetchOne')
+            ->with(
+                $this->logicalAnd(
+                    $this->stringContains('id = ?'),
+                    $this->stringContains('autoPublishEvents = 1'),
+                    $this->stringContains('autoPublishEventsDate IS NOT NULL'),
+                    $this->stringContains('autoPublishEventsExecutedForDate <> autoPublishEventsDate'),
+                    // The due date may be in the future (run command with --calendar)
+                    $this->logicalNot($this->stringContains('autoPublishEventsDate <= ?')),
+                ),
+                [7],
+            )
+            ->willReturnOnConsecutiveCalls('7', false)
+        ;
+
+        $runner = new CalendarRunner($connection, $this->createMock(CandidateProvider::class), $this->createMock(EventPublisher::class));
+
+        $this->assertTrue($runner->isPending(7));
+        $this->assertFalse($runner->isPending(7));
+    }
+
     public function testPublishesTheCandidatesAndMarksTheRunAsExecuted(): void
     {
         $logger = $this->createMock(LoggerInterface::class);

@@ -80,7 +80,7 @@
             zoom: {{ swisstopoZoom }},
 
             // The api url
-            apiUrl: 'eventApi/events?dateStart={{ date_start }}&dateEnd={{ date_end }}&fields[]=organizers&fields[]=eventDates&fields[]=coordsCH1903&fields[]=tourType&fields[]=eventType&fields[]=title&fields[]=location&fields[]=id&limit={{ limit }}',
+            apiUrl: 'eventApi/events?dateStart={{ date_start }}&dateEnd={{ date_end }}&fields[]=organizers&fields[]=eventDates&fields[]=coordsCH1903&fields[]=tourType&fields[]=eventType&fields[]=title&fields[]=location&fields[]=id&fields[]=eventUrl&limit={{ limit }}',
 
             // Tour type ID => icon URL, built by the controller from the file
             // names in public/icons/swisstopo/tourtypes/svg (prefix = tour type ID).
@@ -193,7 +193,8 @@
                         yCoord = parseInt(yCoord);
                         xCoord = xCoord < 2000000 ? xCoord + 2000000 : xCoord;
                         yCoord = yCoord < 1000000 ? yCoord + 1000000 : yCoord;
-                        const url = `https://www.sac-pilatus.ch/touren-detailansicht/event-${data.id}.html`;
+                        // Detail page of the calendar (jumpTo), as a path: the host is the current one
+                        const url = data.eventUrl;
 
                         swisstopoEventMap.addMarker(xCoord, yCoord, data.title, url, data.tourType, data.eventType, {
                             eventDates: data.eventDates,

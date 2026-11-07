@@ -50,11 +50,14 @@
                 </div>
                 {# end row #}
 
-                <div class="filter-board-widget" id="submit">
-                    <div class="widget widget-submit">
-                        <button class="submit" id="ctrl_submit" name type="submit">Filter anwenden</button>
+                {% if not auto_apply %}
+                    <div class="filter-board-widget" id="submit">
+                        <div class="widget widget-submit">
+                            <button class="submit" id="ctrl_submit" type="submit">{{ 'tl_event_filter_form.submitBtn'|trans({}, 'contao_default') }}</button>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
+
                 <div class="mt-3 filter-board-widget">
                     <a class="small reset-form" href="#">Filter zurücksetzen</a>
                 </div>
@@ -73,7 +76,11 @@
             let options = {
                 'datePicker': {
                     'minYear': 2017,
-                }
+                },
+                // Apply the filter on change without page reload (module setting)
+                'autoApply': {{ auto_apply ? 'true' : 'false' }},
+                // Delay in ms before the filter is applied while typing into a text field
+                'textInputDelay': 3000,
             }
 
             EventListFilter.initialize(options);

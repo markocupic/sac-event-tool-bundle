@@ -15,57 +15,19 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\Download;
 
 use Contao\CalendarEventsModel;
-use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\FrontendUser;
-use Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx;
 use Markocupic\SacEventToolBundle\ICal\EventICal;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class DownloadController extends AbstractController
 {
     public function __construct(
-        private readonly TokenStorageInterface $tokenStorage,
         private readonly ContaoFramework $framework,
         private readonly EventICal $eventICal,
-        private readonly ExportEvents2Docx $exportEvents2Docx,
     ) {
         $this->framework->initialize();
-    }
-
-    /**
-     * Download events as docx document:
-     * /_download/print_workshop_details_as_docx --> current year
-     * /_download/print_workshop_details_as_docx/2017
-     * /_download/print_workshop_details_as_docx/year=2017/89.
-     */
-    #[Route('/_download/print_workshop_details_as_docx/{year}/{eventId}',
-        name: 'sac_event_tool_download_print_workshop_details_as_docx',
-        requirements: ['year' => '\d+', 'eventId' => '\d+'],
-        defaults: ['_scope' => 'frontend', '_token_check' => false])]
-    public function printWorkshopDetailsAsDocxAction(int $year = 0, int|null $eventId = null): Response
-    {
-        $user = $this->tokenStorage->getToken()?->getUser();
-
-        // Do not make the service available to non-logged-in users.
-        if (!$user instanceof FrontendUser) {
-            throw new PageNotFoundException('Page not found!');
-        }
-
-        $event = $this->framework->getAdapter(CalendarEventsModel::class)->findById($eventId);
-
-        if (null !== $eventId && null === $event) {
-            return new Response('Download failed. Please check if the event id is valid.', Response::HTTP_BAD_REQUEST);
-        }
-
-        if (0 === $year) {
-            $year = date('Y');
-        }
-
-        return $this->exportEvents2Docx->generate((int) $year, $eventId);
     }
 
     /**

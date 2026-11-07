@@ -119,6 +119,7 @@
     new VueEventList('#course-list', {
         'modId': {{ data.id }},
         'csrfToken': '{{ csrfToken }}',
+        'showFavoredEventsOnly': {{ data.showFavoredEventsOnly ? 'true' : 'false' }},
         'apiParams': {
             'arrIds': [{{ apiParam.arrIds }}],
             'calendarIds': {{ apiParam.calendarIds }}, // json_encoded array [1, 2]

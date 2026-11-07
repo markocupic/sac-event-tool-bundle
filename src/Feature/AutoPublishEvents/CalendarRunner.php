@@ -19,7 +19,7 @@ use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 
 /**
- * Runs the auto publish for one calendar. Used by the cron and the console command.
+ * Runs the auto publish for one calendar. Used by the cron and the console commands (preview and run).
  *
  * The run happens once per due date: after the run, autoPublishEventsExecutedForDate is set to the
  * due date. If the due date is changed in the back end, the calendar is due again.
@@ -77,6 +77,22 @@ class CalendarRunner
         );
 
         return array_map(intval(...), $ids);
+    }
+
+    /**
+     * Calendar with the feature enabled, a due date set and no run for this due date yet.
+     * The due date may still be in the future. Used by the run command (option --calendar).
+     */
+    public function isPending(int $calendarId): bool
+    {
+        return false !== $this->connection->fetchOne(
+            'SELECT id FROM tl_calendar
+            WHERE id = ?
+                AND autoPublishEvents = 1
+                AND autoPublishEventsDate IS NOT NULL
+                AND (autoPublishEventsExecutedForDate IS NULL OR autoPublishEventsExecutedForDate <> autoPublishEventsDate)',
+            [$calendarId],
+        );
     }
 
     /**
